@@ -1,0 +1,147 @@
+datatype buffer = {int(0..3) val, int(0..3) id, bool serviced, int(0..3) priority};
+int unserviced;
+const int clkLower = 100; 
+const int clkUpper = 105;
+int(clkLower..clkUpper) clk;
+
+buffer north, east, south, west;
+
+buffer[] a; 
+buffer[] temp;
+
+action tick;
+
+// ------ Begin: properties ---------
+property Pr1 = Pmax(<> (clk >= clkUpper));
+// ------ End: properties ---------
+
+process Clock()
+{
+	tick {= clk++ =};
+	if (clk <= clkUpper) {
+	   Clock()
+	}
+	else {
+	   stop
+	}   
+}
+
+process initialize(){
+	tick {= 
+	north.id = 0, 
+	east.id = 1, 
+	south.id = 2, 
+	west.id = 3,  
+	
+	north.val = 3,//DiscreteUniform(0, 3),
+	east.val = 3,//DiscreteUniform(0, 3),
+	south.val = 3,//DiscreteUniform(0, 3),
+	west.val = DiscreteUniform(0, 3),
+	
+	unserviced = 0
+	=};
+	
+	{= a = [north, east, south, west] =};
+	{= temp = [north, east, south, west] =}
+	
+}
+
+process arbiter(){
+	initialize();
+	
+	//runtime loop
+	do {
+		tick;
+		
+		//Service buffers
+		
+		//Buffer priority 0
+		//<Service>
+		{= a[0].serviced = true =};
+		
+		service1();
+		
+		service2();
+		
+		service3();
+		
+		
+		//Set priority values for the next run and update the value of the buffers
+		setPriority(0);
+		setPriority(1);
+		setPriority(2);
+		setPriority(3);
+		
+		
+		//Rewrite buffer array with new priority values
+		{= temp[a[0].priority] = a[0],
+		temp[a[1].priority] = a[1],
+		temp[a[2].priority] = a[2],
+		temp[a[3].priority] = a[3] =};
+		
+		{= a = temp =};
+		
+		
+		if (clk >= clkUpper) {
+			stop
+		}
+		else {
+			tau
+		}
+		
+	}
+}
+
+process setPriority(int i){
+	if (a[i].serviced == true){
+		{= a[i].val = DiscreteUniform(0, 3),
+		a[i].priority = i + unserviced =}
+		//edit so the id of the buffer will not be chosen as the value
+		//<update buffer value and dequeue buffer>
+	}
+	else {
+		{= a[i].priority = unserviced - 1 ,
+		unserviced = unserviced - 1 =}
+	}
+}
+
+process service1(){
+	//Buffer priority 1
+		if( a[1].val == a[0].val) {
+			{= a[1].serviced = false,
+			unserviced = unserviced + 1 =}
+		}
+		else {
+			//<Service>
+			{= a[1].serviced = true =}
+		}
+}
+
+process service2(){
+	//Buffer priority 2
+		if(a[2].val == a[1].val || a[2].val == a[0].val){
+			{= a[2].serviced = false, 
+			unserviced = unserviced + 1 =}
+		}
+		else {
+			//<Service>
+			{= a[2].serviced = true =}
+		}
+}
+
+process service3(){
+	//Buffer priority 3
+		if( a[3].val == a[2].val || a[3].val == a[1].val || a[3].val == a[0].val){
+			{= a[3].serviced = false,
+			unserviced = unserviced + 1 =}
+		}
+		else {
+			//<Service>
+			{= a[3].serviced = true =}
+		}
+}
+
+par{
+::	Clock()
+::	arbiter()
+}
