@@ -1,8 +1,10 @@
-datatype buffer = {int(0..3) val, int(0..3) id, bool serviced, int(0..3) priority};		//Datatype for a buffer with the next buffer value, id of the buffer, whether the buffer was serviced last clock cycle or not, and the priority number of the buffer
+datatype buffer = {int(0..3) val, int(0..3) id, bool serviced, int(0..3) priority, int timesServiced};		//Datatype for a buffer with the next buffer value, id of the buffer, whether the buffer was serviced last clock cycle or not, and the priority number of the buffer
 int unserviced;		//Number of unserviced buffers, iterates down when unserviced buffer's priority is set
 int totalUnserviced;	//Total number of unserviced buffers in a clock cycle
+int totalServiced = 0;
+int optimalRuns = 0;
 const int clkLower = 100; 
-const int clkUpper = 110;
+const int clkUpper = 105;
 int(clkLower..clkUpper) clk;
 
 buffer north, east, south, west;
@@ -14,6 +16,21 @@ action tick;
 
 // ------ Begin: properties ---------
 property Pr1 = Pmax(<> (clk >= clkUpper));
+
+property TotalServiced = Pmax(<> (totalServiced >= 15));		//Probablility that the arbiter servieces at least 15 buffers out of a possible 20. probablity the arbiter is at least 75% efficient
+
+/*
+property northServiced = Pmax(<> (north.timesServiced >= 3));
+property eastServiced = Pmax(<> (east.timesServiced >= 3));
+property southServiced = Pmax(<> (south.timesServiced >= 3));
+property westServiced = Pmax(<> (west.timesServiced >= 3));
+*/
+
+property Runs1 = Pmax(<> (optimalRuns >= 1));		//Probablilitythat there was at least 1 cycle where all buffers were serviced
+property Runs2 = Pmax(<> (optimalRuns >= 2));		//Probablilitythat there was at least 2 cycles where all buffers were serviced
+property Runs3 = Pmax(<> (optimalRuns >= 3));		//Probablilitythat there was at least 3 cycles where all buffers were serviced
+property Runs4 = Pmax(<> (optimalRuns >= 4));		//Probablilitythat there was at least 4 cycles where all buffers were serviced
+property Runs5 = Pmax(<> (optimalRuns >= 5));		//Probablilitythat there was at least 5 cycles where all buffers were serviced
 // ------ End: properties ---------
 
 process Clock()
@@ -34,13 +51,14 @@ process Arbiter(){
 	
 	//runtime loop
 	do {
-		tick;
-		
 		//Service buffers
 		
 		//Buffer priority 0
 		//<Service Buffer a[0]>
-		{= a[0].serviced = true =};
+		{= 
+		a[0].timesServiced++,
+		a[0].serviced = true 
+		=};
 		
 		service1();
 		
@@ -48,8 +66,17 @@ process Arbiter(){
 		
 		service3();
 		
-		{= totalUnserviced = unserviced =};
-
+		{= 
+		totalUnserviced = unserviced,
+		totalServiced = totalServiced + 4 - unserviced
+		=};
+		
+		if (unserviced == 0){
+			{= optimalRuns++ =}
+		}
+		else {
+			tau
+		};
 		
 		//Set priority values for the next run and update the value of the buffers
 		setPriority(0);
@@ -68,6 +95,7 @@ process Arbiter(){
 		
 		{= a = temp =};
 		
+		tick;
 		
 		if (clk >= clkUpper) {
 			stop
@@ -81,24 +109,23 @@ process Arbiter(){
 
 //initialize values 
 process initialize(){
-	tick {= 
-	north.id = 0, 
-	east.id = 1, 
-	south.id = 2, 
-	west.id = 3,  
-	
-	north.val = DiscreteUniform(1, 3),
-	east.val = (DiscreteUniform(1, 3) + 1) % 4,
-	south.val = (DiscreteUniform(1, 3) + 2) % 4,
-	west.val = DiscreteUniform(0, 2),
-	
-	unserviced = 0
-	=};
-	
 	{= 
 	a = [north, east, south, west],
-	temp = [north, east, south, west] 
+	temp = [north, east, south, west], 
+	
+	a[0].id = 0, 
+	a[1].id = 1, 
+	a[2].id = 2, 
+	a[3].id = 3,  
+	
+	a[0].val = DiscreteUniform(1, 3),
+	a[1].val = (DiscreteUniform(1, 3) + 1) % 4,
+	a[2].val = (DiscreteUniform(1, 3) + 2) % 4,
+	a[3].val = DiscreteUniform(0, 2),
+	
+	unserviced = 0
 	=}
+
 	
 }
 
@@ -130,7 +157,10 @@ process service1(){
 		}
 		else {
 			//<Service buffer a[1]>
-			{= a[1].serviced = true =}
+			{= 
+			a[1].timesServiced++,
+			a[1].serviced = true 
+			=}
 		}
 }
 
@@ -145,7 +175,10 @@ process service2(){
 		}
 		else {
 			//<Service buffer a[2]>
-			{= a[2].serviced = true =}
+			{= 
+			a[2].timesServiced++,
+			a[2].serviced = true 
+			=}
 		}
 }
 
@@ -160,7 +193,10 @@ process service3(){
 		}
 		else {
 			//<Service buffer a[3]>
-			{= a[3].serviced = true =}
+			{= 
+			a[3].timesServiced++,
+			a[3].serviced = true 
+			=}
 		}
 }
 
