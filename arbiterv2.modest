@@ -26,11 +26,11 @@ property southServiced = Pmax(<> (south.timesServiced >= 3));
 property westServiced = Pmax(<> (west.timesServiced >= 3));
 */
 
-property Runs1 = Pmax(<> (optimalRuns >= 1));		//Probablilitythat there was at least 1 cycle where all buffers were serviced
-property Runs2 = Pmax(<> (optimalRuns >= 2));		//Probablilitythat there was at least 2 cycles where all buffers were serviced
-property Runs3 = Pmax(<> (optimalRuns >= 3));		//Probablilitythat there was at least 3 cycles where all buffers were serviced
-property Runs4 = Pmax(<> (optimalRuns >= 4));		//Probablilitythat there was at least 4 cycles where all buffers were serviced
-property Runs5 = Pmax(<> (optimalRuns >= 5));		//Probablilitythat there was at least 5 cycles where all buffers were serviced
+property Runs1 = Pmax(<> (optimalRuns >= 1));		//Probablility that there was at least 1 cycle where all buffers were serviced
+property Runs2 = Pmax(<> (optimalRuns >= 2));		//Probablility that there was at least 2 cycles where all buffers were serviced
+property Runs3 = Pmax(<> (optimalRuns >= 3));		//Probablility that there was at least 3 cycles where all buffers were serviced
+property Runs4 = Pmax(<> (optimalRuns >= 4));		//Probablility that there was at least 4 cycles where all buffers were serviced
+property Runs5 = Pmax(<> (optimalRuns >= 5));		//Probablility that there was at least 5 cycles where all buffers were serviced
 // ------ End: properties ---------
 
 process Clock()
@@ -45,47 +45,95 @@ process Clock()
 }
 
 
-//Main process for the arbiter
+//Main process for the arbiter -------------------------------------------------------------------------------------------------------------------------------------------------
 process Arbiter(){
 	initialize();
 	
 	//runtime loop
 	do {
-		//Service buffers
+		//Service buffers-------------------------------------------------------------------------------------------------------
 		
 		//Buffer priority 0
-		//<Service Buffer a[0]>
+		//<Service Buffer a[0]>--------------------------------------------------------
 		{= 
 		a[0].timesServiced++,
 		a[0].serviced = true 
 		=};
 		
-		service1();
+		//<Service buffer <a[1]> ------------------------------------------------------
+		if( a[1].val == a[0].val) {			//If buffer a[1] conflicts with a[0]
+			{= 
+			a[1].serviced = false,
+			unserviced++ 		//Increment unserviced
+			=}
+		}
+		else {
+			{= 
+			a[1].timesServiced++,		//Service Buffer
+			a[1].serviced = true 
+			=}
+		};
 		
-		service2();
+		//<Service buffer a[2]> --------------------------------------------------------
+		//If buffer a[2] conflicts with a[1] or a[0]
+		if(a[2].val == a[1].val || a[2].val == a[0].val){	
+			{= 
+			a[2].serviced = false, 
+			unserviced++			//Increment unserviced
+			=}
+		}
+		else {
+			{= 
+			a[2].timesServiced++,		//Service Buffer
+			a[2].serviced = true 
+			=}
+		};
 		
-		service3();
+		//<Service buffer a[3]> ---------------------------------------------------------
+		//If buffer a[3] conflicts with a[2], a[1], or a[0]
+		if( a[3].val == a[2].val || a[3].val == a[1].val || a[3].val == a[0].val){	
+			{= 
+			a[3].serviced = false,
+			unserviced++ 			//Increment unserviced
+			=}
+		}
+		else {
+			{= 
+			a[3].timesServiced++,		//Service Buffer
+			a[3].serviced = true 
+			=}
+		};
 		
+		/*
 		{= 
 		totalUnserviced = unserviced,
 		totalServiced = totalServiced + 4 - unserviced
 		=};
+		*/
 		
+		//Increment optimal runs if there were no conflitcs -------------------------------------------------------------------
 		if (unserviced == 0){
-			{= optimalRuns++ =}
+			{= 
+			optimalRuns++,
+			totalUnserviced = unserviced,
+			totalServiced = totalServiced + 4 - unserviced 
+			=}
 		}
 		else {
-			tau
+			{= 
+			totalUnserviced = unserviced,
+			totalServiced = totalServiced + 4 - unserviced
+			=}
 		};
 		
-		//Set priority values for the next run and update the value of the buffers
+		//Set priority values for the next run and update the value of the buffers----------------------------------------------
 		setPriority(0);
 		setPriority(1);
 		setPriority(2);
 		setPriority(3);
 		
 		
-		//Rewrite buffer array with new priority values
+		//Rewrite buffer array with new priority values-------------------------------------------------------------------------
 		{= 
 		temp[a[0].priority] = a[0],
 		temp[a[1].priority] = a[1],
@@ -93,9 +141,7 @@ process Arbiter(){
 		temp[a[3].priority] = a[3] 
 		=};
 		
-		{= a = temp =};
-		
-		tick;
+		tick {= a = temp =};
 		
 		if (clk >= clkUpper) {
 			stop
@@ -107,7 +153,7 @@ process Arbiter(){
 	}
 }
 
-//initialize values 
+//initialize values -------------------------------------------------------------------------------------------------------------------------------------------------------------
 process initialize(){
 	{= 
 	a = [north, east, south, west],
@@ -129,7 +175,7 @@ process initialize(){
 	
 }
 
-//Sets the new priority value of buffer a[i] and updates the value if the buffer was serviced
+//Sets the new priority value of buffer a[i] and updates the value if the buffer was serviced ------------------------------------------------------------------------------------
 process setPriority(int i){
 	if (a[i].serviced == true){
 		{= 
@@ -146,59 +192,6 @@ process setPriority(int i){
 	}
 }
 
-//Determines if buffer a[1] can be serviced and services it
-process service1(){
-	//Buffer priority 1
-		if( a[1].val == a[0].val) {			//If buffer a[1] conflicts with a[0]
-			{= 
-			a[1].serviced = false,
-			unserviced++ 		//Increment unserviced
-			=}
-		}
-		else {
-			//<Service buffer a[1]>
-			{= 
-			a[1].timesServiced++,
-			a[1].serviced = true 
-			=}
-		}
-}
-
-//Determines if buffer a[2] can be serviced and services it
-process service2(){
-	//Buffer priority 2
-		if(a[2].val == a[1].val || a[2].val == a[0].val){	//If buffer a[2] conflicts with a[1] or a[0]
-			{= 
-			a[2].serviced = false, 
-			unserviced++			//Increment unserviced
-			=}
-		}
-		else {
-			//<Service buffer a[2]>
-			{= 
-			a[2].timesServiced++,
-			a[2].serviced = true 
-			=}
-		}
-}
-
-//Determines if buffer a[3] can be serviced and services it
-process service3(){
-	//Buffer priority 3
-		if( a[3].val == a[2].val || a[3].val == a[1].val || a[3].val == a[0].val){	//If buffer a[3] conflicts with a[2], a[1], or a[0]
-			{= 
-			a[3].serviced = false,
-			unserviced++ 			//Increment unserviced
-			=}
-		}
-		else {
-			//<Service buffer a[3]>
-			{= 
-			a[3].timesServiced++,
-			a[3].serviced = true 
-			=}
-		}
-}
 
 par{
 ::	Clock()
