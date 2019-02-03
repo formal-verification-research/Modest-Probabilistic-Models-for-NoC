@@ -1,14 +1,16 @@
 
 // no contention = 0, contention1 = 1, contention2 = 2
 
-datatype buffer = {int(0..2) val, int(0..3) id, bool serviced, int(0..3) priority};
-int unserviced;		//Number of unserviced buffers, iterates down when unserviced buffer's priority is set
-int totalUnserviced;	//Total number of unserviced buffers in a clock cycle
-int totalServiced = 0;
-int optimalRuns = 0;
 const int clkLower = 100; 
-const int clkUpper = 125;
+const int clkUpper = 101;
 int(clkLower..clkUpper) clk;
+
+datatype buffer = {int(0..2) val, int(0..3) id, bool serviced, int(0..3) priority};
+int(0..2) unserviced;		//Number of unserviced buffers, iterates down when unserviced buffer's priority is set
+int(0..2) totalUnserviced;	//Total number of unserviced buffers in a clock cycle
+int(0..((clkUpper - clkLower) * 4)) totalServiced = 0;
+int(0..(clkUpper - clkLower)) optimalRuns = 0;
+
 
 buffer north, east, south, west;
 
@@ -29,8 +31,7 @@ property Runs4 = Pmax(<> (optimalRuns == 4));		//Probablility that there was at 
 property Runs5 = Pmax(<> (optimalRuns == 5));		//Probablility that there was at least 5 cycles where all buffers were serviced
 // ------ End: properties ---------
 
-process Clock()
-{	
+process Clock(){	
 	tick {= clk++ =};
 	if (clk <= clkUpper) {
 	   Clock()
@@ -166,9 +167,7 @@ process initialize(){
 	a[0].id = 0, 
 	a[1].id = 1, 
 	a[2].id = 2, 
-	a[3].id = 3,  
-	
-	unserviced = 0
+	a[3].id = 3
 	=};
 	
 	palt{
