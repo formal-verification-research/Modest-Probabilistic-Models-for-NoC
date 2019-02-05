@@ -1,0 +1,1927 @@
+﻿{
+	"jani-version": 1,
+	"name": "arbiterv2",
+	"type": "sta",
+	"features": [
+		"derived-operators",
+		"arrays",
+		"datatypes"
+	],
+	"actions": [ {
+		"name": "tick"
+	} ],
+	"datatypes": [ {
+		"name": "buffer",
+		"members": [
+			{
+				"name": "val",
+				"type": {
+					"kind": "bounded",
+					"base": "int",
+					"lower-bound": -1,
+					"upper-bound": 3
+				}
+			},
+			{
+				"name": "id",
+				"type": {
+					"kind": "bounded",
+					"base": "int",
+					"lower-bound": 0,
+					"upper-bound": 3
+				}
+			},
+			{
+				"name": "serviced",
+				"type": "bool"
+			},
+			{
+				"name": "priority",
+				"type": {
+					"kind": "bounded",
+					"base": "int",
+					"lower-bound": 0,
+					"upper-bound": 3
+				}
+			},
+			{
+				"name": "timesServiced",
+				"type": "int"
+			}
+		]
+	} ],
+	"variables": [
+		{
+			"name": "unserviced",
+			"type": "int",
+			"initial-value": 0
+		},
+		{
+			"name": "totalUnserviced",
+			"type": "int",
+			"initial-value": 0
+		},
+		{
+			"name": "totalServiced",
+			"type": "int",
+			"initial-value": 0
+		},
+		{
+			"name": "optimalRuns",
+			"type": "int",
+			"initial-value": 0
+		},
+		{
+			"name": "clk",
+			"type": {
+				"kind": "bounded",
+				"base": "int",
+				"lower-bound": 100,
+				"upper-bound": 110
+			},
+			"initial-value": 100
+		},
+		{
+			"name": "tri",
+			"type": "bool",
+			"initial-value": false
+		},
+		{
+			"name": "north",
+			"type": {
+				"kind": "datatype",
+				"ref": "buffer"
+			},
+			"initial-value": {
+				"op": "dv",
+				"type": "buffer",
+				"values": [
+					{
+						"member": "id",
+						"value": 0
+					},
+					{
+						"member": "priority",
+						"value": 0
+					},
+					{
+						"member": "serviced",
+						"value": false
+					},
+					{
+						"member": "timesServiced",
+						"value": 0
+					},
+					{
+						"member": "val",
+						"value": -1
+					}
+				]
+			}
+		},
+		{
+			"name": "east",
+			"type": {
+				"kind": "datatype",
+				"ref": "buffer"
+			},
+			"initial-value": {
+				"op": "dv",
+				"type": "buffer",
+				"values": [
+					{
+						"member": "id",
+						"value": 0
+					},
+					{
+						"member": "priority",
+						"value": 0
+					},
+					{
+						"member": "serviced",
+						"value": false
+					},
+					{
+						"member": "timesServiced",
+						"value": 0
+					},
+					{
+						"member": "val",
+						"value": -1
+					}
+				]
+			}
+		},
+		{
+			"name": "south",
+			"type": {
+				"kind": "datatype",
+				"ref": "buffer"
+			},
+			"initial-value": {
+				"op": "dv",
+				"type": "buffer",
+				"values": [
+					{
+						"member": "id",
+						"value": 0
+					},
+					{
+						"member": "priority",
+						"value": 0
+					},
+					{
+						"member": "serviced",
+						"value": false
+					},
+					{
+						"member": "timesServiced",
+						"value": 0
+					},
+					{
+						"member": "val",
+						"value": -1
+					}
+				]
+			}
+		},
+		{
+			"name": "west",
+			"type": {
+				"kind": "datatype",
+				"ref": "buffer"
+			},
+			"initial-value": {
+				"op": "dv",
+				"type": "buffer",
+				"values": [
+					{
+						"member": "id",
+						"value": 0
+					},
+					{
+						"member": "priority",
+						"value": 0
+					},
+					{
+						"member": "serviced",
+						"value": false
+					},
+					{
+						"member": "timesServiced",
+						"value": 0
+					},
+					{
+						"member": "val",
+						"value": -1
+					}
+				]
+			}
+		},
+		{
+			"name": "a",
+			"type": {
+				"kind": "array",
+				"base": {
+					"kind": "datatype",
+					"ref": "buffer"
+				}
+			},
+			"initial-value": {
+				"op": "ac",
+				"length": 0,
+				"var": "i",
+				"exp": {
+					"op": "dv",
+					"type": "buffer",
+					"values": [
+						{
+							"member": "id",
+							"value": 0
+						},
+						{
+							"member": "priority",
+							"value": 0
+						},
+						{
+							"member": "serviced",
+							"value": false
+						},
+						{
+							"member": "timesServiced",
+							"value": 0
+						},
+						{
+							"member": "val",
+							"value": -1
+						}
+					]
+				}
+			}
+		},
+		{
+			"name": "temp",
+			"type": {
+				"kind": "array",
+				"base": {
+					"kind": "datatype",
+					"ref": "buffer"
+				}
+			},
+			"initial-value": {
+				"op": "ac",
+				"length": 0,
+				"var": "i",
+				"exp": {
+					"op": "dv",
+					"type": "buffer",
+					"values": [
+						{
+							"member": "id",
+							"value": 0
+						},
+						{
+							"member": "priority",
+							"value": 0
+						},
+						{
+							"member": "serviced",
+							"value": false
+						},
+						{
+							"member": "timesServiced",
+							"value": 0
+						},
+						{
+							"member": "val",
+							"value": -1
+						}
+					]
+				}
+			}
+		}
+	],
+	"properties": [
+		{
+			"name": "Pr1",
+			"expression": {
+				"op": "filter",
+				"fun": "max",
+				"values": {
+					"op": "Pmax",
+					"exp": {
+						"op": "F",
+						"exp": {
+							"op": "≥",
+							"left": "clk",
+							"right": 110
+						}
+					}
+				},
+				"states": {
+					"op": "initial"
+				}
+			}
+		},
+		{
+			"name": "TotalServiced",
+			"expression": {
+				"op": "filter",
+				"fun": "max",
+				"values": {
+					"op": "Pmax",
+					"exp": {
+						"op": "F",
+						"exp": {
+							"op": "≥",
+							"left": "totalServiced",
+							"right": 30
+						}
+					}
+				},
+				"states": {
+					"op": "initial"
+				}
+			}
+		},
+		{
+			"name": "Runs1",
+			"expression": {
+				"op": "filter",
+				"fun": "max",
+				"values": {
+					"op": "Pmax",
+					"exp": {
+						"op": "F",
+						"exp": {
+							"op": "=",
+							"left": "optimalRuns",
+							"right": 1
+						}
+					}
+				},
+				"states": {
+					"op": "initial"
+				}
+			}
+		},
+		{
+			"name": "Runs2",
+			"expression": {
+				"op": "filter",
+				"fun": "max",
+				"values": {
+					"op": "Pmax",
+					"exp": {
+						"op": "F",
+						"exp": {
+							"op": "=",
+							"left": "optimalRuns",
+							"right": 2
+						}
+					}
+				},
+				"states": {
+					"op": "initial"
+				}
+			}
+		},
+		{
+			"name": "Runs3",
+			"expression": {
+				"op": "filter",
+				"fun": "max",
+				"values": {
+					"op": "Pmax",
+					"exp": {
+						"op": "F",
+						"exp": {
+							"op": "=",
+							"left": "optimalRuns",
+							"right": 3
+						}
+					}
+				},
+				"states": {
+					"op": "initial"
+				}
+			}
+		}
+	],
+	"automata": [
+		{
+			"name": "Clock",
+			"locations": [
+				{
+					"name": "loc_1"
+				},
+				{
+					"name": "loc_5"
+				}
+			],
+			"initial-locations": [ "loc_1" ],
+			"edges": [
+				{
+					"location": "loc_1",
+					"action": "tick",
+					"destinations": [ {
+						"location": "loc_5",
+						"assignments": [ {
+							"ref": "clk",
+							"value": {
+								"op": "+",
+								"left": "clk",
+								"right": 1
+							}
+						} ]
+					} ]
+				},
+				{
+					"location": "loc_5",
+					"action": "tick",
+					"guard": {
+						"exp": {
+							"op": "≤",
+							"left": "clk",
+							"right": 110
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5",
+						"assignments": [ {
+							"ref": "clk",
+							"value": {
+								"op": "+",
+								"left": "clk",
+								"right": 1
+							}
+						} ]
+					} ]
+				}
+			]
+		},
+		{
+			"name": "Arbiter",
+			"locations": [
+				{
+					"name": "loc_1"
+				},
+				{
+					"name": "loc_6"
+				},
+				{
+					"name": "loc_10"
+				},
+				{
+					"name": "loc_17"
+				},
+				{
+					"name": "loc_24"
+				},
+				{
+					"name": "loc_31"
+				},
+				{
+					"name": "loc_38"
+				},
+				{
+					"name": "loc_46"
+				},
+				{
+					"name": "loc_49"
+				},
+				{
+					"name": "loc_52"
+				},
+				{
+					"name": "loc_55"
+				},
+				{
+					"name": "loc_58"
+				},
+				{
+					"name": "loc_62"
+				}
+			],
+			"initial-locations": [ "loc_1" ],
+			"variables": [ {
+				"name": "i",
+				"type": "int",
+				"initial-value": 0
+			} ],
+			"edges": [
+				{
+					"location": "loc_1",
+					"destinations": [ {
+						"location": "loc_6",
+						"assignments": [
+							{
+								"ref": "a",
+								"value": {
+									"op": "av",
+									"elements": [
+										"north",
+										"east",
+										"south",
+										"west"
+									]
+								}
+							},
+							{
+								"ref": "temp",
+								"value": {
+									"op": "av",
+									"elements": [
+										"north",
+										"east",
+										"south",
+										"west"
+									]
+								}
+							},
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 0
+									},
+									"member": "id"
+								},
+								"value": 0
+							},
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 1
+									},
+									"member": "id"
+								},
+								"value": 1
+							},
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 2
+									},
+									"member": "id"
+								},
+								"value": 2
+							},
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 3
+									},
+									"member": "id"
+								},
+								"value": 3
+							},
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 0
+									},
+									"member": "val"
+								},
+								"value": {
+									"distribution": "DiscreteUniform",
+									"args": [
+										1,
+										3
+									]
+								}
+							},
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 1
+									},
+									"member": "val"
+								},
+								"value": {
+									"op": "%",
+									"left": {
+										"op": "+",
+										"left": {
+											"distribution": "DiscreteUniform",
+											"args": [
+												1,
+												3
+											]
+										},
+										"right": 1
+									},
+									"right": 4
+								}
+							},
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 2
+									},
+									"member": "val"
+								},
+								"value": {
+									"op": "%",
+									"left": {
+										"op": "+",
+										"left": {
+											"distribution": "DiscreteUniform",
+											"args": [
+												1,
+												3
+											]
+										},
+										"right": 2
+									},
+									"right": 4
+								}
+							},
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 3
+									},
+									"member": "val"
+								},
+								"value": {
+									"distribution": "DiscreteUniform",
+									"args": [
+										0,
+										2
+									]
+								}
+							},
+							{
+								"ref": "unserviced",
+								"value": 0
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_6",
+					"destinations": [ {
+						"location": "loc_10",
+						"assignments": [
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 0
+									},
+									"member": "timesServiced"
+								},
+								"value": {
+									"op": "+",
+									"left": {
+										"op": "da",
+										"exp": {
+											"op": "aa",
+											"exp": "a",
+											"index": 0
+										},
+										"member": "timesServiced"
+									},
+									"right": 1
+								}
+							},
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 0
+									},
+									"member": "serviced"
+								},
+								"value": true
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_10",
+					"guard": {
+						"exp": {
+							"op": "=",
+							"left": {
+								"op": "da",
+								"exp": {
+									"op": "aa",
+									"exp": "a",
+									"index": 1
+								},
+								"member": "val"
+							},
+							"right": {
+								"op": "da",
+								"exp": {
+									"op": "aa",
+									"exp": "a",
+									"index": 0
+								},
+								"member": "val"
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_17",
+						"assignments": [
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 1
+									},
+									"member": "serviced"
+								},
+								"value": false
+							},
+							{
+								"ref": "unserviced",
+								"value": {
+									"op": "+",
+									"left": "unserviced",
+									"right": 1
+								}
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_10",
+					"guard": {
+						"exp": {
+							"op": "≠",
+							"left": {
+								"op": "da",
+								"exp": {
+									"op": "aa",
+									"exp": "a",
+									"index": 1
+								},
+								"member": "val"
+							},
+							"right": {
+								"op": "da",
+								"exp": {
+									"op": "aa",
+									"exp": "a",
+									"index": 0
+								},
+								"member": "val"
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_17",
+						"assignments": [
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 1
+									},
+									"member": "timesServiced"
+								},
+								"value": {
+									"op": "+",
+									"left": {
+										"op": "da",
+										"exp": {
+											"op": "aa",
+											"exp": "a",
+											"index": 1
+										},
+										"member": "timesServiced"
+									},
+									"right": 1
+								}
+							},
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 1
+									},
+									"member": "serviced"
+								},
+								"value": true
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_17",
+					"guard": {
+						"exp": {
+							"op": "∨",
+							"left": {
+								"op": "=",
+								"left": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 2
+									},
+									"member": "val"
+								},
+								"right": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 1
+									},
+									"member": "val"
+								}
+							},
+							"right": {
+								"op": "=",
+								"left": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 2
+									},
+									"member": "val"
+								},
+								"right": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 0
+									},
+									"member": "val"
+								}
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_24",
+						"assignments": [
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 2
+									},
+									"member": "serviced"
+								},
+								"value": false
+							},
+							{
+								"ref": "unserviced",
+								"value": {
+									"op": "+",
+									"left": "unserviced",
+									"right": 1
+								}
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_17",
+					"guard": {
+						"exp": {
+							"op": "¬",
+							"exp": {
+								"op": "∨",
+								"left": {
+									"op": "=",
+									"left": {
+										"op": "da",
+										"exp": {
+											"op": "aa",
+											"exp": "a",
+											"index": 2
+										},
+										"member": "val"
+									},
+									"right": {
+										"op": "da",
+										"exp": {
+											"op": "aa",
+											"exp": "a",
+											"index": 1
+										},
+										"member": "val"
+									}
+								},
+								"right": {
+									"op": "=",
+									"left": {
+										"op": "da",
+										"exp": {
+											"op": "aa",
+											"exp": "a",
+											"index": 2
+										},
+										"member": "val"
+									},
+									"right": {
+										"op": "da",
+										"exp": {
+											"op": "aa",
+											"exp": "a",
+											"index": 0
+										},
+										"member": "val"
+									}
+								}
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_24",
+						"assignments": [
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 2
+									},
+									"member": "timesServiced"
+								},
+								"value": {
+									"op": "+",
+									"left": {
+										"op": "da",
+										"exp": {
+											"op": "aa",
+											"exp": "a",
+											"index": 2
+										},
+										"member": "timesServiced"
+									},
+									"right": 1
+								}
+							},
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 2
+									},
+									"member": "serviced"
+								},
+								"value": true
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_24",
+					"guard": {
+						"exp": {
+							"op": "∨",
+							"left": {
+								"op": "∨",
+								"left": {
+									"op": "=",
+									"left": {
+										"op": "da",
+										"exp": {
+											"op": "aa",
+											"exp": "a",
+											"index": 3
+										},
+										"member": "val"
+									},
+									"right": {
+										"op": "da",
+										"exp": {
+											"op": "aa",
+											"exp": "a",
+											"index": 2
+										},
+										"member": "val"
+									}
+								},
+								"right": {
+									"op": "=",
+									"left": {
+										"op": "da",
+										"exp": {
+											"op": "aa",
+											"exp": "a",
+											"index": 3
+										},
+										"member": "val"
+									},
+									"right": {
+										"op": "da",
+										"exp": {
+											"op": "aa",
+											"exp": "a",
+											"index": 1
+										},
+										"member": "val"
+									}
+								}
+							},
+							"right": {
+								"op": "=",
+								"left": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 3
+									},
+									"member": "val"
+								},
+								"right": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 0
+									},
+									"member": "val"
+								}
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_31",
+						"assignments": [
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 3
+									},
+									"member": "serviced"
+								},
+								"value": false
+							},
+							{
+								"ref": "unserviced",
+								"value": {
+									"op": "+",
+									"left": "unserviced",
+									"right": 1
+								}
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_24",
+					"guard": {
+						"exp": {
+							"op": "¬",
+							"exp": {
+								"op": "∨",
+								"left": {
+									"op": "∨",
+									"left": {
+										"op": "=",
+										"left": {
+											"op": "da",
+											"exp": {
+												"op": "aa",
+												"exp": "a",
+												"index": 3
+											},
+											"member": "val"
+										},
+										"right": {
+											"op": "da",
+											"exp": {
+												"op": "aa",
+												"exp": "a",
+												"index": 2
+											},
+											"member": "val"
+										}
+									},
+									"right": {
+										"op": "=",
+										"left": {
+											"op": "da",
+											"exp": {
+												"op": "aa",
+												"exp": "a",
+												"index": 3
+											},
+											"member": "val"
+										},
+										"right": {
+											"op": "da",
+											"exp": {
+												"op": "aa",
+												"exp": "a",
+												"index": 1
+											},
+											"member": "val"
+										}
+									}
+								},
+								"right": {
+									"op": "=",
+									"left": {
+										"op": "da",
+										"exp": {
+											"op": "aa",
+											"exp": "a",
+											"index": 3
+										},
+										"member": "val"
+									},
+									"right": {
+										"op": "da",
+										"exp": {
+											"op": "aa",
+											"exp": "a",
+											"index": 0
+										},
+										"member": "val"
+									}
+								}
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_31",
+						"assignments": [
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 3
+									},
+									"member": "timesServiced"
+								},
+								"value": {
+									"op": "+",
+									"left": {
+										"op": "da",
+										"exp": {
+											"op": "aa",
+											"exp": "a",
+											"index": 3
+										},
+										"member": "timesServiced"
+									},
+									"right": 1
+								}
+							},
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": 3
+									},
+									"member": "serviced"
+								},
+								"value": true
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_31",
+					"guard": {
+						"exp": {
+							"op": "=",
+							"left": "unserviced",
+							"right": 0
+						}
+					},
+					"destinations": [ {
+						"location": "loc_38",
+						"assignments": [
+							{
+								"ref": "optimalRuns",
+								"value": {
+									"op": "+",
+									"left": "optimalRuns",
+									"right": 1
+								}
+							},
+							{
+								"ref": "totalUnserviced",
+								"value": "unserviced"
+							},
+							{
+								"ref": "totalServiced",
+								"value": {
+									"op": "-",
+									"left": {
+										"op": "+",
+										"left": "totalServiced",
+										"right": 4
+									},
+									"right": "unserviced"
+								}
+							},
+							{
+								"ref": "i",
+								"value": 0
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_31",
+					"guard": {
+						"exp": {
+							"op": "≠",
+							"left": "unserviced",
+							"right": 0
+						}
+					},
+					"destinations": [ {
+						"location": "loc_38",
+						"assignments": [
+							{
+								"ref": "totalUnserviced",
+								"value": "unserviced"
+							},
+							{
+								"ref": "totalServiced",
+								"value": {
+									"op": "-",
+									"left": {
+										"op": "+",
+										"left": "totalServiced",
+										"right": 4
+									},
+									"right": "unserviced"
+								}
+							},
+							{
+								"ref": "i",
+								"value": 0
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_38",
+					"guard": {
+						"exp": {
+							"op": "da",
+							"exp": {
+								"op": "aa",
+								"exp": "a",
+								"index": "i"
+							},
+							"member": "serviced"
+						}
+					},
+					"destinations": [ {
+						"location": "loc_46",
+						"assignments": [
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": "i"
+									},
+									"member": "val"
+								},
+								"value": {
+									"op": "%",
+									"left": {
+										"op": "+",
+										"left": {
+											"distribution": "DiscreteUniform",
+											"args": [
+												1,
+												3
+											]
+										},
+										"right": {
+											"op": "da",
+											"exp": {
+												"op": "aa",
+												"exp": "a",
+												"index": "i"
+											},
+											"member": "id"
+										}
+									},
+									"right": 4
+								}
+							},
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": "i"
+									},
+									"member": "priority"
+								},
+								"value": {
+									"op": "+",
+									"left": "i",
+									"right": "unserviced"
+								}
+							},
+							{
+								"ref": "i",
+								"value": 1
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_38",
+					"guard": {
+						"exp": {
+							"op": "¬",
+							"exp": {
+								"op": "da",
+								"exp": {
+									"op": "aa",
+									"exp": "a",
+									"index": "i"
+								},
+								"member": "serviced"
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_46",
+						"assignments": [
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": "i"
+									},
+									"member": "priority"
+								},
+								"value": {
+									"op": "-",
+									"left": "totalUnserviced",
+									"right": "unserviced"
+								}
+							},
+							{
+								"ref": "unserviced",
+								"value": {
+									"op": "-",
+									"left": "unserviced",
+									"right": 1
+								}
+							},
+							{
+								"ref": "i",
+								"value": 1
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_46",
+					"guard": {
+						"exp": {
+							"op": "da",
+							"exp": {
+								"op": "aa",
+								"exp": "a",
+								"index": "i"
+							},
+							"member": "serviced"
+						}
+					},
+					"destinations": [ {
+						"location": "loc_49",
+						"assignments": [
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": "i"
+									},
+									"member": "val"
+								},
+								"value": {
+									"op": "%",
+									"left": {
+										"op": "+",
+										"left": {
+											"distribution": "DiscreteUniform",
+											"args": [
+												1,
+												3
+											]
+										},
+										"right": {
+											"op": "da",
+											"exp": {
+												"op": "aa",
+												"exp": "a",
+												"index": "i"
+											},
+											"member": "id"
+										}
+									},
+									"right": 4
+								}
+							},
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": "i"
+									},
+									"member": "priority"
+								},
+								"value": {
+									"op": "+",
+									"left": "i",
+									"right": "unserviced"
+								}
+							},
+							{
+								"ref": "i",
+								"value": 2
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_46",
+					"guard": {
+						"exp": {
+							"op": "¬",
+							"exp": {
+								"op": "da",
+								"exp": {
+									"op": "aa",
+									"exp": "a",
+									"index": "i"
+								},
+								"member": "serviced"
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_49",
+						"assignments": [
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": "i"
+									},
+									"member": "priority"
+								},
+								"value": {
+									"op": "-",
+									"left": "totalUnserviced",
+									"right": "unserviced"
+								}
+							},
+							{
+								"ref": "unserviced",
+								"value": {
+									"op": "-",
+									"left": "unserviced",
+									"right": 1
+								}
+							},
+							{
+								"ref": "i",
+								"value": 2
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_49",
+					"guard": {
+						"exp": {
+							"op": "da",
+							"exp": {
+								"op": "aa",
+								"exp": "a",
+								"index": "i"
+							},
+							"member": "serviced"
+						}
+					},
+					"destinations": [ {
+						"location": "loc_52",
+						"assignments": [
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": "i"
+									},
+									"member": "val"
+								},
+								"value": {
+									"op": "%",
+									"left": {
+										"op": "+",
+										"left": {
+											"distribution": "DiscreteUniform",
+											"args": [
+												1,
+												3
+											]
+										},
+										"right": {
+											"op": "da",
+											"exp": {
+												"op": "aa",
+												"exp": "a",
+												"index": "i"
+											},
+											"member": "id"
+										}
+									},
+									"right": 4
+								}
+							},
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": "i"
+									},
+									"member": "priority"
+								},
+								"value": {
+									"op": "+",
+									"left": "i",
+									"right": "unserviced"
+								}
+							},
+							{
+								"ref": "i",
+								"value": 3
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_49",
+					"guard": {
+						"exp": {
+							"op": "¬",
+							"exp": {
+								"op": "da",
+								"exp": {
+									"op": "aa",
+									"exp": "a",
+									"index": "i"
+								},
+								"member": "serviced"
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_52",
+						"assignments": [
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": "i"
+									},
+									"member": "priority"
+								},
+								"value": {
+									"op": "-",
+									"left": "totalUnserviced",
+									"right": "unserviced"
+								}
+							},
+							{
+								"ref": "unserviced",
+								"value": {
+									"op": "-",
+									"left": "unserviced",
+									"right": 1
+								}
+							},
+							{
+								"ref": "i",
+								"value": 3
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_52",
+					"guard": {
+						"exp": {
+							"op": "da",
+							"exp": {
+								"op": "aa",
+								"exp": "a",
+								"index": "i"
+							},
+							"member": "serviced"
+						}
+					},
+					"destinations": [ {
+						"location": "loc_55",
+						"assignments": [
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": "i"
+									},
+									"member": "val"
+								},
+								"value": {
+									"op": "%",
+									"left": {
+										"op": "+",
+										"left": {
+											"distribution": "DiscreteUniform",
+											"args": [
+												1,
+												3
+											]
+										},
+										"right": {
+											"op": "da",
+											"exp": {
+												"op": "aa",
+												"exp": "a",
+												"index": "i"
+											},
+											"member": "id"
+										}
+									},
+									"right": 4
+								}
+							},
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": "i"
+									},
+									"member": "priority"
+								},
+								"value": {
+									"op": "+",
+									"left": "i",
+									"right": "unserviced"
+								}
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_52",
+					"guard": {
+						"exp": {
+							"op": "¬",
+							"exp": {
+								"op": "da",
+								"exp": {
+									"op": "aa",
+									"exp": "a",
+									"index": "i"
+								},
+								"member": "serviced"
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_55",
+						"assignments": [
+							{
+								"ref": {
+									"op": "da",
+									"exp": {
+										"op": "aa",
+										"exp": "a",
+										"index": "i"
+									},
+									"member": "priority"
+								},
+								"value": {
+									"op": "-",
+									"left": "totalUnserviced",
+									"right": "unserviced"
+								}
+							},
+							{
+								"ref": "unserviced",
+								"value": {
+									"op": "-",
+									"left": "unserviced",
+									"right": 1
+								}
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_55",
+					"destinations": [ {
+						"location": "loc_58",
+						"assignments": [
+							{
+								"ref": {
+									"op": "aa",
+									"exp": "temp",
+									"index": {
+										"op": "da",
+										"exp": {
+											"op": "aa",
+											"exp": "a",
+											"index": 0
+										},
+										"member": "priority"
+									}
+								},
+								"value": {
+									"op": "aa",
+									"exp": "a",
+									"index": 0
+								}
+							},
+							{
+								"ref": {
+									"op": "aa",
+									"exp": "temp",
+									"index": {
+										"op": "da",
+										"exp": {
+											"op": "aa",
+											"exp": "a",
+											"index": 1
+										},
+										"member": "priority"
+									}
+								},
+								"value": {
+									"op": "aa",
+									"exp": "a",
+									"index": 1
+								}
+							},
+							{
+								"ref": {
+									"op": "aa",
+									"exp": "temp",
+									"index": {
+										"op": "da",
+										"exp": {
+											"op": "aa",
+											"exp": "a",
+											"index": 2
+										},
+										"member": "priority"
+									}
+								},
+								"value": {
+									"op": "aa",
+									"exp": "a",
+									"index": 2
+								}
+							},
+							{
+								"ref": {
+									"op": "aa",
+									"exp": "temp",
+									"index": {
+										"op": "da",
+										"exp": {
+											"op": "aa",
+											"exp": "a",
+											"index": 3
+										},
+										"member": "priority"
+									}
+								},
+								"value": {
+									"op": "aa",
+									"exp": "a",
+									"index": 3
+								}
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_58",
+					"action": "tick",
+					"destinations": [ {
+						"location": "loc_62",
+						"assignments": [ {
+							"ref": "a",
+							"value": "temp"
+						} ]
+					} ]
+				},
+				{
+					"location": "loc_62",
+					"guard": {
+						"exp": {
+							"op": "<",
+							"left": "clk",
+							"right": 110
+						}
+					},
+					"destinations": [ {
+						"location": "loc_6"
+					} ]
+				}
+			]
+		}
+	],
+	"system": {
+		"elements": [
+			{
+				"automaton": "Clock"
+			},
+			{
+				"automaton": "Arbiter"
+			}
+		],
+		"syncs": [ {
+			"synchronise": [
+				"tick",
+				"tick"
+			],
+			"result": "tick"
+		} ]
+	}
+}
