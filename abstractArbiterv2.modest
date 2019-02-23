@@ -1,4 +1,9 @@
-
+/*
+* abstraction: 0 means no conflict, 
+*1 means conflcits with some 0 in the buffer, 
+*2 means conflicts with some 1 or some 0 in the buffer
+*
+*/
 // no contention = 0, contention1 = 1, contention2 = 2
 
 const int clkLower = 100; 
@@ -6,12 +11,13 @@ const int clkUpper = 102;
 int(clkLower..clkUpper) clk;
 
 datatype buffer = {int(0..2) val, int(0..3) id, bool serviced, int(0..3) priority};
-int(0..2) unserviced;		//Number of unserviced buffers, iterates down when unserviced buffer's priority is set
-int(0..2) totalUnserviced;	//Total number of unserviced buffers in a clock cycle
+int(0..2) unserviced = 0;		//Number of unserviced buffers, iterates down when unserviced buffer's priority is set
+int(0..2) totalUnserviced =0s;	//Total number of unserviced buffers in a clock cycle
 int(0..((clkUpper - clkLower) * 4)) totalServiced = 0;
 int(0..(clkUpper - clkLower)) optimalRuns = 0;
+int conflict = 0;
 
-
+ 
 buffer north, east, south, west;
 
 buffer[] a; 	//Array of the four buffers. a[0] is the highest priority
@@ -25,10 +31,10 @@ property Pr1 = Pmax(<> (clk >= clkUpper));
 property TotalServiced = Pmax(<> (totalServiced >= ((clkUpper-clkLower)*3)));		//Probablility that the arbiter servieces at least 15 buffers out of a possible 20. probablity the arbiter is at least 75% efficient
 
 property Runs1 = Pmax(<> (optimalRuns == 1));		//Probablility that there was at least 1 cycle where all buffers were serviced
-property Runs2 = Pmax(<> (optimalRuns == 2));		//Probablility that there was at least 2 cycles where all buffers were serviced
-property Runs3 = Pmax(<> (optimalRuns == 3));		//Probablility that there was at least 3 cycles where all buffers were serviced
-property Runs4 = Pmax(<> (optimalRuns == 4));		//Probablility that there was at least 4 cycles where all buffers were serviced
-property Runs5 = Pmax(<> (optimalRuns == 5));		//Probablility that there was at least 5 cycles where all buffers were serviced
+//property Runs2 = Pmax(<> (optimalRuns == 2));		//Probablility that there was at least 2 cycles where all buffers were serviced
+//property Runs3 = Pmax(<> (optimalRuns == 3));		//Probablility that there was at least 3 cycles where all buffers were serviced
+//property Runs4 = Pmax(<> (optimalRuns == 4));		//Probablility that there was at least 4 cycles where all buffers were serviced
+//property Runs5 = Pmax(<> (optimalRuns == 5));		//Probablility that there was at least 5 cycles where all buffers were serviced
 // ------ End: properties ---------
 
 process Clock(){	
@@ -39,9 +45,7 @@ process Clock(){
 	else {
 	   stop
 	}   
-	
 }
-
 
 //Main process for the arbiter -------------------------------------------------------------------------------------------------------------------------------------------------
 process Arbiter(){
@@ -53,49 +57,92 @@ process Arbiter(){
 		
 		//Buffer priority 0
 		//<Service Buffer a[0]>--------------------------------------------------------
-		{= 
-		a[0].serviced = true 
-		=};
-		
-		//<Service buffer <a[1]> ------------------------------------------------------
-		if(a[1].val != 0 && a[1].val == a[0].val) {			//If buffer a[1] conflicts with a[0]
+		if (a[0].val == 1 || a[0].val == 2){
 			{= 
-			a[1].serviced = false,
-			unserviced++ 		//Increment unserviced
+			a[0].serviced = true,
+			conflict ++
 			=}
 		}
 		else {
-			{= 		//Service Buffer
-			a[1].serviced = true 
+			{= 
+			a[0].serviced = true 
 			=}
+		};
+		
+		//<Service buffer <a[1]> ------------------------------------------------------
+		if(conflict == 1) {
+			if(a[1].val == 1){
+				{=
+				a[1].serviced = true,
+				conflict ++
+				=}
+			}
+			else {
+				{=
+				a[1].serviced = false,
+				unserviced ++,
+				conflict --
+				=}
+			}
+		}
+		else {
+			if((a[1].val == 1 && a[0].val == 0) || (a[1].val == 2 && a[0].val == 1)) {			//If buffer a[1] conflicts with a[0]
+				{= 
+				a[1].serviced = false,
+				unserviced++ 		//Increment unserviced
+				=}
+			}
+			else {
+				{= 		//Service Buffer
+				a[1].serviced = true 
+				=}
+			}
 		};
 		
 		//<Service buffer a[2]> --------------------------------------------------------
 		//If buffer a[2] conflicts with a[1] or a[0]
-		if(a[2].val != 0 && (a[2].val == a[1].val || a[2].val == a[0].val)){	
+		if(conflict >= 1) {
 			{= 
+			conflict --,
 			a[2].serviced = false, 
 			unserviced++			//Increment unserviced
 			=}
 		}
 		else {
-			{= 	//Service Buffer
-			a[2].serviced = true 
-			=}
+			if(a[2].val == 1  || a[2].val == 2){	
+				{= 
+				a[2].serviced = false, 
+				unserviced++			//Increment unserviced
+				=}
+			}
+			else {
+				{= 	//Service Buffer
+				a[2].serviced = true 
+				=}
+			}
 		};
 		
 		//<Service buffer a[3]> ---------------------------------------------------------
 		//If buffer a[3] conflicts with a[2], a[1], or a[0]
-		if(a[3].val != 0 && (a[3].val == a[2].val || a[3].val == a[1].val || a[3].val == a[0].val)){	
+		if(conflict >= 1) {
 			{= 
-			a[3].serviced = false,
-			unserviced++ 			//Increment unserviced
+			conflict --,
+			a[3].serviced = false, 
+			unserviced++			//Increment unserviced
 			=}
 		}
 		else {
-			{= 		//Service Buffer
-			a[3].serviced = true 
-			=}
+			if(a[3].val == 1 || a[3].val == 2){	
+				{= 
+				a[3].serviced = false,
+				unserviced++ 			//Increment unserviced
+				=}
+			}
+			else {
+				{= 		//Service Buffer
+				a[3].serviced = true 
+				=}
+			}
 		};
 		
 		//Increment optimal runs if there were no conflitcs -------------------------------------------------------------------
@@ -119,6 +166,7 @@ process Arbiter(){
 		setPriority(2);
 		setPriority(3);
 		
+		/*
 		if(totalUnserviced == 2 && a[0].val == 1 && a[1].val == 1){
 			palt{
 				:0.444444444444444: {= a[0].val = 1, a[1].val = 1, a[2].val = 0, a[3].val = 0 =}
@@ -134,7 +182,7 @@ process Arbiter(){
 				:0.123456790123456: {= a[0].val = 1, a[1].val = 1, a[2].val = 2, a[3].val = 2 =}
 			}
 		};
-		
+		*/
 		
 		//Rewrite buffer array with new priority values-------------------------------------------------------------------------
 		{= 
@@ -146,15 +194,12 @@ process Arbiter(){
 		
 		tick {= a = temp =};
 		
-		
 		if (clk >= clkUpper) {
 			stop
 		}
 		else {
 			tau
 		}
-		
-		
 	}
 }
 
@@ -167,15 +212,29 @@ process initialize(){
 	a[0].id = 0, 
 	a[1].id = 1, 
 	a[2].id = 2, 
-	a[3].id = 3
+	a[3].id = 3,  
+	
+	a[0].serviced = true,
+	a[1].serviced = true,
+	a[2].serviced = true,
+	a[3].serviced = true,
+	
+	unserviced = 0
 	=};
 	
+	setPriority(0);
+	setPriority(1);
+	setPriority(2);
+	setPriority(3)
+	
+	/*
 	palt{
 		:0.111111111111111: {= a[0].val = 0, a[1].val = 0, a[2].val = 0, a[3].val = 0 =}
-		:0.592592592592592: {= a[0].val = 1, a[1].val = 1, a[2].val = 0, a[3].val = 0 =}
-		:0.172839506172841: {= a[0].val = 1, a[1].val = 1, a[2].val = 1, a[3].val = 0 =}
-		:0.123456790123456: {= a[0].val = 1, a[1].val = 1, a[2].val = 2, a[3].val = 2 =}
+		:0.592592592592592: {= a[0].val = 0, a[1].val = 0, a[2].val = 0, a[3].val = 1 =}
+		:0.172839506172841: {= a[0].val = 0, a[1].val = 0, a[2].val = 1, a[3].val = 1 =}
+		:0.123456790123456: {= a[0].val = 0, a[1].val = 0, a[2].val = 1, a[3].val = 2 =}
 	}
+	*/
 
 	
 }
@@ -183,11 +242,12 @@ process initialize(){
 //Sets the new priority value of buffer a[i] and updates the value if the buffer was serviced ------------------------------------------------------------------------------------
 process setPriority(int i){
 	if (a[i].serviced == true){
-		{= 
-		//a[i].val = DiscreteUniform(0, 2),	//Update value	
-		a[i].priority = i + unserviced 						//Set new priority
-		=}
-		//<update buffer value and dequeue buffer>
+		palt{
+			:0.7037037037037035: {= a[i].val = 0, a[i].priority = i + unserviced =}
+			:0.25308641975308625: {= a[i].val = 1, a[i].priority = i + unserviced =}
+			:0.04320987654321025:  {= a[i].val = 2, a[i].priority = i + unserviced =}
+		}
+		//dequeue buffer
 	}
 	else {
 		{= 

@@ -1,0 +1,534 @@
+//full 13 state model (may be reduced)
+
+const int clkLower = 100; 
+const int clkUpper = 105;
+int(clkLower..clkUpper) clk;
+
+datatype buffer = {int(0..1) val, int(0..3) id, bool serviced, int(0..3) priority, int(0..1) output};
+
+int(0..2) unserviced;
+int(0..2) totalUnserviced;
+
+int(0..((clkUpper - clkLower) * 4)) totalServiced = 0;
+int(0..(clkUpper - clkLower)) optimalRuns = 0;
+
+//0- no conflict, 1- one confilct, 2- three-way conflict, 3 - two pairs[2a, both unserviced buffers point to eachother], 
+//4 - two pairs[2b, both unserviced buffers point to the serviced buffers], 5 - two pairs[2c, one unserviced buffer points to the other underviced buffer, which points to a serviced buffer]
+int(0..12) state = 0;
+
+buffer north, east, south, west;
+
+buffer[] a; 	//Array of the four buffers. a[0] is the highest priority
+buffer[] temp;		//Temporary buffer used to update buffer a
+
+action tick;
+
+// ------ Begin: properties ---------
+property Pr1 = Pmax(<> (clk >= clkUpper));
+
+property TotalServiced = Pmax(<> (totalServiced >= ((clkUpper-clkLower)*3)));
+
+property Runs1 = Pmax(<> (optimalRuns == 1));
+property Runs2 = Pmax(<> (optimalRuns == 2));
+property Runs3 = Pmax(<> (optimalRuns == 3));	
+property Runs4 = Pmax(<> (optimalRuns == 4));
+property Runs5 = Pmax(<> (optimalRuns == 5));
+// ------ End: properties -----------
+
+
+process Clock(){	
+
+	tick {= clk++ =};
+	if (clk <= clkUpper) {
+	   Clock()
+	}
+	else {
+	   stop
+	}   
+	
+}
+
+process Arbiter(){
+	initialize();
+	
+	//runtime loop
+	do {
+		
+		if (state == 0){
+			if(a[0].val + a[1].val + a[2].val + a[3].val == 4){		//all four buffers have values
+				palt{
+					:(): {= unserviced = 0, totalUnserviced = 0, state = 0 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 1 =} 
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 2 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 3 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 4 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 5 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 6 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 7 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 8 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 9 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 10 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 11 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 12 =}
+				}
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 3){		//three buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 2){		//two buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 1){		//one buffer has a value
+			}
+			else{			//no buffers have values
+			}
+		}
+		else if(state == 1){
+			if(a[0].val + a[1].val + a[2].val + a[3].val == 4){		//all four buffers have values
+				palt{
+					:(): {= unserviced = 0, totalUnserviced = 0, state = 0 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 1 =} 
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 2 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 3 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 4 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 5 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 6 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 7 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 8 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 9 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 10 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 11 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 12 =}
+				}
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 3){		//three buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 2){		//two buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 1){		//one buffer has a value
+			}
+			else{			//no buffers have values
+			}
+		}
+		else if(state == 2){
+			if(a[0].val + a[1].val + a[2].val + a[3].val == 4){		//all four buffers have values
+				palt{
+					:(): {= unserviced = 0, totalUnserviced = 0, state = 0 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 1 =} 
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 2 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 3 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 4 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 5 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 6 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 7 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 8 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 9 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 10 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 11 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 12 =}
+				}
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 3){		//three buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 2){		//two buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 1){		//one buffer has a value
+			}
+			else{			//no buffers have values
+			}
+		}
+		else if(state == 3){
+			if(a[0].val + a[1].val + a[2].val + a[3].val == 4){		//all four buffers have values
+				palt{
+					:(): {= unserviced = 0, totalUnserviced = 0, state = 0 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 1 =} 
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 2 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 3 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 4 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 5 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 6 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 7 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 8 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 9 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 10 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 11 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 12 =}
+				}
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 3){		//three buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 2){		//two buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 1){		//one buffer has a value
+			}
+			else{			//no buffers have values
+			}
+		}
+		else if(state == 4){
+			if(a[0].val + a[1].val + a[2].val + a[3].val == 4){		//all four buffers have values
+				palt{
+					:(): {= unserviced = 0, totalUnserviced = 0, state = 0 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 1 =} 
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 2 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 3 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 4 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 5 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 6 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 7 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 8 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 9 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 10 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 11 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 12 =}
+				}
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 3){		//three buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 2){		//two buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 1){		//one buffer has a value
+			}
+			else{			//no buffers have values
+			}
+		}
+		else if(state == 5){
+			if(a[0].val + a[1].val + a[2].val + a[3].val == 4){		//all four buffers have values
+				palt{
+					:(): {= unserviced = 0, totalUnserviced = 0, state = 0 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 1 =} 
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 2 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 3 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 4 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 5 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 6 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 7 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 8 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 9 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 10 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 11 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 12 =}
+				}
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 3){		//three buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 2){		//two buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 1){		//one buffer has a value
+			}
+			else{			//no buffers have values
+			}
+		}
+		else if(state == 6){
+			if(a[0].val + a[1].val + a[2].val + a[3].val == 4){		//all four buffers have values
+				palt{
+					:(): {= unserviced = 0, totalUnserviced = 0, state = 0 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 1 =} 
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 2 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 3 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 4 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 5 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 6 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 7 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 8 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 9 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 10 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 11 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 12 =}
+				}
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 3){		//three buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 2){		//two buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 1){		//one buffer has a value
+			}
+			else{			//no buffers have values
+			}
+		}
+		else if(state == 7){
+			if(a[0].val + a[1].val + a[2].val + a[3].val == 4){		//all four buffers have values
+				palt{
+					:(): {= unserviced = 0, totalUnserviced = 0, state = 0 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 1 =} 
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 2 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 3 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 4 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 5 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 6 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 7 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 8 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 9 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 10 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 11 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 12 =}
+				}
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 3){		//three buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 2){		//two buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 1){		//one buffer has a value
+			}
+			else{			//no buffers have values
+			}
+		}
+		else if(state == 8){
+			if(a[0].val + a[1].val + a[2].val + a[3].val == 4){		//all four buffers have values
+				palt{
+					:(): {= unserviced = 0, totalUnserviced = 0, state = 0 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 1 =} 
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 2 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 3 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 4 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 5 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 6 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 7 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 8 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 9 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 10 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 11 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 12 =}
+				}
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 3){		//three buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 2){		//two buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 1){		//one buffer has a value
+			}
+			else{			//no buffers have values
+			}
+		}
+		else if(state == 9){
+			if(a[0].val + a[1].val + a[2].val + a[3].val == 4){		//all four buffers have values
+				palt{
+					:(): {= unserviced = 0, totalUnserviced = 0, state = 0 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 1 =} 
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 2 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 3 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 4 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 5 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 6 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 7 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 8 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 9 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 10 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 11 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 12 =}
+				}
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 3){		//three buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 2){		//two buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 1){		//one buffer has a value
+			}
+			else{			//no buffers have values
+			}
+		}
+		else if(state == 10){
+			if(a[0].val + a[1].val + a[2].val + a[3].val == 4){		//all four buffers have values
+				palt{
+					:(): {= unserviced = 0, totalUnserviced = 0, state = 0 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 1 =} 
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 2 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 3 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 4 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 5 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 6 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 7 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 8 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 9 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 10 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 11 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 12 =}
+				}
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 3){		//three buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 2){		//two buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 1){		//one buffer has a value
+			}
+			else{			//no buffers have values
+			}
+		}
+		else if(state == 11){
+			if(a[0].val + a[1].val + a[2].val + a[3].val == 4){		//all four buffers have values
+				palt{
+					:(): {= unserviced = 0, totalUnserviced = 0, state = 0 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 1 =} 
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 2 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 3 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 4 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 5 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 6 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 7 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 8 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 9 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 10 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 11 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 12 =}
+				}
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 3){		//three buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 2){		//two buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 1){		//one buffer has a value
+			}
+			else{			//no buffers have values
+			}
+		}
+		else if(state == 12){
+			if(a[0].val + a[1].val + a[2].val + a[3].val == 4){		//all four buffers have values
+				palt{
+					:(): {= unserviced = 0, totalUnserviced = 0, state = 0 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 1 =} 
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 2 =}
+					:(): {= unserviced = 1, totalUnserviced = 1, state = 3 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 4 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 5 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 6 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 7 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 8 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 9 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 10 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 11 =}
+					:(): {= unserviced = 2, totalUnserviced = 2, state = 12 =}
+				}
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 3){		//three buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 2){		//two buffers have values
+			}
+			else if(a[0].val + a[1].val + a[2].val + a[3].val == 1){		//one buffer has a value
+			}
+			else{			//no buffers have values
+			}
+		}
+		else {
+			tau
+		}
+		
+		{= totalServiced = totalServiced + 4 - unserviced =};
+		
+		//Assign unserviced variables
+		if(unserviced == 0){
+			{= a[0].serviced = true, a[1].serviced = true, a[2].serviced = true, a[3].serviced = true, optimalRuns++ =}
+		}
+		else {
+			if(state == 1){
+				{= a[0].serviced = true =}; 
+				palt{
+					:(1/6): {= a[1].serviced = false, a[2].serviced = true, a[3].serviced = true =}
+					:(2/6): {= a[1].serviced = true, a[2].serviced = false, a[3].serviced = true =}
+					:(3/6): {= a[1].serviced = true, a[2].serviced = true, a[3].serviced = false =}
+				}
+			}
+			else{
+				if(state == 2){
+					{= a[0].serviced = true =}; 
+					palt{
+						:(1/4): {= a[1].serviced = false, a[2].serviced = false, a[3].serviced = true =}
+						:(2/4): {= a[1].serviced = true, a[2].serviced = false, a[3].serviced = false =}
+						:(1/4): {= a[1].serviced = false, a[2].serviced = true, a[3].serviced = false =}
+					}
+				}
+				else {
+					//UPDATE!v
+					if(state == 3){
+						{= a[0].serviced = true =}; 
+						palt{
+							:(2/3): {= a[1].serviced = true, a[2].serviced = false, a[3].serviced = false =}
+							:(1/3): {= a[1].serviced = false, a[2].serviced = true, a[3].serviced = false =}
+						}
+					}
+					else{
+						if(state == 4) {
+							{= a[0].serviced = true =}; 
+						palt{
+							:(2/3): {= a[1].serviced = true, a[2].serviced = false, a[3].serviced = false =}
+							:(1/3): {= a[1].serviced = false, a[2].serviced = true, a[3].serviced = false =}
+						}
+						}
+						else {
+							if(state == 5) {
+								{= a[0].serviced = true =}; 
+						palt{
+							:(2/3): {= a[1].serviced = true, a[2].serviced = false, a[3].serviced = false =}
+							:(1/3): {= a[1].serviced = false, a[2].serviced = true, a[3].serviced = false =}
+						}
+							}
+							else{
+								tau
+							}
+						}
+					}
+					//UPDATE!^
+				}
+			}
+		};
+		
+		setPriority(0);
+		setPriority(1);
+		setPriority(2);
+		setPriority(3);
+		
+		{= 
+		temp[a[0].priority] = a[0],
+		temp[a[1].priority] = a[1],
+		temp[a[2].priority] = a[2],
+		temp[a[3].priority] = a[3] 
+		=};
+		
+		tick {= a = temp =};
+		
+		
+		if (clk >= clkUpper) {
+			stop
+		}
+		else {
+			tau
+		}
+		
+	}
+}
+
+process initialize(){
+	{= 
+	a = [north, east, south, west],
+	temp = [north, east, south, west], 
+	
+	a[0].id = 0, 
+	a[1].id = 1, 
+	a[2].id = 2, 
+	a[3].id = 3,  
+	
+	a[0].val = 1, 
+	a[1].val = 1, 
+	a[2].val = 1, 
+	a[3].val = 1
+	
+	=}
+	
+}
+
+process setPriority(int i){
+	if (a[i].serviced == true){
+		{= 
+		//a[i].val = DiscreteUniform(0, 1),	//Update value	
+		a[i].priority = i + unserviced 						//Set new priority
+		=}
+		//<update buffer value and dequeue buffer>
+	}
+	else {
+		{= 
+		a[i].priority = totalUnserviced - unserviced,		//Set new priority
+		unserviced-- 						//decrement unserviced
+		=}
+	}
+}
+
+par{
+::	Clock()
+::	Arbiter()
+}
