@@ -1,8 +1,8 @@
 //reduced 12 state model
 
-const int clkLower = 100; 
-const int clkUpper = 500;
-int(clkLower..clkUpper) clk;
+// const int clkLower = 100; 
+// const int clkUpper = 500;
+// int(clkLower..clkUpper) clk;
 
 datatype buffer = {int(0..1) val, int(0..3) id, bool serviced, int(0..3) priority, int(0..1) output};
 
@@ -10,7 +10,7 @@ int(0..2) unserviced;
 int(0..2) totalUnserviced;
 
 // int(0..((clkUpper - clkLower) * 4)) totalServiced = 0;
-int(0..(clkUpper - clkLower)) optimalRuns = 0;
+// int(0..(clkUpper - clkLower)) optimalRuns = 0;
 
 
 int(0..11) state = 0;
@@ -27,24 +27,33 @@ action tick;
 
 //property TotalServiced = Pmax(<> (totalServiced >= ((clkUpper-clkLower)*3)));
 
-property Runs1 = Pmax(<> (optimalRuns == 1));
-property Runs2 = Pmax(<> (optimalRuns == 2));
-property Runs3 = Pmax(<> (optimalRuns == 3));	
-property Runs4 = Pmax(<> (optimalRuns == 4));
-property Runs5 = Pmax(<> (optimalRuns == 5));
+// property Runs1 = Pmax(<> (optimalRuns == 1));
+// property Runs2 = Pmax(<> (optimalRuns == 2));
+// property Runs3 = Pmax(<> (optimalRuns == 3));	
+// property Runs4 = Pmax(<> (optimalRuns == 4));
+// property Runs5 = Pmax(<> (optimalRuns == 5));
+
+property dummy = Pmax(<> (state == 5));
+
 // ------ End: properties -----------
 
 
+// process Clock(){	
+
+// 	tick {= clk++ =};
+// 	if (clk <= clkUpper) {
+// 	   Clock()
+// 	}
+// 	else {
+// 	   stop
+// 	}   
+	
+// }
+
 process Clock(){	
 
-	tick {= clk++ =};
-	if (clk <= clkUpper) {
-	   Clock()
-	}
-	else {
-	   stop
-	}   
-	
+ 	tick;
+	Clock()
 }
 
 process Arbiter(){
@@ -471,7 +480,7 @@ process Arbiter(){
 		
 		//Assign unserviced variables
 		if (state == 0){
-			{= a[0].serviced = true, a[1].serviced = true, a[2].serviced = true, a[3].serviced = true, optimalRuns++ =}
+			{= a[0].serviced = true, a[1].serviced = true, a[2].serviced = true, a[3].serviced = true =} //, optimalRuns++ =}
 		}
 		else if (state == 1 || state == 2 || state == 3){
 			palt{
@@ -506,15 +515,15 @@ process Arbiter(){
 		temp[a[3].priority] = a[3] 
 		=};
 		
-		tick {= a = temp =};
+		tick {= a = temp =}//;
 		
 		
-		if (clk >= clkUpper) {
-			stop
-		}
-		else {
-			tau
-		}
+		// if (clk >= clkUpper) {
+		// 	stop
+		// }
+		// else {
+		// 	tau
+		// }
 		
 	}
 }
