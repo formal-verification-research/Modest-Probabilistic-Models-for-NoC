@@ -33,9 +33,11 @@ action tick;
 // property Runs2 = Pmax(<> (optimalRuns == 2));
 // property Runs3 = Pmax(<> (optimalRuns == 3));	
 // property Runs4 = Pmax(<> (optimalRuns == 4));
-// property Runs5 = Smax(<> (optimalRuns >= 100));
-property Runs6 = Xmax(S, optimalRuns == 100);
-//property Runs7 = Xmax(S(state==0), state==0);
+//property Runs5 = Smax((optimalRuns >= 10));
+property Runs6 = Xmax(S(3), optimalRuns == 100);
+property Runs7 = Xmax(S(1), optimalRuns == 100);
+property Runs8 = Xmax(S(1/3), optimalRuns == 100);
+
 
 // ------ End: properties -----------
 
