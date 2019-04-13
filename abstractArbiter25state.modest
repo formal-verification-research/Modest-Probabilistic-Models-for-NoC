@@ -1,0 +1,767 @@
+//25 state model with possible empty buffers
+
+const int clkLower = 100; 
+const int clkUpper = 5100;
+int(clkLower..clkUpper) clk;
+
+int(0..(clkUpper - clkLower)*4) deltaI = 0;
+
+
+int(0..24) state = 0;
+
+action tick;
+
+// ------ Begin: properties ---------
+property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (deltaI >= 100));
+// ------ End: properties -----------
+
+
+process Clock(){	
+
+	tick {= clk++ =};
+	if (clk <= clkUpper) {
+	   Clock()
+	}
+	else {
+	   stop
+	}   
+	
+}
+
+process Arbiter(){
+	
+	//runtime loop
+	do {
+		alt{
+		::when(state == 0)
+			palt{
+				:( 9/256): {= state = 0, deltaI += 0 =}
+				:( 3/64 ): {= state = 1, deltaI += 1 =} 
+				:( 1/16 ): {= state = 2, deltaI += 1 =}
+				:( 5/64 ): {= state = 3, deltaI += 1 =}
+				:( 3/256): {= state = 4, deltaI += 2 =}
+				:( 9/256): {= state = 5, deltaI += 2 =}
+				:( 3/256): {= state = 6, deltaI += 2 =}
+				:( 1/256): {= state = 7, deltaI += 2 =}
+				:( 1/128): {= state = 8, deltaI += 2 =}
+				:( 1/128): {= state = 9, deltaI += 2 =}
+				:( 1/256): {= state = 10, deltaI += 2 =}
+				:( 1/256): {= state = 11, deltaI += 2 =}
+				:( 1/128): {= state = 12, deltaI += 2 =}
+				:(11/64 ): {= state = 13, deltaI += 3 =} 
+				:(15/256): {= state = 14, deltaI += 2 =}
+				:( 5/64 ): {= state = 15, deltaI += 2 =}
+				:(25/256): {= state = 16, deltaI += 2 =}
+				:( 1/256): {= state = 17, deltaI += 3 =}
+				:( 3/256): {= state = 18, deltaI += 3 =}
+				:(21/128): {= state = 19, deltaI += 2 =}
+				:( 3/256): {= state = 20, deltaI += 3 =}
+				:( 1/64 ): {= state = 21, deltaI += 3 =}
+				:( 5/256): {= state = 22, deltaI += 3 =}
+				:( 3/64 ): {= state = 23, deltaI += 3 =}
+				:( 1/256): {= state = 24, deltaI += 4 =}
+			}
+		
+		::when(state == 1)
+			palt{
+				:( 3/64 ): {= state = 0 , deltaI += 1 =}
+				:( 1/16 ): {= state = 1 , deltaI += 0 =} 
+				:( 1/8  ): {= state = 2 , deltaI += 0 =}
+				:( 1/16 ): {= state = 3 , deltaI += 0 =}
+				:( 1/64 ): {= state = 4 , deltaI += 1 =}
+				:( 3/64 ): {= state = 5 , deltaI += 1 =}
+				:(  0   ): {= state = 6 , deltaI += 1 =}
+				:( 1/64 ): {= state = 7 , deltaI += 1 =}
+				:( 1/64 ): {= state = 8 , deltaI += 1 =}
+				:(  0   ): {= state = 9 , deltaI += 1 =}
+				:( 1/64 ): {= state = 10 , deltaI += 1 =}
+				:(  0   ): {= state = 11 , deltaI += 1 =}
+				:( 1/64 ): {= state = 12 , deltaI += 1 =}
+				:(11/64 ): {= state = 13 , deltaI += 0 =} 
+				:( 3/64 ): {= state = 14 , deltaI += 1 =}
+				:( 5/32 ): {= state = 15 , deltaI += 1 =}
+				:( 1/32 ): {= state = 16 , deltaI += 1 =}
+				:(  0   ): {= state = 17 , deltaI += 2 =}
+				:( 1/64 ): {= state = 18 , deltaI += 2 =}
+				:( 7/64 ): {= state = 19 , deltaI += 1 =}
+				:(  0   ): {= state = 20 , deltaI += 2 =}
+				:( 1/32 ): {= state = 21 , deltaI += 2 =}
+				:(  0   ): {= state = 22 , deltaI += 2 =}
+				:( 1/64 ): {= state = 23 , deltaI += 2 =}
+				:(  0   ): {= state = 24 , deltaI += 3 =}
+			}
+			
+		::when(state == 2)
+			palt{
+				:( 3/64 ): {= state = 0 , deltaI += 1 =}
+				:( 1/16 ): {= state = 1 , deltaI += 0 =} 
+				:( 3/32 ): {= state = 2 , deltaI += 0 =}
+				:( 3/32 ): {= state = 3 , deltaI += 0 =}
+				:( 1/64 ): {= state = 4 , deltaI += 1 =}
+				:( 3/64 ): {= state = 5 , deltaI += 1 =}
+				:( 1/64	): {= state = 6 , deltaI += 1 =}
+				:(  0   ): {= state = 7 , deltaI += 1 =}
+				:( 1/64 ): {= state = 8 , deltaI += 1 =}
+				:(  0   ): {= state = 9 , deltaI += 1 =}
+				:(  0   ): {= state = 10 , deltaI += 1 =}
+				:( 1/64 ): {= state = 11 , deltaI += 1 =}
+				:( 1/64 ): {= state = 12 , deltaI += 1 =}
+				:(11/64 ): {= state = 13 , deltaI += 0 =} 
+				:( 3/64 ): {= state = 14 , deltaI += 1 =}
+				:( 3/32 ): {= state = 15 , deltaI += 1 =}
+				:( 3/32 ): {= state = 16 , deltaI += 1 =}
+				:(  0   ): {= state = 17 , deltaI += 2 =}
+				:( 1/64 ): {= state = 18 , deltaI += 2 =}
+				:( 7/64 ): {= state = 19 , deltaI += 1 =}
+				:(  0   ): {= state = 20 , deltaI += 2 =}
+				:( 1/64 ): {= state = 21 , deltaI += 2 =}
+				:( 1/64 ): {= state = 22 , deltaI += 2 =}
+				:( 1/64 ): {= state = 23 , deltaI += 2 =}
+				:(  0   ): {= state = 24 , deltaI += 3 =}
+			}
+			
+		::when(state == 3)
+			palt{
+				:( 3/64 ): {= state = 0 , deltaI += 1 =}
+				:( 1/16 ): {= state = 1 , deltaI += 0 =} 
+				:( 1/32 ): {= state = 2 , deltaI += 0 =}
+				:( 5/32 ): {= state = 3 , deltaI += 0 =}
+				:( 1/64 ): {= state = 4 , deltaI += 1 =}
+				:( 3/64 ): {= state = 5 , deltaI += 1 =}
+				:( 1/32 ): {= state = 6 , deltaI += 1 =}
+				:(  0   ): {= state = 7 , deltaI += 1 =}
+				:(  0   ): {= state = 8 , deltaI += 1 =}
+				:( 1/32 ): {= state = 9 , deltaI += 1 =}
+				:(  0   ): {= state = 10 , deltaI += 1 =}
+				:(  0   ): {= state = 11 , deltaI += 1 =}
+				:(  0   ): {= state = 12 , deltaI += 1 =}
+				:(11/64 ): {= state = 13 , deltaI += 0 =} 
+				:( 3/64 ): {= state = 14 , deltaI += 1 =}
+				:( 1/64 ): {= state = 15 , deltaI += 1 =}
+				:(11/64 ): {= state = 16 , deltaI += 1 =}
+				:(  0   ): {= state = 17 , deltaI += 2 =}
+				:( 1/64 ): {= state = 18 , deltaI += 2 =}
+				:( 7/64 ): {= state = 19 , deltaI += 1 =}
+				:(  0   ): {= state = 20 , deltaI += 2 =}
+				:(  0   ): {= state = 21 , deltaI += 2 =}
+				:( 1/32 ): {= state = 22 , deltaI += 2 =}
+				:( 1/64 ): {= state = 23 , deltaI += 2 =}
+				:(  0   ): {= state = 24 , deltaI += 3 =}
+			}
+			
+		::when(state == 4)
+			palt{
+				:(  0   ): {= state = 0 , deltaI += 2 =}
+				:(  0   ): {= state = 1 , deltaI += 1 =} 
+				:( 1/4  ): {= state = 2 , deltaI += 1 =}
+				:(  0   ): {= state = 3 , deltaI += 1 =}
+				:(  0   ): {= state = 4 , deltaI += 0 =}
+				:( 3/16 ): {= state = 5 , deltaI += 0 =}
+				:(  0   ): {= state = 6 , deltaI += 0 =}
+				:(  0   ): {= state = 7 , deltaI += 0 =}
+				:( 1/16 ): {= state = 8 , deltaI += 0 =}
+				:(  0   ): {= state = 9 , deltaI += 0 =}
+				:(  0   ): {= state = 10 , deltaI += 0 =}
+				:(  0   ): {= state = 11 , deltaI += 0 =}
+				:( 1/16 ): {= state = 12 , deltaI += 0 =}
+				:(  0   ): {= state = 13 , deltaI += 1 =} 
+				:(  0   ): {= state = 14 , deltaI += 0 =}
+				:( 5/16 ): {= state = 15 , deltaI += 0 =}
+				:(  0   ): {= state = 16 , deltaI += 0 =}
+				:(  0   ): {= state = 17 , deltaI += 1 =}
+				:( 1/16 ): {= state = 18 , deltaI += 1 =}
+				:(  0   ): {= state = 19 , deltaI += 0 =}
+				:(  0   ): {= state = 20 , deltaI += 1 =}
+				:( 1/16 ): {= state = 21 , deltaI += 1 =}
+				:(  0   ): {= state = 22 , deltaI += 1 =}
+				:(  0   ): {= state = 23 , deltaI += 1 =}
+				:(  0   ): {= state = 24 , deltaI += 2 =}
+			}
+			
+		::when(state == 5)
+			palt{
+				:(  0   ): {= state = 0 , deltaI += 2 =}
+				:(  0   ): {= state = 1 , deltaI += 1 =} 
+				:(  0   ): {= state = 2 , deltaI += 1 =}
+				:( 1/4  ): {= state = 3 , deltaI += 1 =}
+				:(  0   ): {= state = 4 , deltaI += 0 =}
+				:( 3/16 ): {= state = 5 , deltaI += 0 =}
+				:( 1/16 ): {= state = 6 , deltaI += 0 =}
+				:(  0   ): {= state = 7 , deltaI += 0 =}
+				:(  0   ): {= state = 8 , deltaI += 0 =}
+				:( 1/16 ): {= state = 9 , deltaI += 0 =}
+				:(  0   ): {= state = 10 , deltaI += 0 =}
+				:(  0   ): {= state = 11 , deltaI += 0 =}
+				:(  0   ): {= state = 12 , deltaI += 0 =}
+				:(  0   ): {= state = 13 , deltaI += 1 =} 
+				:(  0   ): {= state = 14 , deltaI += 0 =}
+				:(  0   ): {= state = 15 , deltaI += 0 =}
+				:( 5/16 ): {= state = 16 , deltaI += 0 =}
+				:(  0   ): {= state = 17 , deltaI += 1 =}
+				:( 1/16 ): {= state = 18 , deltaI += 1 =}
+				:(  0   ): {= state = 19 , deltaI += 0 =}
+				:(  0   ): {= state = 20 , deltaI += 1 =}
+				:(  0   ): {= state = 21 , deltaI += 1 =}
+				:( 1/16 ): {= state = 22 , deltaI += 1 =}
+				:(  0   ): {= state = 23 , deltaI += 1 =}
+				:(  0   ): {= state = 24 , deltaI += 2 =}
+			}
+			
+		::when(state == 6)
+			palt{
+				:( 1/64 ): {= state = 0 , deltaI += 2 =}
+				:( 1/32 ): {= state = 1 , deltaI += 1 =} 
+				:( 1/32 ): {= state = 2 , deltaI += 1 =}
+				:(  0   ): {= state = 3 , deltaI += 1 =}
+				:( 1/64 ): {= state = 4 , deltaI += 0 =}
+				:( 1/64 ): {= state = 5 , deltaI += 0 =}
+				:(  0   ): {= state = 6 , deltaI += 0 =}
+				:( 1/64 ): {= state = 7 , deltaI += 0 =}
+				:( 1/64 ): {= state = 8 , deltaI += 0 =}
+				:(  0   ): {= state = 9 , deltaI += 0 =}
+				:(  0   ): {= state = 10 , deltaI += 0 =}
+				:(  0   ): {= state = 11 , deltaI += 0 =}
+				:(  0   ): {= state = 12 , deltaI += 0 =}
+				:( 1/32 ): {= state = 13 , deltaI += 1 =} 
+				:( 1/32 ): {= state = 14 , deltaI += 0 =}
+				:( 1/32 ): {= state = 15 , deltaI += 0 =}
+				:(  0   ): {= state = 16 , deltaI += 0 =}
+				:(  0   ): {= state = 17 , deltaI += 1 =}
+				:(  0   ): {= state = 18 , deltaI += 1 =}
+				:( 1/64 ): {= state = 19 , deltaI += 0 =}
+				:(  0   ): {= state = 20 , deltaI += 1 =}
+				:(  0   ): {= state = 21 , deltaI += 1 =}
+				:(  0   ): {= state = 22 , deltaI += 1 =}
+				:(  0   ): {= state = 23 , deltaI += 1 =}
+				:(  0   ): {= state = 24 , deltaI += 2 =}
+			}
+			
+		::when(state == 7)
+			palt{
+				:( 1/8  ): {= state = 0 , deltaI += 2 =}
+				:( 1/16 ): {= state = 1 , deltaI += 1 =} 
+				:( 1/16 ): {= state = 2 , deltaI += 1 =}
+				:( 1/4  ): {= state = 3 , deltaI += 1 =}
+				:(  0   ): {= state = 4 , deltaI += 0 =}
+				:(  0   ): {= state = 5 , deltaI += 0 =}
+				:( 1/16 ): {= state = 6 , deltaI += 0 =}
+				:(  0   ): {= state = 7 , deltaI += 0 =}
+				:(  0   ): {= state = 8 , deltaI += 0 =}
+				:(  0   ): {= state = 9 , deltaI += 0 =}
+				:(  0   ): {= state = 10 , deltaI += 0 =}
+				:(  0   ): {= state = 11 , deltaI += 0 =}
+				:(  0   ): {= state = 12 , deltaI += 0 =}
+				:( 1/4  ): {= state = 13 , deltaI += 1 =} 
+				:(  0   ): {= state = 14 , deltaI += 0 =}
+				:(  0   ): {= state = 15 , deltaI += 0 =}
+				:( 1/8  ): {= state = 16 , deltaI += 0 =}
+				:(  0   ): {= state = 17 , deltaI += 1 =}
+				:(  0   ): {= state = 18 , deltaI += 1 =}
+				:( 1/16 ): {= state = 19 , deltaI += 0 =}
+				:(  0   ): {= state = 20 , deltaI += 1 =}
+				:(  0   ): {= state = 21 , deltaI += 1 =}
+				:(  0   ): {= state = 22 , deltaI += 1 =}
+				:(  0   ): {= state = 23 , deltaI += 1 =}
+				:(  0   ): {= state = 24 , deltaI += 2 =}
+			}
+		
+		::when(state == 8)
+			palt{
+				:( 1/8  ): {= state = 0 , deltaI += 2 =}
+				:( 1/16 ): {= state = 1 , deltaI += 1 =} 
+				:( 1/16 ): {= state = 2 , deltaI += 1 =}
+				:( 1/4  ): {= state = 3 , deltaI += 1 =}
+				:(  0   ): {= state = 4 , deltaI += 0 =}
+				:(  0   ): {= state = 5 , deltaI += 0 =}
+				:( 1/16 ): {= state = 6 , deltaI += 0 =}
+				:(  0   ): {= state = 7 , deltaI += 0 =}
+				:(  0   ): {= state = 8 , deltaI += 0 =}
+				:(  0   ): {= state = 9 , deltaI += 0 =}
+				:(  0   ): {= state = 10 , deltaI += 0 =}
+				:(  0   ): {= state = 11 , deltaI += 0 =}
+				:(  0   ): {= state = 12 , deltaI += 0 =}
+				:( 1/4  ): {= state = 13 , deltaI += 1 =} 
+				:(  0   ): {= state = 14 , deltaI += 0 =}
+				:(  0   ): {= state = 15 , deltaI += 0 =}
+				:( 1/8  ): {= state = 16 , deltaI += 0 =}
+				:(  0   ): {= state = 17 , deltaI += 1 =}
+				:(  0   ): {= state = 18 , deltaI += 1 =}
+				:( 1/16 ): {= state = 19 , deltaI += 0 =}
+				:(  0   ): {= state = 20 , deltaI += 1 =}
+				:(  0   ): {= state = 21 , deltaI += 1 =}
+				:(  0   ): {= state = 22 , deltaI += 1 =}
+				:(  0   ): {= state = 23 , deltaI += 1 =}
+				:(  0   ): {= state = 24 , deltaI += 2 =}
+			}
+		
+		::when(state == 9)
+			palt{
+				:( 1/16 ): {= state = 0 , deltaI += 2 =}
+				:( 1/16 ): {= state = 1 , deltaI += 1 =} 
+				:( 3/16 ): {= state = 2 , deltaI += 1 =}
+				:( 1/8  ): {= state = 3 , deltaI += 1 =}
+				:(  0   ): {= state = 4 , deltaI += 0 =}
+				:( 1/16 ): {= state = 5 , deltaI += 0 =}
+				:(  0   ): {= state = 6 , deltaI += 0 =}
+				:(  0   ): {= state = 7 , deltaI += 0 =}
+				:(  0   ): {= state = 8 , deltaI += 0 =}
+				:(  0   ): {= state = 9 , deltaI += 0 =}
+				:(  0   ): {= state = 10 , deltaI += 0 =}
+				:(  0   ): {= state = 11 , deltaI += 0 =}
+				:( 1/16 ): {= state = 12 , deltaI += 0 =}
+				:( 3/16 ): {= state = 13 , deltaI += 1 =} 
+				:(  0   ): {= state = 14 , deltaI += 0 =}
+				:( 1/8  ): {= state = 15 , deltaI += 0 =}
+				:( 1/16 ): {= state = 16 , deltaI += 0 =}
+				:(  0   ): {= state = 17 , deltaI += 1 =}
+				:(  0   ): {= state = 18 , deltaI += 1 =}
+				:( 1/16 ): {= state = 19 , deltaI += 0 =}
+				:(  0   ): {= state = 20 , deltaI += 1 =}
+				:(  0   ): {= state = 21 , deltaI += 1 =}
+				:(  0   ): {= state = 22 , deltaI += 1 =}
+				:(  0   ): {= state = 23 , deltaI += 1 =}
+				:(  0   ): {= state = 24 , deltaI += 2 =}
+			}
+			
+		::when(state == 10)
+			palt{
+				:( 1/16 ): {= state = 0 , deltaI += 2 =}
+				:( 1/16 ): {= state = 1 , deltaI += 1 =} 
+				:( 3/16 ): {= state = 2 , deltaI += 1 =}
+				:( 1/8  ): {= state = 3 , deltaI += 1 =}
+				:(  0   ): {= state = 4 , deltaI += 0 =}
+				:( 1/16 ): {= state = 5 , deltaI += 0 =}
+				:(  0   ): {= state = 6 , deltaI += 0 =}
+				:(  0   ): {= state = 7 , deltaI += 0 =}
+				:(  0   ): {= state = 8 , deltaI += 0 =}
+				:(  0   ): {= state = 9 , deltaI += 0 =}
+				:( 1/16 ): {= state = 10 , deltaI += 0 =}
+				:(  0   ): {= state = 11 , deltaI += 0 =}
+				:(  0   ): {= state = 12 , deltaI += 0 =}
+				:( 3/16 ): {= state = 13 , deltaI += 1 =} 
+				:(  0   ): {= state = 14 , deltaI += 0 =}
+				:( 1/8  ): {= state = 15 , deltaI += 0 =}
+				:( 1/16 ): {= state = 16 , deltaI += 0 =}
+				:(  0   ): {= state = 17 , deltaI += 1 =}
+				:(  0   ): {= state = 18 , deltaI += 1 =}
+				:( 1/16 ): {= state = 19 , deltaI += 0 =}
+				:(  0   ): {= state = 20 , deltaI += 1 =}
+				:(  0   ): {= state = 21 , deltaI += 1 =}
+				:(  0   ): {= state = 22 , deltaI += 1 =}
+				:(  0   ): {= state = 23 , deltaI += 1 =}
+				:(  0   ): {= state = 24 , deltaI += 2 =}
+			}
+		::when(state == 11)
+			palt{
+				:( 1/16 ): {= state = 0 , deltaI += 2 =}
+				:( 3/16 ): {= state = 1 , deltaI += 1 =} 
+				:( 1/16 ): {= state = 2 , deltaI += 1 =}
+				:( 1/8  ): {= state = 3 , deltaI += 1 =}
+				:( 1/16 ): {= state = 4 , deltaI += 0 =}
+				:(  0   ): {= state = 5 , deltaI += 0 =}
+				:(  0   ): {= state = 6 , deltaI += 0 =}
+				:(  0   ): {= state = 7 , deltaI += 0 =}
+				:(  0   ): {= state = 8 , deltaI += 0 =}
+				:(  0   ): {= state = 9 , deltaI += 0 =}
+				:(  0   ): {= state = 10 , deltaI += 0 =}
+				:( 1/16 ): {= state = 11 , deltaI += 0 =}
+				:(  0   ): {= state = 12 , deltaI += 0 =}
+				:( 3/16 ): {= state = 13 , deltaI += 1 =} 
+				:( 1/8  ): {= state = 14 , deltaI += 0 =}
+				:(  0   ): {= state = 15 , deltaI += 0 =}
+				:( 1/16 ): {= state = 16 , deltaI += 0 =}
+				:(  0   ): {= state = 17 , deltaI += 1 =}
+				:(  0   ): {= state = 18 , deltaI += 1 =}
+				:( 1/16 ): {= state = 19 , deltaI += 0 =}
+				:(  0   ): {= state = 20 , deltaI += 1 =}
+				:(  0   ): {= state = 21 , deltaI += 1 =}
+				:(  0   ): {= state = 22 , deltaI += 1 =}
+				:(  0   ): {= state = 23 , deltaI += 1 =}
+				:(  0   ): {= state = 24 , deltaI += 2 =}
+			}
+		::when(state == 12)
+			palt{
+				:( 1/16 ): {= state = 0 , deltaI += 2 =}
+				:( 3/16 ): {= state = 1 , deltaI += 1 =} 
+				:( 1/16 ): {= state = 2 , deltaI += 1 =}
+				:( 1/8  ): {= state = 3 , deltaI += 1 =}
+				:( 1/16 ): {= state = 4 , deltaI += 0 =}
+				:(  0   ): {= state = 5 , deltaI += 0 =}
+				:(  0   ): {= state = 6 , deltaI += 0 =}
+				:(  0   ): {= state = 7 , deltaI += 0 =}
+				:(  0   ): {= state = 8 , deltaI += 0 =}
+				:( 1/16 ): {= state = 9 , deltaI += 0 =}
+				:(  0   ): {= state = 10 , deltaI += 0 =}
+				:(  0   ): {= state = 11 , deltaI += 0 =}
+				:(  0   ): {= state = 12 , deltaI += 0 =}
+				:( 3/16 ): {= state = 13 , deltaI += 1 =} 
+				:( 1/8  ): {= state = 14 , deltaI += 0 =}
+				:(  0   ): {= state = 15 , deltaI += 0 =}
+				:( 1/16 ): {= state = 16 , deltaI += 0 =}
+				:(  0   ): {= state = 17 , deltaI += 1 =}
+				:(  0   ): {= state = 18 , deltaI += 1 =}
+				:( 1/16 ): {= state = 19 , deltaI += 0 =}
+				:(  0   ): {= state = 20 , deltaI += 1 =}
+				:(  0   ): {= state = 21 , deltaI += 1 =}
+				:(  0   ): {= state = 22 , deltaI += 1 =}
+				:(  0   ): {= state = 23 , deltaI += 1 =}
+				:(  0   ): {= state = 24 , deltaI += 2 =}
+			}
+			
+		::when(state == 13)
+			palt{
+				:( 9/256): {= state = 0 , deltaI += 1 =}
+				:( 3/64 ): {= state = 1 , deltaI += 0 =} 
+				:( 1/16 ): {= state = 2 , deltaI += 0 =}
+				:( 5/64 ): {= state = 3 , deltaI += 0 =}
+				:( 3/256): {= state = 4 , deltaI += 1 =}
+				:( 9/256): {= state = 5 , deltaI += 1 =}
+				:( 3/256): {= state = 6 , deltaI += 1 =}
+				:( 1/256): {= state = 7 , deltaI += 1 =}
+				:( 1/128): {= state = 8 , deltaI += 1 =}
+				:( 1/128): {= state = 9 , deltaI += 1 =}
+				:( 1/256): {= state = 10 , deltaI += 1 =}
+				:( 1/256): {= state = 11 , deltaI += 1 =}
+				:( 1/128): {= state = 12 , deltaI += 1 =}
+				:(11/64 ): {= state = 13 , deltaI += 0 =} 
+				:(15/256): {= state = 14 , deltaI += 1 =}
+				:( 5/64 ): {= state = 15 , deltaI += 1 =}
+				:(25/256): {= state = 16 , deltaI += 1 =}
+				:( 1/256): {= state = 17 , deltaI += 2 =}
+				:( 3/256): {= state = 18 , deltaI += 2 =}
+				:(21/128): {= state = 19 , deltaI += 1 =}
+				:( 3/256): {= state = 20 , deltaI += 2 =}
+				:( 1/64 ): {= state = 21 , deltaI += 2 =}
+				:( 5/256): {= state = 22 , deltaI += 2 =}
+				:( 3/64 ): {= state = 23 , deltaI += 2 =}
+				:( 1/256): {= state = 24 , deltaI += 3 =}
+			}	
+		::when(state == 14)
+			palt{
+				:( 3/64 ): {= state = 0 , deltaI += 2 =}
+				:( 1/16 ): {= state = 1 , deltaI += 1 =} 
+				:( 1/8  ): {= state = 2 , deltaI += 1 =}
+				:( 1/16 ): {= state = 3 , deltaI += 1 =}
+				:( 1/64 ): {= state = 4 , deltaI += 0 =}
+				:( 3/64 ): {= state = 5 , deltaI += 0 =}
+				:(  0   ): {= state = 6 , deltaI += 0 =}
+				:( 1/64 ): {= state = 7 , deltaI += 0 =}
+				:( 1/64 ): {= state = 8 , deltaI += 0 =}
+				:(  0   ): {= state = 9 , deltaI += 0 =}
+				:( 1/64 ): {= state = 10 , deltaI += 0 =}
+				:(  0   ): {= state = 11 , deltaI += 0 =}
+				:( 1/64 ): {= state = 12 , deltaI += 0 =}
+				:(11/64 ): {= state = 13 , deltaI += 1 =} 
+				:( 3/64 ): {= state = 14 , deltaI += 0 =}
+				:( 5/32 ): {= state = 15 , deltaI += 0 =}
+				:( 1/32 ): {= state = 16 , deltaI += 0 =}
+				:(  0   ): {= state = 17 , deltaI += 1 =}
+				:( 1/64 ): {= state = 18 , deltaI += 1 =}
+				:( 7/64 ): {= state = 19 , deltaI += 0 =}
+				:(  0   ): {= state = 20 , deltaI += 1 =}
+				:( 1/32 ): {= state = 21 , deltaI += 1 =}
+				:(  0   ): {= state = 22 , deltaI += 1 =}
+				:( 1/64 ): {= state = 23 , deltaI += 1 =}
+				:(  0   ): {= state = 24 , deltaI += 2 =}
+			}
+		::when(state == 15)
+			palt{
+				:( 3/64 ): {= state = 0 , deltaI += 2 =}
+				:( 1/16 ): {= state = 1 , deltaI += 1 =} 
+				:( 3/32 ): {= state = 2 , deltaI += 1 =}
+				:( 3/32 ): {= state = 3 , deltaI += 1 =}
+				:( 1/64 ): {= state = 4 , deltaI += 0 =}
+				:( 3/64 ): {= state = 5 , deltaI += 0 =}
+				:( 1/64	): {= state = 6 , deltaI += 0 =}
+				:(  0   ): {= state = 7 , deltaI += 0 =}
+				:( 1/64 ): {= state = 8 , deltaI += 0 =}
+				:(  0   ): {= state = 9 , deltaI += 0 =}
+				:(  0   ): {= state = 10 , deltaI += 0 =}
+				:( 1/64 ): {= state = 11 , deltaI += 0 =}
+				:( 1/64 ): {= state = 12 , deltaI += 0 =}
+				:(11/64 ): {= state = 13 , deltaI += 1 =} 
+				:( 3/64 ): {= state = 14 , deltaI += 0 =}
+				:( 3/32 ): {= state = 15 , deltaI += 0 =}
+				:( 3/32 ): {= state = 16 , deltaI += 0 =}
+				:(  0   ): {= state = 17 , deltaI += 1 =}
+				:( 1/64 ): {= state = 18 , deltaI += 1 =}
+				:( 7/64 ): {= state = 19 , deltaI += 0 =}
+				:(  0   ): {= state = 20 , deltaI += 1 =}
+				:( 1/64 ): {= state = 21 , deltaI += 1 =}
+				:( 1/64 ): {= state = 22 , deltaI += 1 =}
+				:( 1/64 ): {= state = 23 , deltaI += 1 =}
+				:(  0   ): {= state = 24 , deltaI += 2 =}
+			}
+		::when(state == 16)
+			palt{
+				:( 3/64 ): {= state = 0 , deltaI += 2 =}
+				:( 1/16 ): {= state = 1 , deltaI += 1 =} 
+				:( 1/32 ): {= state = 2 , deltaI += 1 =}
+				:( 5/32 ): {= state = 3 , deltaI += 1 =}
+				:( 1/64 ): {= state = 4 , deltaI += 0 =}
+				:( 3/64 ): {= state = 5 , deltaI += 0 =}
+				:( 1/32 ): {= state = 6 , deltaI += 0 =}
+				:(  0   ): {= state = 7 , deltaI += 0 =}
+				:(  0   ): {= state = 8 , deltaI += 0 =}
+				:( 1/32 ): {= state = 9 , deltaI += 0 =}
+				:(  0   ): {= state = 10 , deltaI += 0 =}
+				:(  0   ): {= state = 11 , deltaI += 0 =}
+				:(  0   ): {= state = 12 , deltaI += 0 =}
+				:(11/64 ): {= state = 13 , deltaI += 1 =} 
+				:( 3/64 ): {= state = 14 , deltaI += 0 =}
+				:( 1/64 ): {= state = 15 , deltaI += 0 =}
+				:(11/64 ): {= state = 16 , deltaI += 0 =}
+				:(  0   ): {= state = 17 , deltaI += 1 =}
+				:( 1/64 ): {= state = 18 , deltaI += 1 =}
+				:( 7/64 ): {= state = 19 , deltaI += 0 =}
+				:(  0   ): {= state = 20 , deltaI += 1 =}
+				:(  0   ): {= state = 21 , deltaI += 1 =}
+				:( 1/32 ): {= state = 22 , deltaI += 1 =}
+				:( 1/64 ): {= state = 23 , deltaI += 1 =}
+				:(  0   ): {= state = 24 , deltaI += 2 =}
+			}	
+		::when(state == 17)
+			palt{
+				:(  0   ): {= state = 0 , deltaI += 3 =}
+				:(  0   ): {= state = 1 , deltaI += 2 =} 
+				:( 1/4  ): {= state = 2 , deltaI += 2 =}
+				:(  0   ): {= state = 3 , deltaI += 2 =}
+				:(  0   ): {= state = 4 , deltaI += 1 =}
+				:( 3/16 ): {= state = 5 , deltaI += 1 =}
+				:(  0   ): {= state = 6 , deltaI += 1 =}
+				:(  0   ): {= state = 7 , deltaI += 1 =}
+				:( 1/16 ): {= state = 8 , deltaI += 1 =}
+				:(  0   ): {= state = 9 , deltaI += 1 =}
+				:(  0   ): {= state = 10 , deltaI += 1 =}
+				:(  0   ): {= state = 11 , deltaI += 1 =}
+				:( 1/16 ): {= state = 12 , deltaI += 1 =}
+				:(  0   ): {= state = 13 , deltaI += 2 =} 
+				:(  0   ): {= state = 14 , deltaI += 1 =}
+				:( 5/16 ): {= state = 15 , deltaI += 1 =}
+				:(  0   ): {= state = 16 , deltaI += 1 =}
+				:(  0   ): {= state = 17 , deltaI += 0 =}
+				:( 1/16 ): {= state = 18 , deltaI += 0 =}
+				:(  0   ): {= state = 19 , deltaI += 1 =}
+				:(  0   ): {= state = 20 , deltaI += 0 =}
+				:( 1/16 ): {= state = 21 , deltaI += 0 =}
+				:(  0   ): {= state = 22 , deltaI += 0 =}
+				:(  0   ): {= state = 23 , deltaI += 0 =}
+				:(  0   ): {= state = 24 , deltaI += 1 =}
+			}
+		::when(state == 18)
+			palt{
+				:(  0   ): {= state = 0 , deltaI += 3 =}
+				:(  0   ): {= state = 1 , deltaI += 2 =} 
+				:(  0   ): {= state = 2 , deltaI += 2 =}
+				:( 1/4  ): {= state = 3 , deltaI += 2 =}
+				:(  0   ): {= state = 4 , deltaI += 1 =}
+				:( 3/16 ): {= state = 5 , deltaI += 1 =}
+				:( 1/16 ): {= state = 6 , deltaI += 1 =}
+				:(  0   ): {= state = 7 , deltaI += 1 =}
+				:(  0   ): {= state = 8 , deltaI += 1 =}
+				:( 1/16 ): {= state = 9 , deltaI += 1 =}
+				:(  0   ): {= state = 10 , deltaI += 1 =}
+				:(  0   ): {= state = 11 , deltaI += 1 =}
+				:(  0   ): {= state = 12 , deltaI += 1 =}
+				:(  0   ): {= state = 13 , deltaI += 2 =} 
+				:(  0   ): {= state = 14 , deltaI += 1 =}
+				:(  0   ): {= state = 15 , deltaI += 1 =}
+				:( 5/16 ): {= state = 16 , deltaI += 1 =}
+				:(  0   ): {= state = 17 , deltaI += 0 =}
+				:( 1/16 ): {= state = 18 , deltaI += 0 =}
+				:(  0   ): {= state = 19 , deltaI += 1 =}
+				:(  0   ): {= state = 20 , deltaI += 0 =}
+				:(  0   ): {= state = 21 , deltaI += 0 =}
+				:( 1/16 ): {= state = 22 , deltaI += 0 =}
+				:(  0   ): {= state = 23 , deltaI += 0 =}
+				:(  0   ): {= state = 24 , deltaI += 1 =}
+			}
+		::when(state == 19)
+			palt{
+				:( 9/256): {= state = 0 , deltaI += 2 =}
+				:( 3/64 ): {= state = 1 , deltaI += 1 =} 
+				:( 1/16 ): {= state = 2 , deltaI += 1 =}
+				:( 5/64 ): {= state = 3 , deltaI += 1 =}
+				:( 3/256): {= state = 4 , deltaI += 0 =}
+				:( 9/256): {= state = 5 , deltaI += 0 =}
+				:( 3/256): {= state = 6 , deltaI += 0 =}
+				:( 1/256): {= state = 7 , deltaI += 0 =}
+				:( 1/128): {= state = 8 , deltaI += 0 =}
+				:( 1/128): {= state = 9 , deltaI += 0 =}
+				:( 1/256): {= state = 10 , deltaI += 0 =}
+				:( 1/256): {= state = 11 , deltaI += 0 =}
+				:( 1/128): {= state = 12 , deltaI += 0 =}
+				:(11/64 ): {= state = 13 , deltaI += 1 =} 
+				:(15/256): {= state = 14 , deltaI += 0 =}
+				:( 5/64 ): {= state = 15 , deltaI += 0 =}
+				:(25/256): {= state = 16 , deltaI += 0 =}
+				:( 1/256): {= state = 17 , deltaI += 1 =}
+				:( 3/256): {= state = 18 , deltaI += 1 =}
+				:(21/128): {= state = 19 , deltaI += 0 =}
+				:( 3/256): {= state = 20 , deltaI += 1 =}
+				:( 1/64 ): {= state = 21 , deltaI += 1 =}
+				:( 5/256): {= state = 22 , deltaI += 1 =}
+				:( 3/64 ): {= state = 23 , deltaI += 1 =}
+				:( 1/256): {= state = 24 , deltaI += 2 =}
+			}	
+		::when(state == 20)
+			palt{
+				:( 3/64 ): {= state = 0 , deltaI += 3 =}
+				:( 1/16 ): {= state = 1 , deltaI += 2 =} 
+				:( 1/8  ): {= state = 2 , deltaI += 2 =}
+				:( 1/16 ): {= state = 3 , deltaI += 2 =}
+				:( 1/64 ): {= state = 4 , deltaI += 1 =}
+				:( 3/64 ): {= state = 5 , deltaI += 1 =}
+				:(  0   ): {= state = 6 , deltaI += 1 =}
+				:( 1/64 ): {= state = 7 , deltaI += 1 =}
+				:( 1/64 ): {= state = 8 , deltaI += 1 =}
+				:(  0   ): {= state = 9 , deltaI += 1 =}
+				:( 1/64 ): {= state = 10 , deltaI += 1 =}
+				:(  0   ): {= state = 11 , deltaI += 1 =}
+				:( 1/64 ): {= state = 12 , deltaI += 1 =}
+				:(11/64 ): {= state = 13 , deltaI += 2 =} 
+				:( 3/64 ): {= state = 14 , deltaI += 1 =}
+				:( 5/32 ): {= state = 15 , deltaI += 1 =}
+				:( 1/32 ): {= state = 16 , deltaI += 1 =}
+				:(  0   ): {= state = 17 , deltaI += 0 =}
+				:( 1/64 ): {= state = 18 , deltaI += 0 =}
+				:( 7/64 ): {= state = 19 , deltaI += 1 =}
+				:(  0   ): {= state = 20 , deltaI += 0 =}
+				:( 1/32 ): {= state = 21 , deltaI += 0 =}
+				:(  0   ): {= state = 22 , deltaI += 0 =}
+				:( 1/64 ): {= state = 23 , deltaI += 0 =}
+				:(  0   ): {= state = 24 , deltaI += 1 =}
+			}
+		::when(state == 21)
+			palt{
+				:( 3/64 ): {= state = 0 , deltaI += 3 =}
+				:( 1/16 ): {= state = 1 , deltaI += 2 =} 
+				:( 3/32 ): {= state = 2 , deltaI += 2 =}
+				:( 3/32 ): {= state = 3 , deltaI += 2 =}
+				:( 1/64 ): {= state = 4 , deltaI += 1 =}
+				:( 3/64 ): {= state = 5 , deltaI += 1 =}
+				:( 1/64	): {= state = 6 , deltaI += 1 =}
+				:(  0   ): {= state = 7 , deltaI += 1 =}
+				:( 1/64 ): {= state = 8 , deltaI += 1 =}
+				:(  0   ): {= state = 9 , deltaI += 1 =}
+				:(  0   ): {= state = 10 , deltaI += 1 =}
+				:( 1/64 ): {= state = 11 , deltaI += 1 =}
+				:( 1/64 ): {= state = 12 , deltaI += 1 =}
+				:(11/64 ): {= state = 13 , deltaI += 2 =} 
+				:( 3/64 ): {= state = 14 , deltaI += 1 =}
+				:( 3/32 ): {= state = 15 , deltaI += 1 =}
+				:( 3/32 ): {= state = 16 , deltaI += 1 =}
+				:(  0   ): {= state = 17 , deltaI += 0 =}
+				:( 1/64 ): {= state = 18 , deltaI += 0 =}
+				:( 7/64 ): {= state = 19 , deltaI += 0 =}
+				:(  0   ): {= state = 20 , deltaI += 0 =}
+				:( 1/64 ): {= state = 21 , deltaI += 0 =}
+				:( 1/64 ): {= state = 22 , deltaI += 0 =}
+				:( 1/64 ): {= state = 23 , deltaI += 0 =}
+				:(  0   ): {= state = 24 , deltaI += 1 =}
+			}
+		::when(state == 22)
+			palt{
+				:( 3/64 ): {= state = 0 , deltaI += 3 =}
+				:( 1/16 ): {= state = 1 , deltaI += 2 =} 
+				:( 1/32 ): {= state = 2 , deltaI += 2 =}
+				:( 5/32 ): {= state = 3 , deltaI += 2 =}
+				:( 1/64 ): {= state = 4 , deltaI += 1 =}
+				:( 3/64 ): {= state = 5 , deltaI += 1 =}
+				:( 1/32 ): {= state = 6 , deltaI += 1 =}
+				:(  0   ): {= state = 7 , deltaI += 1 =}
+				:(  0   ): {= state = 8 , deltaI += 1 =}
+				:( 1/32 ): {= state = 9 , deltaI += 1 =}
+				:(  0   ): {= state = 10 , deltaI += 1 =}
+				:(  0   ): {= state = 11 , deltaI += 1 =}
+				:(  0   ): {= state = 12 , deltaI += 1 =}
+				:(11/64 ): {= state = 13 , deltaI += 2 =} 
+				:( 3/64 ): {= state = 14 , deltaI += 1 =}
+				:( 1/64 ): {= state = 15 , deltaI += 1 =}
+				:(11/64 ): {= state = 16 , deltaI += 1 =}
+				:(  0   ): {= state = 17 , deltaI += 0 =}
+				:( 1/64 ): {= state = 18 , deltaI += 0 =}
+				:( 7/64 ): {= state = 19 , deltaI += 1 =}
+				:(  0   ): {= state = 20 , deltaI += 0 =}
+				:(  0   ): {= state = 21 , deltaI += 0 =}
+				:( 1/32 ): {= state = 22 , deltaI += 0 =}
+				:( 1/64 ): {= state = 23 , deltaI += 0 =}
+				:(  0   ): {= state = 24 , deltaI += 1 =}
+			}	
+		::when(state == 23)
+			palt{
+				:( 9/256): {= state = 0 , deltaI += 3 =}
+				:( 3/64 ): {= state = 1 , deltaI += 2 =} 
+				:( 1/16 ): {= state = 2 , deltaI += 2 =}
+				:( 5/64 ): {= state = 3 , deltaI += 2 =}
+				:( 3/256): {= state = 4 , deltaI += 1 =}
+				:( 9/256): {= state = 5 , deltaI += 1 =}
+				:( 3/256): {= state = 6 , deltaI += 1 =}
+				:( 1/256): {= state = 7 , deltaI += 1 =}
+				:( 1/128): {= state = 8 , deltaI += 1 =}
+				:( 1/128): {= state = 9 , deltaI += 1 =}
+				:( 1/256): {= state = 10 , deltaI += 1 =}
+				:( 1/256): {= state = 11 , deltaI += 1 =}
+				:( 1/128): {= state = 12 , deltaI += 1 =}
+				:(11/64 ): {= state = 13 , deltaI += 2 =} 
+				:(15/256): {= state = 14 , deltaI += 1 =}
+				:( 5/64 ): {= state = 15 , deltaI += 1 =}
+				:(25/256): {= state = 16 , deltaI += 1 =}
+				:( 1/256): {= state = 17 , deltaI += 0 =}
+				:( 3/256): {= state = 18 , deltaI += 0 =}
+				:(21/128): {= state = 19 , deltaI += 1 =}
+				:( 3/256): {= state = 20 , deltaI += 0 =}
+				:( 1/64 ): {= state = 21 , deltaI += 0 =}
+				:( 5/256): {= state = 22 , deltaI += 0 =}
+				:( 3/64 ): {= state = 23 , deltaI += 0 =}
+				:( 1/256): {= state = 24 , deltaI += 1 =}
+			}	
+		::when(state == 24)
+			palt{
+				:( 9/256): {= state = 0 , deltaI += 4 =}
+				:( 3/64 ): {= state = 1 , deltaI += 3 =} 
+				:( 1/16 ): {= state = 2 , deltaI += 3 =}
+				:( 5/64 ): {= state = 3 , deltaI += 3 =}
+				:( 3/256): {= state = 4 , deltaI += 2 =}
+				:( 9/256): {= state = 5 , deltaI += 2 =}
+				:( 3/256): {= state = 6 , deltaI += 2 =}
+				:( 1/256): {= state = 7 , deltaI += 2 =}
+				:( 1/128): {= state = 8 , deltaI += 2 =}
+				:( 1/128): {= state = 9 , deltaI += 2 =}
+				:( 1/256): {= state = 10 , deltaI += 2 =}
+				:( 1/256): {= state = 11 , deltaI += 2 =}
+				:( 1/128): {= state = 12 , deltaI += 2 =}
+				:(11/64 ): {= state = 13 , deltaI += 3 =} 
+				:(15/256): {= state = 14 , deltaI += 2 =}
+				:( 5/64 ): {= state = 15 , deltaI += 2 =}
+				:(25/256): {= state = 16 , deltaI += 2 =}
+				:( 1/256): {= state = 17 , deltaI += 1 =}
+				:( 3/256): {= state = 18 , deltaI += 1 =}
+				:(21/128): {= state = 19 , deltaI += 2 =}
+				:( 3/256): {= state = 20 , deltaI += 1 =}
+				:( 1/64 ): {= state = 21 , deltaI += 1 =}
+				:( 5/256): {= state = 22 , deltaI += 1 =}
+				:( 3/64 ): {= state = 23 , deltaI += 1 =}
+				:( 1/256): {= state = 24 , deltaI += 0 =}
+			}		
+			
+		};
+		
+		tick;
+		
+		
+		if (clk >= clkUpper) {
+			stop
+		}
+		else {
+			tau
+		}
+		
+	}
+}
+
+
+par{
+::	Clock()
+::	Arbiter()
+}
