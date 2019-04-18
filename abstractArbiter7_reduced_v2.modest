@@ -1,8 +1,11 @@
 option "dtmc";
 //reduced 12 state model
 
+const int N = 20000;
+const real k = 0.04;
+
 const int clkLower = 0; 
-const int clkUpper = 5000;
+const int clkUpper = N;
 transient int(0..1) clk;
 
 datatype buffer = {int(0..1) val, int(0..3) id, bool serviced, int(0..3) priority, int(0..1) output};
@@ -34,7 +37,7 @@ action tick;
 //property Runs4 = Pmax(<> (optimalRuns == 4));
 //property Runs5 = Pmax(<> (optimalRuns == 5));
 //property test = Pmax(<> (optimalRuns == 10));
-property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (optimalRuns >= 100));
+property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (optimalRuns >= k*N));
 
 
 

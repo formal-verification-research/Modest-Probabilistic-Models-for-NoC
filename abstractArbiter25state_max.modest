@@ -1,8 +1,12 @@
+option "dtmc";
 //25 state model with possible empty buffers
 
-const int clkLower = 100; 
-const int clkUpper = 102;
-int(clkLower..clkUpper) clk;
+const int N = 20000;
+const real k = 0.04;
+
+const int clkLower = 0; 
+const int clkUpper = N;
+transient int(0..1) clk;
 
 int(0..(clkUpper - clkLower)*4) deltaI = 0;
 
@@ -12,19 +16,14 @@ int(0..24) state = 0;
 action tick;
 
 // ------ Begin: properties ---------
-property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (deltaI >= 100));
+property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (deltaI >= k*N));
 // ------ End: properties -----------
 
 
 process Clock(){	
 
-	tick {= clk++ =};
-	if (clk <= clkUpper) {
-	   Clock()
-	}
-	else {
-	   stop
-	}   
+	tick {= clk=1 =};
+	Clock()
 	
 }
 
@@ -747,15 +746,15 @@ process Arbiter(){
 			
 		};
 		
-		tick;
+		tick//;
 		
 		
-		if (clk >= clkUpper) {
-			stop
-		}
-		else {
-			tau
-		}
+		//if (clk >= clkUpper) {
+		//	stop
+		//}
+		//else {
+		//	tau
+		//}
 		
 	}
 }
