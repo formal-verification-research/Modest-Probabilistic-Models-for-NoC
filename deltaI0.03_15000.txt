@@ -1,0 +1,25 @@
+﻿Peak memory usage: 168 MB
+Analysis results for abstractArbiter25state_max.modest
+
++ State space exploration
+  State size:  8 bytes
+  States:      22503
+  Transitions: 22503
+  Branches:    181827
+  Rate:        96996 states/s
+  Time:        0.3 s
+
++ Property p1
+  Probability: 0
+  Bounds:      [0, 0]
+  CDF:         { (0, 0), ..., (15000, 0) }
+  Time:        5.5 s
+
+  + State elimination
+    States:      11253
+    Transitions: 11253
+    Branches:    170577
+    Time:        1.1 s
+
+  + Value iteration
+    Time: 4.4 s
