@@ -205,26 +205,26 @@ process Arbiter(){
 			
 		::when(state == 6)
 			palt{
-				:( 1/64 ): {= state = 0 , deltaI += 2 =}
-				:( 1/32 ): {= state = 1 , deltaI += 1 =} 
-				:( 1/32 ): {= state = 2 , deltaI += 1 =}
+				:( 1/16 ): {= state = 0 , deltaI += 2 =}
+				:( 1/8  ): {= state = 1 , deltaI += 1 =} 
+				:( 1/8  ): {= state = 2 , deltaI += 1 =}
 				:(  0   ): {= state = 3 , deltaI += 1 =}
-				:( 1/64 ): {= state = 4 , deltaI += 0 =}
-				:( 1/64 ): {= state = 5 , deltaI += 0 =}
+				:( 1/16 ): {= state = 4 , deltaI += 0 =}
+				:( 1/16 ): {= state = 5 , deltaI += 0 =}
 				:(  0   ): {= state = 6 , deltaI += 0 =}
-				:( 1/64 ): {= state = 7 , deltaI += 0 =}
-				:( 1/64 ): {= state = 8 , deltaI += 0 =}
+				:( 1/16 ): {= state = 7 , deltaI += 0 =}
+				:( 1/16 ): {= state = 8 , deltaI += 0 =}
 				:(  0   ): {= state = 9 , deltaI += 0 =}
 				:(  0   ): {= state = 10 , deltaI += 0 =}
 				:(  0   ): {= state = 11 , deltaI += 0 =}
 				:(  0   ): {= state = 12 , deltaI += 0 =}
-				:( 1/32 ): {= state = 13 , deltaI += 1 =} 
-				:( 1/32 ): {= state = 14 , deltaI += 0 =}
-				:( 1/32 ): {= state = 15 , deltaI += 0 =}
+				:( 1/8  ): {= state = 13 , deltaI += 1 =} 
+				:( 1/8  ): {= state = 14 , deltaI += 0 =}
+				:( 1/8  ): {= state = 15 , deltaI += 0 =}
 				:(  0   ): {= state = 16 , deltaI += 0 =}
 				:(  0   ): {= state = 17 , deltaI += 1 =}
 				:(  0   ): {= state = 18 , deltaI += 1 =}
-				:( 1/64 ): {= state = 19 , deltaI += 0 =}
+				:( 1/16 ): {= state = 19 , deltaI += 0 =}
 				:(  0   ): {= state = 20 , deltaI += 1 =}
 				:(  0   ): {= state = 21 , deltaI += 1 =}
 				:(  0   ): {= state = 22 , deltaI += 1 =}
