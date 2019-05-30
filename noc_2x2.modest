@@ -9,10 +9,10 @@ NoC router IDs
 const int BUFFERLENGTH = 4;
 const int NOCSIZE = 2;
 const int clkLower = 100; 
-const int clkUpper = 102;
+const int clkUpper = 105;
 int(clkLower..clkUpper) clk;
 
-int test, test1, test2;
+int test, test1;
 
 int(0..3) startNode;
 
@@ -56,7 +56,7 @@ function intlist option enqueue(int n, intlist option ls) =
 	if len(ls) == BUFFERLENGTH then ls
 	else some(intlist { hd: n, tl: ls });		 
 
-//Routing function	
+//Routing function	(x-y routing)
 function int route(int dest, int routerID) =
 	if dest == -1 then -1/*no flit*/
 	else if (dest % NOCSIZE) > (routerID % NOCSIZE) then 1/*east*/
@@ -82,12 +82,15 @@ process Clock(){
 
 process Top(){
 	initialize();
-	//{= noc[1].bufferArray[2].dest = 2 =};
-	subPopulate(0);
-	subPopulate(1);
-	subPopulate(2);
-	subPopulate(3);
-	tick;
+	{= noc[0].bufferArray[2].buff = enqueue(3, noc[0].bufferArray[2].buff) =};
+	{= noc[1].bufferArray[2].buff = enqueue(2, noc[1].bufferArray[2].buff) =};
+	{= noc[2].bufferArray[2].buff = enqueue(1, noc[2].bufferArray[2].buff) =};
+	{= noc[3].bufferArray[2].buff = enqueue(0, noc[3].bufferArray[2].buff) =};
+	//subPopulate(0);
+	//subPopulate(1);
+	//subPopulate(2);
+	//subPopulate(3);
+	tick;		//for measuring initial values in testing and maybe syncing population of routers?
 	initialRoute(0);
 	initialRoute(1);
 	initialRoute(2);
@@ -96,7 +99,24 @@ process Top(){
 		Arbiter_corner(0);
 		Arbiter_corner(1);
 		Arbiter_corner(2);
-		Arbiter_corner(3);
+		Arbiter_corner(3);		
+		
+		updateDestination(0, 0);
+		updateDestination(1, 0);
+		updateDestination(2, 0);
+		
+		updateDestination(0, 1);
+		updateDestination(1, 1);
+		updateDestination(2, 1);
+		
+		updateDestination(0, 2);
+		updateDestination(1, 2);
+		updateDestination(2, 2);
+		
+		updateDestination(0, 3);
+		updateDestination(1, 3);
+		updateDestination(2, 3);
+		
 		tick
 	}
 }
@@ -172,156 +192,6 @@ process Arbiter_corner(int routerID){
 		
 		{= noc[routerID].bufferArray = noc[routerID].temp =}
 }
-/*
-process Arbiter0(){
-	initialize();
-	
-	//runtime loop
-	do {
-		//Service buffers-------------------------------------------------------------------------------------------------------
-		
-		//Buffer priority 0
-		//<Service Buffer bufferArray[0]>--------------------------------------------------------
-		{= 
-		a0[0].serviced = true 
-		=};
-		
-		//<Service buffer <bufferArray[1]> ------------------------------------------------------
-		if((a0[1].val != -1) && (a0[1].val == a0[0].val)) {			//If buffer bufferArray[1] conflicts with bufferArray[0]
-			{= 
-			a0[1].serviced = false,
-			unserviced0++ 		//Increment unserviced
-			=}
-		}
-		else {
-			{= 	//Service Buffer
-			a0[1].serviced = true 
-			=}
-		};
-		
-		//<Service buffer bufferArray[2]> --------------------------------------------------------
-		//If buffer bufferArray[2] conflicts with bufferArray[1] or bufferArray[0]
-		if((a0[2].val != -1) && (a0[2].val == a0[1].val || a0[2].val == a0[0].val)){	
-			{= 
-			a0[2].serviced = false, 
-			unserviced0++			//Increment unserviced
-			=}
-		}
-		else {
-			{= 		//Service Buffer
-			a0[2].serviced = true 
-			=}
-		};
-		
-		
-		//Increment optimal runs if there were no conflitcs -------------------------------------------------------------------
-		{= 
-			totalUnserviced0 = unserviced0
-		=}
-		
-		//Set priority values for the next run and update the value of the buffers----------------------------------------------
-		setPriority0(0, 0);
-		setPriority0(1, 0);
-		setPriority0(2, 0);
-		
-		
-		//Rewrite buffer array with new priority values-------------------------------------------------------------------------
-		{= 
-		temp0[a0[0].priority] = a0[0],
-		temp0[a0[1].priority] = a0[1],
-		temp0[a0[2].priority] = a0[2],
-		
-		bufferID0[a0[0].id] = a0[0].priority,
-		bufferID0[a0[1].id] = a0[1].priority,
-		bufferID0[a0[2].id] = a0[2].priority
-		=};
-		
-		tick {= a0 = temp0 =};
-		
-		if (clk >= clkUpper) {
-			stop
-		}
-		else {
-			tau
-		}
-	}
-}
-
-
-process Arbiter1(){
-	
-	//runtime loop
-	do {
-		//Service buffers-------------------------------------------------------------------------------------------------------
-		
-		//Buffer priority 0
-		//<Service Buffer bufferArray[0]>--------------------------------------------------------
-		{= 
-		a1[0].serviced = true 
-		=};
-		
-		//<Service buffer <bufferArray[1]> ------------------------------------------------------
-		if((a1[1].val != -1) && (a1[1].val == a1[0].val)) {			//If buffer bufferArray[1] conflicts with bufferArray[0]
-			{= 
-			a1[1].serviced = false,
-			unserviced1++ 		//Increment unserviced
-			=}
-		}
-		else {
-			{= 	//Service Buffer
-			a1[1].serviced = true 
-			=}
-		};
-		
-		//<Service buffer bufferArray[2]> --------------------------------------------------------
-		//If buffer bufferArray[2] conflicts with bufferArray[1] or bufferArray[0]
-		if((a1[2].val != -1) && (a1[2].val == a1[1].val || a1[2].val == a1[0].val)){	
-			{= 
-			a1[2].serviced = false, 
-			unserviced1++			//Increment unserviced
-			=}
-		}
-		else {
-			{= 		//Service Buffer
-			a1[2].serviced = true 
-			=}
-		};
-		
-		
-		//Increment optimal runs if there were no conflitcs -------------------------------------------------------------------
-		{= 
-			totalUnserviced1 = unserviced1
-		=}
-		
-		//Set priority values for the next run and update the value of the buffers----------------------------------------------
-		setPriority1(0, 1);
-		setPriority1(1, 1);
-		setPriority1(2, 1);
-		
-		
-		//Rewrite buffer array with new priority values-------------------------------------------------------------------------
-		{= 
-		temp1[a1[0].priority] = a1[0],
-		temp1[a1[1].priority] = a1[1],
-		temp1[a1[2].priority] = a1[2],
-		
-		bufferID1[a1[0].id] = a1[0].priority,
-		bufferID1[a1[1].id] = a1[1].priority,
-		bufferID1[a1[2].id] = a1[2].priority
-		=};
-		
-		tick {= a1 = temp1 =};
-		
-		if (clk >= clkUpper) {
-			stop
-		}
-		else {
-			tau
-		}
-	}
-}
-*/
-
 	
 //initialize values --------------------------------------------------------------------------------------------------------------------------------------------
 process initialize(){
@@ -417,7 +287,7 @@ process initialize_node_se(int routerID){
 	
 }
 
-
+//runs routing after initial setup (for testing)
 process initialRoute(int routerID){
 	
 	{=
@@ -428,46 +298,36 @@ process initialRoute(int routerID){
 }
 
 
-//Sets the new priority value of buffer bufferArray[i] and updates the value if the buffer was serviced ------------------------------------------------------------------
+//Sets the new priority value of buffer bufferArray[i] and forwards the detination if the buffer was serviced ------------------------------------------------------------------
 process setPriority(int i, int routerID){
 	if (noc[routerID].bufferArray[i].serviced == true){
 		if(noc[routerID].bufferArray[i].val == -1){ tau }
 		else if(noc[routerID].bufferArray[i].val == 4){
 			tau		//flit delivered
 		}
-		else if(noc[routerID].bufferArray[i].val == 0){
-			/*
-			{=
-			noc[routerID + (((-(noc[routerID].bufferArray[i].val) + 2) * (noc[routerID].bufferArray[i].val % 2)) + (NOCSIZE * (noc[routerID].bufferArray[i].val - 1) * ((noc[routerID].bufferArray[i].val + 1) % 2)))].bufferArray[noc[routerID].bufferID[(noc[routerID].bufferArray[i].val + 2) % 4]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID + (((-(noc[routerID].bufferArray[i].val) + 2) * (noc[routerID].bufferArray[i].val % 2)) + (NOCSIZE * (noc[routerID].bufferArray[i].val - 1) * ((noc[routerID].bufferArray[i].val + 1) % 2)))].bufferArray[noc[routerID].bufferID[(noc[routerID].bufferArray[i].val + 2) % 4]].buff) 
-				//transfer destination value to next router
-			=}
-			*/
-			
+		else if(noc[routerID].bufferArray[i].val == 0 && len(noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff) == BUFFERLENGTH){	
 			{=
 			noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff)
 			=}
 		}
-		else if(noc[routerID].bufferArray[i].val == 1){
+		else if(noc[routerID].bufferArray[i].val == 1 && len(noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff) == BUFFERLENGTH){
 			{=
 			noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff)
 			=}
 		}
-		else if(noc[routerID].bufferArray[i].val == 2){
+		else if(noc[routerID].bufferArray[i].val == 2&& len(noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff) == BUFFERLENGTH){
 			{=
 			noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff)
 			=}
 		}
-		else if(noc[routerID].bufferArray[i].val == 3){
+		else if(noc[routerID].bufferArray[i].val == 3 && len(noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff) == BUFFERLENGTH){
 			{=
 			noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff)
 			=}
 		}
 		else {tau};
 		
-		{= 
-		noc[routerID].bufferArray[i].dest = peekFront(noc[routerID].bufferArray[i].buff),
-		noc[routerID].bufferArray[i].val = route(peekFront(noc[routerID].bufferArray[i].buff), routerID),		//Update value from buffer
-		noc[routerID].bufferArray[i].buff = dequeue(noc[routerID].bufferArray[i].buff),			//deque buffer
+		{=
 		noc[routerID].bufferArray[i].priority = i + noc[routerID].unserviced 				//Set new priority
 		=}
 	}
@@ -479,6 +339,19 @@ process setPriority(int i, int routerID){
 	}
 }
 
+//Updates the destination from the buffer if the buffer was serviced
+process updateDestination(int i , int routerID){
+	if(noc[routerID].bufferArray[i].serviced == true){
+		{= 
+		noc[routerID].bufferArray[i].dest = peekFront(noc[routerID].bufferArray[i].buff)
+		=};
+		{=
+		noc[routerID].bufferArray[i].val = route(noc[routerID].bufferArray[i].dest, routerID),		//Update value from buffer
+		noc[routerID].bufferArray[i].buff = dequeue(noc[routerID].bufferArray[i].buff)
+		=}
+	}
+	else {tau}
+}
 
 process subPopulate(int routerID){
 	{= noc[routerID].bufferArray[noc[routerID].bufferID[4]].buff = enqueue(DiscreteUniform(0, 3), noc[routerID].bufferArray[noc[routerID].bufferID[4]].buff) =}
@@ -488,5 +361,5 @@ process subPopulate(int routerID){
 par{
 ::	Clock()
 :: 	Top()
-::	Populate()
+//::	Populate()
 }
