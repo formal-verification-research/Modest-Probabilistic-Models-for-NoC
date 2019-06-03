@@ -10,12 +10,12 @@ option "dtmc";
 //Top level varables
 const int BUFFERLENGTH = 4;
 const int NOCSIZE = 2;
-const int OPTIMALRUNSMEASURE = 2;
+const int OPTIMALRUNSMEASURE = 4;
 const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
 const int clkLower = 100; 
-const int clkUpper = 105;
+const int clkUpper = 104;
 int(clkLower..clkUpper) clk;
 
 datatype intlist = { int(0.. ((NOCSIZE*NOCSIZE)-1)) hd, intlist option tl };
@@ -345,22 +345,22 @@ process setPriority(int i, int routerID){
 		else if(noc[routerID].bufferArray[i].val == 4){
 			tau		//flit delivered
 		}
-		else if(noc[routerID].bufferArray[i].val == 0 && len(noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff) <= BUFFERLENGTH){	
+		else if(noc[routerID].bufferArray[i].val == 0 && len(noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff) < BUFFERLENGTH){	
 			{=
 			noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff)
 			=}
 		}
-		else if(noc[routerID].bufferArray[i].val == 1 && len(noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff) <= BUFFERLENGTH){
+		else if(noc[routerID].bufferArray[i].val == 1 && len(noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff) < BUFFERLENGTH){
 			{=
 			noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff)
 			=}
 		}
-		else if(noc[routerID].bufferArray[i].val == 2 && len(noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff) <= BUFFERLENGTH){
+		else if(noc[routerID].bufferArray[i].val == 2 && len(noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff) < BUFFERLENGTH){
 			{=
 			noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff)
 			=}
 		}
-		else if(noc[routerID].bufferArray[i].val == 3 && len(noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff) <= BUFFERLENGTH){
+		else if(noc[routerID].bufferArray[i].val == 3 && len(noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff) < BUFFERLENGTH){
 			{=
 			noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff)
 			=}
