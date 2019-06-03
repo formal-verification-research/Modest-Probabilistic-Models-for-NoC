@@ -10,14 +10,13 @@ option "dtmc";
 //Top level varables
 const int BUFFERLENGTH = 4;
 const int NOCSIZE = 2;
-const int OPTIMALRUNSMEASURE = 5;
+const int OPTIMALRUNSMEASURE = 2;
+const int INJECTIONRATENUMERATOR = 1;
+const int INJECTIONRATEDENOMINATOR = 2;
+
 const int clkLower = 100; 
 const int clkUpper = 105;
 int(clkLower..clkUpper) clk;
-
-int test, test1;
-
-int(0..3) startNode;
 
 datatype intlist = { int(0.. ((NOCSIZE*NOCSIZE)-1)) hd, intlist option tl };
 
@@ -27,7 +26,9 @@ datatype router = {int(0..3) unserviced, int(0..3) totalUnserviced, buffer[] buf
 
 router r0, r1, r2, r3;
 
-int/*(0..(clkUpper - clkLower))*/ optimalRuns0, optimalRuns1, optimalRuns2, optimalRuns3;
+int test = 0;
+
+int(0..(clkUpper - clkLower)) optimalRuns0, optimalRuns1, optimalRuns2, optimalRuns3;
 
 router[] noc;
 
@@ -134,10 +135,14 @@ process Top(){
 }
 
 process Populate(){
-	//subPopulate(0);
-	subPopulate(1);
-	subPopulate(2);
-	subPopulate(3)
+
+	if((clk % INJECTIONRATEDENOMINATOR) < INJECTIONRATENUMERATOR){
+		subPopulate(0);
+		subPopulate(1);
+		subPopulate(2);
+		subPopulate(3)
+	}
+	else {tau}
 }
 
 

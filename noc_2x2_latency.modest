@@ -10,13 +10,12 @@ option "dtmc";
 //Top level varables
 const int BUFFERLENGTH = 4;
 const int NOCSIZE = 2;
+const int INJECTIONRATENUMERATOR = 1;
+const int INJECTIONRATEDENOMINATOR = 2;
+
 const int clkLower = 100; 
-const int clkUpper = 103;
+const int clkUpper = 104;
 int(clkLower..clkUpper) clk;
-
-int test, test1;
-
-int(0..3) startNode;
 
 datatype intlist = { int(0.. ((NOCSIZE*NOCSIZE)-1)) hd, intlist option tl };
 
@@ -100,7 +99,7 @@ process Top(){
 		Arbiter_corner(2);
 		Arbiter_corner(3);		
 		
-		Populate();
+		//Populate();
 		
 		updateDestination(0, 0);
 		updateDestination(1, 0);
@@ -123,10 +122,13 @@ process Top(){
 }
 
 process Populate(){
-	subPopulate(0);
-	subPopulate(1);
-	subPopulate(2);
-	subPopulate(3)
+	if((clk % INJECTIONRATEDENOMINATOR) < INJECTIONRATENUMERATOR){
+		subPopulate(0);
+		subPopulate(1);
+		subPopulate(2);
+		subPopulate(3)
+	}
+	else {tau}
 }
 
 
@@ -306,24 +308,28 @@ process setPriority(int i, int routerID){
 			totalLatency += (clk-(noc[routerID].bufferArray[i].time))
 			=}
 		}
-		else if(noc[routerID].bufferArray[i].val == 0 && len(noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff) == BUFFERLENGTH){	
+		else if(noc[routerID].bufferArray[i].val == 0 && len(noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff) < BUFFERLENGTH){	
 			{=
-			noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff)
+			noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff),
+			noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buffTime = enqueue(noc[routerID].bufferArray[i].time, noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buffTime)
 			=}
 		}
-		else if(noc[routerID].bufferArray[i].val == 1 && len(noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff) == BUFFERLENGTH){
+		else if(noc[routerID].bufferArray[i].val == 1 && len(noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff) < BUFFERLENGTH){
 			{=
-			noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff)
+			noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff),
+			noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buffTime = enqueue(noc[routerID].bufferArray[i].time, noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buffTime)
 			=}
 		}
-		else if(noc[routerID].bufferArray[i].val == 2&& len(noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff) == BUFFERLENGTH){
+		else if(noc[routerID].bufferArray[i].val == 2&& len(noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff) < BUFFERLENGTH){
 			{=
-			noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff)
+			noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff),
+			noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buffTime = enqueue(noc[routerID].bufferArray[i].time, noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buffTime)
 			=}
 		}
-		else if(noc[routerID].bufferArray[i].val == 3 && len(noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff) == BUFFERLENGTH){
+		else if(noc[routerID].bufferArray[i].val == 3 && len(noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff) < BUFFERLENGTH){
 			{=
-			noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff)
+			noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff),
+			noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buffTime = enqueue(noc[routerID].bufferArray[i].time, noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buffTime)
 			=}
 		}
 		else {tau};
