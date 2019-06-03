@@ -15,7 +15,7 @@ const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
 const int clkLower = 100; 
-const int clkUpper = 104;
+const int clkUpper = 103;
 int(clkLower..clkUpper) clk;
 
 datatype intlist = { int(0.. ((NOCSIZE*NOCSIZE)-1)) hd, intlist option tl };
