@@ -7,7 +7,7 @@ const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
 const int clkLower = 0; 
-const int clkUpper = 10;
+const int clkUpper = 2;
 //int(clkLower..clkUpper) clk;
 transient int(0..1) clk;
 
@@ -16,7 +16,7 @@ action tick;
 int totalFlitsDelivered = 0;
 int totalLatency = 0;
 
-datatype node = {bool local, bool localB1, bool localB2, bool localB3, bool localB4, bool localBlocked, int(-1..2) localVal, bool ew, bool ewB1, bool ewB2, bool ewB3, bool ewB4, bool ewBlocked, int(-1..2) ewVal, bool ns, bool nsB1, bool nsB2, bool nsB3, bool nsB4, bool nsBlocked, int(-1..2) nsVal, bool a1, bool a2, bool a3};
+datatype node = {bool local, bool localB1, bool localB2, bool localB3, bool localB4, bool localLocked, int(-1..2) localVal, bool ew, bool ewB1, bool ewB2, bool ewB3, bool ewB4, bool ewLocked, int(-1..2) ewVal, bool ns, bool nsB1, bool nsB2, bool nsB3, bool nsB4, bool nsLocked, int(-1..2) nsVal, bool a1, bool a2, bool a3};
 
 node r0, r1, r2, r3;
 
@@ -24,11 +24,11 @@ node[] noc;
 
 // ------ Begin: properties ---------
 //property Pr1 = Pmax(<> (clk >= clkUpper));
-property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 10));
+property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 2));
 // ------ End: properties ---------
 
 process Clock(){	
-	/*
+	
 	tick {= clk++ =};
 	if (clk <= clkUpper) {
 	   Clock()
@@ -36,9 +36,9 @@ process Clock(){
 	else {
 	   stop
 	}   
-	*/
-	tick {= clk = 1 =};
-	Clock()
+	
+	//tick {= clk = 1 =};
+	//Clock()
 }
 
 process Top(){
@@ -50,7 +50,7 @@ process Top(){
 		arbiter(2);
 		arbiter(3);
 		
-		tick/*;
+		tick;
 		
 		if(clk>=clkUpper){
 			stop
@@ -59,7 +59,7 @@ process Top(){
 			tau
 
 		} 	
-		*/
+		
 	}
 }
 
@@ -472,7 +472,7 @@ if(noc[0].nsB3 == false && noc[0].nsB2 == false && noc[0].nsB1 == false){
 }
 
 process arbiter(int n){
-	if(noc[n].local == true && noc[n].localBlocked == false){
+	if(noc[n].local == true && noc[n].localLocked == false){
 		palt{
 			:(2/3): {= noc[n].localVal = 1 =}  
 			:(1/3): {= noc[n].localVal = 0 =}  
@@ -480,7 +480,7 @@ process arbiter(int n){
 	}
 	else{tau};
 	
-	if(noc[n].ew == true && noc[n].ewBlocked == false){
+	if(noc[n].ew == true && noc[n].ewLocked == false){
 		palt{
 			:(1/2): {= noc[n].ewVal = 0 =}  
 			:(1/2): {= noc[n].ewVal = 2 =}  
@@ -488,7 +488,7 @@ process arbiter(int n){
 	}
 	else{tau};
 	
-	if(noc[n].ns == true && noc[n].nsBlocked == false){
+	if(noc[n].ns == true && noc[n].nsLocked == false){
 		{= noc[n].nsVal = 2 =}
 	}
 	else{tau};
@@ -496,14 +496,14 @@ process arbiter(int n){
 	if(noc[n].localVal != -1 && noc[n].localVal == noc[n].ewVal){	//local and ew conflict
 		if(!(noc[n].a1 || (noc[n].a2 && noc[n].a3))){		//local and south are serviced, east unserviced
 			{= 
-			noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, noc[n].local = false, noc[n].localVal = -1, noc[n].localBlocked = false,
-			noc[n].ewBlocked = true
+			noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, noc[n].local = false, noc[n].localVal = -1, noc[n].localLocked = false,
+			noc[n].ewLocked = true
 			=}		//forward ns direction
 		}
 		else{		//east and south are serviced, local unserviced
 			{= 
-			noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, noc[n].ew = false, noc[n].ewVal = -1, noc[n].ewBlocked = false,
-			noc[n].localBlocked = true
+			noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, noc[n].ew = false, noc[n].ewVal = -1, noc[n].ewLocked = false,
+			noc[n].locaLlocked = true
 			=}		//forward ns direction
 		};
 		
@@ -513,7 +513,7 @@ process arbiter(int n){
 			::when(noc[n].nsVal == -1)
 				tau
 			::when(noc[n].nsVal == 2)
-				{= totalFlitsDelivered++, noc[n].nsVal = -1, noc[n].nsBlocked = false =}		//flit delivered
+				{= totalFlitsDelivered++, noc[n].nsVal = -1, noc[n].nsLocked = false =}		//flit delivered
 		};
 		
 		{=
