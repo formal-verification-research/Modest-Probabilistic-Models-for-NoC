@@ -503,7 +503,7 @@ process arbiter(int n){
 		else{		//east and south are serviced, local unserviced
 			{= 
 			noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, noc[n].ew = false, noc[n].ewVal = -1, noc[n].ewLocked = false,
-			noc[n].locaLlocked = true
+			noc[n].localLocked = true
 			=}		//forward ns direction
 		};
 		
