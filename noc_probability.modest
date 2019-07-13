@@ -526,14 +526,14 @@ process arbiter(int n){
 	else if(noc[n].ewVal != -1 && noc[n].ewVal == noc[n].nsVal){	//ew and ns conflict
 		if(noc[n].a3){		//south and local are serviced, east is not
 			{=
-			totalFlitsDelivered++, noc[n].nsVal = -1, noc[n].nsBlocked = false,
-			noc[n].ewBlocked = true
+			totalFlitsDelivered++, noc[n].nsVal = -1, noc[n].nsLocked = false,
+			noc[n].ewLocked = true
 			=}
 		}
 		else{		//east and local are serviced, south is not
 			{= 
-			totalFlitsDelivered++, noc[n].ewVal = -1, noc[n].ewBlocked = false,
-			noc[n].nsBlocked = true
+			totalFlitsDelivered++, noc[n].ewVal = -1, noc[n].ewLocked = false,
+			noc[n].nsLocked = true
 			=}
 		};
 		
@@ -542,9 +542,9 @@ process arbiter(int n){
 			::when(noc[n].localVal == -1)
 				tau
 			::when(noc[n].localVal == 0)
-				{= noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, noc[n].local = false, noc[n].localVal = -1, noc[n].localBlocked = false =}		//forward ns direction
+				{= noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, noc[n].local = false, noc[n].localVal = -1, noc[n].localLocked = false =}		//forward ns direction
 			::when(noc[n].localVal == 1)
-				{= noc[(n % 2)*(n - 1) + (-(n % 2) + 1)*(n + 1)].ewB4 = true, noc[n].local = false, noc[n].localVal = -1, noc[n].localBlocked = false =}		//forward ew direction
+				{= noc[(n % 2)*(n - 1) + (-(n % 2) + 1)*(n + 1)].ewB4 = true, noc[n].local = false, noc[n].localVal = -1, noc[n].localLocked = false =}		//forward ew direction
 		};
 		
 		{=
@@ -559,9 +559,9 @@ process arbiter(int n){
 			::when(noc[n].localVal == -1)
 				tau
 			::when(noc[n].localVal == 0)
-				{= noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, noc[n].local = false, noc[n].localVal = -1, noc[n].localBlocked = false =}		//forward ns direction
+				{= noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, noc[n].local = false, noc[n].localVal = -1, noc[n].localLocked = false =}		//forward ns direction
 			::when(noc[n].localVal == 1)
-				{= noc[(n % 2)*(n - 1) + (-(n % 2) + 1)*(n + 1)].ewB4 = true, noc[n].local = false, noc[n].localVal = -1, noc[n].localBlocked = false =}		//forward ew direction
+				{= noc[(n % 2)*(n - 1) + (-(n % 2) + 1)*(n + 1)].ewB4 = true, noc[n].local = false, noc[n].localVal = -1, noc[n].localLocked = false =}		//forward ew direction
 		};
 		
 		//service ew buffer
@@ -569,9 +569,9 @@ process arbiter(int n){
 			::when(noc[n].ewVal == -1)
 				tau
 			::when(noc[n].ewVal == 0)
-				{= noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, noc[n].local = false, noc[n].ewVal = -1, noc[n].ewBlocked = false =}		//forward ns direction
+				{= noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, noc[n].local = false, noc[n].ewVal = -1, noc[n].ewLocked = false =}		//forward ns direction
 			::when(noc[n].ewVal == 2)
-				{= totalFlitsDelivered++, noc[n].ewVal = -1, noc[n].ewBlocked = false =}		//flit delivered
+				{= totalFlitsDelivered++, noc[n].ewVal = -1, noc[n].ewLocked = false =}		//flit delivered
 		};
 		
 		//service ns buffer
@@ -579,7 +579,7 @@ process arbiter(int n){
 			::when(noc[n].nsVal == -1)
 				tau
 			::when(noc[n].nsVal == 2)
-				{= totalFlitsDelivered++, noc[n].nsVal = -1, noc[n].nsBlocked = false =}		//flit delivered
+				{= totalFlitsDelivered++, noc[n].nsVal = -1, noc[n].nsLocked = false =}		//flit delivered
 		}
 		
 	}
