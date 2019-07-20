@@ -1,0 +1,501 @@
+option "dtmc";
+
+//Top level varables
+const int BUFFERLENGTH = 4;
+const int NOCSIZE = 2;
+const int INJECTIONRATENUMERATOR = 1;
+const int INJECTIONRATEDENOMINATOR = 2;
+
+const int clkLower = 0; 
+const int clkUpper = 2;
+//int(clkLower..clkUpper) clk;
+transient int(0..1) clk;
+
+action tick;
+
+int totalFlitsDelivered = 0;
+int totalLatency = 0;
+
+datatype node = {bool local, bool localB1, bool localB2, bool localB3, bool localB4, bool ew, bool ewB1, bool ewB2, bool ewB3, bool ewB4, bool ns, bool nsB1, bool nsB2, bool nsB3, bool nsB4, bool a1, bool a2, bool a3};
+
+node r0, r1, r2, r3;
+
+node[] noc;
+
+// ------ Begin: properties ---------
+//property Pr1 = Pmax(<> (clk >= clkUpper));
+property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 2));
+// ------ End: properties ---------
+
+process Clock(){	
+	
+	tick {= clk++ =};
+	if (clk <= clkUpper) {
+	   Clock()
+	}
+	else {
+	   stop
+	}   
+	
+	//tick {= clk = 1 =};
+	//Clock()
+}
+
+process Top(){
+	initialize();
+	do{
+		populate();
+		arbiter(0);
+		arbiter(1);
+		arbiter(2);
+		arbiter(3);
+		
+		tick;
+		
+		if(clk>=clkUpper){
+			stop
+		}
+		else{
+			tau
+
+		} 	
+		
+	}
+}
+
+process initialize(){
+	{=
+	noc = [r0, r1, r2, r3],
+	noc[0].localVal = -1,
+	noc[0].ewVal = -1,
+	noc[0].nsVal = -1,
+	noc[1].localVal = -1,
+	noc[1].ewVal = -1,
+	noc[1].nsVal = -1,
+	noc[2].localVal = -1,
+	noc[2].ewVal = -1,
+	noc[2].nsVal = -1,
+	noc[3].localVal = -1,
+	noc[3].ewVal = -1,
+	noc[3].nsVal = -1
+	
+	//, noc[0].localB4 = true
+	=}
+}
+
+process populate(){
+	
+	if((clk % INJECTIONRATEDENOMINATOR) < INJECTIONRATENUMERATOR){
+		{=
+		noc[0].localB4 = true,
+		noc[1].localB4 = true,
+		noc[2].localB4 = true,
+		noc[3].localB4 = true
+		=}
+	}
+	else {tau};
+	
+	
+	if(noc[0].localB3 == false && noc[0].localB2 == false && noc[0].localB1 == false){
+		{=
+		noc[0].local = noc[0].localB4,
+		noc[0].localB4 = false
+		=}
+	}
+	else if(noc[0].localB3 == false && noc[0].localB2 == false && noc[0].localB1 == true){
+		{=
+		noc[0].local = noc[0].localB1,
+		noc[0].localB1 = noc[0].localB4,
+		noc[0].localB4 = false
+		=}
+	}
+	else if(noc[0].localB3 == true && noc[0].localB2 == true && noc[0].localB1 == true){
+		{=
+		noc[0].local = noc[0].localB1,
+		noc[0].localB1 = noc[0].localB2,
+		noc[0].localB2 = noc[0].localB4,
+		noc[0].localB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[0].local = noc[0].localB1,
+		noc[0].localB1 = noc[0].localB2,
+		noc[0].localB2 = noc[0].localB3,
+		noc[0].localB3 = noc[0].localB4,
+		noc[0].localB4 = false
+		=}
+	};
+	
+	if(noc[1].localB3 == false && noc[1].localB2 == false && noc[1].localB1 == false){
+		{=
+		noc[1].local = noc[1].localB4,
+		noc[1].localB4 = false
+		=}
+	}
+	else if(noc[1].localB3 == false && noc[1].localB2 == false && noc[1].localB1 == true){
+		{=
+		noc[1].local = noc[1].localB1,
+		noc[1].localB1 = noc[1].localB4,
+		noc[1].localB4 = false
+		=}
+	}
+	else if(noc[1].localB3 == true && noc[1].localB2 == true && noc[1].localB1 == true){
+		{=
+		noc[1].local = noc[1].localB1,
+		noc[1].localB1 = noc[1].localB2,
+		noc[1].localB2 = noc[1].localB4,
+		noc[1].localB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[1].local = noc[1].localB1,
+		noc[1].localB1 = noc[1].localB2,
+		noc[1].localB2 = noc[1].localB3,
+		noc[1].localB3 = noc[1].localB4,
+		noc[1].localB4 = false
+		=}
+	};
+	
+	if(noc[2].localB3 == false && noc[2].localB2 == false && noc[2].localB1 == false){
+		{=
+		noc[2].local = noc[2].localB4,
+		noc[2].localB4 = false
+		=}
+	}
+	else if(noc[2].localB3 == false && noc[2].localB2 == false && noc[2].localB1 == true){
+		{=
+		noc[2].local = noc[2].localB1,
+		noc[2].localB1 = noc[2].localB4,
+		noc[2].localB4 = false
+		=}
+	}
+	else if(noc[2].localB3 == true && noc[2].localB2 == true && noc[2].localB1 == true){
+		{=
+		noc[2].local = noc[2].localB1,
+		noc[2].localB1 = noc[2].localB2,
+		noc[2].localB2 = noc[2].localB4,
+		noc[2].localB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[2].local = noc[2].localB1,
+		noc[2].localB1 = noc[2].localB2,
+		noc[2].localB2 = noc[2].localB3,
+		noc[2].localB3 = noc[2].localB4,
+		noc[2].localB4 = false
+		=}
+	};
+	
+	if(noc[3].localB3 == false && noc[3].localB2 == false && noc[3].localB1 == false){
+		{=
+		noc[3].local = noc[3].localB4,
+		noc[3].localB4 = false
+		=}
+	}
+	else if(noc[3].localB3 == false && noc[3].localB2 == false && noc[3].localB1 == true){
+		{=
+		noc[3].local = noc[3].localB1,
+		noc[3].localB1 = noc[3].localB4,
+		noc[3].localB4 = false
+		=}
+	}
+	else if(noc[3].localB3 == true && noc[3].localB2 == true && noc[3].localB1 == true){
+		{=
+		noc[3].local = noc[3].localB1,
+		noc[3].localB1 = noc[3].localB2,
+		noc[3].localB2 = noc[3].localB4,
+		noc[3].localB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[3].local = noc[3].localB1,
+		noc[3].localB1 = noc[3].localB2,
+		noc[3].localB2 = noc[3].localB3,
+		noc[3].localB3 = noc[3].localB4,
+		noc[3].localB4 = false
+		=}
+	};
+	
+	
+	if(noc[0].ewB3 == false && noc[0].ewB2 == false && noc[0].ewB1 == false){
+		{=
+		noc[0].ew = noc[0].ewB4,
+		noc[0].ewB4 = false
+		=}
+	}
+	else if(noc[0].ewB3 == false && noc[0].ewB2 == false && noc[0].ewB1 == true){
+		{=
+		noc[0].ew = noc[0].ewB1,
+		noc[0].ewB1 = noc[0].ewB4,
+		noc[0].ewB4 = false
+		=}
+	}
+	else if(noc[0].ewB3 == true && noc[0].ewB2 == true && noc[0].ewB1 == true){
+		{=
+		noc[0].ew = noc[0].ewB1,
+		noc[0].ewB1 = noc[0].ewB2,
+		noc[0].ewB2 = noc[0].ewB4,
+		noc[0].ewB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[0].ew = noc[0].ewB1,
+		noc[0].ewB1 = noc[0].ewB2,
+		noc[0].ewB2 = noc[0].ewB3,
+		noc[0].ewB3 = noc[0].ewB4,
+		noc[0].ewB4 = false
+		=}
+	};
+	
+	if(noc[1].ewB3 == false && noc[1].ewB2 == false && noc[1].ewB1 == false){
+		{=
+		noc[1].ew = noc[1].ewB4,
+		noc[1].ewB4 = false
+		=}
+	}
+	else if(noc[1].ewB3 == false && noc[1].ewB2 == false && noc[1].ewB1 == true){
+		{=
+		noc[1].ew = noc[1].ewB1,
+		noc[1].ewB1 = noc[1].ewB4,
+		noc[1].ewB4 = false
+		=}
+	}
+	else if(noc[1].ewB3 == true && noc[1].ewB2 == true && noc[1].ewB1 == true){
+		{=
+		noc[1].ew = noc[1].ewB1,
+		noc[1].ewB1 = noc[1].ewB2,
+		noc[1].ewB2 = noc[1].ewB4,
+		noc[1].ewB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[1].ew = noc[1].ewB1,
+		noc[1].ewB1 = noc[1].ewB2,
+		noc[1].ewB2 = noc[1].ewB3,
+		noc[1].ewB3 = noc[1].ewB4,
+		noc[1].ewB4 = false
+		=}
+	};
+	
+	if(noc[2].ewB3 == false && noc[2].ewB2 == false && noc[2].ewB1 == false){
+		{=
+		noc[2].ew = noc[2].ewB4,
+		noc[2].ewB4 = false
+		=}
+	}
+	else if(noc[2].ewB3 == false && noc[2].ewB2 == false && noc[2].ewB1 == true){
+		{=
+		noc[2].ew = noc[2].ewB1,
+		noc[2].ewB1 = noc[2].ewB4,
+		noc[2].ewB4 = false
+		=}
+	}
+	else if(noc[2].ewB3 == true && noc[2].ewB2 == true && noc[2].ewB1 == true){
+		{=
+		noc[2].ew = noc[2].ewB1,
+		noc[2].ewB1 = noc[2].ewB2,
+		noc[2].ewB2 = noc[2].ewB4,
+		noc[2].ewB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[2].ew = noc[2].ewB1,
+		noc[2].ewB1 = noc[2].ewB2,
+		noc[2].ewB2 = noc[2].ewB3,
+		noc[2].ewB3 = noc[2].ewB4,
+		noc[2].ewB4 = false
+		=}
+	};
+	
+	if(noc[3].ewB3 == false && noc[3].ewB2 == false && noc[3].ewB1 == false){
+		{=
+		noc[3].ew = noc[3].ewB4,
+		noc[3].ewB4 = false
+		=}
+	}
+	else if(noc[3].ewB3 == false && noc[3].ewB2 == false && noc[3].ewB1 == true){
+		{=
+		noc[3].ew = noc[3].ewB1,
+		noc[3].ewB1 = noc[3].ewB4,
+		noc[3].ewB4 = false
+		=}
+	}
+	else if(noc[3].ewB3 == true && noc[3].ewB2 == true && noc[3].ewB1 == true){
+		{=
+		noc[3].ew = noc[3].ewB1,
+		noc[3].ewB1 = noc[3].ewB2,
+		noc[3].ewB2 = noc[3].ewB4,
+		noc[3].ewB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[3].ew = noc[3].ewB1,
+		noc[3].ewB1 = noc[3].ewB2,
+		noc[3].ewB2 = noc[3].ewB3,
+		noc[3].ewB3 = noc[3].ewB4,
+		noc[3].ewB4 = false
+		=}
+	};
+
+if(noc[0].nsB3 == false && noc[0].nsB2 == false && noc[0].nsB1 == false){
+		{=
+		noc[0].ns = noc[0].nsB4,
+		noc[0].nsB4 = false
+		=}
+	}
+	else if(noc[0].nsB3 == false && noc[0].nsB2 == false && noc[0].nsB1 == true){
+		{=
+		noc[0].ns = noc[0].nsB1,
+		noc[0].nsB1 = noc[0].nsB4,
+		noc[0].nsB4 = false
+		=}
+	}
+	else if(noc[0].nsB3 == true && noc[0].nsB2 == true && noc[0].nsB1 == true){
+		{=
+		noc[0].ns = noc[0].nsB1,
+		noc[0].nsB1 = noc[0].nsB2,
+		noc[0].nsB2 = noc[0].nsB4,
+		noc[0].nsB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[0].ns = noc[0].nsB1,
+		noc[0].nsB1 = noc[0].nsB2,
+		noc[0].nsB2 = noc[0].nsB3,
+		noc[0].nsB3 = noc[0].nsB4,
+		noc[0].nsB4 = false
+		=}
+	};
+	
+	if(noc[1].nsB3 == false && noc[1].nsB2 == false && noc[1].nsB1 == false){
+		{=
+		noc[1].ns = noc[1].nsB4,
+		noc[1].nsB4 = false
+		=}
+	}
+	else if(noc[1].nsB3 == false && noc[1].nsB2 == false && noc[1].nsB1 == true){
+		{=
+		noc[1].ns = noc[1].nsB1,
+		noc[1].nsB1 = noc[1].nsB4,
+		noc[1].nsB4 = false
+		=}
+	}
+	else if(noc[1].nsB3 == true && noc[1].nsB2 == true && noc[1].nsB1 == true){
+		{=
+		noc[1].ns = noc[1].nsB1,
+		noc[1].nsB1 = noc[1].nsB2,
+		noc[1].nsB2 = noc[1].nsB4,
+		noc[1].nsB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[1].ns = noc[1].nsB1,
+		noc[1].nsB1 = noc[1].nsB2,
+		noc[1].nsB2 = noc[1].nsB3,
+		noc[1].nsB3 = noc[1].nsB4,
+		noc[1].nsB4 = false
+		=}
+	};
+	
+	if(noc[2].nsB3 == false && noc[2].nsB2 == false && noc[2].nsB1 == false){
+		{=
+		noc[2].ns = noc[2].nsB4,
+		noc[2].nsB4 = false
+		=}
+	}
+	else if(noc[2].nsB3 == false && noc[2].nsB2 == false && noc[2].nsB1 == true){
+		{=
+		noc[2].ns = noc[2].nsB1,
+		noc[2].nsB1 = noc[2].nsB4,
+		noc[2].nsB4 = false
+		=}
+	}
+	else if(noc[2].nsB3 == true && noc[2].nsB2 == true && noc[2].nsB1 == true){
+		{=
+		noc[2].ns = noc[2].nsB1,
+		noc[2].nsB1 = noc[2].nsB2,
+		noc[2].nsB2 = noc[2].nsB4,
+		noc[2].nsB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[2].ns = noc[2].nsB1,
+		noc[2].nsB1 = noc[2].nsB2,
+		noc[2].nsB2 = noc[2].nsB3,
+		noc[2].nsB3 = noc[2].nsB4,
+		noc[2].nsB4 = false
+		=}
+	};
+	
+	if(noc[3].nsB3 == false && noc[3].nsB2 == false && noc[3].nsB1 == false){
+		{=
+		noc[3].ns = noc[3].nsB4,
+		noc[3].nsB4 = false
+		=}
+	}
+	else if(noc[3].nsB3 == false && noc[3].nsB2 == false && noc[3].nsB1 == true){
+		{=
+		noc[3].ns = noc[3].nsB1,
+		noc[3].nsB1 = noc[3].nsB4,
+		noc[3].nsB4 = false
+		=}
+	}
+	else if(noc[3].nsB3 == true && noc[3].nsB2 == true && noc[3].nsB1 == true){
+		{=
+		noc[3].ns = noc[3].nsB1,
+		noc[3].nsB1 = noc[3].nsB2,
+		noc[3].nsB2 = noc[3].nsB4,
+		noc[3].nsB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[3].ns = noc[3].nsB1,
+		noc[3].nsB1 = noc[3].nsB2,
+		noc[3].nsB2 = noc[3].nsB3,
+		noc[3].nsB3 = noc[3].nsB4,
+		noc[3].nsB4 = false
+		=}
+	}
+
+}
+
+process arbiter(int n){
+	if(noc[n].local == true){
+		palt{
+			:(2/3): {= noc[(n % 2)*(n - 1) + (-(n % 2) + 1)*(n + 1)].ewB4 = true, noc[n].local = false =}  				//forward ew
+			:(1/3): {= noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, noc[n].local = false =}  	//forward ns
+		}
+	}
+	else{tau};
+	
+	if(noc[n].ew == true){
+		palt{
+			:(1/2): {= noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, noc[n].ew = false =}  //forward ns
+			:(1/2): {= totalFlitsDelivered++, noc[n].ew = false =}  //delivered
+		}
+	}
+	else{tau};
+	
+	if(noc[n].ns == true){
+		{= totalFlitsDelivered++, noc[n].ns = false =}	//delivered
+	}
+	else{tau};
+		
+}
+
+par{
+::	Clock()
+:: 	Top()
+}
