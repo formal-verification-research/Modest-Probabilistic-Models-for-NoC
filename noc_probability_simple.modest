@@ -24,21 +24,23 @@ node[] noc;
 
 // ------ Begin: properties ---------
 //property Pr1 = Pmax(<> (clk >= clkUpper));
-property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 2));
+property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= (clkUpper-clkLower)*2));
 // ------ End: properties ---------
 
 process Clock(){	
 	
+	/*
 	tick {= clk++ =};
 	if (clk <= clkUpper) {
 	   Clock()
 	}
 	else {
 	   stop
-	}   
+	} 
+	*/	
 	
-	//tick {= clk = 1 =};
-	//Clock()
+	tick {= clk = 1 =};
+	Clock()
 }
 
 process Top(){
@@ -50,7 +52,7 @@ process Top(){
 		arbiter(2);
 		arbiter(3);
 		
-		tick;
+		tick/*;
 		
 		if(clk>=clkUpper){
 			stop
@@ -59,25 +61,14 @@ process Top(){
 			tau
 
 		} 	
+		*/
 		
 	}
 }
 
 process initialize(){
 	{=
-	noc = [r0, r1, r2, r3],
-	noc[0].localVal = -1,
-	noc[0].ewVal = -1,
-	noc[0].nsVal = -1,
-	noc[1].localVal = -1,
-	noc[1].ewVal = -1,
-	noc[1].nsVal = -1,
-	noc[2].localVal = -1,
-	noc[2].ewVal = -1,
-	noc[2].nsVal = -1,
-	noc[3].localVal = -1,
-	noc[3].ewVal = -1,
-	noc[3].nsVal = -1
+	noc = [r0, r1, r2, r3]
 	
 	//, noc[0].localB4 = true
 	=}
@@ -491,7 +482,7 @@ process arbiter(int n){
 	if(noc[n].ns == true){
 		{= totalFlitsDelivered++, noc[n].ns = false =}	//delivered
 	}
-	else{tau};
+	else{tau}
 		
 }
 
