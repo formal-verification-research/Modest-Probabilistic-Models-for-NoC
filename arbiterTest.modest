@@ -9,9 +9,9 @@ int(clkLower..clkUpper) clk;
 
 int(0..3) state;
 int(0..3) pstate;
-int(0..3) pPstate;
-int(0..3) p3state;
-int(0..3) p4state;
+//int(0..3) pPstate;
+//int(0..3) p3state;
+//int(0..3) p4state;
 
 buffer north, east, south, west;
 
@@ -32,12 +32,14 @@ property TotalServiced = Pmax(<> (totalServiced >= ((clkUpper-clkLower)*3)));		/
 //property triway = Pmax(<> (tri == true && clk >= clkUpper));
 
 //1 clock cycle
+/*
 property State0 = Pmax(<> ((clk >= clkUpper) && (state == 0)));
 property State1 = Pmax(<> ((clk >= clkUpper) && (state == 1)));
 property StateTri = Pmax(<> ((clk >= clkUpper) && (state == 2)));
 property State2a = Pmax(<> ((clk >= clkUpper) && (state == 3)));
 property State2a = Pmax(<> ((clk >= clkUpper) && (state == 3)));
 property State2a = Pmax(<> ((clk >= clkUpper) && (state == 3)));
+*/
 
 //2 clock cycles
 /*
@@ -215,9 +217,9 @@ process Arbiter(){
 		totalServiced = totalServiced + 4 - unserviced
 		=};
 		*/
-		{= p4state = p3state =};
-		{= p3state = pPstate =};
-		{= pPstate = pstate =};
+		//{= p4state = p3state =};
+		//{= p3state = pPstate =};
+		//{= pPstate = pstate =};
 		{= pstate = state =};
 		
 		//Increment optimal runs if there were no conflitcs -------------------------------------------------------------------
