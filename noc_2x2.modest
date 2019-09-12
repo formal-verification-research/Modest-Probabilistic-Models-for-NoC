@@ -14,10 +14,10 @@ const int OPTIMALRUNSMEASURE = 4;
 const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
-const int clkLower = 0; 
-const int clkUpper = 100;
-//int(clkLower..clkUpper) clk;
-transient int(0..1) clk;
+const int clkLower = 100; 
+const int clkUpper = 105;
+int(clkLower..clkUpper) clk;
+//transient int(0..1) clk;
 
 datatype intlist = { int(0.. ((NOCSIZE*NOCSIZE)-1)) hd, intlist option tl };
 
@@ -29,7 +29,7 @@ router r0, r1, r2, r3;
 
 int test = 0;
 
-int(0..(clkUpper - clkLower)) optimalRuns0, optimalRuns1, optimalRuns2, optimalRuns3;
+int(0..5/*(clkUpper - clkLower)*/) optimalRuns0, optimalRuns1, optimalRuns2, optimalRuns3;
 
 router[] noc;
 
@@ -37,8 +37,8 @@ action tick;
 
 
 // ------ Begin: properties ---------
-//property Pr1 = Pmax(<> (clk >= clkUpper));
-property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (optimalRuns >= 10));
+property Pr1 = Pmax(<> (clk >= clkUpper));
+//property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (optimalRuns0 >= 1));
 //property optimalRuns0 = Pmax(<> (optimalRuns0 >= OPTIMALRUNSMEASURE));
 //property optimalRuns1 = Pmax(<> (optimalRuns1 >= OPTIMALRUNSMEASURE));
 //property optimalRuns2 = Pmax(<> (optimalRuns2 >= OPTIMALRUNSMEASURE));
@@ -83,10 +83,10 @@ function int route(int dest, int routerID) =
 // ------ Begin: process definitions ------
 //---- Paralell Processes ----
 process Clock(){	
-	tick {= clk=1 =};
-	Clock()	
+	//tick {= clk=1 =};
+	//Clock()	
 
-	/*
+	
 	tick {= clk++ =};
 	if (clk <= clkUpper) {
 	   Clock()
@@ -94,7 +94,7 @@ process Clock(){
 	else {
 	   stop
 	} 
-		*/
+		
 }
 
 process Top(){
@@ -129,16 +129,16 @@ process Top(){
 		updateDestination(1, 3);
 		updateDestination(2, 3);
 		
-		tick//;
+		tick;
 
-		/*
+		
 		if(clk>=clkUpper){
 			stop
 		}
 		else{
 			tau
 		} 
-		*/
+		
 	}
 }
 

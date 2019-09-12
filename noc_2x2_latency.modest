@@ -14,7 +14,7 @@ const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
 const int clkLower = 100; 
-const int clkUpper = 105;
+const int clkUpper = 102;
 int(clkLower..clkUpper) clk;
 
 datatype intlist = { int(0.. ((NOCSIZE*NOCSIZE)-1)) hd, intlist option tl };
@@ -310,8 +310,8 @@ process setPriority(int i, int routerID){
 		if(noc[routerID].bufferArray[i].val == -1){ tau }
 		else if(noc[routerID].bufferArray[i].val == 4){
 			{=
-			totalFlitsDelivered++,
-			totalLatency += (clk-(noc[routerID].bufferArray[i].time))
+			totalFlitsDelivered++//,
+			//totalLatency += (clk-(noc[routerID].bufferArray[i].time))
 			=}
 		}
 		else if(noc[routerID].bufferArray[i].val == 0 && len(noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff) < BUFFERLENGTH){	

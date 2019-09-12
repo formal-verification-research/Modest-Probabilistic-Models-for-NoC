@@ -6,10 +6,10 @@ const int NOCSIZE = 2;
 const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
-const int clkLower = 0; 
-const int clkUpper = 2;
-//int(clkLower..clkUpper) clk;
-transient int(0..1) clk;
+const int clkLower = 100; 
+const int clkUpper = 106;
+int(clkLower..clkUpper) clk;
+//transient int(0..1) clk;
 
 action tick;
 
@@ -18,13 +18,15 @@ int totalLatency = 0;
 
 datatype node = {bool local, bool localB1, bool localB2, bool localB3, bool localB4, bool localLocked, int(-1..2) localVal, bool ew, bool ewB1, bool ewB2, bool ewB3, bool ewB4, bool ewLocked, int(-1..2) ewVal, bool ns, bool nsB1, bool nsB2, bool nsB3, bool nsB4, bool nsLocked, int(-1..2) nsVal, bool a1, bool a2, bool a3};
 
+//int localVal, nsVal, ewVal: -1 no flit, 0 destined to ns channel, 1 destined to ew channel, 2 destined to local channel
+
 node r0, r1, r2, r3;
 
 node[] noc;
 
 // ------ Begin: properties ---------
-//property Pr1 = Pmax(<> (clk >= clkUpper));
-property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 2));
+property Pr1 = Pmax(<> (clk >= clkUpper));
+//property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 3));
 // ------ End: properties ---------
 
 process Clock(){	
@@ -472,6 +474,7 @@ if(noc[0].nsB3 == false && noc[0].nsB2 == false && noc[0].nsB1 == false){
 }
 
 process arbiter(int n){
+	//assign values to the buffers according to the probabilities
 	if(noc[n].local == true && noc[n].localLocked == false){
 		palt{
 			:(2/3): {= noc[n].localVal = 1 =}  
@@ -494,7 +497,7 @@ process arbiter(int n){
 	else{tau};
 	
 	if(noc[n].localVal != -1 && noc[n].localVal == noc[n].ewVal){	//local and ew conflict
-		if(!(noc[n].a1 || (noc[n].a2 && noc[n].a3))){		//local and south are serviced, east unserviced
+		if(!(noc[n].a1 || (noc[n].a2 && noc[n].a3))){		//local and south are serviced, east unserviced, encodes the priority buffer into three predicates and uses a truth table
 			{= 
 			noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, noc[n].local = false, noc[n].localVal = -1, noc[n].localLocked = false,
 			noc[n].ewLocked = true
@@ -516,6 +519,7 @@ process arbiter(int n){
 				{= totalFlitsDelivered++, noc[n].nsVal = -1, noc[n].nsLocked = false =}		//flit delivered
 		};
 		
+		//Update priorities using boolean algebra
 		{=
 		noc[n].a1 = !(noc[n].a1 || (noc[n].a2 && noc[n].a3)),
 		noc[n].a2 =  noc[n].a1,

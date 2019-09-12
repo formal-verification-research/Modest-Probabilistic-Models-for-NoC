@@ -6,10 +6,10 @@ const int NOCSIZE = 2;
 const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
-const int clkLower = 0; 
-const int clkUpper = 2;
-//int(clkLower..clkUpper) clk;
-transient int(0..1) clk;
+const int clkLower = 100; 
+const int clkUpper = 106;
+int(clkLower..clkUpper) clk;
+//transient int(0..1) clk;
 
 action tick;
 
@@ -22,14 +22,14 @@ node r0, r1, r2, r3;
 
 node[] noc;
 
-// ------ Begin: properties ---------
-//property Pr1 = Pmax(<> (clk >= clkUpper));
-property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= (clkUpper-clkLower)*2));
+// ------ Begin: properties ---------	
+property Pr1 = Pmax(<> (clk >= clkUpper));
+//property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= (clkUpper-clkLower)*2));
 // ------ End: properties ---------
 
 process Clock(){	
 	
-	/*
+	
 	tick {= clk++ =};
 	if (clk <= clkUpper) {
 	   Clock()
@@ -37,10 +37,10 @@ process Clock(){
 	else {
 	   stop
 	} 
-	*/	
+		
 	
-	tick {= clk = 1 =};
-	Clock()
+	//tick {= clk = 1 =};
+	//Clock()
 }
 
 process Top(){
@@ -52,7 +52,7 @@ process Top(){
 		arbiter(2);
 		arbiter(3);
 		
-		tick/*;
+		tick;
 		
 		if(clk>=clkUpper){
 			stop
@@ -61,7 +61,7 @@ process Top(){
 			tau
 
 		} 	
-		*/
+		
 		
 	}
 }
