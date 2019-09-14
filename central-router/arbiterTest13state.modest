@@ -1,3 +1,5 @@
+//version of the concrete model used to calculate transition probabilities for the 13 state model
+
 datatype buffer = {int(-1..3) val, int(0..3) id, bool serviced, int(0..3) priority, int timesServiced};		//Datatype for a buffer with the next buffer value, id of the buffer, whether the buffer was serviced last clock cycle or not, and the priority number of the buffer
 int unserviced;		//Number of unserviced buffers, iterates down when unserviced buffer's priority is set
 int totalUnserviced;	//Total number of unserviced buffers in a clock cycle
