@@ -8,7 +8,7 @@ action tick;
 
 //Represent the destination of the package from the producer. 0 represents no package
 int(0..5) producer, router1, router2, consumer1, consumer2, consumer3, consumer4, consumer5;
-int(0..100) packagesReceived = 0;
+int(0..(clkUpper - clkLower)) packagesReceived = 0;
 /*
 				producer
 					|
