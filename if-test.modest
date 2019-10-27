@@ -39,8 +39,8 @@ process ifTest() {
 	*/
 
 	alt{
+	:: when(b == 3) {= test = 2 =}
 	:: when(a == 3) {= test = 1 =}
-	:: when(b == 3) {= test = 1 =}
 	:: when((a != 3) && (b != 3)) {= test = 3 =}
 	}
 }
