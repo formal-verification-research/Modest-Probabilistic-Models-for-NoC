@@ -7,7 +7,7 @@ const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
 const int clkLower = 100; 
-const int clkUpper = 120;
+const int clkUpper = 115;
 int(clkLower..clkUpper) clk;
 //transient int(0..1) clk;
 int test;
@@ -195,7 +195,7 @@ process arbiter(int n){
 			if(noc[n].ewLockedns) {	
 
 				//Local has a 1 or 3 and EW has a 2
-				{= noc[n].localLockedns = !ewNotFull(xDirection(n)), //Local is locked in the ew direction if it is unable to send
+				{= noc[n].localLockedew = !ewNotFull(xDirection(n)), //Local is locked in the ew direction if it is unable to send
 							noc[n].localPriority = !ewNotFull(xDirection(n)), //Local remains in priority under the same conditions
 							noc[n].localLen -= (ewNotFull1(xDirection(n))),  //Local sends ew if it is not empty and the ew direciton is not full
 							noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n))), //The ew direction recieves under the same conditions
@@ -212,7 +212,7 @@ process arbiter(int n){
 			else if (noc[n].ewLockedlocal) {
 
 				//Local has a 1 or 3 and EW has a 0	
-				{= noc[n].localLockedns = !ewNotFull(xDirection(n)), //Local is locked in the ew direction if it is unable to send
+				{= noc[n].localLockedew = !ewNotFull(xDirection(n)), //Local is locked in the ew direction if it is unable to send
 							noc[n].localPriority = !ewNotFull(xDirection(n)), //Local remains in priority under the same conditions
 							noc[n].localLen -= (ewNotFull1(xDirection(n))),  //Local sends ew if it is not empty and the ew direciton is not full
 							noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n))), //The ew direction receives under the same conditions
