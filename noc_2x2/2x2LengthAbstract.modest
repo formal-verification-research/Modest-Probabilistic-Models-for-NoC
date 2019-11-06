@@ -874,11 +874,10 @@ process arbiter(int n){
 					palt {
 						//Local and EW both send to 2
 						:(1/2): {= noc[n].localPriority = !nsNotFull(yDirection(n)), 
-									noc[n].localLockedns = localNotEmpty(n) && !nsNotFull(yDirection(n)), 
-									noc[n].localLen -= (localNotEmpty1(n))*(nsNotFull1(yDirection(n))),  
+									noc[n].localLockedns = !nsNotFull(yDirection(n)), 
+									noc[n].localLen -= (nsNotFull1(yDirection(n))),  
 									noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n))), 
-									noc[n].ewLockedns = localNotEmpty(n),
-									noc[n].ewLen -= localNotEmpty0(n),
+									noc[n].ewLockedns = true,
 									noc[n].nsLen -= (nsNotEmpty1(n)) 
 				//INCREMENT counter for flits delivered (if used) under same conditions	
 								=}	
