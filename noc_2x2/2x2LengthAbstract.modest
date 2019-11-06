@@ -664,10 +664,11 @@ process arbiter(int n){
 
 
 			}
+			//Logically determined that ew cannot be locked local
 			else {
 
 			palt {	//Local and EW both send to 2
-			:(1/6): {= noc[n].localPriority = nsNotFull(yDirection(n)),  
+			:(1/2): {= noc[n].localPriority = nsNotFull(yDirection(n)),  
 						noc[n].ewLockedns = !nsNotFull(yDirection(n)),
 						noc[n].ewLen -= (nsNotFull1(yDirection(n))),  
 						noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n))), 
@@ -675,7 +676,7 @@ process arbiter(int n){
 				//INCREMENT counter for flits delivered (if used) under same conditions	
 					=}
 					//Local Sends to 2, EW to 0
-			:(1/6): {= noc[n].localPriority = !nsNotFull(yDirection(n)),
+			:(1/2): {= noc[n].localPriority = !nsNotFull(yDirection(n)),
 						noc[n].localLockedns = !nsNotFull(yDirection(n)),
 						noc[n].localLen -= nsNotFull1(yDirection(n)),  
 						noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n))), 
