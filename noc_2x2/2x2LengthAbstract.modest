@@ -670,7 +670,7 @@ process arbiter(int n){
 
 						//Local has a 1 or 3 and EW has a 0
 						:(1/2): {=  noc[n].localPriority = !ewNotFull(xDirection(n)) && !nsNotEmpty(n), 
-									noc[n].localLockedew = !ewNotFull(yDirection(n)),
+									noc[n].localLockedew = !ewNotFull(xDirection(n)),
 									noc[n].localLen -= (ewNotFull1(xDirection(n))),  
 									noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n))), 
 									noc[n].nsLen -= nsNotEmpty1(n),
@@ -680,7 +680,7 @@ process arbiter(int n){
 
 						//Local has a 1 or 3 and EW has a 2
 						:(1/2): {= noc[n].localPriority = !ewNotFull(xDirection(n)) && !nsNotEmpty(n), 
-									noc[n].localLockedew = !ewNotFull(yDirection(n)),									
+									noc[n].localLockedew = !ewNotFull(xDirection(n)),									
 									noc[n].localLen -= (ewNotFull1(xDirection(n))),  
 									noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n))), 
 									noc[n].ewLen -= (nsNotFull1(yDirection(n))), 
