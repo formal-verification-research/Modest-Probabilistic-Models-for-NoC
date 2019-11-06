@@ -103,8 +103,8 @@ process arbiter(int n){
 
 		else if (noc[n].localLockedew) {
 
-			{=  			noc[n].localLockedew = !ewNotFull(yDirection(n)), // Local is locked it if has a flit and is unable to send it
-							noc[n].localPriority = !ewNotFull(yDirection(n)),  // Local gets priority under the same conditions		
+			{=  			noc[n].localLockedew = !ewNotFull(xDirection(n)), // Local is locked it if has a flit and is unable to send it
+							noc[n].localPriority = !ewNotFull(xDirection(n)),  // Local gets priority under the same conditions		
 							noc[n].localLen -= (ewNotFull1(xDirection(n))),  //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
 							noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n))), //The ew direction receives it under the same conditions
 							noc[n].nsLen -= (nsNotEmpty1(n)) //The ns buffer sends a flit to local if it is not empty
@@ -124,8 +124,8 @@ process arbiter(int n){
 							noc[n].nsLen -= (nsNotEmpty1(n))   //The ns buffer sends a flit to local if it is not empty	
 						=}
 				//Local sends to the ew direction
-				:(2/3): {=  noc[n].localLockedew = localNotEmpty(n) && !ewNotFull(yDirection(n)), // Local is locked it if has a flit and is unable to send it
-							noc[n].localPriority = localNotEmpty(n) && !ewNotFull(yDirection(n)),  // Local gets priority under the same conditions
+				:(2/3): {=  noc[n].localLockedew = localNotEmpty(n) && !ewNotFull(xDirection(n)), // Local is locked it if has a flit and is unable to send it
+							noc[n].localPriority = localNotEmpty(n) && !ewNotFull(xDirection(n)),  // Local gets priority under the same conditions
 							noc[n].localLen -= (localNotEmpty1(n))*(ewNotFull1(xDirection(n))),  //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
 							noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n)))*(localNotEmpty1(n)), //The ew direction receives it under the same conditions
 							noc[n].nsLen -= (nsNotEmpty1(n)) //The ns buffer sends a flit to local if it is not empty
