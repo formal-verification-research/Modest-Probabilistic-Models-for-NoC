@@ -101,7 +101,7 @@ process arbiter(int n){
 
 		}
 
-		else if (noc[n].localLockedew) {
+		/*else if (noc[n].localLockedew) {
 
 			{=  			noc[n].localLockedew = !ewNotFull(xDirection(n)), // Local is locked it if has a flit and is unable to send it
 							noc[n].localPriority = !ewNotFull(xDirection(n)),  // Local gets priority under the same conditions		
@@ -112,7 +112,7 @@ process arbiter(int n){
 			=}
 
 
-		}
+		}*/
 
 		else {
 			palt {
@@ -190,7 +190,7 @@ process arbiter(int n){
 
 		}
 
-		else if (noc[n].localLockedew) {
+		/*else if (noc[n].localLockedew) {
 
 			if(noc[n].ewLockedns) {	
 
@@ -258,7 +258,7 @@ process arbiter(int n){
 		}
 
 		
-
+		*/
 		else{
 
 			if(noc[n].ewLockedns) {
@@ -435,7 +435,7 @@ process arbiter(int n){
 
 			}
 
-			else if (noc[n].localLockedew) {
+			/*else if (noc[n].localLockedew) {
 
 
 					if (noc[n].ewLockedlocal) {
@@ -498,7 +498,7 @@ process arbiter(int n){
 
 
 			}
-
+			*/
 			else {
 
 				if (noc[n].ewLockedlocal) {
@@ -643,7 +643,7 @@ process arbiter(int n){
 
 		}
 
-		else if(noc[n].localLockedew) {
+		/*else if(noc[n].localLockedew) {
 
 			if (noc[n].ewLockedns) {
 
@@ -694,7 +694,7 @@ process arbiter(int n){
 				}
 
 		}
-
+		*/
 		else {
 		
 			 if (noc[n].ewLockedns) {
@@ -834,7 +834,7 @@ process arbiter(int n){
 
 		}
 
-		else if(noc[n].localLockedew) {
+		/*else if(noc[n].localLockedew) {
 
 			if (noc[n].ewLockedlocal) {
 
@@ -899,7 +899,7 @@ process arbiter(int n){
 
 		}
 
-
+		*/
 		else {
 			 if (noc[n].ewLockedlocal) {
 
