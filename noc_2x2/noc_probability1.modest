@@ -22,8 +22,8 @@ node r0, r1, r2, r3;
 node[] noc;
 
 // ------ Begin: properties ---------
-property Pr1 = Pmax(<> (totalFlitsDelivered >= 25));
-//property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 2));
+//property Pr1 = Pmax(<> (totalFlitsDelivered >= 25));
+property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 2));
 // ------ End: properties ---------
 
 process Clock(){	
