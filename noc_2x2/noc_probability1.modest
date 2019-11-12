@@ -23,7 +23,7 @@ node[] noc;
 
 // ------ Begin: properties ---------
 //property Pr1 = Pmax(<> (totalFlitsDelivered >= 25));
-property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 2));
+property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 25));
 // ------ End: properties ---------
 
 process Clock(){	
