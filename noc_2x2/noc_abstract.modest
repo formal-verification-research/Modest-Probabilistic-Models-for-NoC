@@ -8,7 +8,7 @@ option "dtmc";
 
 // ---- Begin Varialbes ----
 const int clkLower = 100; 
-const int clkUpper = 107;
+const int clkUpper = 104;
 //int(clkLower..clkUpper) clk;
 transient int(0..1) clk;
 
@@ -100,7 +100,7 @@ bool r3a1, r3a2, r3a3 = false; //priority positions of the arbiter  noc[3].buffe
 // ------ Begin: properties ---------
 //property Pr1 = Pmax(<> (clk >= clkUpper));
 //property averageLatency = Pmax(<> ((clk >= clkUpper) && ((totalLatency/totalFlits) <= 1.75)));
-property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 10));
+property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 5));
 // ------ End: properties ---------
 
 
