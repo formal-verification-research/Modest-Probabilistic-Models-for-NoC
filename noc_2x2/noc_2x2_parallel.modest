@@ -7,7 +7,7 @@ const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
 const int clkLower = 100; 
-const int clkUpper = 150;
+const int clkUpper = 110;
 int(clkLower..clkUpper) clk;
 //transient int(0..1) clk;
 
@@ -34,7 +34,8 @@ process Clock(){
 	Clock() */
 	if (clk == clkLower) {
 		initialize();
-		tick {= clk++ =}
+		tick {= clk++ =};
+		Clock()
 
 	}
 
