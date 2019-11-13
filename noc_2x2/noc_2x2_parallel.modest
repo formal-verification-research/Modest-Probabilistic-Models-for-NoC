@@ -17,7 +17,7 @@ action tock;
 
 
 
-datatype node = {int(0..4) localLen, int(0..4) ewLen, int(0..4) nsLen, bool localPriority, bool nsPriority, bool ewLockedns, bool ewLockedlocal, bool localLockedns, bool localLockedew, int(0..1) nsShouldDec, int(0..1) ewShouldDec, int totalFlitsDelivered = 0};
+datatype node = {int(0..4) localLen, int(0..4) ewLen, int(0..4) nsLen, bool localPriority, bool nsPriority, bool ewLockedns, bool ewLockedlocal, bool localLockedns, bool localLockedew, int(0..1) nsShouldDec, int(0..1) ewShouldDec, int (0..clkUpper) totalFlitsDelivered};
 
 node r0, r1, r2, r3;
 
@@ -84,7 +84,11 @@ process Clock(){
 
 process initialize(){
 	 {=
-	noc = [r0, r1, r2, r3]
+	noc = [r0, r1, r2, r3].
+	noc[0].totalFlitsDelivered = 0,
+	noc[1].totalFlitsDelivered = 0,
+	noc[2].totalFlitsDelivered = 0,
+	noc[3].totalFlitsDelivered = 0
 	=}
 }
 
