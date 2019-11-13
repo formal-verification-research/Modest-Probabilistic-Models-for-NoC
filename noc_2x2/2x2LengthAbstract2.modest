@@ -7,7 +7,7 @@ const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
 const int clkLower = 100; 
-const int clkUpper = 107;
+const int clkUpper = 104;
 //int(clkLower..clkUpper) clk;
 transient int(0..1) clk;
 
@@ -24,7 +24,7 @@ node[] noc;
 
 // ------ Begin: properties ---------
 //property Pr1 = Pmax(<> (clk == clkUpper));
-property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 10));
+property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 5));
 // ------ End: properties ---------
 
 process Clock(){	
