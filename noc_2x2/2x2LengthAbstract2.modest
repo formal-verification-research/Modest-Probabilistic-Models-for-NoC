@@ -8,8 +8,8 @@ const int INJECTIONRATEDENOMINATOR = 2;
 
 const int clkLower = 100; 
 const int clkUpper = 110;
-int(clkLower..clkUpper) clk;
-//transient int(0..1) clk;
+//int(clkLower..clkUpper) clk;
+transient int(0..1) clk;
 
 
 action tick;
@@ -21,25 +21,48 @@ datatype node = {int(0..4) localLen, int(0..4) ewLen, int(0..4) nsLen, bool loca
 node r0, r1, r2, r3;
 
 node[] noc;
+//transient int(0..1)[] localNotEmptyOne = [0, 0, 0, 0];
+
+function int(0..1) localNotEmpty1(int(0..4) n) =  (noc[n].localLen > 0) ? 1 : 0 ;     //ceil(noc[n].localLen/(noc[n].localLen+1));
+//function int(0..1) localNotEmpty1(int(0..4) n) = localNotEmptyOne[n];
+
+
+function int(0..1) localNotEmpty0(int(0..4) n) =  (noc[n].localLen > 0) ? 0 : 1 ; 
+function int(0..1) nsNotEmpty1(int(0..4) n) =    (noc[n].nsLen > 0) ? 1 : 0 ;        
+function int(0..4) xDirection(int(0..1) n) =   (n % 2)*(n - 1) + (-(n % 2) + 1)*(n + 1);   
+function int(0..4) yDirection(int(0..1) n) =   ((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2);  
+function int(0..1) nsNotFull1(int(0..4) n) = (noc[n].nsLen < 4) ? 1 : 0;
+function int(0..1) ewNotFull1(int(0..4) n) = (noc[n].ewLen < 4) ? 1 : 0;
+function int(0..1) localNotFull1(int(0..4) n) = (noc[n].localLen < 4) ? 1 : 0;
+function int(0..1) nsNotFull0(int(0..4) n) = ((noc[n].nsLen < 4 ) ? 0 : 1);
+function bool nsNotFull(int(0..4) n) = ((noc[n].nsLen < 4) ? true: false);
+function bool ewNotFull(int(0..4) n) = ((noc[n].ewLen < 4) ? true: false);
+function bool nsNotEmpty(int(0..4)n) = ((noc[n].nsLen > 0) ? true: false);
+function bool localNotEmpty(int(0..4)n) = ((noc[n].localLen > 0) ? true: false);
+function bool localNotFull(int(0..4)n) = ((noc[n].localLen < 4) ? true: false);
+function int(0..1) nsNotEmpty0(int(0..4) n) =    (noc[n].nsLen > 0) ? 0 : 1 ;
+
+
+
 
 // ------ Begin: properties ---------
-property Pr1 = Pmax(<> (clk == clkUpper));
-//property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 25));
+//property Pr1 = Pmax(<> (clk == clkUpper));
+property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 3));
 // ------ End: properties ---------
 
 process Clock(){	
 	
-	/*tick{= clk = 1 =};
-	Clock()*/
+	tick{= clk = 1 =};
+	Clock()
 	
 	
-	tick {= clk++ =};
+	/*tick {= clk++ =};
 	if (clk <= clkUpper) {
 	   Clock()
 	}
 	else {
 	   stop
-	} 
+	} */
 	
 }
 
@@ -76,7 +99,7 @@ process initialize(){
 process populate() {
 
 if((clk % INJECTIONRATEDENOMINATOR) < INJECTIONRATENUMERATOR){
-		{=
+		 {=
 		noc[0].localLen += localNotFull1(0),		//Adds a flit to the local buffer of each NoC, if they are not already full
 		noc[1].localLen += localNotFull1(1),
 		noc[2].localLen += localNotFull1(2),
@@ -90,7 +113,12 @@ if((clk % INJECTIONRATEDENOMINATOR) < INJECTIONRATENUMERATOR){
 		noc[0].ewShouldDec = 0,
 		noc[1].ewShouldDec = 0,
 		noc[2].ewShouldDec = 0,
-		noc[3].ewShouldDec = 0
+		noc[3].ewShouldDec = 0/*,
+
+		localNotEmptyOne[0] = (noc[0].localLen > 0) ? 1 : 0,
+		localNotEmptyOne[1] = (noc[1].localLen > 0) ? 1 : 0,
+		localNotEmptyOne[2] = (noc[2].localLen > 0) ? 1 : 0,
+		localNotEmptyOne[3] = (noc[3].localLen > 0) ? 1 : 0*/
 		=}
 	}
 	else {
@@ -104,7 +132,12 @@ if((clk % INJECTIONRATEDENOMINATOR) < INJECTIONRATENUMERATOR){
 		noc[0].ewShouldDec = 0,
 		noc[1].ewShouldDec = 0,
 		noc[2].ewShouldDec = 0,
-		noc[3].ewShouldDec = 0
+		noc[3].ewShouldDec = 0/*,
+
+		localNotEmptyOne[0] = (noc[0].localLen > 0) ? 1 : 0,
+		localNotEmptyOne[1] = (noc[1].localLen > 0) ? 1 : 0,
+		localNotEmptyOne[2] = (noc[2].localLen > 0) ? 1 : 0,
+		localNotEmptyOne[3] = (noc[3].localLen > 0) ? 1 : 0*/
 
 		=}
 	}
@@ -303,7 +336,7 @@ process arbiter(int n){
 
 				palt { 
 				//Local and EW both send to 2	
-				:(1/3): {= noc[n].ewLockedns = (localNotEmpty(n)),                //The ew buffer gets locked in the ns direction if local is not empty 
+				:(1/3): {=	noc[n].ewLockedns = (localNotEmpty(n)),                //The ew buffer gets locked in the ns direction if local is not empty 
 							noc[n].localPriority = (localNotEmpty(n) && !nsNotFull(yDirection(n))),   //Local remains in priority if it is non-empty and is unable to send
 							noc[n].localLockedns = (localNotEmpty(n) && !nsNotFull(yDirection(n))), // Local gets locked to ns under the same conditions
 							noc[n].localLen -= (localNotEmpty1(n))*(nsNotFull1(yDirection(n))),  	//Local sends the ns direction if it is not empty, and the receiving buffer is not full
@@ -1122,21 +1155,7 @@ process decrement() {
 }
 
 
-function int(0..1) localNotEmpty1(int(0..4) n) =  (noc[n].localLen > 0) ? 1 : 0 ;     //ceil(noc[n].localLen/(noc[n].localLen+1));
-function int(0..1) localNotEmpty0(int(0..4) n) =  (noc[n].localLen > 0) ? 0 : 1 ; 
-function int(0..1) nsNotEmpty1(int(0..4) n) =    (noc[n].nsLen > 0) ? 1 : 0 ;        
-function int(0..4) xDirection(int(0..1) n) =   (n % 2)*(n - 1) + (-(n % 2) + 1)*(n + 1);   
-function int(0..4) yDirection(int(0..1) n) =   ((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2);  
-function int(0..1) nsNotFull1(int(0..4) n) = (noc[n].nsLen < 4) ? 1 : 0;
-function int(0..1) ewNotFull1(int(0..4) n) = (noc[n].ewLen < 4) ? 1 : 0;
-function int(0..1) localNotFull1(int(0..4) n) = (noc[n].localLen < 4) ? 1 : 0;
-function int(0..1) nsNotFull0(int(0..4) n) = ((noc[n].nsLen < 4 ) ? 0 : 1);
-function bool nsNotFull(int(0..4) n) = ((noc[n].nsLen < 4) ? true: false);
-function bool ewNotFull(int(0..4) n) = ((noc[n].ewLen < 4) ? true: false);
-function bool nsNotEmpty(int(0..4)n) = ((noc[n].nsLen > 0) ? true: false);
-function bool localNotEmpty(int(0..4)n) = ((noc[n].localLen > 0) ? true: false);
-function bool localNotFull(int(0..4)n) = ((noc[n].localLen < 4) ? true: false);
-function int(0..1) nsNotEmpty0(int(0..4) n) =    (noc[n].nsLen > 0) ? 0 : 1 ;
+
 
 
 par{
