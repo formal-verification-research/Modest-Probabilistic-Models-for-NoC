@@ -3,190 +3,205 @@
 module arbiter
 
 	 
-	a0.val : [0..3]; //value in head of buffer in position 0
-	a0.id : [0..3]; //id of buffer in position 0, 0-n, 1-e, 2-s, 3-w
-	a0.serviced : [0..1] //boolean, 1 if serviced, 0 if not
+	a0val : [0..3]; //value in head of buffer in position 0
+	a0id : [0..3]; //id of buffer in position 0, 0-n, 1-e, 2-s, 3-w
+	a0serviced : [0..1]; //boolean, 1 if serviced, 0 if not
 	
-	a1.val : [0..3]; //value in head of buffer in position 1
-	a1.id : [0..3]; //id of buffer in position 1, 0-n, 1-e, 2-s, 3-w	
-	a1.serviced : [0..1] //boolean, 1 if serviced, 0 if not
+	a1val : [0..3]; //value in head of buffer in position 1
+	a1id : [0..3]; //id of buffer in position 1, 0-n, 1-e, 2-s, 3-w	
+	a1serviced : [0..1]; //boolean, 1 if serviced, 0 if not
 	
-	a2.val : [0..3]; //value in head of buffer in position 3
-	a2.id : [0..3]; //id of buffer in position 3, 0-n, 1-e, 2-s, 3-w	
-	a2.serviced : [0..1] //boolean, 1 if serviced, 0 if not
+	a2val : [0..3]; //value in head of buffer in position 3
+	a2id : [0..3]; //id of buffer in position 3, 0-n, 1-e, 2-s, 3-w	
+	a2serviced : [0..1]; //boolean, 1 if serviced, 0 if not
 
-	a3.val : [0..3]; //value in head of buffer in position 3
-	a3.id : [0..3]; //id of buffer in position 3, 0-n, 1-e, 2-s, 3-w
-	a3.serviced : [0..1] //boolean, 1 if serviced, 0 if not
+	a3val : [0..3]; //value in head of buffer in position 3
+	a3id : [0..3]; //id of buffer in position 3, 0-n, 1-e, 2-s, 3-w
+	a3serviced : [0..1]; //boolean, 1 if serviced, 0 if not
 
-	temp0.val : [0..3]; //value in head of buffer in position 0
-	temp0.id : [0..3]; //id of buffer in position 0, 0-n, 1-e, 2-s, 3-w
-	temp0.serviced : [0..1] //boolean, 1 if serviced, 0 if not
+	temp0val : [0..3]; //value in head of buffer in position 0
+	temp0id : [0..3]; //id of buffer in position 0, 0-n, 1-e, 2-s, 3-w
+	temp0serviced : [0..1]; //boolean, 1 if serviced, 0 if not
 	
-	temp1.val : [0..3]; //value in head of buffer in position 1
-	temp1.id : [0..3]; //id of buffer in position 1, 0-n, 1-e, 2-s, 3-w	
-	temp1.serviced : [0..1] //boolean, 1 if serviced, 0 if not
+	temp1val : [0..3]; //value in head of buffer in position 1
+	temp1id : [0..3]; //id of buffer in position 1, 0-n, 1-e, 2-s, 3-w	
+	temp1serviced : [0..1]; //boolean, 1 if serviced, 0 if not
 	
-	temp2.val : [0..3]; //value in head of buffer in position 3
-	temp2.id : [0..3]; //id of buffer in position 3, 0-n, 1-e, 2-s, 3-w	
-	temp2.serviced : [0..1] //boolean, 1 if serviced, 0 if not
+	temp2val : [0..3]; //value in head of buffer in position 3
+	temp2id : [0..3]; //id of buffer in position 3, 0-n, 1-e, 2-s, 3-w	
+	temp2serviced : [0..1]; //boolean, 1 if serviced, 0 if not
 
-	temp3.val : [0..3]; //value in head of buffer in position 3
-	temp3.id : [0..3]; //id of buffer in position 3, 0-n, 1-e, 2-s, 3-w
-	temp3.serviced : [0..1] //boolean, 1 if serviced, 0 if not
+	temp3val : [0..3]; //value in head of buffer in position 3
+	temp3id : [0..3]; //id of buffer in position 3, 0-n, 1-e, 2-s, 3-w
+	temp3serviced : [0..1]; //boolean, 1 if serviced, 0 if not
 
-	unserviced : [0..2] //Number of unserviced buffers that decrements	
-	totalUnserviced : [0..2] //Number of unserviced buffers that does not decrement
+	unserviced : [0..2]; //Number of unserviced buffers that decrements	
+	totalUnserviced : [0..2]; //Number of unserviced buffers that does not decrement
 
-	\\Insert packet generation here
-	[] a0.serviced=1 & a0.id=0 ->
-		  1/3 : (a0.val'=1)
-		+ 1/3 : (a0.val'=2)
-		+ 1/3 : (a0.val'=3);
+	optimalRuns : [0..100]; //counter for cycles where all packets are serviced
 
-	[] a0.serviced=1 & a0.id=1 ->
-		  1/3 : (a0.val'=0)
-		+ 1/3 : (a0.val'=2)
-		+ 1/3 : (a0.val'=3);
+	//Insert packet generation here
+	[] a0serviced=1 & a0id=0 ->
+		  1/3 : (a0val'=1)
+		+ 1/3 : (a0val'=2)
+		+ 1/3 : (a0val'=3);
+
+	[] a0serviced=1 & a0id=1 ->
+		  1/3 : (a0val'=0)
+		+ 1/3 : (a0val'=2)
+		+ 1/3 : (a0val'=3);
 	
-	[] a0.serviced=1 & a0.id=2 ->
-		  1/3 : (a0.val'=1)
-		+ 1/3 : (a0.val'=0)
-		+ 1/3 : (a0.val'=3);
+	[] a0serviced=1 & a0id=2 ->
+		  1/3 : (a0val'=1)
+		+ 1/3 : (a0val'=0)
+		+ 1/3 : (a0val'=3);
 
-	[] a0.serviced=1 & a0.id=3 ->
-		  1/3 : (a0.val'=1)
-		+ 1/3 : (a0.val'=2)
-		+ 1/3 : (a0.val'=0);
+	[] a0serviced=1 & a0id=3 ->
+		  1/3 : (a0val'=1)
+		+ 1/3 : (a0val'=2)
+		+ 1/3 : (a0val'=0);
 
 
-	[] a1.serviced=1 & a1.id=0 ->
-		  1/3 : (a1.val'=1)
-		+ 1/3 : (a1.val'=2)
-		+ 1/3 : (a1.val'=3);
+	[] a1serviced=1 & a1id=0 ->
+		  1/3 : (a1val'=1)
+		+ 1/3 : (a1val'=2)
+		+ 1/3 : (a1val'=3);
 
-	[] a1.serviced=1 & a1.id=1 ->
-		  1/3 : (a1.val'=0)
-		+ 1/3 : (a1.val'=2)
-		+ 1/3 : (a1.val'=3);
+	[] a1serviced=1 & a1id=1 ->
+		  1/3 : (a1val'=0)
+		+ 1/3 : (a1val'=2)
+		+ 1/3 : (a1val'=3);
 	
-	[] a1.serviced=1 & a1.id=2 ->
-		  1/3 : (a1.val'=1)
-		+ 1/3 : (a1.val'=0)
-		+ 1/3 : (a1.val'=3);
+	[] a1serviced=1 & a1id=2 ->
+		  1/3 : (a1val'=1)
+		+ 1/3 : (a1val'=0)
+		+ 1/3 : (a1val'=3);
 
-	[] a1.serviced=1 & a1.id=3 ->
-		  1/3 : (a1.val'=1)
-		+ 1/3 : (a1.val'=2)
-		+ 1/3 : (a1.val'=0);
-	
-	
-	[] a2.serviced=1 & a2.id=0 ->
-		  1/3 : (a2.val'=1)
-		+ 1/3 : (a2.val'=2)
-		+ 1/3 : (a2.val'=3);
-
-	[] a2.serviced=1 & a2.id=1 ->
-		  1/3 : (a2.val'=0)
-		+ 1/3 : (a2.val'=2)
-		+ 1/3 : (a2.val'=3);
-	
-	[] a2.serviced=1 & a2.id=2 ->
-		  1/3 : (a2.val'=1)
-		+ 1/3 : (a2.val'=0)
-		+ 1/3 : (a2.val'=3);
-
-	[] a2.serviced=1 & a2.id=3 ->
-		  1/3 : (a2.val'=1)
-		+ 1/3 : (a2.val'=2)
-		+ 1/3 : (a2.val'=0);
+	[] a1serviced=1 & a1id=3 ->
+		  1/3 : (a1val'=1)
+		+ 1/3 : (a1val'=2)
+		+ 1/3 : (a1val'=0);
 	
 	
-	[] a3.serviced=1 & a3.id=0 ->
-		  1/3 : (a3.val'=1)
-		+ 1/3 : (a3.val'=2)
-		+ 1/3 : (a3.val'=3);
+	[] a2serviced=1 & a2id=0 ->
+		  1/3 : (a2val'=1)
+		+ 1/3 : (a2val'=2)
+		+ 1/3 : (a2val'=3);
 
-	[] a3.serviced=1 & a3.id=1 ->
-		  1/3 : (a3.val'=0)
-		+ 1/3 : (a3.val'=2)
-		+ 1/3 : (a3.val'=3);
+	[] a2serviced=1 & a2id=1 ->
+		  1/3 : (a2val'=0)
+		+ 1/3 : (a2val'=2)
+		+ 1/3 : (a2val'=3);
 	
-	[] a3.serviced=1 & a3.id=2 ->
-		  1/3 : (a3.val'=1)
-		+ 1/3 : (a3.val'=0)
-		+ 1/3 : (a3.val'=3);
+	[] a2serviced=1 & a2id=2 ->
+		  1/3 : (a2val'=1)
+		+ 1/3 : (a2val'=0)
+		+ 1/3 : (a2val'=3);
 
-	[] a3.serviced=1 & a3.id=3 ->
-		  1/3 : (a3.val'=1)
-		+ 1/3 : (a3.val'=2)
-		+ 1/3 : (a3.val'=0);
+	[] a2serviced=1 & a2id=3 ->
+		  1/3 : (a2val'=1)
+		+ 1/3 : (a2val'=2)
+		+ 1/3 : (a2val'=0);
+	
+	
+	[] a3serviced=1 & a3id=0 ->
+		  1/3 : (a3val'=1)
+		+ 1/3 : (a3val'=2)
+		+ 1/3 : (a3val'=3);
+
+	[] a3serviced=1 & a3id=1 ->
+		  1/3 : (a3val'=0)
+		+ 1/3 : (a3val'=2)
+		+ 1/3 : (a3val'=3);
+	
+	[] a3serviced=1 & a3id=2 ->
+		  1/3 : (a3val'=1)
+		+ 1/3 : (a3val'=0)
+		+ 1/3 : (a3val'=3);
+
+	[] a3serviced=1 & a3id=3 ->
+		  1/3 : (a3val'=1)
+		+ 1/3 : (a3val'=2)
+		+ 1/3 : (a3val'=0);
 
 	//behaviors
 	
-	[] 1=1 -> a0.serviced'=1;
+	[] 1=1 -> (a0serviced'=1);
 
-	[] a0.val = a1.val -> a1.serviced'=0;
-	[] a0.val != a1.val -> a1.serviced'=1;
+	[] a0val = a1val -> (a1serviced'=0);
+	[] a0val != a1val -> (a1serviced'=1);
 
 
-	[] a0.val = a2.val | a1.val = a2.val -> a2.serviced'=0;
-	[] a0.val != a2.val & a1.val != a2.val -> a2.serviced'=1;
+	[] a0val = a2val | a1val = a2val -> (a2serviced'=0);
+	[] a0val != a2val & a1val != a2val -> (a2serviced'=1);
 	
 
-	[] a0.val = a3.val | a1.val = a3.val | a2.val = a3.val -> a3.serviced'=0;
-	[] a0.val != a3.val & a1.val != a3.val & a2.val != a3.val -> a3.serviced'=1;
+	[] a0val = a3val | a1val = a3val | a2val = a3val -> (a3serviced'=0);
+	[] a0val != a3val & a1val != a3val & a2val != a3val -> (a3serviced'=1);
 
 
 
 	//Set Priority
 
-	[] 1=1 -> (unserviced = a0.serviced + a1.serviced + a2.serviced + a3.serviced) & (totalUnserviced = a0.serviced + a1.serviced + a2.serviced + a3.serviced)
+	[] 1=1 -> (unserviced' = a0serviced + a1serviced + a2serviced + a3serviced) & (totalUnserviced' = a0serviced + a1serviced + a2serviced + a3serviced);
 
-	[] (a0.serviced = 1) & (unserviced = 0) -> (temp0.val = a0.val) & (temp0.id = a0.id) & (temp0.serviced = a0.serviced)
+	[] (unserviced = 0) -> (optimalRuns'= optimalRuns + 1);
+
+	[] (a0serviced = 1) & (unserviced = 0) -> (temp0val' = a0val) & (temp0id' = a0id) & (temp0serviced' = a0serviced);
  	
-	[] (a0.serviced = 1) & (unserviced = 1) -> (temp1.val = a0.val) & (temp1.id = a0.id) & (temp1.serviced = a0.serviced) 	
+	[] (a0serviced = 1) & (unserviced = 1) -> (temp1val' = a0val) & (temp1id' = a0id) & (temp1serviced' = a0serviced); 	
 
-	[] (a0.serviced = 1) & (unserviced = 2) -> (temp2.val = a0.val) & (temp2.id = a0.id) & (temp2.serviced = a0.serviced) 	
+	[] (a0serviced = 1) & (unserviced = 2) -> (temp2val' = a0val) & (temp2id' = a0id) & (temp2serviced' = a0serviced); 	
 
-	[] (a0.serviced = 0) & (totalUnserviced - unserviced = 0) -> (temp0.serviced = a0.serviced) & (temp0.val = a0.val) & (temp0.id = a0.id) & (unserviced = unserviced - 1) 
+	[] (a0serviced = 0) & (totalUnserviced - unserviced = 0) -> (temp0serviced' = a0serviced) & (temp0val' = a0val) & (temp0id' = a0id) & (unserviced' = unserviced - 1); 
 
-	[] (a0.serviced = 0) & (totalUnserviced - unserviced = 1) -> (temp1.serviced = a0.serviced) & (temp1.val = a0.val) & (temp1.id = a0.id) & (unserviced = unserviced - 1)
+	[] (a0serviced = 0) & (totalUnserviced - unserviced = 1) -> (temp1serviced' = a0serviced) & (temp1val' = a0val) & (temp1id' = a0id) & (unserviced' = unserviced - 1);
 
-	[] (a0.serviced = 0) & (totalUnserviced - unserviced = 2) -> (temp2.serviced = a0.serviced) & (temp2.val = a0.val) & (temp2.id = a0.id) & (unserviced = unserviced - 1)
+	[] (a0serviced = 0) & (totalUnserviced - unserviced = 2) -> (temp2serviced' = a0serviced) & (temp2val' = a0val) & (temp2id' = a0id) & (unserviced' = unserviced - 1);
 
 
-	[] (a1.serviced = 1) & (unserviced = 0) -> (temp1.val = a1.val) & (temp1.id = a1.id) & (temp1.serviced = a1.serviced)
+	[] (a1serviced = 1) & (unserviced = 0) -> (temp1val' = a1val) & (temp1id' = a1id) & (temp1serviced' = a1serviced);
  	
-	[] (a1.serviced = 1) & (unserviced = 1) -> (temp2.val = a1.val) & (temp2.id = a1.id) & (temp2.serviced = a1.serviced) 	
+	[] (a1serviced = 1) & (unserviced = 1) -> (temp2val' = a1val) & (temp2id' = a1id) & (temp2serviced' = a1serviced); 	
 
-	[] (a1.serviced = 1) & (unserviced = 1) -> (temp3.val = a1.val) & (temp3.id = a1.id) & (temp3.serviced = a1.serviced)
+	[] (a1serviced = 1) & (unserviced = 1) -> (temp3val' = a1val) & (temp3id' = a1id) & (temp3serviced' = a1serviced);
  	
-	[] (a1.serviced = 0) & (totalUnserviced - unserviced = 0) -> (temp0.serviced = a1.serviced) & (temp0.val = a1.val) & (temp0.id = a1.id) & (unserviced = unserviced - 1) 
+	[] (a1serviced = 0) & (totalUnserviced - unserviced = 0) -> (temp0serviced' = a1serviced) & (temp0val' = a1val) & (temp0id' = a1id) & (unserviced' = unserviced - 1); 
 
-	[] (a1.serviced = 0) & (totalUnserviced - unserviced = 1) -> (temp1.serviced = a1.serviced) & (temp1.val = a1.val) & (temp1.id = a1.id) & (unserviced = unserviced - 1)
+	[] (a1serviced = 0) & (totalUnserviced - unserviced = 1) -> (temp1serviced' = a1serviced) & (temp1val' = a1val) & (temp1id' = a1id) & (unserviced' = unserviced - 1);
 
-	[] (a1.serviced = 0) & (totalUnserviced - unserviced = 2) -> (temp2.serviced = a1.serviced) & (temp2.val = a1.val) & (temp2.id = a1.id) & (unserviced = unserviced - 1)
+	[] (a1serviced = 0) & (totalUnserviced - unserviced = 2) -> (temp2serviced' = a1serviced) & (temp2val' = a1val) & (temp2id' = a1id) & (unserviced' = unserviced - 1);
 
  
-	[] (a2.serviced = 1) & (unserviced = 0) -> (temp2.val = a2.val) & (temp2.id = a2.id) & (temp2.serviced = a2.serviced)
+	[] (a2serviced = 1) & (unserviced = 0) -> (temp2val' = a2val) & (temp2id' = a2id) & (temp2serviced' = a2serviced);
  	
-	[] (a2.serviced = 1) & (unserviced = 1) -> (temp3.val = a2.val) & (temp3.id = a2.id) & (temp3.serviced = a2.serviced) 	
+	[] (a2serviced = 1) & (unserviced = 1) -> (temp3val' = a2val) & (temp3id' = a2id) & (temp3serviced' = a2serviced); 	
 
-	[] (a2.serviced = 0) & (totalUnserviced - unserviced = 0) -> (temp0.serviced = a2.serviced) & (temp0.val = a2.val) & (temp0.id = a2.id) & (unserviced = unserviced - 1) 
+	[] (a2serviced = 0) & (totalUnserviced - unserviced = 0) -> (temp0serviced' = a2serviced) & (temp0val' = a2val) & (temp0id' = a2id) & (unserviced' = unserviced - 1); 
 
-	[] (a2.serviced = 0) & (totalUnserviced - unserviced = 1) -> (temp1.serviced = a2.serviced) & (temp1.val = a2.val) & (temp1.id = a2.id) & (unserviced = unserviced - 1)
+	[] (a2serviced = 0) & (totalUnserviced - unserviced = 1) -> (temp1serviced' = a2serviced) & (temp1val' = a2val) & (temp1id' = a2id) & (unserviced' = unserviced - 1);
 
-	[] (a2.serviced = 0) & (totalUnserviced - unserviced = 2) -> (temp2.serviced = a2.serviced) & (temp2.val = a2.val) & (temp2.id = a2.id) & (unserviced = unserviced - 1)
+	[] (a2serviced = 0) & (totalUnserviced - unserviced = 2) -> (temp2serviced' = a2serviced) & (temp2val' = a2val) & (temp2id' = a2id) & (unserviced' = unserviced - 1);
 
  
-	[] (a3.serviced = 1) & (unserviced = 0) -> (temp3.val = a3.val) & (temp3.id = a3.id) & (temp3.serviced = a3.serviced)
+	[] (a3serviced = 1) & (unserviced = 0) -> (temp3val' = a3val) & (temp3id' = a3id) & (temp3serviced' = a3serviced);
  	
-	[] (a2.serviced = 0) & (totalUnserviced - unserviced = 0) -> (temp0.serviced = a2.serviced) & (temp0.val = a2.val) & (temp0.id = a2.id) & (unserviced = unserviced - 1) 
+	[] (a3serviced = 0) & (totalUnserviced - unserviced = 0) -> (temp0serviced' = a3serviced) & (temp0val' = a3val) & (temp0id' = a3id) & (unserviced' = unserviced - 1); 
 
-	[] (a2.serviced = 0) & (totalUnserviced - unserviced = 1) -> (temp1.serviced = a2.serviced) & (temp1.val = a2.val) & (temp1.id = a2.id) & (unserviced = unserviced - 1)
+	[] (a3serviced = 0) & (totalUnserviced - unserviced = 1) -> (temp1serviced' = a3serviced) & (temp1val' = a3val) & (temp1id' = a3id) & (unserviced' = unserviced - 1);
 
-	[] (a2.serviced = 0) & (totalUnserviced - unserviced = 2) -> (temp2.serviced = a2.serviced) & (temp2.val = a2.val) & (temp2.id = a2.id) & (unserviced = unserviced - 1)
+	[] (a3serviced = 0) & (totalUnserviced - unserviced = 2) -> (temp2serviced' = a3serviced) & (temp2val' = a3val) & (temp2id' = a3id) & (unserviced' = unserviced - 1);
+
+	
+	//copy temp arbiter to actual arbiter
+
+	[] (1=1) -> (a0val' = temp0val) & (a0id' = temp0id) & (a0serviced' = temp0serviced) & (a1val' = temp1val) & (a1id' = temp1id) & (a1serviced' = temp1serviced) & (a2val' = temp2val) & (a2id' = temp2id) & (a2serviced' = temp2serviced) & (a3val' = temp3val) & (a3id' = temp3id) & (a3serviced' = temp3serviced);
 
 endmodule
 
+
+pred
+ (unserviced = 0)
+,((unserviced + (-1)) = 0)
+,((unserviced + (-2)) = 0)
+,((a0val - a1val) = 0);
