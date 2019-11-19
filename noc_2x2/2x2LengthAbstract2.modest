@@ -7,9 +7,9 @@ const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
 const int clkLower = 100; 
-const int clkUpper = 110;
-//int(clkLower..clkUpper) clk;
-transient int(0..1) clk;
+const int clkUpper = 105;
+int(clkLower..clkUpper) clk;
+//transient int(0..1) clk;
 
 
 action tick;
@@ -46,23 +46,23 @@ function int(0..1) nsNotEmpty0(int(0..4) n) =    (noc[n].nsLen > 0) ? 0 : 1 ;
 
 
 // ------ Begin: properties ---------
-//property Pr1 = Pmax(<> (clk == clkUpper));
-property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 3));
+property Pr1 = Pmax(<> (clk == clkUpper));
+//property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 3));
 // ------ End: properties ---------
 
 process Clock(){	
 	
-	tick{= clk = 1 =};
-	Clock()
+	//tick{= clk = 1 =};
+	//Clock()
 	
 	
-	/*tick {= clk++ =};
+	tick {= clk++ =};
 	if (clk <= clkUpper) {
 	   Clock()
 	}
 	else {
 	   stop
-	} */
+	} 
 	
 }
 
@@ -149,7 +149,7 @@ process arbiter(int n){
 
 		if (noc[n].localLockedns == true) {		//If the local buffer is locked sending NS
 
-			{= noc[n].localLockedns = localNotEmpty(n) && !nsNotFull(yDirection(n)),  //Sets the priority to false if it was able to send to the ns buffer of the NoC in the y direction
+			{= noc[n].localLockedns = !nsNotFull(yDirection(n)),  //Sets the priority to false if it was able to send to the ns buffer of the NoC in the y direction
 				noc[n].localPriority = !nsNotFull(yDirection(n)),		//Local gets priority if it is unable to send
 				noc[n].localLen -= nsNotFull1(yDirection(n)),     //Local sends a flit ns if the receiving buffer is not full
 				noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n))),  //The ns direction receives the flit if it is not already full
@@ -202,10 +202,11 @@ process arbiter(int n){
 
 			if (noc[n].ewLockedns) {
 
-				{= noc[n].localLockedns = localNotEmpty(n) && !nsNotFull(yDirection(n)), 	//Local stays locked if it is unable to send
+				{= noc[n].localLockedns = !nsNotFull(yDirection(n)), 	//Local stays locked if it is unable to send
 					noc[n].localPriority = !nsNotFull(yDirection(n)),
 						noc[n].localLen -= nsNotFull1(yDirection(n)),  //Local sends if the ns direction is not already full
 						noc[yDirection(n)].nsLen += nsNotFull1(yDirection(n)), //The ns direction receives under the same conditions
+						noc[n].nsPriority = false,
 						noc[n].nsShouldDec = (nsNotEmpty1(n)),   //The ns buffer sends a flit to local if it is not empty 
 						totalFlitsDelivered += nsNotEmpty1(n)
 				=}
@@ -231,17 +232,18 @@ process arbiter(int n){
 			else {
 			palt {
 			// Local and EW both send ns	
-			:(1/2): {= noc[n].localLockedns = localNotEmpty(n) && !nsNotFull(yDirection(n)), 	//Local stays locked if it is unable to send
+			:(1/2): {= noc[n].localLockedns = !nsNotFull(yDirection(n)), 	//Local stays locked if it is unable to send
 						noc[n].localLen -= nsNotFull1(yDirection(n)),  //Local sends if the ns direction is not already full
 						noc[yDirection(n)].nsLen += nsNotFull1(yDirection(n)), //The ns direction receives under the same conditions
 						noc[n].nsShouldDec = (nsNotEmpty1(n)),   //The ns buffer sends a flit to local if it is not empty
+						noc[n].nsPriority = false,
 						totalFlitsDelivered += nsNotEmpty1(n),
 						noc[n].ewLockedns = true, 			//The Ew buffer is locked to send in the ns direction
 						noc[n].localPriority = !nsNotFull(yDirection(n)) //Local remains in priority if it did not send
 					=}  
 			 
 			 //Local sends ns, and EW sends to to local
-			:(1/2): {= noc[n].localLockedns =  localNotEmpty(n) && !nsNotFull(yDirection(n)),  //Local stays locked if it is unable to send
+			:(1/2): {= noc[n].localLockedns =  !nsNotFull(yDirection(n)),  //Local stays locked if it is unable to send
 						noc[n].localPriority = !(nsNotFull(yDirection(n)) && nsNotEmpty(n)), //Local only loses priority if it sends and ew doesn't
 						noc[n].localLen -= (nsNotFull1(yDirection(n))),  //Local sends ns if it isn't empty and ns isn't full
 						noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n))), //Ns receives under the same conditions
@@ -263,13 +265,13 @@ process arbiter(int n){
 
 				//Local has a 1 or 3 and EW has a 2
 				{= noc[n].localLockedew = !ewNotFull(xDirection(n)), //Local is locked in the ew direction if it is unable to send
-							noc[n].localPriority = !ewNotFull(xDirection(n)), //Local remains in priority under the same conditions
+							noc[n].localPriority = !(ewNotFull(xDirection(n)) && !nsNotFull(yDirection(n))), //Local remains in priority under the same conditions
 							noc[n].localLen -= (ewNotFull1(xDirection(n))),  //Local sends ew if it is not empty and the ew direciton is not full
 							noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n))), //The ew direction recieves under the same conditions
 							noc[n].ewShouldDec = (nsNotFull1(yDirection(n))),  // Ew sends if the ns direction is not full
 							noc[n].ewLockedns = !nsNotFull(yDirection(n)), // Ew is locked to ns if it is unable to send
 							noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n))), //The ns direction receives if it is not full
-							noc[n].nsPriority = !nsNotEmpty(n) || nsNotFull(yDirection(n)),  //The ns buffer stays in priority if it is empty or ew is able to send
+							noc[n].nsPriority = nsNotFull(yDirection(n)),  //The ns buffer stays in priority if it is empty or ew is able to send
 							noc[n].nsShouldDec = (nsNotEmpty1(n)), // Ns sends if it is not empty
 							totalFlitsDelivered += nsNotEmpty1(n)
 				=} 
@@ -281,7 +283,7 @@ process arbiter(int n){
 
 				//Local has a 1 or 3 and EW has a 0	
 				{= noc[n].localLockedew = !ewNotFull(xDirection(n)), //Local is locked in the ew direction if it is unable to send
-							noc[n].localPriority = !ewNotFull(xDirection(n)), //Local remains in priority under the same conditions
+							noc[n].localPriority = !(ewNotFull(xDirection(n)) && nsNotEmpty(n)), //Local remains in priority under the same conditions
 							noc[n].localLen -= (ewNotFull1(xDirection(n))),  //Local sends ew if it is not empty and the ew direciton is not full
 							noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n))), //The ew direction receives under the same conditions
 							noc[n].ewLockedlocal = nsNotEmpty(n), //The ew buffer is locked into the local direction if the ns buffer is not empty
@@ -299,7 +301,7 @@ process arbiter(int n){
 
 				//Local has a 1 or 3 and EW has a 0	
 				:(1/2): {= noc[n].localLockedew = !ewNotFull(xDirection(n)), //Local is locked in the ew direction if it is unable to send
-							noc[n].localPriority = !ewNotFull(xDirection(n)), //Local remains in priority under the same conditions
+							noc[n].localPriority = !(ewNotFull(xDirection(n)) && nsNotEmpty(n)), //Local remains in priority under the same conditions
 							noc[n].localLen -= (ewNotFull1(xDirection(n))),  //Local sends ew if it is not empty and the ew direciton is not full
 							noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n))), //The ew direction receives under the same conditions
 							noc[n].ewLockedlocal = nsNotEmpty(n), //The ew buffer is locked into the local direction if the ns buffer is not empty
@@ -311,13 +313,13 @@ process arbiter(int n){
 
 				//Local has a 1 or 3 and EW has a 2
 				:(1/2): {= noc[n].localLockedew = !ewNotFull(xDirection(n)), //Local is locked in the ew direction if it is unable to send
-							noc[n].localPriority = !ewNotFull(xDirection(n)), //Local remains in priority under the same conditions
+							noc[n].localPriority = !(ewNotFull(xDirection(n)) && !nsNotFull(yDirection(n))), //Local remains in priority under the same conditions
 							noc[n].localLen -= (ewNotFull1(xDirection(n))),  //Local sends ew if it is not empty and the ew direciton is not full
 							noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n))), //The ew direction recieves under the same conditions
 							noc[n].ewShouldDec = (nsNotFull1(yDirection(n))),  // Ew sends if the ns direction is not full
 							noc[n].ewLockedns = !nsNotFull(yDirection(n)), // Ew is locked to ns if it is unable to send
 							noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n))), //The ns direction receives if it is not full
-							noc[n].nsPriority = !nsNotEmpty(n) || nsNotFull(yDirection(n)),  //The ns buffer stays in priority if it is empty or ew is able to send
+							noc[n].nsPriority = nsNotFull(yDirection(n)),  //The ns buffer stays in priority if it is empty or ew is able to send
 							noc[n].nsShouldDec = (nsNotEmpty1(n)), // Ns sends if it is not empty
 							totalFlitsDelivered += nsNotEmpty1(n)
 				=} 
