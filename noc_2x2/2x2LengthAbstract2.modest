@@ -7,7 +7,7 @@ const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
 const int clkLower = 100; 
-const int clkUpper = 110;
+const int clkUpper = 105;
 int(clkLower..clkUpper) clk;
 //transient int(0..1) clk;
 
@@ -21,10 +21,10 @@ datatype node = {int(0..4) localLen, int(0..4) ewLen, int(0..4) nsLen, bool loca
 node r0, r1, r2, r3;
 
 node[] noc;
-transient int(0..1) localNotEmptyOne = 0;
+//transient int(0..1) localNotEmptyOne = 0;
 
-//function int(0..1) localNotEmpty1(int(0..4) n) =  (noc[n].localLen > 0) ? 1 : 0 ;     //ceil(noc[n].localLen/(noc[n].localLen+1));
-function int(0..1) localNotEmpty1(int(0..4) n) = localNotEmptyOne;
+function int(0..1) localNotEmpty1(int(0..4) n) =  (noc[n].localLen > 0) ? 1 : 0 ;     //ceil(noc[n].localLen/(noc[n].localLen+1));
+//function int(0..1) localNotEmpty1(int(0..4) n) = localNotEmptyOne;
 
 
 function int(0..1) localNotEmpty0(int(0..4) n) =  (noc[n].localLen > 0) ? 0 : 1 ; 
@@ -122,7 +122,9 @@ if((clk % INJECTIONRATEDENOMINATOR) < INJECTIONRATENUMERATOR){
 		noc[0].ewShouldDec = 0,
 		noc[1].ewShouldDec = 0,
 		noc[2].ewShouldDec = 0,
-		noc[3].ewShouldDec = 0/*,
+		noc[3].ewShouldDec = 0
+
+		/*,
 
 		localNotEmptyOne[0] = (noc[0].localLen > 0) ? 1 : 0,
 		localNotEmptyOne[1] = (noc[1].localLen > 0) ? 1 : 0,
@@ -165,7 +167,7 @@ if((clk % INJECTIONRATEDENOMINATOR) < INJECTIONRATENUMERATOR){
 }
 process arbiter(int n){
 
-	{= localNotEmptyOne = (noc[n].localLen > 0) ? 1 : 0 =};
+	//{= localNotEmptyOne = (noc[n].localLen > 0) ? 1 : 0 =};
 
 	if (noc[n].ewLen == 0) {		//If the EW buffer of the NoC is empty
 
