@@ -478,7 +478,6 @@ process arbiter(int n){
 							}
 
 						}
-						//Done to here with the walkthrough
 
 			}
 
@@ -492,6 +491,7 @@ process arbiter(int n){
 										noc[n].localPriority = !ewNotFull(xDirection(n)),
 										noc[n].localLen -= (ewNotFull1(xDirection(n))),  
 										noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n))), 
+										noc[n].ewLockedlocal = !ewNotFull(xDirection(n)),
 										noc[n].ewShouldDec = 1, 
 										totalFlitsDelivered += 1,
 										noc[n].nsPriority = nsNotEmpty(n) 
@@ -508,13 +508,12 @@ process arbiter(int n){
 										noc[n].localLen -= (ewNotFull1(xDirection(n))),  
 										noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n))), 
 										noc[n].ewShouldDec = nsNotFull1(yDirection(n)), 
+										noc[n].ewLockedns = !nsNotFull(yDirection(n)),
 										noc[yDirection(n)].nsLen += nsNotFull1(yDirection(n)), 
 										noc[n].nsShouldDec = (nsNotEmpty1(n)), 
 										totalFlitsDelivered += nsNotEmpty1(n)
 									=} 
-
-
-						
+	
 
 					}
 					else {
@@ -528,6 +527,7 @@ process arbiter(int n){
 										noc[n].localPriority = !ewNotFull(xDirection(n)),
 										noc[n].localLen -= (ewNotFull1(xDirection(n))),  
 										noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n))), 
+										noc[n].ewLockedlocal = !ewNotFull(xDirection(n)),
 										noc[n].ewShouldDec = 1, 
 										totalFlitsDelivered += 1,
 										noc[n].nsPriority = nsNotEmpty(n) 
@@ -539,6 +539,7 @@ process arbiter(int n){
 										noc[n].localLen -= (ewNotFull1(xDirection(n))),  
 										noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n))), 
 										noc[n].ewShouldDec = nsNotFull1(yDirection(n)), 
+										noc[n].ewLockedns = !nsNotFull(yDirection(n)),
 										noc[yDirection(n)].nsLen += nsNotFull1(yDirection(n)), 
 										noc[n].nsShouldDec = (nsNotEmpty1(n)), 
 										totalFlitsDelivered += nsNotEmpty1(n)
@@ -574,7 +575,7 @@ process arbiter(int n){
 									noc[n].localLen -= (localNotEmpty1(n))*(ewNotFull1(xDirection(n))),  
 									noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n)))*(localNotEmpty1(n)), 
 									noc[n].ewShouldDec = 1, 
-									totalFlitsDelivered += nsNotEmpty1(n),
+									totalFlitsDelivered += 1,
 									noc[n].nsPriority = nsNotEmpty(n) 
 								=}  
 
@@ -599,6 +600,7 @@ process arbiter(int n){
 									noc[n].localLen -= (localNotEmpty1(n))*(ewNotFull1(xDirection(n))),  
 									noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n)))*(localNotEmpty1(n)), 
 									noc[n].ewShouldDec = nsNotFull1(yDirection(n)), 
+									noc[n].ewLockedns = !nsNotFull(yDirection(n)),
 									noc[yDirection(n)].nsLen += nsNotFull1(yDirection(n)), 
 									noc[n].nsShouldDec = (nsNotEmpty1(n)), 
 									totalFlitsDelivered += nsNotEmpty1(n)
@@ -617,7 +619,7 @@ process arbiter(int n){
 									noc[n].ewLockedns = !nsNotFull(yDirection(n)),
 									noc[n].ewShouldDec = nsNotFull1(yDirection(n)), 
 									noc[yDirection(n)].nsLen += nsNotFull1(yDirection(n)), 
-									noc[n].nsShouldDec = (nsNotEmpty1(n)),
+									noc[n].nsShouldDec = (nsNotEmpty1(n)), 
 									totalFlitsDelivered += nsNotEmpty1(n)
 							=}			
 
@@ -648,6 +650,7 @@ process arbiter(int n){
 									noc[n].localLen -= (localNotEmpty1(n))*(ewNotFull1(xDirection(n))),  
 									noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n)))*(localNotEmpty1(n)), 
 									noc[n].ewShouldDec = nsNotFull1(yDirection(n)), 
+									noc[n].ewLockedns = !nsNotFull(yDirection(n)),
 									noc[yDirection(n)].nsLen += nsNotFull1(yDirection(n)), 
 									noc[n].nsShouldDec = (nsNotEmpty1(n)), 
 									totalFlitsDelivered += nsNotEmpty1(n)
@@ -659,8 +662,6 @@ process arbiter(int n){
 		}
 
 	}
-
-
 
 
 	else if ((noc[n].localPriority == false) && (noc[n].nsPriority == true)) {
@@ -675,7 +676,7 @@ process arbiter(int n){
 					noc[yDirection(n)].nsLen += nsNotFull1(yDirection(n)), 
 					noc[n].nsShouldDec = (nsNotEmpty1(n)),
 					totalFlitsDelivered += nsNotEmpty1(n),
-					noc[n].nsPriority = !nsNotFull(yDirection(n))
+					noc[n].nsPriority = nsNotFull(yDirection(n))
 				=} 
 
 
@@ -684,21 +685,24 @@ process arbiter(int n){
 			else {
 
 			palt {	//Local and EW both send to 2
-			:(1/2): {= noc[n].localPriority = nsNotFull(yDirection(n)),  
-						noc[n].ewLockedns = !nsNotFull(yDirection(n)),
-						noc[n].ewShouldDec = (nsNotFull1(yDirection(n))),  
-						noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n))), 
-						noc[n].nsShouldDec = (nsNotEmpty1(n)), 
-						totalFlitsDelivered += nsNotEmpty1(n)
+			:(1/2): {= noc[n].localPriority = nsNotFull(yDirection(n)), 
+					noc[n].ewLockedns = !nsNotFull(yDirection(n)),
+					noc[n].ewShouldDec = nsNotFull1(yDirection(n)), 
+					noc[yDirection(n)].nsLen += nsNotFull1(yDirection(n)), 
+					noc[n].nsShouldDec = (nsNotEmpty1(n)),
+					totalFlitsDelivered += nsNotEmpty1(n),
+					noc[n].nsPriority = nsNotFull(yDirection(n))
 					=}
 					//Local Sends to 2, EW to 0
 			:(1/2): {= noc[n].localPriority = !nsNotFull(yDirection(n)),
 						noc[n].localLockedns = !nsNotFull(yDirection(n)),
 						noc[n].localLen -= nsNotFull1(yDirection(n)),  
 						noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n))), 
-						noc[n].ewShouldDec = 1, 
+						noc[n].ewShouldDec = nsNotEmpty0(n),
+						noc[n].ewLockedns = nsNotEmpty(n),
+						noc[n].nsShouldDec = nsNotEmpty1(n), 
 						totalFlitsDelivered += 1,
-						noc[n].nsPriority = nsNotEmpty(n) 
+						noc[n].nsPriority = !nsNotEmpty(n)
 				
 					=}	
 			}
@@ -722,7 +726,7 @@ process arbiter(int n){
 									noc[yDirection(n)].nsLen += nsNotFull1(yDirection(n)), 
 									noc[n].nsShouldDec = (nsNotEmpty1(n)), 
 									totalFlitsDelivered += nsNotEmpty1(n),
-									noc[n].nsPriority = !nsNotFull(yDirection(n))
+									noc[n].nsPriority = nsNotFull(yDirection(n))
 								=} 
 
 
@@ -740,21 +744,23 @@ process arbiter(int n){
 									noc[n].localLen -= (ewNotFull1(xDirection(n))),  
 									noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n))), 
 									noc[n].nsShouldDec = nsNotEmpty1(n),
-									noc[n].nsPriority = false, 
+									noc[n].nsPriority = !nsNotEmpty(n), 
 									noc[n].ewShouldDec = nsNotEmpty0(n), 
+									noc[n].ewLockedlocal = nsNotEmpty(n),
 									totalFlitsDelivered += 1
 								=}	
 
 						//Local has a 1 or 3 and EW has a 2
-						:(1/2): {= noc[n].localPriority = !ewNotFull(xDirection(n)) && !nsNotEmpty(n), 
-									noc[n].localLockedew = !ewNotFull(xDirection(n)),									
+						:(1/2): {= noc[n].localPriority = !ewNotFull(xDirection(n)) && nsNotFull(yDirection(n)),
+									noc[n].localLockedew = !ewNotFull(xDirection(n)),
 									noc[n].localLen -= (ewNotFull1(xDirection(n))),  
 									noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n))), 
-									noc[n].ewShouldDec = (nsNotFull1(yDirection(n))), 
-									noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n))), 
-									noc[n].nsPriority = nsNotFull(yDirection(n)),
+									noc[n].ewLockedns = !nsNotFull(yDirection(n)),
+									noc[n].ewShouldDec = nsNotFull1(yDirection(n)), 
+									noc[yDirection(n)].nsLen += nsNotFull1(yDirection(n)), 
 									noc[n].nsShouldDec = (nsNotEmpty1(n)), 
-									totalFlitsDelivered += nsNotEmpty1(n)
+									totalFlitsDelivered += nsNotEmpty1(n),
+									noc[n].nsPriority = nsNotFull(yDirection(n))
 								=}  
 
 
@@ -762,6 +768,7 @@ process arbiter(int n){
 				}
 
 		}
+
 
 		else {
 		
@@ -776,7 +783,7 @@ process arbiter(int n){
 									noc[yDirection(n)].nsLen += nsNotFull1(yDirection(n)), 
 									noc[n].nsShouldDec = (nsNotEmpty1(n)),
 									totalFlitsDelivered += nsNotEmpty1(n),
-									noc[n].nsPriority = !nsNotFull(yDirection(n))
+									noc[n].nsPriority = nsNotFull(yDirection(n))
 								=} 
 						//Local sends EW and EW sends NS
 						:(2/3): {=  noc[n].localPriority = localNotEmpty(n) && !ewNotFull(xDirection(n)) && nsNotFull(yDirection(n)),
@@ -788,7 +795,7 @@ process arbiter(int n){
 									noc[yDirection(n)].nsLen += nsNotFull1(yDirection(n)), 
 									noc[n].nsShouldDec = (nsNotEmpty1(n)), 
 									totalFlitsDelivered += nsNotEmpty1(n),
-									noc[n].nsPriority = !nsNotFull(yDirection(n))
+									noc[n].nsPriority = nsNotFull(yDirection(n))
 								=} 
 
 
@@ -799,22 +806,25 @@ process arbiter(int n){
 				
 					palt {
 						//Local and EW both send to 2
-						:(1/6): {= noc[n].localPriority = nsNotFull(yDirection(n)) && localNotEmpty(n), 
-									noc[n].localLockedns = localNotEmpty(n), 
-									noc[n].ewShouldDec = (nsNotFull1(yDirection(n))),  
-									noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n))), 
-									noc[n].nsPriority = nsNotFull(yDirection(n)),
-									noc[n].nsShouldDec = (nsNotEmpty1(n)), 
-									totalFlitsDelivered += nsNotEmpty1(n)
+						:(1/6): {= noc[n].localPriority = localNotEmpty(n) && nsNotFull(yDirection(n)),
+									noc[n].localLockedns = localNotEmpty(n),
+									noc[n].ewLockedns = !nsNotFull(yDirection(n)),
+									noc[n].ewShouldDec = nsNotFull1(yDirection(n)), 
+									noc[yDirection(n)].nsLen += nsNotFull1(yDirection(n)), 
+									noc[n].nsShouldDec = (nsNotEmpty1(n)),
+									totalFlitsDelivered += nsNotEmpty1(n),
+									noc[n].nsPriority = nsNotFull(yDirection(n))
 								=}			
 						//Local Sends to 2, EW to 0
-						:(1/6): {= noc[n].localPriority = !nsNotFull(yDirection(n)) && localNotEmpty(n), 
+						:(1/6): {= noc[n].localPriority = !nsNotFull(yDirection(n)) && localNotEmpty(n) && !nsNotEmpty(n), 
 									noc[n].localLockedns = localNotEmpty(n) && !nsNotFull(yDirection(n)),
 									noc[n].localLen -= (localNotEmpty1(n))*(nsNotFull1(yDirection(n))),  
 									noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n)))*(localNotEmpty1(n)), 
-									noc[n].ewShouldDec = 1, 
+									noc[n].ewShouldDec = nsNotEmpty0(n),
+									noc[n].ewLockedlocal = nsNotEmpty(n),
+									noc[n].nsShouldDec = nsNotEmpty1(n), 
 									totalFlitsDelivered += 1,
-									noc[n].nsPriority = nsNotEmpty(n) 
+									noc[n].nsPriority = !nsNotEmpty(n) 
 								=}					
 				
 
@@ -824,21 +834,23 @@ process arbiter(int n){
 									noc[n].localLen -= (localNotEmpty1(n))*(ewNotFull1(xDirection(n))),  
 									noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n)))*(localNotEmpty1(n)), 
 									noc[n].nsShouldDec = nsNotEmpty1(n),
-									noc[n].nsPriority = false, 
+									noc[n].nsPriority = !nsNotEmpty(n), 
 									noc[n].ewShouldDec = nsNotEmpty0(n),
+									noc[n].ewLockedlocal = nsNotEmpty(n),
 									totalFlitsDelivered += 1
 								=}	
 
 						//Local has a 1 or 3 and EW has a 2
-						:(1/3): {= noc[n].localPriority = !ewNotFull(xDirection(n)) && localNotEmpty(n) && !nsNotEmpty(n), 
-									noc[n].localLockedew = localNotEmpty(n) && !ewNotFull(xDirection(n)),									
+						:(1/3): {= noc[n].localPriority = localNotEmpty(n) && !ewNotFull(xDirection(n)) && nsNotFull(yDirection(n)),
+									noc[n].localLockedew = localNotEmpty(n) && !ewNotFull(xDirection(n)),
 									noc[n].localLen -= (localNotEmpty1(n))*(ewNotFull1(xDirection(n))),  
 									noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n)))*(localNotEmpty1(n)), 
-									noc[n].ewShouldDec = (nsNotFull1(yDirection(n))), 
-									noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n))), 
-									noc[n].nsPriority = nsNotFull(yDirection(n)),
+									noc[n].ewLockedns = !nsNotFull(yDirection(n)),
+									noc[n].ewShouldDec = nsNotFull1(yDirection(n)), 
+									noc[yDirection(n)].nsLen += nsNotFull1(yDirection(n)), 
 									noc[n].nsShouldDec = (nsNotEmpty1(n)), 
-									totalFlitsDelivered += nsNotEmpty1(n)
+									totalFlitsDelivered += nsNotEmpty1(n),
+									noc[n].nsPriority = nsNotFull(yDirection(n))
 								=}  
 
 
@@ -856,11 +868,12 @@ process arbiter(int n){
 
 
 						 //Local sends NS and EW sends local
-								{= noc[n].localPriority = !nsNotFull(yDirection(n)), 
+								{= noc[n].localPriority = true, 
 									noc[n].localLockedns = !nsNotFull(yDirection(n)), 
 									noc[n].localLen -= (nsNotFull1(yDirection(n))),
 									noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n))), 
 									noc[n].ewShouldDec = 1, 
+									noc[n].ewLockedlocal = false,
 									totalFlitsDelivered += 1,
 									noc[n].nsPriority = nsNotEmpty(n) 
 								=} 
@@ -875,6 +888,7 @@ process arbiter(int n){
 									noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n))), 
 									noc[n].ewLockedns = true,
 									noc[n].nsShouldDec = (nsNotEmpty1(n)), 
+									noc[n].nsPriority = false,
 									totalFlitsDelivered += nsNotEmpty1(n)
 								=}	
 
@@ -887,20 +901,22 @@ process arbiter(int n){
 
 					palt {
 						//Local and EW both send to 2
-						:(1/2): {= noc[n].localPriority = !nsNotFull(yDirection(n)), 
+						:(1/2): {= 	noc[n].localPriority = !nsNotFull(yDirection(n)), 
 									noc[n].localLockedns = !nsNotFull(yDirection(n)), 
 									noc[n].localLen -= (nsNotFull1(yDirection(n))),  
 									noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n))), 
 									noc[n].ewLockedns = true,
 									noc[n].nsShouldDec = (nsNotEmpty1(n)), 
+									noc[n].nsPriority = false,
 									totalFlitsDelivered += nsNotEmpty1(n)
 								=}	
 						//Local Sends to 2, EW to 0
-						:(1/2): {= noc[n].localPriority = !nsNotFull(yDirection(n)), 
-									noc[n].localLockedns = nsNotFull(yDirection(n)), 
+						:(1/2): {= noc[n].localPriority = true, 
+									noc[n].localLockedns = !nsNotFull(yDirection(n)), 
 									noc[n].localLen -= (nsNotFull1(yDirection(n))),
 									noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n))), 
 									noc[n].ewShouldDec = 1, 
+									noc[n].ewLockedlocal = false,
 									totalFlitsDelivered += 1,
 									noc[n].nsPriority = nsNotEmpty(n) 
 								=}					
@@ -916,14 +932,15 @@ process arbiter(int n){
 			if (noc[n].ewLockedlocal) {
 
 						// Local Sends EW and EW sends local
-						  {= noc[n].localPriority = !ewNotFull(xDirection(n)), 
-									noc[n].localLockedew = !ewNotFull(xDirection(n)),
-									noc[n].localLen -= (ewNotFull1(xDirection(n))),  
-									noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n))), 
-									noc[n].ewShouldDec = 1, 
-									totalFlitsDelivered += 1,
-									noc[n].nsPriority = nsNotEmpty(n) 
-								=}  
+					{= 	noc[n].localPriority = true, 
+						noc[n].localLockedew = !ewNotFull(xDirection(n)),
+						noc[n].localLen -= (ewNotFull1(xDirection(n))),  
+						noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n))), 
+						noc[n].ewShouldDec = 1, 
+						noc[n].ewLockedlocal = false,
+						totalFlitsDelivered += 1,
+						noc[n].nsPriority = nsNotEmpty(n) 
+					=}  
 
 					
 
@@ -933,13 +950,15 @@ process arbiter(int n){
 
 	
 								//Local has a 1 or 3 and EW has a 2
-						{=  noc[n].localPriority = !ewNotFull(xDirection(n)), 
+						{=  		noc[n].localPriority = !(ewNotFull(xDirection(n)) && !nsNotFull(yDirection(n))), 
 									noc[n].localLockedew = !ewNotFull(xDirection(n)),
 									noc[n].localLen -= (ewNotFull1(xDirection(n))),  
 									noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n))), 
 									noc[n].ewShouldDec = (nsNotFull1(yDirection(n))), 
+									noc[n].ewLockedlocal = !nsNotFull(yDirection(n)),
 									noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n))), 
 									noc[n].nsShouldDec = (nsNotEmpty1(n)), 
+									noc[n].nsPriority = false,
 									totalFlitsDelivered += nsNotEmpty1(n)
 								=}  
 
@@ -954,22 +973,25 @@ process arbiter(int n){
 				
 
 						//Local has a 1 or 3 and EW has a 0
-						:(1/2): {= noc[n].localPriority = !ewNotFull(xDirection(n)), 
+						:(1/2): {= 	noc[n].localPriority = true, 
 									noc[n].localLockedew = !ewNotFull(xDirection(n)),
 									noc[n].localLen -= (ewNotFull1(xDirection(n))),  
 									noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n))), 
 									noc[n].ewShouldDec = 1, 
+									noc[n].ewLockedlocal = false,
 									totalFlitsDelivered += 1,
-									noc[n].nsPriority = nsNotEmpty(n) 
+									noc[n].nsPriority = nsNotEmpty(n)
 								=} 			
 						//Local has a 1 or 3 and EW has a 2
-						:(1/2): {=  noc[n].localPriority = !ewNotFull(xDirection(n)), 
+						:(1/2): {=  noc[n].localPriority = !(ewNotFull(xDirection(n)) && !nsNotFull(yDirection(n))), 
 									noc[n].localLockedew = !ewNotFull(xDirection(n)),
 									noc[n].localLen -= (ewNotFull1(xDirection(n))),  
 									noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n))), 
 									noc[n].ewShouldDec = (nsNotFull1(yDirection(n))), 
+									noc[n].ewLockedlocal = !nsNotFull(yDirection(n)),
 									noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n))), 
 									noc[n].nsShouldDec = (nsNotEmpty1(n)), 
+									noc[n].nsPriority = false,
 									totalFlitsDelivered += nsNotEmpty1(n)
 								=}  
 
@@ -986,20 +1008,22 @@ process arbiter(int n){
 
 					palt {
 						 //Local sends NS and EW sends local
-						:(1/3):  {= noc[n].localPriority = !nsNotFull(yDirection(n)) && localNotEmpty(n), 
+						:(1/3):  {= noc[n].localPriority = true, 
 									noc[n].localLockedns = localNotEmpty(n) && !nsNotFull(yDirection(n)), 
 									noc[n].localLen -= (nsNotFull1(yDirection(n)))*(localNotEmpty1(n)),
 									noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n)))*(localNotEmpty1(n)), 
-									noc[n].ewShouldDec = 1, 
+									noc[n].ewShouldDec = 1,
+									noc[n].ewLockedlocal = false, 
 									totalFlitsDelivered += 1,
 									noc[n].nsPriority = nsNotEmpty(n) 
 								=} 
 						// Local Sends EW and EW sends local
-						:(2/3):  {= noc[n].localPriority = !ewNotFull(xDirection(n)) && localNotEmpty(n), 
+						:(2/3):  {= noc[n].localPriority = true, 
 									noc[n].localLockedew = localNotEmpty(n) && !ewNotFull(xDirection(n)),
 									noc[n].localLen -= (localNotEmpty1(n))*(ewNotFull1(xDirection(n))),  
 									noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n)))*(localNotEmpty1(n)), 
 									noc[n].ewShouldDec = 1, 
+									noc[n].ewLockedlocal = false,
 									totalFlitsDelivered += 1,
 									noc[n].nsPriority = nsNotEmpty(n) 
 								=}  
@@ -1013,23 +1037,26 @@ process arbiter(int n){
 
 						palt {
 						//Local and EW both send to 2
-						:(1/3): {= noc[n].localPriority = localNotEmpty(n) && !nsNotFull(yDirection(n)), 
+						:(1/3): {= noc[n].localPriority = (localNotEmpty(n) && !nsNotFull(yDirection(n))) || (!localNotEmpty(n) && nsNotFull(yDirection(n))), 
 									noc[n].localLockedns = localNotEmpty(n) && !nsNotFull(yDirection(n)), 
 									noc[n].localLen -= (localNotEmpty1(n))*(nsNotFull1(yDirection(n))),  
 									noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n))), 
-									noc[n].ewLockedns = localNotEmpty(n),
-									noc[n].ewShouldDec = localNotEmpty0(n),
+									noc[n].ewLockedns = localNotEmpty(n) || (!localNotEmpty(n) && !nsNotFull(yDirection(n))),
+									noc[n].ewShouldDec = localNotEmpty0(n)*nsNotFull1(yDirection(n)),
 									noc[n].nsShouldDec = (nsNotEmpty1(n)), 
+									noc[n].nsPriority = false,
 									totalFlitsDelivered += nsNotEmpty1(n)
 								=}	
 								//Local has a 1 or 3 and EW has a 2
-						:(2/3): {=  noc[n].localPriority = !ewNotFull(xDirection(n)) && localNotEmpty(n), 
+						:(2/3): {=  noc[n].localPriority = (!ewNotFull(xDirection(n)) && localNotEmpty(n)) || (!localNotEmpty(n) && nsNotFull(yDirection(n))) || (ewNotFull(xDirection(n)) && localNotEmpty(n) && nsNotFull(yDirection(n))), 
 									noc[n].localLockedew = localNotEmpty(n) && !ewNotFull(xDirection(n)),
 									noc[n].localLen -= (localNotEmpty1(n))*(ewNotFull1(xDirection(n))),  
 									noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n)))*(localNotEmpty1(n)), 
 									noc[n].ewShouldDec = (nsNotFull1(yDirection(n))), 
+									noc[n].ewLockedns = !nsNotFull(yDirection(n)),
 									noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n))), 
 									noc[n].nsShouldDec = (nsNotEmpty1(n)), 
+									noc[n].nsPriority = false,
 									totalFlitsDelivered += nsNotEmpty1(n)
 								=}  
 						}
@@ -1043,43 +1070,48 @@ process arbiter(int n){
 
 					palt {
 						//Local and EW both send to 2
-						:(1/6): {= noc[n].localPriority = localNotEmpty(n) && !nsNotFull(yDirection(n)), 
+						:(1/6): {= noc[n].localPriority = (localNotEmpty(n) && !nsNotFull(yDirection(n))) || (!localNotEmpty(n) && nsNotFull(yDirection(n))), 
 									noc[n].localLockedns = localNotEmpty(n) && !nsNotFull(yDirection(n)), 
 									noc[n].localLen -= (localNotEmpty1(n))*(nsNotFull1(yDirection(n))),  
 									noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n))), 
-									noc[n].ewLockedns = localNotEmpty(n),
-									noc[n].ewShouldDec = localNotEmpty0(n),
-									noc[n].nsShouldDec = (nsNotEmpty1(n)),
+									noc[n].ewLockedns = localNotEmpty(n) || (!localNotEmpty(n) && !nsNotFull(yDirection(n))),
+									noc[n].ewShouldDec = localNotEmpty0(n)*nsNotFull1(yDirection(n)),
+									noc[n].nsShouldDec = (nsNotEmpty1(n)), 
+									noc[n].nsPriority = false,
 									totalFlitsDelivered += nsNotEmpty1(n)
 								=}	
 						//Local Sends to 2, EW to 0
-						:(1/6): {= noc[n].localPriority = !nsNotFull(yDirection(n)) && localNotEmpty(n), 
+						:(1/6): {= noc[n].localPriority = true, 
 									noc[n].localLockedns = localNotEmpty(n) && !nsNotFull(yDirection(n)), 
 									noc[n].localLen -= (nsNotFull1(yDirection(n)))*(localNotEmpty1(n)),
 									noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n)))*(localNotEmpty1(n)), 
-									noc[n].ewShouldDec = 1, 
+									noc[n].ewShouldDec = 1,
+									noc[n].ewLockedlocal = false, 
 									totalFlitsDelivered += 1,
 									noc[n].nsPriority = nsNotEmpty(n) 
 								=}					
 				
 
 						//Local has a 1 or 3 and EW has a 0
-						:(1/3): {= noc[n].localPriority = !ewNotFull(xDirection(n)) && localNotEmpty(n), 
+						:(1/3): {= noc[n].localPriority = true, 
 									noc[n].localLockedew = localNotEmpty(n) && !ewNotFull(xDirection(n)),
 									noc[n].localLen -= (localNotEmpty1(n))*(ewNotFull1(xDirection(n))),  
 									noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n)))*(localNotEmpty1(n)), 
 									noc[n].ewShouldDec = 1, 
-									totalFlitsDelivered += nsNotEmpty1(n),
+									noc[n].ewLockedlocal = false,
+									totalFlitsDelivered += 1,
 									noc[n].nsPriority = nsNotEmpty(n) 
 								=} 			
 						//Local has a 1 or 3 and EW has a 2
-						:(1/3): {=  noc[n].localPriority = !ewNotFull(xDirection(n)) && localNotEmpty(n), 
+						:(1/3): {=  noc[n].localPriority = (!ewNotFull(xDirection(n)) && localNotEmpty(n)) || (!localNotEmpty(n) && nsNotFull(yDirection(n))) || (ewNotFull(xDirection(n)) && localNotEmpty(n) && nsNotFull(yDirection(n))), 
 									noc[n].localLockedew = localNotEmpty(n) && !ewNotFull(xDirection(n)),
 									noc[n].localLen -= (localNotEmpty1(n))*(ewNotFull1(xDirection(n))),  
 									noc[xDirection(n)].ewLen += (ewNotFull1(xDirection(n)))*(localNotEmpty1(n)), 
 									noc[n].ewShouldDec = (nsNotFull1(yDirection(n))), 
+									noc[n].ewLockedns = !nsNotFull(yDirection(n)),
 									noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n))), 
 									noc[n].nsShouldDec = (nsNotEmpty1(n)), 
+									noc[n].nsPriority = false,
 									totalFlitsDelivered += nsNotEmpty1(n)
 								=}  
 
