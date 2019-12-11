@@ -16,7 +16,7 @@ action tick;
 
 transient int(0..1) totalFlitsDelivered = 0;
 
-datatype node = {int(0..4) localLen, int(0..4) ewLen, int(0..4) nsLen, bool localPriority, bool nsPriority, bool ewLockedns, bool ewLockedlocal, bool localLockedns, bool localLockedew, int(0..1) nsShouldDec, int(0..1) ewShouldDec, int noiseRuns, bool optimalRun, bool noneSent};
+datatype node = {int(0..4) localLen, int(0..4) ewLen, int(0..4) nsLen, bool localPriority, bool nsPriority, bool ewLockedns, bool ewLockedlocal, bool localLockedns, bool localLockedew, int(0..1) nsShouldDec, int(0..1) ewShouldDec, int noiseRuns, int(0..1) optimalRun, int(0..1) noneSent};
 
 node r0, r1, r2, r3;
 
@@ -169,8 +169,9 @@ process arbiter(int n){
 				noc[yDirection(n)].nsLen += (nsNotFull1(yDirection(n))),  //The ns direction receives the flit if it is not already full
 				noc[n].nsShouldDec = (nsNotEmpty1(n)),						//The ns buffer sends a flit to local if it is not empty
 				totalFlitsDelivered = nsNotEmpty1(n),
-				optimalRun = 0,
-				noneSent = !nsNotEmpty(n) && !nsNotFull(yDirection(n))
+				noc[n].optimalRun = 0,
+				noc[n].noneSent = nsNotEmpty0(n)*nsNotFull0(yDirection(n)),
+				noc[n].noiseRuns += nsNotEmpty0(n)*nsNotFull0(yDirection(n))*noc[n].optimalRun
 			=}
 
 		}
