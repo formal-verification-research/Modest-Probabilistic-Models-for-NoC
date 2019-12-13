@@ -97,380 +97,700 @@ process populate(){
 	}
 	else {tau};
 	
-	
-	if(noc[0].localB3 == false && noc[0].localB2 == false && noc[0].localB1 == false){
-		{=
-		noc[0].local = noc[0].localB4,
-		noc[0].localB4 = false
-		=}
-	}
-	else if(noc[0].localB3 == false && noc[0].localB2 == false && noc[0].localB1 == true){
-		{=
-		noc[0].local = noc[0].localB1,
-		noc[0].localB1 = noc[0].localB4,
-		noc[0].localB4 = false
-		=}
-	}
-	else if(noc[0].localB3 == true && noc[0].localB2 == true && noc[0].localB1 == true){
-		{=
-		noc[0].local = noc[0].localB1,
-		noc[0].localB1 = noc[0].localB2,
-		noc[0].localB2 = noc[0].localB4,
-		noc[0].localB4 = false
-		=}
-	}
-	else{
-		{=
-		noc[0].local = noc[0].localB1,
-		noc[0].localB1 = noc[0].localB2,
-		noc[0].localB2 = noc[0].localB3,
-		noc[0].localB3 = noc[0].localB4,
-		noc[0].localB4 = false
-		=}
-	};
-	
-	if(noc[1].localB3 == false && noc[1].localB2 == false && noc[1].localB1 == false){
-		{=
-		noc[1].local = noc[1].localB4,
-		noc[1].localB4 = false
-		=}
-	}
-	else if(noc[1].localB3 == false && noc[1].localB2 == false && noc[1].localB1 == true){
-		{=
-		noc[1].local = noc[1].localB1,
-		noc[1].localB1 = noc[1].localB4,
-		noc[1].localB4 = false
-		=}
-	}
-	else if(noc[1].localB3 == true && noc[1].localB2 == true && noc[1].localB1 == true){
-		{=
-		noc[1].local = noc[1].localB1,
-		noc[1].localB1 = noc[1].localB2,
-		noc[1].localB2 = noc[1].localB4,
-		noc[1].localB4 = false
-		=}
+//update router 0
+	if(noc[0].local == false){	
+		if(noc[0].localB3 == false && noc[0].localB2 == false && noc[0].localB1 == false){
+			{=
+			noc[0].local = noc[0].localB4,
+			noc[0].localB4 = false
+			=}
+		}
+		else if(noc[0].localB3 == false && noc[0].localB2 == false && noc[0].localB1 == true){
+			{=
+			noc[0].local = noc[0].localB1,
+			noc[0].localB1 = noc[0].localB4,
+			noc[0].localB4 = false
+			=}
+		}
+		else if(noc[0].localB3 == true && noc[0].localB2 == true && noc[0].localB1 == true){
+			{=
+			noc[0].local = noc[0].localB1,
+			noc[0].localB1 = noc[0].localB2,
+			noc[0].localB2 = noc[0].localB4,
+			noc[0].localB4 = false
+			=}
+		}
+		else{
+			{=
+			noc[0].local = noc[0].localB1,
+			noc[0].localB1 = noc[0].localB2,
+			noc[0].localB2 = noc[0].localB3,
+			noc[0].localB3 = noc[0].localB4,
+			noc[0].localB4 = false
+			=}
+		}
 	}
 	else{
-		{=
-		noc[1].local = noc[1].localB1,
-		noc[1].localB1 = noc[1].localB2,
-		noc[1].localB2 = noc[1].localB3,
-		noc[1].localB3 = noc[1].localB4,
-		noc[1].localB4 = false
-		=}
-	};
+		if(noc[0].localB3 == false && noc[0].localB2 == false && noc[0].localB1 == false){
+			{=
+			noc[0].localB1 = noc[0].localB4,
+			noc[0].localB4 = false
+			=}
+		}
+		else if(noc[0].localB3 == false && noc[0].localB2 == false && noc[0].localB1 == true){
+			{=
+			noc[0].localB2 = noc[0].localB4,
+			noc[0].localB4 = false
+			=}
+		}
+		else if(noc[0].localB3 == true && noc[0].localB2 == true && noc[0].localB1 == true){
+			{=
+			noc[0].localB3 = noc[0].localB4,
+			noc[0].localB4 = false
+			=}
+		}
+		else{
+			tau //The buffer has reached capacity!
+		}
 	
-	if(noc[2].localB3 == false && noc[2].localB2 == false && noc[2].localB1 == false){
-		{=
-		noc[2].local = noc[2].localB4,
-		noc[2].localB4 = false
-		=}
-	}
-	else if(noc[2].localB3 == false && noc[2].localB2 == false && noc[2].localB1 == true){
-		{=
-		noc[2].local = noc[2].localB1,
-		noc[2].localB1 = noc[2].localB4,
-		noc[2].localB4 = false
-		=}
-	}
-	else if(noc[2].localB3 == true && noc[2].localB2 == true && noc[2].localB1 == true){
-		{=
-		noc[2].local = noc[2].localB1,
-		noc[2].localB1 = noc[2].localB2,
-		noc[2].localB2 = noc[2].localB4,
-		noc[2].localB4 = false
-		=}
-	}
-	else{
-		{=
-		noc[2].local = noc[2].localB1,
-		noc[2].localB1 = noc[2].localB2,
-		noc[2].localB2 = noc[2].localB3,
-		noc[2].localB3 = noc[2].localB4,
-		noc[2].localB4 = false
-		=}
-	};
-	
-	if(noc[3].localB3 == false && noc[3].localB2 == false && noc[3].localB1 == false){
-		{=
-		noc[3].local = noc[3].localB4,
-		noc[3].localB4 = false
-		=}
-	}
-	else if(noc[3].localB3 == false && noc[3].localB2 == false && noc[3].localB1 == true){
-		{=
-		noc[3].local = noc[3].localB1,
-		noc[3].localB1 = noc[3].localB4,
-		noc[3].localB4 = false
-		=}
-	}
-	else if(noc[3].localB3 == true && noc[3].localB2 == true && noc[3].localB1 == true){
-		{=
-		noc[3].local = noc[3].localB1,
-		noc[3].localB1 = noc[3].localB2,
-		noc[3].localB2 = noc[3].localB4,
-		noc[3].localB4 = false
-		=}
-	}
-	else{
-		{=
-		noc[3].local = noc[3].localB1,
-		noc[3].localB1 = noc[3].localB2,
-		noc[3].localB2 = noc[3].localB3,
-		noc[3].localB3 = noc[3].localB4,
-		noc[3].localB4 = false
-		=}
-	};
-	
-	
-	if(noc[0].ewB3 == false && noc[0].ewB2 == false && noc[0].ewB1 == false){
-		{=
-		noc[0].ew = noc[0].ewB4,
-		noc[0].ewB4 = false
-		=}
-	}
-	else if(noc[0].ewB3 == false && noc[0].ewB2 == false && noc[0].ewB1 == true){
-		{=
-		noc[0].ew = noc[0].ewB1,
-		noc[0].ewB1 = noc[0].ewB4,
-		noc[0].ewB4 = false
-		=}
-	}
-	else if(noc[0].ewB3 == true && noc[0].ewB2 == true && noc[0].ewB1 == true){
-		{=
-		noc[0].ew = noc[0].ewB1,
-		noc[0].ewB1 = noc[0].ewB2,
-		noc[0].ewB2 = noc[0].ewB4,
-		noc[0].ewB4 = false
-		=}
-	}
-	else{
-		{=
-		noc[0].ew = noc[0].ewB1,
-		noc[0].ewB1 = noc[0].ewB2,
-		noc[0].ewB2 = noc[0].ewB3,
-		noc[0].ewB3 = noc[0].ewB4,
-		noc[0].ewB4 = false
-		=}
-	};
-	
-	if(noc[1].ewB3 == false && noc[1].ewB2 == false && noc[1].ewB1 == false){
-		{=
-		noc[1].ew = noc[1].ewB4,
-		noc[1].ewB4 = false
-		=}
-	}
-	else if(noc[1].ewB3 == false && noc[1].ewB2 == false && noc[1].ewB1 == true){
-		{=
-		noc[1].ew = noc[1].ewB1,
-		noc[1].ewB1 = noc[1].ewB4,
-		noc[1].ewB4 = false
-		=}
-	}
-	else if(noc[1].ewB3 == true && noc[1].ewB2 == true && noc[1].ewB1 == true){
-		{=
-		noc[1].ew = noc[1].ewB1,
-		noc[1].ewB1 = noc[1].ewB2,
-		noc[1].ewB2 = noc[1].ewB4,
-		noc[1].ewB4 = false
-		=}
-	}
-	else{
-		{=
-		noc[1].ew = noc[1].ewB1,
-		noc[1].ewB1 = noc[1].ewB2,
-		noc[1].ewB2 = noc[1].ewB3,
-		noc[1].ewB3 = noc[1].ewB4,
-		noc[1].ewB4 = false
-		=}
-	};
-	
-	if(noc[2].ewB3 == false && noc[2].ewB2 == false && noc[2].ewB1 == false){
-		{=
-		noc[2].ew = noc[2].ewB4,
-		noc[2].ewB4 = false
-		=}
-	}
-	else if(noc[2].ewB3 == false && noc[2].ewB2 == false && noc[2].ewB1 == true){
-		{=
-		noc[2].ew = noc[2].ewB1,
-		noc[2].ewB1 = noc[2].ewB4,
-		noc[2].ewB4 = false
-		=}
-	}
-	else if(noc[2].ewB3 == true && noc[2].ewB2 == true && noc[2].ewB1 == true){
-		{=
-		noc[2].ew = noc[2].ewB1,
-		noc[2].ewB1 = noc[2].ewB2,
-		noc[2].ewB2 = noc[2].ewB4,
-		noc[2].ewB4 = false
-		=}
-	}
-	else{
-		{=
-		noc[2].ew = noc[2].ewB1,
-		noc[2].ewB1 = noc[2].ewB2,
-		noc[2].ewB2 = noc[2].ewB3,
-		noc[2].ewB3 = noc[2].ewB4,
-		noc[2].ewB4 = false
-		=}
-	};
-	
-	if(noc[3].ewB3 == false && noc[3].ewB2 == false && noc[3].ewB1 == false){
-		{=
-		noc[3].ew = noc[3].ewB4,
-		noc[3].ewB4 = false
-		=}
-	}
-	else if(noc[3].ewB3 == false && noc[3].ewB2 == false && noc[3].ewB1 == true){
-		{=
-		noc[3].ew = noc[3].ewB1,
-		noc[3].ewB1 = noc[3].ewB4,
-		noc[3].ewB4 = false
-		=}
-	}
-	else if(noc[3].ewB3 == true && noc[3].ewB2 == true && noc[3].ewB1 == true){
-		{=
-		noc[3].ew = noc[3].ewB1,
-		noc[3].ewB1 = noc[3].ewB2,
-		noc[3].ewB2 = noc[3].ewB4,
-		noc[3].ewB4 = false
-		=}
-	}
-	else{
-		{=
-		noc[3].ew = noc[3].ewB1,
-		noc[3].ewB1 = noc[3].ewB2,
-		noc[3].ewB2 = noc[3].ewB3,
-		noc[3].ewB3 = noc[3].ewB4,
-		noc[3].ewB4 = false
-		=}
 	};
 
-if(noc[0].nsB3 == false && noc[0].nsB2 == false && noc[0].nsB1 == false){
-		{=
-		noc[0].ns = noc[0].nsB4,
-		noc[0].nsB4 = false
-		=}
-	}
-	else if(noc[0].nsB3 == false && noc[0].nsB2 == false && noc[0].nsB1 == true){
-		{=
-		noc[0].ns = noc[0].nsB1,
-		noc[0].nsB1 = noc[0].nsB4,
-		noc[0].nsB4 = false
-		=}
-	}
-	else if(noc[0].nsB3 == true && noc[0].nsB2 == true && noc[0].nsB1 == true){
-		{=
-		noc[0].ns = noc[0].nsB1,
-		noc[0].nsB1 = noc[0].nsB2,
-		noc[0].nsB2 = noc[0].nsB4,
-		noc[0].nsB4 = false
-		=}
+//update router 1	
+	if(noc[1].local == false){	
+		if(noc[1].localB3 == false && noc[1].localB2 == false && noc[1].localB1 == false){
+			{=
+			noc[1].local = noc[1].localB4,
+			noc[1].localB4 = false
+			=}
+		}
+		else if(noc[1].localB3 == false && noc[1].localB2 == false && noc[1].localB1 == true){
+			{=
+			noc[1].local = noc[1].localB1,
+			noc[1].localB1 = noc[1].localB4,
+			noc[1].localB4 = false
+			=}
+		}
+		else if(noc[1].localB3 == true && noc[1].localB2 == true && noc[1].localB1 == true){
+			{=
+			noc[1].local = noc[1].localB1,
+			noc[1].localB1 = noc[1].localB2,
+			noc[1].localB2 = noc[1].localB4,
+			noc[1].localB4 = false
+			=}
+		}
+		else{
+			{=
+			noc[1].local = noc[1].localB1,
+			noc[1].localB1 = noc[1].localB2,
+			noc[1].localB2 = noc[1].localB3,
+			noc[1].localB3 = noc[1].localB4,
+			noc[1].localB4 = false
+			=}
+		}
 	}
 	else{
-		{=
-		noc[0].ns = noc[0].nsB1,
-		noc[0].nsB1 = noc[0].nsB2,
-		noc[0].nsB2 = noc[0].nsB3,
-		noc[0].nsB3 = noc[0].nsB4,
-		noc[0].nsB4 = false
-		=}
+		if(noc[1].localB3 == false && noc[1].localB2 == false && noc[1].localB1 == false){
+			{=
+			noc[1].localB1 = noc[1].localB4,
+			noc[1].localB4 = false
+			=}
+		}
+		else if(noc[1].localB3 == false && noc[1].localB2 == false && noc[1].localB1 == true){
+			{=
+			noc[1].localB2 = noc[1].localB4,
+			noc[1].localB4 = false
+			=}
+		}
+		else if(noc[1].localB3 == true && noc[1].localB2 == true && noc[1].localB1 == true){
+			{=
+			noc[1].localB3 = noc[1].localB4,
+			noc[1].localB4 = false
+			=}
+		}
+		else{
+			tau //The buffer has reached capacity!
+		}
+	
+	};
+
+//update router 2
+	if(noc[2].local == false){	
+		if(noc[2].localB3 == false && noc[2].localB2 == false && noc[2].localB1 == false){
+			{=
+			noc[2].local = noc[2].localB4,
+			noc[2].localB4 = false
+			=}
+		}
+		else if(noc[2].localB3 == false && noc[2].localB2 == false && noc[2].localB1 == true){
+			{=
+			noc[2].local = noc[2].localB1,
+			noc[2].localB1 = noc[2].localB4,
+			noc[2].localB4 = false
+			=}
+		}
+		else if(noc[2].localB3 == true && noc[2].localB2 == true && noc[2].localB1 == true){
+			{=
+			noc[2].local = noc[2].localB1,
+			noc[2].localB1 = noc[2].localB2,
+			noc[2].localB2 = noc[2].localB4,
+			noc[2].localB4 = false
+			=}
+		}
+		else{
+			{=
+			noc[2].local = noc[2].localB1,
+			noc[2].localB1 = noc[2].localB2,
+			noc[2].localB2 = noc[2].localB3,
+			noc[2].localB3 = noc[2].localB4,
+			noc[2].localB4 = false
+			=}
+		}
+	}
+	else{
+		if(noc[2].localB3 == false && noc[2].localB2 == false && noc[2].localB1 == false){
+			{=
+			noc[2].localB1 = noc[2].localB4,
+			noc[2].localB4 = false
+			=}
+		}
+		else if(noc[2].localB3 == false && noc[2].localB2 == false && noc[2].localB1 == true){
+			{=
+			noc[2].localB2 = noc[2].localB4,
+			noc[2].localB4 = false
+			=}
+		}
+		else if(noc[2].localB3 == true && noc[2].localB2 == true && noc[2].localB1 == true){
+			{=
+			noc[2].localB3 = noc[2].localB4,
+			noc[2].localB4 = false
+			=}
+		}
+		else{
+			tau //The buffer has reached capacity!
+		}
+	
+	};
+
+//update router 3	
+	if(noc[3].local == false){	
+		if(noc[3].localB3 == false && noc[3].localB2 == false && noc[3].localB1 == false){
+			{=
+			noc[3].local = noc[3].localB4,
+			noc[3].localB4 = false
+			=}
+		}
+		else if(noc[3].localB3 == false && noc[3].localB2 == false && noc[3].localB1 == true){
+			{=
+			noc[3].local = noc[3].localB1,
+			noc[3].localB1 = noc[3].localB4,
+			noc[3].localB4 = false
+			=}
+		}
+		else if(noc[3].localB3 == true && noc[3].localB2 == true && noc[3].localB1 == true){
+			{=
+			noc[3].local = noc[3].localB1,
+			noc[3].localB1 = noc[3].localB2,
+			noc[3].localB2 = noc[3].localB4,
+			noc[3].localB4 = false
+			=}
+		}
+		else{
+			{=
+			noc[3].local = noc[3].localB1,
+			noc[3].localB1 = noc[3].localB2,
+			noc[3].localB2 = noc[3].localB3,
+			noc[3].localB3 = noc[3].localB4,
+			noc[3].localB4 = false
+			=}
+		}
+	}
+	else{
+		if(noc[3].localB3 == false && noc[3].localB2 == false && noc[3].localB1 == false){
+			{=
+			noc[3].localB1 = noc[3].localB4,
+			noc[3].localB4 = false
+			=}
+		}
+		else if(noc[3].localB3 == false && noc[3].localB2 == false && noc[3].localB1 == true){
+			{=
+			noc[3].localB2 = noc[3].localB4,
+			noc[3].localB4 = false
+			=}
+		}
+		else if(noc[3].localB3 == true && noc[3].localB2 == true && noc[3].localB1 == true){
+			{=
+			noc[3].localB3 = noc[3].localB4,
+			noc[3].localB4 = false
+			=}
+		}
+		else{
+			tau //The buffer has reached capacity!
+		}
+	
+	};
+
+	
+	if(noc[0].ew == false){	
+		if(noc[0].ewB3 == false && noc[0].ewB2 == false && noc[0].ewB1 == false){
+			{=
+			noc[0].ew = noc[0].ewB4,
+			noc[0].ewB4 = false
+			=}
+		}
+		else if(noc[0].ewB3 == false && noc[0].ewB2 == false && noc[0].ewB1 == true){
+			{=
+			noc[0].ew = noc[0].ewB1,
+			noc[0].ewB1 = noc[0].ewB4,
+			noc[0].ewB4 = false
+			=}
+		}
+		else if(noc[0].ewB3 == true && noc[0].ewB2 == true && noc[0].ewB1 == true){
+			{=
+			noc[0].ew = noc[0].ewB1,
+			noc[0].ewB1 = noc[0].ewB2,
+			noc[0].ewB2 = noc[0].ewB4,
+			noc[0].ewB4 = false
+			=}
+		}
+		else{
+			{=
+			noc[0].ew = noc[0].ewB1,
+			noc[0].ewB1 = noc[0].ewB2,
+			noc[0].ewB2 = noc[0].ewB3,
+			noc[0].ewB3 = noc[0].ewB4,
+			noc[0].ewB4 = false
+			=}
+		}
+	}
+	else{
+		if(noc[0].ewB3 == false && noc[0].ewB2 == false && noc[0].ewB1 == false){
+			{=
+			noc[0].ewB1 = noc[0].ewB4,
+			noc[0].ewB4 = false
+			=}
+		}
+		else if(noc[0].ewB3 == false && noc[0].ewB2 == false && noc[0].ewB1 == true){
+			{=
+			noc[0].ewB2 = noc[0].ewB4,
+			noc[0].ewB4 = false
+			=}
+		}
+		else if(noc[0].ewB3 == true && noc[0].ewB2 == true && noc[0].ewB1 == true){
+			{=
+			noc[0].ewB3 = noc[0].ewB4,
+			noc[0].ewB4 = false
+			=}
+		}
+		else{
+			tau //The buffer has reached capacity!
+		}
+	
 	};
 	
-	if(noc[1].nsB3 == false && noc[1].nsB2 == false && noc[1].nsB1 == false){
-		{=
-		noc[1].ns = noc[1].nsB4,
-		noc[1].nsB4 = false
-		=}
-	}
-	else if(noc[1].nsB3 == false && noc[1].nsB2 == false && noc[1].nsB1 == true){
-		{=
-		noc[1].ns = noc[1].nsB1,
-		noc[1].nsB1 = noc[1].nsB4,
-		noc[1].nsB4 = false
-		=}
-	}
-	else if(noc[1].nsB3 == true && noc[1].nsB2 == true && noc[1].nsB1 == true){
-		{=
-		noc[1].ns = noc[1].nsB1,
-		noc[1].nsB1 = noc[1].nsB2,
-		noc[1].nsB2 = noc[1].nsB4,
-		noc[1].nsB4 = false
-		=}
+	
+	if(noc[1].ew == false){	
+		if(noc[1].ewB3 == false && noc[1].ewB2 == false && noc[1].ewB1 == false){
+			{=
+			noc[1].ew = noc[1].ewB4,
+			noc[1].ewB4 = false
+			=}
+		}
+		else if(noc[1].ewB3 == false && noc[1].ewB2 == false && noc[1].ewB1 == true){
+			{=
+			noc[1].ew = noc[1].ewB1,
+			noc[1].ewB1 = noc[1].ewB4,
+			noc[1].ewB4 = false
+			=}
+		}
+		else if(noc[1].ewB3 == true && noc[1].ewB2 == true && noc[1].ewB1 == true){
+			{=
+			noc[1].ew = noc[1].ewB1,
+			noc[1].ewB1 = noc[1].ewB2,
+			noc[1].ewB2 = noc[1].ewB4,
+			noc[1].ewB4 = false
+			=}
+		}
+		else{
+			{=
+			noc[1].ew = noc[1].ewB1,
+			noc[1].ewB1 = noc[1].ewB2,
+			noc[1].ewB2 = noc[1].ewB3,
+			noc[1].ewB3 = noc[1].ewB4,
+			noc[1].ewB4 = false
+			=}
+		}
 	}
 	else{
-		{=
-		noc[1].ns = noc[1].nsB1,
-		noc[1].nsB1 = noc[1].nsB2,
-		noc[1].nsB2 = noc[1].nsB3,
-		noc[1].nsB3 = noc[1].nsB4,
-		noc[1].nsB4 = false
-		=}
+		if(noc[1].ewB3 == false && noc[1].ewB2 == false && noc[1].ewB1 == false){
+			{=
+			noc[1].ewB1 = noc[1].ewB4,
+			noc[1].ewB4 = false
+			=}
+		}
+		else if(noc[1].ewB3 == false && noc[1].ewB2 == false && noc[1].ewB1 == true){
+			{=
+			noc[1].ewB2 = noc[1].ewB4,
+			noc[1].ewB4 = false
+			=}
+		}
+		else if(noc[1].ewB3 == true && noc[1].ewB2 == true && noc[1].ewB1 == true){
+			{=
+			noc[1].ewB3 = noc[1].ewB4,
+			noc[1].ewB4 = false
+			=}
+		}
+		else{
+			tau //The buffer has reached capacity!
+		}
+	
 	};
 	
-	if(noc[2].nsB3 == false && noc[2].nsB2 == false && noc[2].nsB1 == false){
-		{=
-		noc[2].ns = noc[2].nsB4,
-		noc[2].nsB4 = false
-		=}
-	}
-	else if(noc[2].nsB3 == false && noc[2].nsB2 == false && noc[2].nsB1 == true){
-		{=
-		noc[2].ns = noc[2].nsB1,
-		noc[2].nsB1 = noc[2].nsB4,
-		noc[2].nsB4 = false
-		=}
-	}
-	else if(noc[2].nsB3 == true && noc[2].nsB2 == true && noc[2].nsB1 == true){
-		{=
-		noc[2].ns = noc[2].nsB1,
-		noc[2].nsB1 = noc[2].nsB2,
-		noc[2].nsB2 = noc[2].nsB4,
-		noc[2].nsB4 = false
-		=}
-	}
-	else{
-		{=
-		noc[2].ns = noc[2].nsB1,
-		noc[2].nsB1 = noc[2].nsB2,
-		noc[2].nsB2 = noc[2].nsB3,
-		noc[2].nsB3 = noc[2].nsB4,
-		noc[2].nsB4 = false
-		=}
-	};
-	
-	if(noc[3].nsB3 == false && noc[3].nsB2 == false && noc[3].nsB1 == false){
-		{=
-		noc[3].ns = noc[3].nsB4,
-		noc[3].nsB4 = false
-		=}
-	}
-	else if(noc[3].nsB3 == false && noc[3].nsB2 == false && noc[3].nsB1 == true){
-		{=
-		noc[3].ns = noc[3].nsB1,
-		noc[3].nsB1 = noc[3].nsB4,
-		noc[3].nsB4 = false
-		=}
-	}
-	else if(noc[3].nsB3 == true && noc[3].nsB2 == true && noc[3].nsB1 == true){
-		{=
-		noc[3].ns = noc[3].nsB1,
-		noc[3].nsB1 = noc[3].nsB2,
-		noc[3].nsB2 = noc[3].nsB4,
-		noc[3].nsB4 = false
-		=}
-	}
-	else{
-		{=
-		noc[3].ns = noc[3].nsB1,
-		noc[3].nsB1 = noc[3].nsB2,
-		noc[3].nsB2 = noc[3].nsB3,
-		noc[3].nsB3 = noc[3].nsB4,
-		noc[3].nsB4 = false
-		=}
+	if(noc[2].ew == false){	
+		if(noc[2].ewB3 == false && noc[2].ewB2 == false && noc[2].ewB1 == false){
+			{=
+			noc[2].ew = noc[2].ewB4,
+			noc[2].ewB4 = false
+			=}
+		}
+		else if(noc[2].ewB3 == false && noc[2].ewB2 == false && noc[2].ewB1 == true){
+			{=
+			noc[2].ew = noc[2].ewB1,
+			noc[2].ewB1 = noc[2].ewB4,
+			noc[2].ewB4 = false
+			=}
+		}
+		else if(noc[2].ewB3 == true && noc[2].ewB2 == true && noc[2].ewB1 == true){
+			{=
+			noc[2].ew = noc[2].ewB1,
+			noc[2].ewB1 = noc[2].ewB2,
+			noc[2].ewB2 = noc[2].ewB4,
+			noc[2].ewB4 = false
+			=}
+		}
+		else{
+			{=
+			noc[2].ew = noc[2].ewB1,
+			noc[2].ewB1 = noc[2].ewB2,
+			noc[2].ewB2 = noc[2].ewB3,
+			noc[2].ewB3 = noc[2].ewB4,
+			noc[2].ewB4 = false
+			=}
+		}
 	}
 
+	if(noc[3].ew == false){	
+		if(noc[3].ewB3 == false && noc[3].ewB2 == false && noc[3].ewB1 == false){
+			{=
+			noc[3].ew = noc[3].ewB4,
+			noc[3].ewB4 = false
+			=}
+		}
+		else if(noc[3].ewB3 == false && noc[3].ewB2 == false && noc[3].ewB1 == true){
+			{=
+			noc[3].ew = noc[3].ewB1,
+			noc[3].ewB1 = noc[3].ewB4,
+			noc[3].ewB4 = false
+			=}
+		}
+		else if(noc[3].ewB3 == true && noc[3].ewB2 == true && noc[3].ewB1 == true){
+			{=
+			noc[3].ew = noc[3].ewB1,
+			noc[3].ewB1 = noc[3].ewB2,
+			noc[3].ewB2 = noc[3].ewB4,
+			noc[3].ewB4 = false
+			=}
+		}
+		else{
+			{=
+			noc[3].ew = noc[3].ewB1,
+			noc[3].ewB1 = noc[3].ewB2,
+			noc[3].ewB2 = noc[3].ewB3,
+			noc[3].ewB3 = noc[3].ewB4,
+			noc[3].ewB4 = false
+			=}
+		}
+	}
+	else{
+		if(noc[2].ewB3 == false && noc[2].ewB2 == false && noc[2].ewB1 == false){
+			{=
+			noc[2].ewB1 = noc[2].ewB4,
+			noc[2].ewB4 = false
+			=}
+		}
+		else if(noc[2].ewB3 == false && noc[2].ewB2 == false && noc[2].ewB1 == true){
+			{=
+			noc[2].ewB2 = noc[2].ewB4,
+			noc[2].ewB4 = false
+			=}
+		}
+		else if(noc[2].ewB3 == true && noc[2].ewB2 == true && noc[2].ewB1 == true){
+			{=
+			noc[2].ewB3 = noc[2].ewB4,
+			noc[2].ewB4 = false
+			=}
+		}
+		else{
+			tau //The buffer has reached capacity!
+		}
+	
+	};
+
+	else{
+		if(noc[3].ewB3 == false && noc[3].ewB2 == false && noc[3].ewB1 == false){
+			{=
+			noc[3].ewB1 = noc[3].ewB4,
+			noc[3].ewB4 = false
+			=}
+		}
+		else if(noc[3].ewB3 == false && noc[3].ewB2 == false && noc[3].ewB1 == true){
+			{=
+			noc[3].ewB2 = noc[3].ewB4,
+			noc[3].ewB4 = false
+			=}
+		}
+		else if(noc[3].ewB3 == true && noc[3].ewB2 == true && noc[3].ewB1 == true){
+			{=
+			noc[3].ewB3 = noc[3].ewB4,
+			noc[3].ewB4 = false
+			=}
+		}
+		else{
+			tau //The buffer has reached capacity!
+		}
+	
+	};
+
+	
+
+	
+	if(noc[0].ns == false){	
+		if(noc[0].nsB3 == false && noc[0].nsB2 == false && noc[0].nsB1 == false){
+			{=
+			noc[0].ns = noc[0].nsB4,
+			noc[0].nsB4 = false
+			=}
+		}
+		else if(noc[0].nsB3 == false && noc[0].nsB2 == false && noc[0].nsB1 == true){
+			{=
+			noc[0].ns = noc[0].nsB1,
+			noc[0].nsB1 = noc[0].nsB4,
+			noc[0].nsB4 = false
+			=}
+		}
+		else if(noc[0].nsB3 == true && noc[0].nsB2 == true && noc[0].nsB1 == true){
+			{=
+			noc[0].ns = noc[0].nsB1,
+			noc[0].nsB1 = noc[0].nsB2,
+			noc[0].nsB2 = noc[0].nsB4,
+			noc[0].nsB4 = false
+			=}
+		}
+		else{
+			{=
+			noc[0].ns = noc[0].nsB1,
+			noc[0].nsB1 = noc[0].nsB2,
+			noc[0].nsB2 = noc[0].nsB3,
+			noc[0].nsB3 = noc[0].nsB4,
+			noc[0].nsB4 = false
+			=}
+		}
+	}
+	else{
+		if(noc[0].nsB3 == false && noc[0].nsB2 == false && noc[0].nsB1 == false){
+			{=
+			noc[0].nsB1 = noc[0].nsB4,
+			noc[0].nsB4 = false
+			=}
+		}
+		else if(noc[0].nsB3 == false && noc[0].nsB2 == false && noc[0].nsB1 == true){
+			{=
+			noc[0].nsB2 = noc[0].nsB4,
+			noc[0].nsB4 = false
+			=}
+		}
+		else if(noc[0].nsB3 == true && noc[0].nsB2 == true && noc[0].nsB1 == true){
+			{=
+			noc[0].nsB3 = noc[0].nsB4,
+			noc[0].nsB4 = false
+			=}
+		}
+		else{
+			tau //The buffer has reached capacity!
+		}
+	
+	};
+
+	
+	if(noc[1].ns == false){	
+		if(noc[1].nsB3 == false && noc[1].nsB2 == false && noc[1].nsB1 == false){
+			{=
+			noc[1].ns = noc[1].nsB4,
+			noc[1].nsB4 = false
+			=}
+		}
+		else if(noc[1].nsB3 == false && noc[1].nsB2 == false && noc[1].nsB1 == true){
+			{=
+			noc[1].ns = noc[1].nsB1,
+			noc[1].nsB1 = noc[1].nsB4,
+			noc[1].nsB4 = false
+			=}
+		}
+		else if(noc[1].nsB3 == true && noc[1].nsB2 == true && noc[1].nsB1 == true){
+			{=
+			noc[1].ns = noc[1].nsB1,
+			noc[1].nsB1 = noc[1].nsB2,
+			noc[1].nsB2 = noc[1].nsB4,
+			noc[1].nsB4 = false
+			=}
+		}
+		else{
+			{=
+			noc[1].ns = noc[1].nsB1,
+			noc[1].nsB1 = noc[1].nsB2,
+			noc[1].nsB2 = noc[1].nsB3,
+			noc[1].nsB3 = noc[1].nsB4,
+			noc[1].nsB4 = false
+			=}
+		}
+	}
+	else{
+		if(noc[1].nsB3 == false && noc[1].nsB2 == false && noc[1].nsB1 == false){
+			{=
+			noc[1].nsB1 = noc[1].nsB4,
+			noc[1].nsB4 = false
+			=}
+		}
+		else if(noc[1].nsB3 == false && noc[1].nsB2 == false && noc[1].nsB1 == true){
+			{=
+			noc[1].nsB2 = noc[1].nsB4,
+			noc[1].nsB4 = false
+			=}
+		}
+		else if(noc[1].nsB3 == true && noc[1].nsB2 == true && noc[1].nsB1 == true){
+			{=
+			noc[1].nsB3 = noc[1].nsB4,
+			noc[1].nsB4 = false
+			=}
+		}
+		else{
+			tau //The buffer has reached capacity!
+		}
+	
+	};
+
+	if(noc[2].ns == false){	
+		if(noc[2].nsB3 == false && noc[2].nsB2 == false && noc[2].nsB1 == false){
+			{=
+			noc[2].ns = noc[2].nsB4,
+			noc[2].nsB4 = false
+			=}
+		}
+		else if(noc[2].nsB3 == false && noc[2].nsB2 == false && noc[2].nsB1 == true){
+			{=
+			noc[2].ns = noc[2].nsB1,
+			noc[2].nsB1 = noc[2].nsB4,
+			noc[2].nsB4 = false
+			=}
+		}
+		else if(noc[2].nsB3 == true && noc[2].nsB2 == true && noc[2].nsB1 == true){
+			{=
+			noc[2].ns = noc[2].nsB1,
+			noc[2].nsB1 = noc[2].nsB2,
+			noc[2].nsB2 = noc[2].nsB4,
+			noc[2].nsB4 = false
+			=}
+		}
+		else{
+			{=
+			noc[2].ns = noc[2].nsB1,
+			noc[2].nsB1 = noc[2].nsB2,
+			noc[2].nsB2 = noc[2].nsB3,
+			noc[2].nsB3 = noc[2].nsB4,
+			noc[2].nsB4 = false
+			=}
+		}
+	}
+	else{
+		if(noc[2].nsB3 == false && noc[2].nsB2 == false && noc[2].nsB1 == false){
+			{=
+			noc[2].nsB1 = noc[2].nsB4,
+			noc[2].nsB4 = false
+			=}
+		}
+		else if(noc[2].nsB3 == false && noc[2].nsB2 == false && noc[2].nsB1 == true){
+			{=
+			noc[2].nsB2 = noc[2].nsB4,
+			noc[2].nsB4 = false
+			=}
+		}
+		else if(noc[2].nsB3 == true && noc[2].nsB2 == true && noc[2].nsB1 == true){
+			{=
+			noc[2].nsB3 = noc[2].nsB4,
+			noc[2].nsB4 = false
+			=}
+		}
+		else{
+			tau //The buffer has reached capacity!
+		}
+	
+	};
+
+	
+	if(noc[3].ns == false){	
+		if(noc[3].nsB3 == false && noc[3].nsB2 == false && noc[3].nsB1 == false){
+			{=
+			noc[3].ns = noc[3].nsB4,
+			noc[3].nsB4 = false
+			=}
+		}
+		else if(noc[3].nsB3 == false && noc[3].nsB2 == false && noc[3].nsB1 == true){
+			{=
+			noc[3].ns = noc[3].nsB1,
+			noc[3].nsB1 = noc[3].nsB4,
+			noc[3].nsB4 = false
+			=}
+		}
+		else if(noc[3].nsB3 == true && noc[3].nsB2 == true && noc[3].nsB1 == true){
+			{=
+			noc[3].ns = noc[3].nsB1,
+			noc[3].nsB1 = noc[3].nsB2,
+			noc[3].nsB2 = noc[3].nsB4,
+			noc[3].nsB4 = false
+			=}
+		}
+		else{
+			{=
+			noc[3].ns = noc[3].nsB1,
+			noc[3].nsB1 = noc[3].nsB2,
+			noc[3].nsB2 = noc[3].nsB3,
+			noc[3].nsB3 = noc[3].nsB4,
+			noc[3].nsB4 = false
+			=}
+		}
+	}
+	else{
+		if(noc[3].nsB3 == false && noc[3].nsB2 == false && noc[3].nsB1 == false){
+			{=
+			noc[3].nsB1 = noc[3].nsB4,
+			noc[3].nsB4 = false
+			=}
+		}
+		else if(noc[3].nsB3 == false && noc[3].nsB2 == false && noc[3].nsB1 == true){
+			{=
+			noc[3].nsB2 = noc[3].nsB4,
+			noc[3].nsB4 = false
+			=}
+		}
+		else if(noc[3].nsB3 == true && noc[3].nsB2 == true && noc[3].nsB1 == true){
+			{=
+			noc[3].nsB3 = noc[3].nsB4,
+			noc[3].nsB4 = false
+			=}
+		}
+		else{
+			tau //The buffer has reached capacity!
+		}
+	
 }
 
 process arbiter(int n){
