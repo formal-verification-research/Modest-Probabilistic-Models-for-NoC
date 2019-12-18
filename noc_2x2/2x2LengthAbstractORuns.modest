@@ -7,14 +7,14 @@ const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
 const int clkLower = 100; 
-const int clkUpper = 103;
-int(clkLower..clkUpper) clk;
-//transient int(0..1) clk;
+const int clkUpper = 106;
+//int(clkLower..clkUpper) clk;
+transient int(0..1) clk;
 
 
 action tick;
 
-transient int totalFlitsDelivered = 0;
+int totalFlitsDelivered = 0;
 
 datatype node = {int(0..4) localLen, int(0..4) ewLen, int(0..4) nsLen, bool localPriority, bool nsPriority, bool ewLockedns, bool ewLockedlocal, bool localLockedns, bool localLockedew, int(0..1) nsShouldDec, int(0..1) ewShouldDec, int (0..1) nsShouldInc, int (0..1) ewShouldInc, int optimalRuns};
 
@@ -23,7 +23,9 @@ node r0, r1, r2, r3;
 node[] noc;
 //transient int(0..1) localNotEmptyOne = 0;
 
-function int(0..1) localNotEmpty1(int(0..4) n) =  (noc[n].localLen > 0) ? 1 : 0 ;     //ceil(noc[n].localLen/(noc[n].localLen+1));
+
+
+function int(0..1) localNotEmpty1(int(0..4) n) =  /*localNotEmptyOne;*/ (noc[n].localLen > 0) ? 1 : 0 ;     //ceil(noc[n].localLen/(noc[n].localLen+1));
 //function int(0..1) localNotEmpty1(int(0..4) n) = localNotEmptyOne;
 
 
@@ -42,47 +44,53 @@ function bool localNotEmpty(int(0..4)n) = ((noc[n].localLen > 0) ? true: false);
 function bool localNotFull(int(0..4)n) = ((noc[n].localLen < 4) ? true: false);
 function int(0..1) nsNotEmpty0(int(0..4) n) =    (noc[n].nsLen > 0) ? 0 : 1 ;
 
+//function int totalOptimalRuns() = noc[0].optimalRuns;//(noc[0].optimalRuns + noc[1].optimalRuns + noc[2].optimalRuns + noc[3].optimalRuns);
 
 
 
 // ------ Begin: properties ---------
-property Pr1 = Pmax(<> (clk == clkUpper) );
-//property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] ((totalFlitsDelivered) >= 6));
+//property Pr1 = Pmax(<> (clk >= clkUpper) );
+property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] ((totalFlitsDelivered) >= 7));
 // ------ End: properties ---------
 
 process Clock(){	
 	
-	//tick{= clk = 1 =};
-	//Clock()
+	tick{= 1: clk = 1 =};
+	Clock()
 	
 	
-	tick {= clk++ =};
+	/*tick {= 0: clk++ =};
 	if (clk <= clkUpper) {
 	   Clock()
 	}
 	else {
 	   stop
-	} 
+	} */
 	
 }
 
 process Top(){
 	initialize();
 	do{
-		populate();
+		
+		arbiter(0);
+		arbiter(1);
+		arbiter(2);
+		arbiter(3);
 
-		if(clk>=clkUpper){
+		populate()
+
+		/*if(clk>=clkUpper){
 			stop
 		}
 		else{
 			tau
 
-		};
+		}*/
 
-		arbiter(0);
-		arbiter(1);
-		arbiter(2);
-		arbiter(3)
+		
+
+		
 		
 		
 			
@@ -105,25 +113,15 @@ if((clk % 2) == 0){
 		noc[2].localLen += localNotFull1(2),
 		noc[3].localLen += localNotFull1(3),
 
-		noc[0].nsLen -= noc[0].nsShouldDec,
-		noc[1].nsLen -= noc[1].nsShouldDec,
-		noc[2].nsLen -= noc[2].nsShouldDec,
-		noc[3].nsLen -= noc[3].nsShouldDec,
+		noc[0].nsLen += (noc[0].nsShouldInc - noc[0].nsShouldDec),
+		noc[1].nsLen += (noc[1].nsShouldInc - noc[1].nsShouldDec),
+		noc[2].nsLen += (noc[2].nsShouldInc - noc[2].nsShouldDec),
+		noc[3].nsLen += (noc[3].nsShouldInc - noc[3].nsShouldDec),
 
-		noc[0].ewLen -= noc[0].ewShouldDec,
-		noc[1].ewLen -= noc[1].ewShouldDec,
-		noc[2].ewLen -= noc[2].ewShouldDec,
-		noc[3].ewLen -= noc[3].ewShouldDec,
-
-		noc[0].nsLen += noc[0].nsShouldInc,
-		noc[1].nsLen += noc[1].nsShouldInc,
-		noc[2].nsLen += noc[2].nsShouldInc,
-		noc[3].nsLen += noc[3].nsShouldInc,
-
-		noc[0].ewLen += noc[0].ewShouldInc,
-		noc[1].ewLen += noc[1].ewShouldInc,
-		noc[2].ewLen += noc[2].ewShouldInc,
-		noc[3].ewLen += noc[3].ewShouldInc,
+		noc[0].ewLen += (noc[0].ewShouldInc - noc[0].ewShouldDec),
+		noc[1].ewLen += (noc[1].ewShouldInc - noc[1].ewShouldDec),
+		noc[2].ewLen += (noc[2].ewShouldInc - noc[2].ewShouldDec),
+		noc[3].ewLen += (noc[3].ewShouldInc - noc[3].ewShouldDec),
 
 		noc[0].nsShouldInc = 0,
 		noc[1].nsShouldInc = 0,
@@ -151,25 +149,15 @@ if((clk % 2) == 0){
 
 		tick {=
 
-		noc[0].nsLen -= noc[0].nsShouldDec,
-		noc[1].nsLen -= noc[1].nsShouldDec,
-		noc[2].nsLen -= noc[2].nsShouldDec,
-		noc[3].nsLen -= noc[3].nsShouldDec,
+		noc[0].nsLen += (noc[0].nsShouldInc - noc[0].nsShouldDec),
+		noc[1].nsLen += (noc[1].nsShouldInc - noc[1].nsShouldDec),
+		noc[2].nsLen += (noc[2].nsShouldInc - noc[2].nsShouldDec),
+		noc[3].nsLen += (noc[3].nsShouldInc - noc[3].nsShouldDec),
 
-		noc[0].ewLen -= noc[0].ewShouldDec,
-		noc[1].ewLen -= noc[1].ewShouldDec,
-		noc[2].ewLen -= noc[2].ewShouldDec,
-		noc[3].ewLen -= noc[3].ewShouldDec,
-
-		noc[0].nsLen += noc[0].nsShouldInc,
-		noc[1].nsLen += noc[1].nsShouldInc,
-		noc[2].nsLen += noc[2].nsShouldInc,
-		noc[3].nsLen += noc[3].nsShouldInc,
-
-		noc[0].ewLen += noc[0].ewShouldInc,
-		noc[1].ewLen += noc[1].ewShouldInc,
-		noc[2].ewLen += noc[2].ewShouldInc,
-		noc[3].ewLen += noc[3].ewShouldInc,
+		noc[0].ewLen += (noc[0].ewShouldInc - noc[0].ewShouldDec),
+		noc[1].ewLen += (noc[1].ewShouldInc - noc[1].ewShouldDec),
+		noc[2].ewLen += (noc[2].ewShouldInc - noc[2].ewShouldDec),
+		noc[3].ewLen += (noc[3].ewShouldInc - noc[3].ewShouldDec),
 
 		noc[0].nsShouldInc = 0,
 		noc[1].nsShouldInc = 0,
@@ -1188,6 +1176,6 @@ process arbiter(int n){
 
 
 par{
-::	Clock()
+::	Clock() 
 :: 	Top()
 }
