@@ -82,7 +82,7 @@ function int(0..1) nsNotEmpty0(int(0..4) n) =    (noc[n].nsLen > 0) ? 0 : 1 ;
 
 // ------ Begin: properties ---------
 //property Pr1 = Pmax(<> (clk >= clkUpper) );
-property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] ((totalFlitsDelivered) >= 5));
+property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] ((totalFlitsDelivered) >= 10));
 //property p1 = Pmax(<> ((noc[0].ewLen >= 1 )));
 // ------ End: properties ---------
 
