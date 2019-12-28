@@ -15,7 +15,7 @@ const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
 const int clkLower = 100; 
-const int clkUpper = 102;
+const int clkUpper = 103;
 int(clkLower..clkUpper) clk;
 //transient int(0..1) clk;
 
@@ -37,7 +37,7 @@ action tick;
 
 
 // ------ Begin: properties ---------
-property Pr1 = Pmax(<> (clk >= clkUpper));
+property Pr1 = Pmax(<> ((optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3) >= 3));
 //property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (optimalRuns0 >= 1));
 //property optimalRuns0 = Pmax(<> (optimalRuns0 >= OPTIMALRUNSMEASURE));
 //property optimalRuns1 = Pmax(<> (optimalRuns1 >= OPTIMALRUNSMEASURE));
@@ -373,25 +373,25 @@ process initialRoute(int routerID){
 process setPriority(int i, int routerID){
 	if (noc[routerID].bufferArray[i].serviced == true){
 		if(noc[routerID].bufferArray[i].val == -1){ tau }
-		else if(noc[routerID].bufferArray[i].val == 4){
+		else if(noc[routerID].bufferArray[i].val == 4){			//Send in the local direction
 			tau		//flit delivered
 		}
-		else if(noc[routerID].bufferArray[i].val == 0){	
+		else if(noc[routerID].bufferArray[i].val == 0){			//Send in the north direction
 			{=
 			noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff)
 			=}
 		}
-		else if(noc[routerID].bufferArray[i].val == 1){
+		else if(noc[routerID].bufferArray[i].val == 1){			//Send in the east direction
 			{=
 			noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff)
 			=}
 		}
-		else if(noc[routerID].bufferArray[i].val == 2){
+		else if(noc[routerID].bufferArray[i].val == 2){			//Send in the south direction
 			{=
 			noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff)
 			=}
 		}
-		else if(noc[routerID].bufferArray[i].val == 3){
+		else if(noc[routerID].bufferArray[i].val == 3){			//Send in the west direction
 			{=
 			noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff)
 			=}
