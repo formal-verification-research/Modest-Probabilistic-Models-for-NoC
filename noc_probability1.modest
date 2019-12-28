@@ -1,0 +1,797 @@
+option "dtmc";
+
+//Top level varables
+const int BUFFERLENGTH = 4;
+const int NOCSIZE = 2;
+const int INJECTIONRATENUMERATOR = 1;
+const int INJECTIONRATEDENOMINATOR = 2;
+
+const int clkLower = 100; 
+const int clkUpper = 106;
+int(clkLower..clkUpper) clk;
+//transient int(0..1) clk;
+
+int(0..10) optimalRuns;
+
+action tick;
+
+int totalFlitsDelivered = 0;
+
+datatype node = {bool local, bool localB1, bool localB2, bool localB3, bool localB4, bool localLockedns, bool ew, bool ewB1, bool ewB2, bool ewB3, bool ewB4, bool ewLockedns, bool ewLockedlocal, bool ns, bool nsB1, bool nsB2, bool nsB3, bool nsB4, bool nsLockedlocal, bool a1, bool a2, bool a3};
+
+node r0, r1, r2, r3;
+
+node[] noc;
+
+// ------ Begin: properties ---------
+property Pr1 = Pmax(<> (totalFlitsDelivered >= 25));
+//property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 2));
+// ------ End: properties ---------
+
+process Clock(){	
+	
+	//tick{= clk = 1 =};
+	//Clock()
+	
+	
+	tick {= clk++ =};
+	if (clk <= clkUpper) {
+	   Clock()
+	}
+	else {
+	   stop
+	} 
+	
+}
+
+process Top(){
+	initialize();
+	do{
+		populate();
+		arbiter(0);
+		arbiter(1);
+		arbiter(2);
+		arbiter(3);
+		
+		tick;
+		
+		if(clk>=clkUpper){
+			stop
+		}
+		else{
+			tau
+
+		} 	
+		
+	}
+}
+
+process initialize(){
+	{=
+	noc = [r0, r1, r2, r3]
+	=}
+}
+
+process populate(){
+	
+	if((clk % INJECTIONRATEDENOMINATOR) < INJECTIONRATENUMERATOR){
+		{=
+		noc[0].localB4 = true,
+		noc[1].localB4 = true,
+		noc[2].localB4 = true,
+		noc[3].localB4 = true
+		=}
+	}
+	else {tau};
+	
+	
+	if(noc[0].localB3 == false && noc[0].localB2 == false && noc[0].localB1 == false){
+		{=
+		noc[0].local = noc[0].localB4,
+		noc[0].localB4 = false
+		=}
+	}
+	else if(noc[0].localB3 == false && noc[0].localB2 == false && noc[0].localB1 == true){
+		{=
+		noc[0].local = noc[0].localB1,
+		noc[0].localB1 = noc[0].localB4,
+		noc[0].localB4 = false
+		=}
+	}
+	else if(noc[0].localB3 == true && noc[0].localB2 == true && noc[0].localB1 == true){
+		{=
+		noc[0].local = noc[0].localB1,
+		noc[0].localB1 = noc[0].localB2,
+		noc[0].localB2 = noc[0].localB4,
+		noc[0].localB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[0].local = noc[0].localB1,
+		noc[0].localB1 = noc[0].localB2,
+		noc[0].localB2 = noc[0].localB3,
+		noc[0].localB3 = noc[0].localB4,
+		noc[0].localB4 = false
+		=}
+	};
+	
+	if(noc[1].localB3 == false && noc[1].localB2 == false && noc[1].localB1 == false){
+		{=
+		noc[1].local = noc[1].localB4,
+		noc[1].localB4 = false
+		=}
+	}
+	else if(noc[1].localB3 == false && noc[1].localB2 == false && noc[1].localB1 == true){
+		{=
+		noc[1].local = noc[1].localB1,
+		noc[1].localB1 = noc[1].localB4,
+		noc[1].localB4 = false
+		=}
+	}
+	else if(noc[1].localB3 == true && noc[1].localB2 == true && noc[1].localB1 == true){
+		{=
+		noc[1].local = noc[1].localB1,
+		noc[1].localB1 = noc[1].localB2,
+		noc[1].localB2 = noc[1].localB4,
+		noc[1].localB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[1].local = noc[1].localB1,
+		noc[1].localB1 = noc[1].localB2,
+		noc[1].localB2 = noc[1].localB3,
+		noc[1].localB3 = noc[1].localB4,
+		noc[1].localB4 = false
+		=}
+	};
+	
+	if(noc[2].localB3 == false && noc[2].localB2 == false && noc[2].localB1 == false){
+		{=
+		noc[2].local = noc[2].localB4,
+		noc[2].localB4 = false
+		=}
+	}
+	else if(noc[2].localB3 == false && noc[2].localB2 == false && noc[2].localB1 == true){
+		{=
+		noc[2].local = noc[2].localB1,
+		noc[2].localB1 = noc[2].localB4,
+		noc[2].localB4 = false
+		=}
+	}
+	else if(noc[2].localB3 == true && noc[2].localB2 == true && noc[2].localB1 == true){
+		{=
+		noc[2].local = noc[2].localB1,
+		noc[2].localB1 = noc[2].localB2,
+		noc[2].localB2 = noc[2].localB4,
+		noc[2].localB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[2].local = noc[2].localB1,
+		noc[2].localB1 = noc[2].localB2,
+		noc[2].localB2 = noc[2].localB3,
+		noc[2].localB3 = noc[2].localB4,
+		noc[2].localB4 = false
+		=}
+	};
+	
+	if(noc[3].localB3 == false && noc[3].localB2 == false && noc[3].localB1 == false){
+		{=
+		noc[3].local = noc[3].localB4,
+		noc[3].localB4 = false
+		=}
+	}
+	else if(noc[3].localB3 == false && noc[3].localB2 == false && noc[3].localB1 == true){
+		{=
+		noc[3].local = noc[3].localB1,
+		noc[3].localB1 = noc[3].localB4,
+		noc[3].localB4 = false
+		=}
+	}
+	else if(noc[3].localB3 == true && noc[3].localB2 == true && noc[3].localB1 == true){
+		{=
+		noc[3].local = noc[3].localB1,
+		noc[3].localB1 = noc[3].localB2,
+		noc[3].localB2 = noc[3].localB4,
+		noc[3].localB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[3].local = noc[3].localB1,
+		noc[3].localB1 = noc[3].localB2,
+		noc[3].localB2 = noc[3].localB3,
+		noc[3].localB3 = noc[3].localB4,
+		noc[3].localB4 = false
+		=}
+	};
+	
+	
+	if(noc[0].ewB3 == false && noc[0].ewB2 == false && noc[0].ewB1 == false){
+		{=
+		noc[0].ew = noc[0].ewB4,
+		noc[0].ewB4 = false
+		=}
+	}
+	else if(noc[0].ewB3 == false && noc[0].ewB2 == false && noc[0].ewB1 == true){
+		{=
+		noc[0].ew = noc[0].ewB1,
+		noc[0].ewB1 = noc[0].ewB4,
+		noc[0].ewB4 = false
+		=}
+	}
+	else if(noc[0].ewB3 == true && noc[0].ewB2 == true && noc[0].ewB1 == true){
+		{=
+		noc[0].ew = noc[0].ewB1,
+		noc[0].ewB1 = noc[0].ewB2,
+		noc[0].ewB2 = noc[0].ewB4,
+		noc[0].ewB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[0].ew = noc[0].ewB1,
+		noc[0].ewB1 = noc[0].ewB2,
+		noc[0].ewB2 = noc[0].ewB3,
+		noc[0].ewB3 = noc[0].ewB4,
+		noc[0].ewB4 = false
+		=}
+	};
+	
+	if(noc[1].ewB3 == false && noc[1].ewB2 == false && noc[1].ewB1 == false){
+		{=
+		noc[1].ew = noc[1].ewB4,
+		noc[1].ewB4 = false
+		=}
+	}
+	else if(noc[1].ewB3 == false && noc[1].ewB2 == false && noc[1].ewB1 == true){
+		{=
+		noc[1].ew = noc[1].ewB1,
+		noc[1].ewB1 = noc[1].ewB4,
+		noc[1].ewB4 = false
+		=}
+	}
+	else if(noc[1].ewB3 == true && noc[1].ewB2 == true && noc[1].ewB1 == true){
+		{=
+		noc[1].ew = noc[1].ewB1,
+		noc[1].ewB1 = noc[1].ewB2,
+		noc[1].ewB2 = noc[1].ewB4,
+		noc[1].ewB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[1].ew = noc[1].ewB1,
+		noc[1].ewB1 = noc[1].ewB2,
+		noc[1].ewB2 = noc[1].ewB3,
+		noc[1].ewB3 = noc[1].ewB4,
+		noc[1].ewB4 = false
+		=}
+	};
+	
+	if(noc[2].ewB3 == false && noc[2].ewB2 == false && noc[2].ewB1 == false){
+		{=
+		noc[2].ew = noc[2].ewB4,
+		noc[2].ewB4 = false
+		=}
+	}
+	else if(noc[2].ewB3 == false && noc[2].ewB2 == false && noc[2].ewB1 == true){
+		{=
+		noc[2].ew = noc[2].ewB1,
+		noc[2].ewB1 = noc[2].ewB4,
+		noc[2].ewB4 = false
+		=}
+	}
+	else if(noc[2].ewB3 == true && noc[2].ewB2 == true && noc[2].ewB1 == true){
+		{=
+		noc[2].ew = noc[2].ewB1,
+		noc[2].ewB1 = noc[2].ewB2,
+		noc[2].ewB2 = noc[2].ewB4,
+		noc[2].ewB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[2].ew = noc[2].ewB1,
+		noc[2].ewB1 = noc[2].ewB2,
+		noc[2].ewB2 = noc[2].ewB3,
+		noc[2].ewB3 = noc[2].ewB4,
+		noc[2].ewB4 = false
+		=}
+	};
+	
+	if(noc[3].ewB3 == false && noc[3].ewB2 == false && noc[3].ewB1 == false){
+		{=
+		noc[3].ew = noc[3].ewB4,
+		noc[3].ewB4 = false
+		=}
+	}
+	else if(noc[3].ewB3 == false && noc[3].ewB2 == false && noc[3].ewB1 == true){
+		{=
+		noc[3].ew = noc[3].ewB1,
+		noc[3].ewB1 = noc[3].ewB4,
+		noc[3].ewB4 = false
+		=}
+	}
+	else if(noc[3].ewB3 == true && noc[3].ewB2 == true && noc[3].ewB1 == true){
+		{=
+		noc[3].ew = noc[3].ewB1,
+		noc[3].ewB1 = noc[3].ewB2,
+		noc[3].ewB2 = noc[3].ewB4,
+		noc[3].ewB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[3].ew = noc[3].ewB1,
+		noc[3].ewB1 = noc[3].ewB2,
+		noc[3].ewB2 = noc[3].ewB3,
+		noc[3].ewB3 = noc[3].ewB4,
+		noc[3].ewB4 = false
+		=}
+	};
+
+if(noc[0].nsB3 == false && noc[0].nsB2 == false && noc[0].nsB1 == false){
+		{=
+		noc[0].ns = noc[0].nsB4,
+		noc[0].nsB4 = false
+		=}
+	}
+	else if(noc[0].nsB3 == false && noc[0].nsB2 == false && noc[0].nsB1 == true){
+		{=
+		noc[0].ns = noc[0].nsB1,
+		noc[0].nsB1 = noc[0].nsB4,
+		noc[0].nsB4 = false
+		=}
+	}
+	else if(noc[0].nsB3 == true && noc[0].nsB2 == true && noc[0].nsB1 == true){
+		{=
+		noc[0].ns = noc[0].nsB1,
+		noc[0].nsB1 = noc[0].nsB2,
+		noc[0].nsB2 = noc[0].nsB4,
+		noc[0].nsB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[0].ns = noc[0].nsB1,
+		noc[0].nsB1 = noc[0].nsB2,
+		noc[0].nsB2 = noc[0].nsB3,
+		noc[0].nsB3 = noc[0].nsB4,
+		noc[0].nsB4 = false
+		=}
+	};
+	
+	if(noc[1].nsB3 == false && noc[1].nsB2 == false && noc[1].nsB1 == false){
+		{=
+		noc[1].ns = noc[1].nsB4,
+		noc[1].nsB4 = false
+		=}
+	}
+	else if(noc[1].nsB3 == false && noc[1].nsB2 == false && noc[1].nsB1 == true){
+		{=
+		noc[1].ns = noc[1].nsB1,
+		noc[1].nsB1 = noc[1].nsB4,
+		noc[1].nsB4 = false
+		=}
+	}
+	else if(noc[1].nsB3 == true && noc[1].nsB2 == true && noc[1].nsB1 == true){
+		{=
+		noc[1].ns = noc[1].nsB1,
+		noc[1].nsB1 = noc[1].nsB2,
+		noc[1].nsB2 = noc[1].nsB4,
+		noc[1].nsB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[1].ns = noc[1].nsB1,
+		noc[1].nsB1 = noc[1].nsB2,
+		noc[1].nsB2 = noc[1].nsB3,
+		noc[1].nsB3 = noc[1].nsB4,
+		noc[1].nsB4 = false
+		=}
+	};
+	
+	if(noc[2].nsB3 == false && noc[2].nsB2 == false && noc[2].nsB1 == false){
+		{=
+		noc[2].ns = noc[2].nsB4,
+		noc[2].nsB4 = false
+		=}
+	}
+	else if(noc[2].nsB3 == false && noc[2].nsB2 == false && noc[2].nsB1 == true){
+		{=
+		noc[2].ns = noc[2].nsB1,
+		noc[2].nsB1 = noc[2].nsB4,
+		noc[2].nsB4 = false
+		=}
+	}
+	else if(noc[2].nsB3 == true && noc[2].nsB2 == true && noc[2].nsB1 == true){
+		{=
+		noc[2].ns = noc[2].nsB1,
+		noc[2].nsB1 = noc[2].nsB2,
+		noc[2].nsB2 = noc[2].nsB4,
+		noc[2].nsB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[2].ns = noc[2].nsB1,
+		noc[2].nsB1 = noc[2].nsB2,
+		noc[2].nsB2 = noc[2].nsB3,
+		noc[2].nsB3 = noc[2].nsB4,
+		noc[2].nsB4 = false
+		=}
+	};
+	
+	if(noc[3].nsB3 == false && noc[3].nsB2 == false && noc[3].nsB1 == false){
+		{=
+		noc[3].ns = noc[3].nsB4,
+		noc[3].nsB4 = false
+		=}
+	}
+	else if(noc[3].nsB3 == false && noc[3].nsB2 == false && noc[3].nsB1 == true){
+		{=
+		noc[3].ns = noc[3].nsB1,
+		noc[3].nsB1 = noc[3].nsB4,
+		noc[3].nsB4 = false
+		=}
+	}
+	else if(noc[3].nsB3 == true && noc[3].nsB2 == true && noc[3].nsB1 == true){
+		{=
+		noc[3].ns = noc[3].nsB1,
+		noc[3].nsB1 = noc[3].nsB2,
+		noc[3].nsB2 = noc[3].nsB4,
+		noc[3].nsB4 = false
+		=}
+	}
+	else{
+		{=
+		noc[3].ns = noc[3].nsB1,
+		noc[3].nsB1 = noc[3].nsB2,
+		noc[3].nsB2 = noc[3].nsB3,
+		noc[3].nsB3 = noc[3].nsB4,
+		noc[3].nsB4 = false
+		=}
+	}
+
+}
+
+process arbiter(int n){
+	
+	if(noc[n].local == true && noc[n].ew == true && noc[n].ns == true){ //chance for both types of conflicts
+		if(noc[n].localLockedns == true && noc[n].ewLockedns == true){
+			local_ew_conflict_ns_serviced(n)
+		}
+		else if(noc[n].localLockedns == true && noc[n].ewLockedlocal == true){ 
+			//ns, ew conflict -- local to ns
+			ew_ns_conflict_local_ns(n)
+		}
+		else if(noc[n].localLockedns == false && noc[n].ewLockedns == true){
+			palt{
+				:(2/3):	no_conflict_all(n)
+				:(1/3):	local_ew_conflict_ns_serviced(n)
+			}
+		}
+		else if(noc[n].localLockedns == false && noc[n].ewLockedlocal == true){
+			//ew, ns conflict
+			palt{
+				:(2/3): ew_ns_conflict_local_ew(n)
+				:(1/3): ew_ns_conflict_local_ns(n)
+			}
+		}
+		else if (noc[n].localLockedns == true && noc[n].ewLockedlocal == false && noc[n].ewLockedns == false){
+			palt{
+				:(1/2):	ew_ns_conflict_local_ns(n)
+				:(1/2):	local_ew_conflict_ns_serviced(n)
+			}
+		}
+		else{
+			palt{
+				:(1/3):	no_conflict_all(n)		
+				:(1/6): local_ew_conflict_ns_serviced(n)
+				:(1/3): ew_ns_conflict_local_ew(n)
+				:(1/6): ew_ns_conflict_local_ew(n)
+			}
+		}
+	}
+	
+	else if(noc[n].local == true && noc[n].ew == true && noc[n].ns == false){ //chance for local and ew conflict
+		if(noc[n].localLockedns == true && noc[n].ewLockedns == true){		//locked in conflict					May not actually be a reachable condition
+			local_ew_conflict_ns_empty(n)
+		}
+		else if(noc[n].localLockedns == true && noc[n].ewLockedlocal == true){	//no conflcit
+			no_conflict_localns_ewlocal(n)
+		}
+		else if(noc[n].localLockedns == false && noc[n].ewLockedns == true){
+			palt{
+				:(2/3):	no_conflict_localew_ewns(n)
+				:(1/3):	local_ew_conflict_ns_empty(n)
+			}
+		}
+		else if(noc[n].localLockedns == false && noc[n].ewLockedlocal == true){
+			palt{
+				:(2/3): no_conflict_localew_ewlocal(n)
+				:(1/3): no_conflict_localns_ewlocal(n)
+			}
+			
+		}
+		else if(noc[n].localLockedns == true && noc[n].ewLockedlocal == false && noc[n].ewLockedns == false){
+			palt{
+				:(1/2):	no_conflict_localns_ewlocal(n)
+				:(1/2):	local_ew_conflict_ns_empty(n)
+			}
+		}
+		else{
+			palt{
+				:(1/3):	no_conflict_localew_ewlocal(n)
+				:(1/3):	no_conflict_localew_ewns(n)
+				:(1/6):	no_conflict_localns_ewlocal(n)
+				:(1/6): local_ew_conflict_ns_empty(n)
+			}						
+		}
+	
+	}
+	
+	else if (noc[n].local == false && noc[n].ew == true && noc[n].ns == true){ //chance for ew and ns conflict
+		if(noc[n].ewLockedlocal == true){
+			ew_ns_conflcit_local_empty(n)
+		}
+		else if(noc[n].ewLockedns == true){
+			no_conflict_ewns_ns(n)
+		}
+		else{
+			palt{
+				:(1/2): no_conflict_ewns_ns(n)
+				:(1/2): ew_ns_conflcit_local_empty(n)
+			}
+		}
+	}
+	
+	else{		//no chance for conflict
+		if(noc[n].local == true){
+			if(noc[n].localLockedns == true){
+				{= noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, noc[n].local = false, noc[n].localLockedns = false =}
+			}
+			else{
+				palt{
+					:(2/3): {= noc[(n % 2)*(n - 1) + (-(n % 2) + 1)*(n + 1)].ewB4 = true, noc[n].local = false =}		//forward ew direction
+					:(1/3): {= noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, noc[n].local = false =}		//forward ns direction
+				}
+			}
+		}
+		else{tau};
+	
+		if(noc[n].ew == true){
+			if(noc[n].ewLockedlocal == true){
+				{= totalFlitsDelivered++, noc[n].ewLockedlocal = false =}
+			}
+			else if(noc[n].ewLockedns == true){
+				{= noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, noc[n].local = false, noc[n].ewLockedns = false =}
+			}
+			else{
+				palt{
+					:(1/2): {= noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, noc[n].ew = false =}		//forward ns direction
+					:(1/2): {= totalFlitsDelivered++ =}
+				}
+			}
+		}
+		else{tau};
+	
+		if(noc[n].ns == true){
+			{= totalFlitsDelivered++, noc[n].nsLockedlocal = false =}
+		}
+		else{tau}
+	}
+}
+
+//Flit forwarding processes
+process local_ew_conflict_ns_serviced(int n){
+	if(!(noc[n].a1 || (noc[n].a2 && noc[n].a3))){				//local and ew conflict
+		{=
+		totalFlitsDelivered++,			//service ns buffer
+		noc[n].ns = false,
+		noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, 	//service local buffer
+		noc[n].local = false,
+		noc[n].ewLockedns = true,		//lock ew to the ns direction for next cycle.
+	
+		noc[n].a1 = !(noc[n].a1 || (noc[n].a2 && noc[n].a3)),			//update aribiter priority positions
+		noc[n].a2 =  noc[n].a1,
+		noc[n].a3 = !noc[n].a1 && !noc[n].a2 && noc[n].a3
+		=}
+	}
+	else{
+		{=
+		totalFlitsDelivered++,			//service ns buffer
+		noc[n].ns = false,
+		noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, 	//service es buffer
+		noc[n].ew = false,
+		noc[n].localLockedns = true,		//lock local to the ns direction for next cycle.
+		
+		noc[n].a1 = !(noc[n].a1 || (noc[n].a2 && noc[n].a3)),			//update aribiter priority positions
+		noc[n].a2 =  noc[n].a1,
+		noc[n].a3 = !noc[n].a1 && !noc[n].a2 && noc[n].a3
+		=}
+	}
+}
+
+process local_ew_conflict_ns_empty(int n){
+	if(!(noc[n].a1 || (noc[n].a2 && noc[n].a3))){				//local and ew conflict
+				{=
+				noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, 	//service local buffer
+				noc[n].local = false,
+				noc[n].ewLockedns = true,		//lock ew to the ns direction for next cycle.
+				noc[n].a1 = !(noc[n].a1 || (noc[n].a2 && noc[n].a3)),			//update aribiter priority positions
+				noc[n].a2 =  noc[n].a1,
+				noc[n].a3 = !noc[n].a1 && !noc[n].a2 && noc[n].a3
+				=}
+			}
+			else{
+				{=
+				noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, 	//service es buffer
+				noc[n].ew = false,
+				noc[n].localLockedns = true,		//lock local to the ns direction for next cycle.
+				noc[n].a1 = !(noc[n].a1 || (noc[n].a2 && noc[n].a3)),			//update aribiter priority positions
+				noc[n].a2 =  noc[n].a1,
+				noc[n].a3 = !noc[n].a1 && !noc[n].a2 && noc[n].a3
+				=}
+			}
+}
+
+process ew_ns_conflict_local_ew(int n){
+	if(noc[n].a3){
+		{= 
+		noc[(n % 2)*(n - 1) + (-(n % 2) + 1)*(n + 1)].ewB4 = true, 		//service local buffer in ew direction
+		noc[n].local = false,
+		totalFlitsDelivered++,				//service ns buffer
+		noc[n].ns = false,
+		noc[n].nsLockedlocal = false,
+		noc[n].ewLockedlocal = true,			//lock ew to local for next cycle
+									
+		noc[n].a1 = false,						//reset arbiter priority positions
+		noc[n].a2 = noc[n].a1,
+		noc[n].a3 = !noc[n].a3
+		=}	
+	}
+	else{
+		{= 
+		noc[(n % 2)*(n - 1) + (-(n % 2) + 1)*(n + 1)].ewB4 = true, 		//service local buffer in ew direction
+		noc[n].local = false,
+		totalFlitsDelivered++,				//service ew buffer
+		noc[n].ew = false,
+		noc[n].nsLockedlocal = true,			//lock ns to local for next cycle
+								
+		noc[n].a1 = false,						//reset arbiter priority positions
+		noc[n].a2 = noc[n].a1,
+		noc[n].a3 = !noc[n].a3
+		=}	
+	}
+}
+
+process ew_ns_conflict_local_ns(int n){
+	if(noc[n].a3){
+		{= 
+		noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, 	//service local buffer in ns direction
+		noc[n].local = false,
+		noc[n].localLockedns = false,
+		totalFlitsDelivered++,				//service ns buffer
+		noc[n].ns = false,
+		noc[n].nsLockedlocal = false,
+		noc[n].ewLockedlocal = true,			//lock ew to local for next cycle
+									
+		noc[n].a1 = false,						//reset arbiter priority positions
+		noc[n].a2 = noc[n].a1,
+		noc[n].a3 = !noc[n].a3
+		=}
+	}
+	else{
+		{= 
+		noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, 	//service local buffer in ns direction
+		noc[n].local = false,
+		noc[n].localLockedns = false,
+		totalFlitsDelivered++,				//service ew buffer
+		noc[n].ew = false,
+		noc[n].ewLockedlocal = false,
+		noc[n].nsLockedlocal = true,			//lock ns to local for next cycle
+		
+		noc[n].a1 = false,						//reset arbiter priority positions
+		noc[n].a2 = noc[n].a1,
+		noc[n].a3 = !noc[n].a3
+		=}
+	}
+}
+
+process ew_ns_conflcit_local_empty(int n){
+	if(noc[n].a3){		//conflict
+		{=
+		totalFlitsDelivered++,				//service ns buffer
+		noc[n].ns = false,
+		noc[n].nsLockedlocal = false,
+		noc[n].ewLockedlocal = true,			//lock ew to local for next cycle
+	
+		noc[n].a1 = false,						//reset arbiter priority positions
+		noc[n].a2 = noc[n].a1,
+		noc[n].a3 = !noc[n].a3
+		=}
+	}	
+	else{
+		{=
+		totalFlitsDelivered++,				//service ew buffer
+		noc[n].ew = false,
+		noc[n].ewLockedlocal = false,
+		noc[n].nsLockedlocal = true,			//lock ns to local for next cycle
+				
+		noc[n].a1 = false,						//reset arbiter priority positions
+		noc[n].a2 = noc[n].a1,
+		noc[n].a3 = !noc[n].a3
+		=}
+	}
+}
+
+process no_conflict_all(int n){
+	{=		//no conlfict 
+	noc[(n % 2)*(n - 1) + (-(n % 2) + 1)*(n + 1)].ewB4 = true, 		//service local buffer in ew direction
+	noc[n].local = false,
+	noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, 	//service es buffer in ns direction
+	noc[n].ew = false,
+	noc[n].ewLockedns = false,
+	totalFlitsDelivered++,			//service ns buffer
+	noc[n].ns = false,
+	noc[n].nsLockedlocal = false,
+	optimalRuns++
+	=}
+}
+
+process no_conflict_localns_ewlocal(int n){
+	{=	//local forward ns, ew forward local
+	noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true,
+	noc[n].local = false,
+	noc[n].localLockedns = false,
+	totalFlitsDelivered++,
+	noc[n].ew = false,
+	noc[n].ewLockedlocal = false,
+	optimalRuns++
+	=}
+}
+
+process no_conflict_localew_ewlocal(int n){
+	{= 	//local forward ew, ew forward local
+	noc[(n % 2)*(n - 1) + (-(n % 2) + 1)*(n + 1)].ewB4 = true, 
+	noc[n].local = false,
+	totalFlitsDelivered++,
+	noc[n].ew = false,
+	noc[n].ewLockedlocal = false,
+	optimalRuns++
+	=}
+}
+
+process no_conflict_localew_ewns(int n){
+	{=
+	noc[(n % 2)*(n - 1) + (-(n % 2) + 1)*(n + 1)].ewB4 = true, 
+	noc[n].local = false,
+	noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, 
+	noc[n].ew = false, 
+	noc[n].ewLockedns = false,
+	optimalRuns++
+	=}
+}
+
+process no_conflict_ewns_ns(int n){
+	{=	//no conflict
+	noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, 
+	noc[n].ew = false, 
+	noc[n].ewLockedns = false,
+	totalFlitsDelivered++,
+	noc[n].ns = false,
+	noc[n].nsLockedlocal = false,
+	optimalRuns++
+	=}
+}
+
+par{
+::	Clock()
+:: 	Top()
+}
