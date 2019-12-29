@@ -19,6 +19,8 @@ const int clkUpper = 103;
 int(clkLower..clkUpper) clk;
 //transient int(0..1) clk;
 
+int test = 0;
+
 datatype intlist = { int(0.. ((NOCSIZE*NOCSIZE)-1)) hd, intlist option tl };
 
 datatype buffer = {int(-1..3) dest, int(-1..4) val, int(0..4) id, bool serviced, int(0..4) priority, intlist option buff};		//Datatype for a buffer with the next buffer value, id of the buffer, whether the buffer was serviced last clock cycle or not, and the priority number of the buffer
@@ -26,8 +28,6 @@ datatype buffer = {int(-1..3) dest, int(-1..4) val, int(0..4) id, bool serviced,
 datatype router = {int(0..3) unserviced, int(0..3) totalUnserviced, buffer[] bufferArray, buffer[] temp, int[]bufferID};	//Datatype for a router, includes router-specific variables and an array of buffers
 
 router r0, r1, r2, r3;
-
-int test = 0;
 
 int(0..5/*(clkUpper - clkLower)*/) optimalRuns0, optimalRuns1, optimalRuns2, optimalRuns3;
 
@@ -37,7 +37,7 @@ action tick;
 
 
 // ------ Begin: properties ---------
-property Pr1 = Pmax(<> ((optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3) >= 3));
+property Pr1 = Pmax(<> ((optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3) >= 12));
 //property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (optimalRuns0 >= 1));
 //property optimalRuns0 = Pmax(<> (optimalRuns0 >= OPTIMALRUNSMEASURE));
 //property optimalRuns1 = Pmax(<> (optimalRuns1 >= OPTIMALRUNSMEASURE));
@@ -159,13 +159,14 @@ process Arbiter_corner(int routerID){
 		
 		//Buffer priority 0
 		//<Service Buffer bufferArray[0]>--------------------------------------------------------
-		if((noc[routerID].bufferArray[0].val == 4) ||
-			(noc[routerID].bufferArray[0].val == 0 && len(noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff) < BUFFERLENGTH) || 
-			(noc[routerID].bufferArray[0].val == 1 && len(noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff) < BUFFERLENGTH) ||
-			(noc[routerID].bufferArray[0].val == 2 && len(noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff) < BUFFERLENGTH) ||
-			(noc[routerID].bufferArray[0].val == 3 && len(noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff) < BUFFERLENGTH)){
+		if((noc[routerID].bufferArray[0].val == -1) ||  
+			(noc[routerID].bufferArray[0].val == 4) || 
+			((noc[routerID].bufferArray[0].val == 0) && (len(noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff) < BUFFERLENGTH)) || 
+			((noc[routerID].bufferArray[0].val == 1) && (len(noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff) < BUFFERLENGTH)) ||
+			((noc[routerID].bufferArray[0].val == 2) && (len(noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff) < BUFFERLENGTH)) ||
+			((noc[routerID].bufferArray[0].val == 3) && (len(noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff) < BUFFERLENGTH))){
 			{= 
-			noc[routerID].bufferArray[0].serviced = true 
+			noc[routerID].bufferArray[0].serviced = true
 			=}
 		}
 		else{
@@ -176,15 +177,15 @@ process Arbiter_corner(int routerID){
 		};
 		
 		//<Service buffer <bufferArray[1]> ------------------------------------------------------
-		if(!(noc[routerID].bufferArray[1].val != -1) && (noc[routerID].bufferArray[1].val == noc[routerID].bufferArray[0].val) &&
+		if((noc[routerID].bufferArray[1].val == -1) || ((noc[routerID].bufferArray[1].val != noc[routerID].bufferArray[0].val) &&
 			(noc[routerID].bufferArray[1].val == 4) ||
 			(noc[routerID].bufferArray[1].val == 0 && len(noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff) < BUFFERLENGTH) || 
 			(noc[routerID].bufferArray[1].val == 1 && len(noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff) < BUFFERLENGTH) ||
 			(noc[routerID].bufferArray[1].val == 2 && len(noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff) < BUFFERLENGTH) ||
-			(noc[routerID].bufferArray[1].val == 3 && len(noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff) < BUFFERLENGTH)
+			(noc[routerID].bufferArray[1].val == 3 && len(noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff) < BUFFERLENGTH))
 			) {			//If buffer bufferArray[1] conflicts with bufferArray[0]
 			{= 	//Service Buffer
-			noc[routerID].bufferArray[1].serviced = true 
+			noc[routerID].bufferArray[1].serviced = true
 			=}
 		}
 		else {
@@ -196,15 +197,15 @@ process Arbiter_corner(int routerID){
 		
 		//<Service buffer bufferArray[2]> --------------------------------------------------------
 		//If buffer bufferArray[2] conflicts with bufferArray[1] or bufferArray[0]
-		if(!(noc[routerID].bufferArray[2].val != -1) && (noc[routerID].bufferArray[2].val == noc[routerID].bufferArray[1].val || noc[routerID].bufferArray[2].val == noc[routerID].bufferArray[0].val) &&
+		if((noc[routerID].bufferArray[2].val == -1) || ((noc[routerID].bufferArray[2].val != noc[routerID].bufferArray[1].val && noc[routerID].bufferArray[2].val != noc[routerID].bufferArray[0].val) &&
 			(noc[routerID].bufferArray[2].val == 4) ||
 			(noc[routerID].bufferArray[2].val == 0 && len(noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff) < BUFFERLENGTH) || 
 			(noc[routerID].bufferArray[2].val == 1 && len(noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff) < BUFFERLENGTH) ||
 			(noc[routerID].bufferArray[2].val == 2 && len(noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff) < BUFFERLENGTH) ||
-			(noc[routerID].bufferArray[2].val == 3 && len(noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff) < BUFFERLENGTH)
+			(noc[routerID].bufferArray[2].val == 3 && len(noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff) < BUFFERLENGTH))
 		){	
 			{= 		//Service Buffer
-			noc[routerID].bufferArray[2].serviced = true 
+			noc[routerID].bufferArray[2].serviced = true, test = 3
 			=}
 		}
 		else {
@@ -418,10 +419,11 @@ process updateDestination(int i , int routerID){
 		=};
 		{=
 		noc[routerID].bufferArray[i].val = route(noc[routerID].bufferArray[i].dest, routerID),		//Update value from buffer
+		test = 17,
 		noc[routerID].bufferArray[i].buff = dequeue(noc[routerID].bufferArray[i].buff)
 		=}
 	}
-	else {tau}
+	else {{=test = 16=}}
 }
 
 //Populate the buffers with new values
