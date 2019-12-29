@@ -8,7 +8,7 @@ NoC router IDs
 option "dtmc";
 
 //Top level varables
-const int BUFFERLENGTH = 4;
+const int BUFFERLENGTH = 3; //Each buffer actually has length of BUFFERLENGTH + 1 because one value is stored in the arbiter itself for easy use when routing.
 const int NOCSIZE = 2;
 const int OPTIMALRUNSMEASURE = 4;
 const int INJECTIONRATENUMERATOR = 1;
