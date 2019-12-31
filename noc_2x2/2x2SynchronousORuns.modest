@@ -95,60 +95,60 @@ property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] ((optimalRuns) >= 1));
 process Top(){
 	//initialize();
 	//begin;
-	do{
+	//do{
 
 		
 
-		populate()
-		/*if(clk>=clkUpper){
+		populate();
+		if(optimalRuns >= 1) {
 			stop
 		}
 		else{
 			Top()
 
-		} */
+		} 
 		
 			
 		
-	}
+	//}
 }
 
 process Arbiter0() {
 	//begin;
-	do{
+	//do{
 
-		arbiter0()
+		arbiter0();
 
-		/*if(clk>=clkUpper){
+		if(optimalRuns >= 1) {
 			stop
 		}
 		else{
 			Arbiter0()
 
-		} */
+		}
 		
 
-	}
+	//}
 
 
 }
 
 process Arbiter1() {
 	//begin;
-	do{
+	//do{
 
-		arbiter1()
+		arbiter1();
 
-		/*if(clk>=clkUpper){
+		if(optimalRuns >= 1) {
 			stop
 		}
 		else{
 			Arbiter1()
 
-		} */
+		} 
 		
 
-	}
+	//}
 
 
 
@@ -156,20 +156,20 @@ process Arbiter1() {
 
 process Arbiter2() {
 	//begin;
-	do{
+	//do{
 
-		arbiter2()
+		arbiter2();
 
-		/*if(clk>=clkUpper){
+		if(optimalRuns >= 1) {
 			stop
 		}
 		else{
 			Arbiter2()
 
-		} */
+		}
 		
 
-	}
+	//}
 
 
 
@@ -177,20 +177,20 @@ process Arbiter2() {
 
 process Arbiter3() {
 	//begin;
-	do{
+	//do{
 
-		arbiter3()
+		arbiter3();
 
-		/*if(clk>=clkUpper){
+		if(optimalRuns >= 1) {
 			stop
 		}
 		else{
 			Arbiter3()
 
-		} */
+		} 
 		
 
-	}
+	//}
 
 
 }
