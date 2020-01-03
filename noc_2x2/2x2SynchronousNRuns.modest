@@ -26,10 +26,10 @@ int //totalFlitsDelivered;*/
 
 datatype node = {int(0..4) localLen, int(0..4) ewLen, int(0..4) nsLen, bool localPriority, bool nsPriority, bool ewLockedns, bool ewLockedlocal, bool localLockedns, bool localLockedew};
 
-int (0..1) //optimalRuns0 = 0;
-int (0..1) //optimalRuns1 = 0;
-int (0..1) //optimalRuns2 = 0;
-int (0..1) //optimalRuns3 = 0;
+int (0..1) optimalRuns0 = 0;
+int (0..1) optimalRuns1 = 0;
+int (0..1) optimalRuns2 = 0;
+int (0..1) optimalRuns3 = 0;
 
 int noiseRuns;
 
