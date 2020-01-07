@@ -7,9 +7,9 @@ const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
 const int clkLower = 100; 
-const int clkUpper = 110;
-int(clkLower..clkUpper) clk;
-//transient int(0..1) clk;
+const int clkUpper = 104;
+//int(clkLower..clkUpper) clk;
+transient int(0..1) clk;
 
 
 action tick;
@@ -82,7 +82,7 @@ function int(0..1) nsNotEmpty0(int(0..4) n) =    (noc[n].nsLen > 0) ? 0 : 1 ;
 
 // ------ Begin: properties ---------
 //property Pr1 = Pmax(<> (clk >= clkUpper) );
-property p1 = Pmax(<>((totalFlitsDelivered/( (clk-clkLower)*2) >= .75));
+property p1 = Pmax(<>((totalFlitsDelivered/(S(clk)*2)) >= .75));
 //property p1 = Pmax(<> ((noc[0].ewLen >= 1 )));
 // ------ End: properties ---------
 
@@ -96,7 +96,7 @@ process Top() {
 
 		populate();
 
-		if((clkUpper - clk) <= 0) {
+		if(1 <= 0) {
 			stop
 		}
 		else{
@@ -114,7 +114,7 @@ process Arbiter0() {
 	//do{
 
 		arbiter0();
-		if((clkUpper - clk) <= 0) {
+		if(1 <= 0) {
 			stop
 		}
 		else{
@@ -133,7 +133,7 @@ process Arbiter1() {
 	//do{
 
 		arbiter1();
-		if((clkUpper - clk) <= 0) {
+		if(1 <= 0) {
 			stop
 		}
 		else{
@@ -152,7 +152,7 @@ process Arbiter2() {
 	//do{
 
 		arbiter2();
-		if((clkUpper - clk) <= 0) {
+		if(1 <= 0) {
 			stop
 		}
 		else{
@@ -171,7 +171,7 @@ process Arbiter3() {
 	//do{
 
 		arbiter3();
-		if((clkUpper - clk) <= 0) {
+		if(1 <= 0) {
 			stop
 		}
 		else{

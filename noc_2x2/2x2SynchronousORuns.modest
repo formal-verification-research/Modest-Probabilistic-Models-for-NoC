@@ -7,7 +7,7 @@ const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
 const int clkLower = 100; 
-const int clkUpper = 112;
+const int clkUpper = 110;
 //int(clkLower..clkUpper) clk;
 transient int(0..1) clk;
 
@@ -30,7 +30,7 @@ transient int (0..1) optimalRuns0 = 0;
 transient int (0..1) optimalRuns1 = 0;
 transient int (0..1) optimalRuns2 = 0;
 transient int (0..1) optimalRuns3 = 0;
-int optimalRuns;
+transient int optimalRuns;
 
 bool doPop = true;
 
@@ -100,7 +100,7 @@ process Top(){
 		
 
 		populate();
-		if(optimalRuns >= 1) {
+		if( (S(clk)<=(clkUpper-clkLower)) >= clkUpper) {
 			stop
 		}
 		else{
@@ -119,7 +119,7 @@ process Arbiter0() {
 
 		arbiter0();
 
-		if(optimalRuns >= 1) {
+		if(S(clk) >= clkUpper) {
 			stop
 		}
 		else{
@@ -139,7 +139,7 @@ process Arbiter1() {
 
 		arbiter1();
 
-		if(optimalRuns >= 1) {
+		if(S(clk) >= clkUpper) {
 			stop
 		}
 		else{
@@ -160,7 +160,7 @@ process Arbiter2() {
 
 		arbiter2();
 
-		if(optimalRuns >= 1) {
+		if(S(clk) >= clkUpper) {
 			stop
 		}
 		else{
@@ -181,7 +181,7 @@ process Arbiter3() {
 
 		arbiter3();
 
-		if(optimalRuns >= 1) {
+		if(S(clk) >= clkUpper) {
 			stop
 		}
 		else{
