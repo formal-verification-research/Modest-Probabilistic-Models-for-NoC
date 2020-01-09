@@ -7,7 +7,7 @@ const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
 const int clkLower = 100; 
-const int clkUpper = 110;
+const int clkUpper = 105;
 //int(clkLower..clkUpper) clk;
 transient int(0..1) clk;
 
@@ -100,7 +100,7 @@ process Top(){
 		
 
 		populate();
-		if( (S(clk)<=(clkUpper-clkLower)) >= clkUpper) {
+		if( 0 == 1) {
 			stop
 		}
 		else{
@@ -119,7 +119,7 @@ process Arbiter0() {
 
 		arbiter0();
 
-		if(S(clk) >= clkUpper) {
+		if( 0 == 1) {
 			stop
 		}
 		else{
@@ -139,7 +139,7 @@ process Arbiter1() {
 
 		arbiter1();
 
-		if(S(clk) >= clkUpper) {
+		if( 0 == 1) {
 			stop
 		}
 		else{
@@ -160,7 +160,7 @@ process Arbiter2() {
 
 		arbiter2();
 
-		if(S(clk) >= clkUpper) {
+		if( 0 == 1) {
 			stop
 		}
 		else{
@@ -181,7 +181,7 @@ process Arbiter3() {
 
 		arbiter3();
 
-		if(S(clk) >= clkUpper) {
+		if( 0 == 1) {
 			stop
 		}
 		else{
