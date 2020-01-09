@@ -1,0 +1,4199 @@
+option "dtmc";
+
+//Top level varables
+const int BUFFERLENGTH = 4;
+const int NOCSIZE = 2;
+const int INJECTIONRATENUMERATOR = 1;
+const int INJECTIONRATEDENOMINATOR = 2;
+
+const int clkLower = 100; 
+const int clkUpper = 111;
+int(clkLower..clkUpper) clk;
+//transient int(0..1) clk;
+
+
+action tick;
+action begin;
+
+
+/*transient int //totalFlitsDelivered0 = 0;
+transient int //totalFlitsDelivered1 = 0;
+transient int //totalFlitsDelivered2 = 0;
+transient int //totalFlitsDelivered3 = 0;
+int //totalFlitsDelivered;*/
+
+
+
+//datatype node = {int(0.4) localLen, int(0.4) ewLen, int(0.4) nsLen, bool localPriority, bool nsPriority, bool ewLockedns, bool ewLockedlocal, bool localLockedns, bool localLockedew};
+
+int(0..4) noc0localLen, noc1localLen, noc2localLen, noc3localLen; 
+int(0..4) noc0ewLen, noc1ewLen, noc2ewLen, noc3ewLen; 
+int(0..4) noc0nsLen, noc1nsLen, noc2nsLen, noc3nsLen; 
+bool noc0localPriority, noc1localPriority, noc2localPriority, noc3localPriority; 
+bool noc0nsPriority, noc1nsPriority, noc2nsPriority, noc3nsPriority; 
+bool noc0ewLockedns, noc1ewLockedns, noc2ewLockedns, noc3ewLockedns; 
+bool noc0ewLockedlocal, noc1ewLockedlocal, noc2ewLockedlocal, noc3ewLockedlocal; 
+bool noc0localLockedns, noc1localLockedns, noc2localLockedns, noc3localLockedns; 
+bool noc0localLockedew, noc1localLockedew, noc2localLockedew, noc3localLockedew; 
+
+transient int (0..1) optimalRuns0 = 0;
+transient int (0..1) optimalRuns1 = 0;
+transient int (0..1) optimalRuns2 = 0;
+transient int (0..1) optimalRuns3 = 0;
+int optimalRuns;
+
+
+transient int(0..1) nsShouldDec0 = 0; 
+transient int(0..1) nsShouldDec1 = 0; 
+transient int(0..1) nsShouldDec2 = 0; 
+transient int(0..1) nsShouldDec3 = 0; 
+
+transient int(0..1) ewShouldDec0 = 0; 
+transient int(0..1) ewShouldDec1 = 0; 
+transient int(0..1) ewShouldDec2 = 0; 
+transient int(0..1) ewShouldDec3 = 0; 
+
+transient int (0..1) nsShouldInc0 = 0;
+transient int (0..1) nsShouldInc1 = 0; 
+transient int (0..1) nsShouldInc2 = 0; 
+transient int (0..1) nsShouldInc3 = 0; 
+
+transient int (0..1) ewShouldInc0 = 0;
+transient int (0..1) ewShouldInc1 = 0;
+transient int (0..1) ewShouldInc2 = 0;
+transient int (0..1) ewShouldInc3 = 0;
+
+//node r0, r1, r2, r3;
+
+//node[] noc = [node {localLen:0}, node {localLen: 0}, node {localLen:0}, node {localLen:0}];
+
+//transient int(0..1) localNotEmptyOne = 0;
+
+
+//function int(0..1) localNotEmpty1(int(0.4) n) =  /*localNotEmptyOne;*/ (noc[n].localLen > 0) ? 1 : 0 ;     //ceil(noc[n].localLen/(noc[n].localLen+1));
+//function int(0..1) localNotEmpty1(int(0.4) n) = localNotEmptyOne;
+
+
+//function int(0..1) localNotEmpty0(int(0.4) n) =  (noc[n].localLen > 0) ? 0 : 1 ; 
+//function int(0..1) nsNotEmpty1(int(0.4) n) =    (noc[n].nsLen > 0) ? 1 : 0 ;        
+//function int(0.4) xDirection(int(0..1) n) =   (n % 2)*(n - 1) + (-(n % 2) + 1)*(n + 1);   
+//function int(0.4) yDirection(int(0..1) n) =   ((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2);  
+//function int(0..1) nsNotFull1(int(0.4) n) = (noc[n].nsLen < 4) ? 1 : 0;
+//function int(0..1) ewNotFull1(int(0.4) n) = (noc[n].ewLen < 4) ? 1 : 0;
+//function int(0..1) localNotFull1(int(0.4) n) = (noc[n].localLen < 4) ? 1 : 0;
+//function int(0..1) nsNotFull0(int(0.4) n) = ((noc[n].nsLen < 4 ) ? 0 : 1);
+//function bool nsNotFull(int(0.4) n) = ((noc[n].nsLen < 4));
+//function bool ewNotFull(int(0.4) n) = ((noc[n].ewLen < 4));
+//function bool nsNotEmpty(int(0.4)n) = ((noc[n].nsLen > 0));
+//function bool localNotEmpty(int(0.4)n) = ((noc[n].localLen > 0));
+//function bool localNotFull(int(0.4)n) = ((noc[n].localLen < 4));
+//function int(0..1) nsNotEmpty0(int(0.4) n) =    (noc[n].nsLen > 0)? 0 : 1;
+
+
+
+
+// ------ Begin: properties ---------
+property Pr1 = Pmax(<> (clk >= clkUpper) );
+//property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] ((optimalRuns) >= 1));
+//property p2 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (optimalRuns == 1));
+//property p3 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] ((optimalRuns0 == 1) | (optimalRuns1==1) | (optimalRuns2==1) | (optimalRuns3==1)));
+// ------ End: properties ---------
+
+
+process Top(){
+	//initialize();
+	//begin;
+	//do{
+
+		
+
+		populate();
+
+		if (clkUpper-clk <= 0) {
+		 stop
+		}
+		else {
+		Top()
+		}
+		
+			
+		
+	//}
+}
+
+process Arbiter0() {
+	//begin;
+	//do{
+
+		arbiter0();
+
+		if (clkUpper-clk <= 0) {
+		 stop
+		}
+		else {
+		Arbiter0()
+		}
+		
+
+//	}
+
+
+}
+
+process Arbiter1() {
+	//begin;
+	//do{
+
+		arbiter1();
+
+		if (clkUpper-clk <= 0) {
+		 stop
+		}
+		else {
+		Arbiter1()
+		}
+		
+
+//	}
+
+
+}
+
+process Arbiter2() {
+	//begin;
+	//do{
+
+		arbiter2();
+		if (clkUpper-clk <= 0) {
+		 stop
+		}
+		else {
+		Arbiter2()
+		}
+		
+
+	//}
+
+
+}
+
+process Arbiter3() {
+	//begin;
+	//do{
+
+		arbiter3();
+		if (clkUpper-clk <= 0) {
+		 stop
+		}
+		else {
+		Arbiter3()
+		}
+		
+
+//	}
+
+
+}
+
+/*process initialize(){
+	{=
+	noc = [node r0, node r1, node r2, node r3]
+	=}
+}*/
+
+process populate() {
+
+	if(clk%2 == 0) {
+
+		 tick {= 
+
+
+		1: noc0localLen += ((noc0localLen < 4) ? 1 : 0),		//Adds a flit to the local buffer of each NoC, if they are not already full
+		1: noc1localLen += ((noc1localLen < 4) ? 1 : 0),
+		1: noc2localLen += ((noc2localLen < 4) ? 1 : 0),
+		1: noc3localLen += ((noc3localLen < 4) ? 1 : 0),
+
+		1: noc0nsLen += (nsShouldInc0 - nsShouldDec0),
+		1: noc1nsLen += (nsShouldInc1 - nsShouldDec1),
+		1: noc2nsLen += (nsShouldInc2 - nsShouldDec2),
+		1: noc3nsLen += (nsShouldInc3 - nsShouldDec3),
+
+		1: noc0ewLen += (ewShouldInc0 - ewShouldDec0),
+		1: noc1ewLen += (ewShouldInc1 - ewShouldDec1),
+		1: noc2ewLen += (ewShouldInc2 - ewShouldDec2),
+		1: noc3ewLen += (ewShouldInc3 - ewShouldDec3),
+
+		1: optimalRuns += (optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+
+		1: clk++
+
+		=}
+
+	}
+	else {
+
+			tick {=
+
+		1: noc0nsLen += (nsShouldInc0 - nsShouldDec0),
+		1: noc1nsLen += (nsShouldInc1 - nsShouldDec1),
+		1: noc2nsLen += (nsShouldInc2 - nsShouldDec2),
+		1: noc3nsLen += (nsShouldInc3 - nsShouldDec3),
+
+		1: noc0ewLen += (ewShouldInc0 - ewShouldDec0),
+		1: noc1ewLen += (ewShouldInc1 - ewShouldDec1),
+		1: noc2ewLen += (ewShouldInc2 - ewShouldDec2),
+		1: noc3ewLen += (ewShouldInc3 - ewShouldDec3),
+
+		1: optimalRuns += (optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+
+		1: clk++
+
+		=}
+
+	}
+
+
+
+}
+
+
+process arbiter0(){
+
+	//tick {= localNotEmptyOne = (noc0localLen > 0) ? 1 : 0 =};
+
+	if (noc0ewLen == 0) {		//If the EW buffer of the NoC is empty
+
+		if (noc0localLockedns == true) {		//If the local buffer is locked sending NS
+
+			tick {= noc0localLockedns = !((noc2nsLen < 4)),  //Sets the priority to false if it was able to send to the ns buffer of the NoC in the y direction
+				noc0localPriority = !((noc2nsLen < 4)) || noc0localPriority,		//Local gets priority if it is unable to send
+				noc0localLen -= ((noc2nsLen < 4) ? 1 : 0),     //Local sends a flit ns if the receiving buffer is not full
+				nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0)),  //The ns direction receives the flit if it is not already full
+				nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) )						//The ns buffer sends a flit to local if it is not empty
+				//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) 
+			=}
+
+		}
+
+		else if (noc0localLockedew) {
+
+			tick {=  		noc0localLockedew = !((noc1ewLen < 4)), // Local is locked it if has a flit and is unable to send it
+							noc0localPriority = !((noc1ewLen < 4)) || noc0localPriority,  // Local gets priority under the same conditions		
+							noc0localLen -= (((noc1ewLen < 4) ? 1 : 0)),  //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
+							ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0)), //The ew direction receives it under the same conditions
+							nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ) //The ns buffer sends a flit to local if it is not empty
+							//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) 	
+							
+			=}
+
+
+		} 
+
+		else {
+			tick palt {
+				//Local sends in the NS direction
+				:(1/3):  {=  noc0localLockedns = ((noc0localLen > 0)) && !((noc2nsLen < 4)), // Local is locked it if has a flit and is unable to send it
+							noc0localPriority = (((noc0localLen > 0)) && !((noc2nsLen < 4))) || noc0localPriority,  // Local gets priority under the same conditions
+							noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc2nsLen < 4) ? 1 : 0)),  //Local sends a flit to the ns direction if it is not empty and the receiving buffer is not full
+					   		nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)), //The ns direction receives the flit under the same conditions
+							nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) )   //The ns buffer sends a flit to local if it is not empty	
+							//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) 
+						=}
+				//Local sends to the ew direction
+				:(2/3): {=  noc0localLockedew = ((noc0localLen > 0)) && !((noc1ewLen < 4)), // Local is locked it if has a flit and is unable to send it
+							noc0localPriority = (((noc0localLen > 0)) && !((noc1ewLen < 4))) || noc0localPriority,  // Local gets priority under the same conditions
+							noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc1ewLen < 4) ? 1 : 0)),  //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
+							ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)), //The ew direction receives it under the same conditions
+							nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ) //The ns buffer sends a flit to local if it is not empty
+							//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) 
+							
+						=}
+			}
+		}
+
+	}
+	else if ((noc0localPriority == true) && (noc0nsPriority == true)) {
+
+		if (noc0localLockedns == true) {
+
+			if (noc0ewLockedns) {
+
+				tick {= noc0localLockedns = !((noc2nsLen < 4)), 	//Local stays locked if it is unable to send
+					noc0localPriority = !((noc2nsLen < 4)),
+						noc0localLen -= ((noc2nsLen < 4) ? 1 : 0),  //Local sends if the ns direction is not already full
+						nsShouldInc2 = ((noc2nsLen < 4) ? 1 : 0), //The ns direction receives under the same conditions
+						noc0nsPriority = false,
+						noc0ewLockedns = true, 
+						nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) )   //The ns buffer sends a flit to local if it is not empty 
+						//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) 
+				=}
+
+			}
+
+			else {
+			tick palt {
+			// Local and EW both send ns	
+			:(1/2):  {= noc0localLockedns = !((noc2nsLen < 4)), 	//Local stays locked if it is unable to send
+						noc0localLen -= ((noc2nsLen < 4) ? 1 : 0),  //Local sends if the ns direction is not already full
+						nsShouldInc2 = ((noc2nsLen < 4) ? 1 : 0), //The ns direction receives under the same conditions
+						nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ),   //The ns buffer sends a flit to local if it is not empty
+						noc0nsPriority = false,
+						//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) ,
+						noc0ewLockedns = true, 			//The Ew buffer is locked to send in the ns direction
+						noc0localPriority = !((noc2nsLen < 4)) //Local remains in priority if it did not send
+					=}  
+			 
+			 //Local sends ns, and EW sends to to local
+			:(1/2):  {= noc0localLockedns =  !((noc2nsLen < 4)),  //Local stays locked if it is unable to send
+						noc0localPriority = !(((noc2nsLen < 4)) && ((noc0nsLen > 0))), //Local only loses priority if it sends and ew doesn't
+						noc0localLen -= (((noc2nsLen < 4) ? 1 : 0)),  //Local sends ns if it isn't empty and ns isn't full
+						nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0)), //Ns receives under the same conditions
+						ewShouldDec0 = ((noc0nsLen > 0)? 0 : 1), 	//Ew sends if the ns buffer is empty
+						noc0ewLockedlocal = ((noc0nsLen > 0)), 	//Local is locked if the ns buffer is not empty
+						noc0nsPriority = !((noc0nsLen > 0)),     //NS loses priority if it sends
+						nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ) 		//Ns sends local if it isn't empty
+						//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) 
+					=}    
+			}
+		}
+
+		}
+
+		else if (noc0localLockedew) {
+
+			if(noc0ewLockedns) {	
+
+				//Local has a 1 or 3 and EW has a 2
+				tick {= noc0localLockedew = !((noc1ewLen < 4)), //Local is locked in the ew direction if it is unable to send
+							noc0localPriority = !(((noc1ewLen < 4)) && !((noc2nsLen < 4))), //Local remains in priority under the same conditions
+							noc0localLen -= (((noc1ewLen < 4) ? 1 : 0)),  //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0)), //The ew direction recieves under the same conditions
+							ewShouldDec0 = (((noc2nsLen < 4) ? 1 : 0)),  // Ew sends if the ns direction is not full
+							noc0ewLockedns = !((noc2nsLen < 4)), // Ew is locked to ns if it is unable to send
+							nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0)), //The ns direction receives if it is not full
+							noc0nsPriority = ((noc2nsLen < 4)),  //The ns buffer stays in priority if it is empty or ew is able to send
+							nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ), // Ns sends if it is not empty
+							//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) ,
+							optimalRuns0 += ((noc1ewLen < 4) ? 1 : 0)*((noc2nsLen < 4) ? 1 : 0)*((noc0nsLen > 0) ? 1 : 0) 
+
+				=} 
+
+
+			}
+
+			else {
+
+				tick palt { 
+
+				//Local has a 1 or 3 and EW has a 0	
+				:(1/2):  {= noc0localLockedew = !((noc1ewLen < 4)), //Local is locked in the ew direction if it is unable to send
+							noc0localPriority = !(((noc1ewLen < 4)) && ((noc0nsLen > 0))), //Local remains in priority under the same conditions
+							noc0localLen -= (((noc1ewLen < 4) ? 1 : 0)),  //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0)), //The ew direction receives under the same conditions
+							noc0ewLockedlocal = ((noc0nsLen > 0)), //The ew buffer is locked into the local direction if the ns buffer is not empty
+							noc0nsPriority = !((noc0nsLen > 0)),  //The ns buffer remains in priority if it is empty
+							nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ),	//Ns sneds if it is not empty
+							ewShouldDec0 = ((noc0nsLen > 0)? 0 : 1)		//Ew sends if 
+							//totalFlitsDelivered0 += 1
+				=}	
+
+				//Local has a 1 or 3 and EW has a 2
+				:(1/2):  {= noc0localLockedew = !((noc1ewLen < 4)), //Local is locked in the ew direction if it is unable to send
+							noc0localPriority = !(((noc1ewLen < 4)) && !((noc2nsLen < 4))), //Local remains in priority under the same conditions
+							noc0localLen -= (((noc1ewLen < 4) ? 1 : 0)),  //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0)), //The ew direction recieves under the same conditions
+							ewShouldDec0 = (((noc2nsLen < 4) ? 1 : 0)),  // Ew sends if the ns direction is not full
+							noc0ewLockedns = !((noc2nsLen < 4)), // Ew is locked to ns if it is unable to send
+							nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0)), //The ns direction receives if it is not full
+							noc0nsPriority = ((noc2nsLen < 4)),  //The ns buffer stays in priority if it is empty or ew is able to send
+							nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ), // Ns sends if it is not empty
+							//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) ,
+							optimalRuns0 += ((noc1ewLen < 4) ? 1 : 0)*((noc2nsLen < 4) ? 1 : 0)*((noc0nsLen > 0) ? 1 : 0) 
+				=} 
+
+
+				}	
+			}
+
+		}
+
+		
+
+		else{
+
+			if(noc0ewLockedns) {
+
+				tick palt { 
+				//Local and EW both send to 2	
+				:(1/3): {=	noc0ewLockedns = (((noc0localLen > 0))) || (!((noc0localLen > 0)) && ((noc2nsLen < 4))),                //The ew buffer gets locked in the ns direction if local is not empty 
+							noc0localPriority = (((noc0localLen > 0)) && !((noc2nsLen < 4))) || (!((noc0localLen > 0)) && ((noc2nsLen < 4))),   //Local remains in priority if it is non-empty and is unable to send
+							noc0localLockedns = (((noc0localLen > 0)) && !((noc2nsLen < 4))), // Local gets locked to ns under the same conditions
+							noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc2nsLen < 4) ? 1 : 0)),  	//Local sends the ns direction if it is not empty, and the receiving buffer is not full
+							nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0)),   //The ns direction receives if it is not full (either from ew or local)
+							ewShouldDec0 = ((noc0localLen > 0) ? 0 : 1) *(((noc2nsLen < 4) ? 1 : 0)),		//Ew sends if local is empty and the ns direction is not full
+							nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ), 		//Ns sends local if it is not empty
+							noc0nsPriority = !((noc0localLen > 0)) && ((noc2nsLen < 4))
+							//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) 
+						=}		
+
+				//Local has a 1 or 3 and EW has a 2
+				:(2/3):  {= noc0localLockedew = ((noc0localLen > 0)) && !((noc1ewLen < 4)), //Local is locked in the ew direction if it is unable to send
+							noc0localPriority = (((noc0localLen > 0)) && !((noc1ewLen < 4))) || (!((noc0localLen > 0)) && ((noc2nsLen < 4))) || ( (((noc0localLen > 0)) && ((noc1ewLen < 4)) && (((noc2nsLen < 4))))), //Local remains in priority under the same conditions
+							noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc1ewLen < 4) ? 1 : 0)),  //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)), //The ew direction recieves under the same conditions
+							ewShouldDec0 = (((noc2nsLen < 4) ? 1 : 0)),  // Ew sends if the ns direction is not full
+							noc0ewLockedns = !((noc2nsLen < 4)), // Ew is locked to ns if it is unable to send
+							nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0)), //The ns direction receives if it is not full
+							noc0nsPriority = ((noc2nsLen < 4)),  //The ns buffer stays in priority if it is empty or ew is able to send
+							nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ), // Ns sends if it is not empty
+							//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) ,
+							optimalRuns0 += ((noc0localLen > 0) ? 1 : 0)*((noc1ewLen < 4) ? 1 : 0)*((noc2nsLen < 4) ? 1 : 0)*((noc0nsLen > 0) ? 1 : 0) 
+				=} 
+
+
+				}	
+
+
+			}
+
+			else {
+
+				tick palt { 
+				//Local and EW both send to 2	
+				:(1/6):  {= noc0ewLockedns = (((noc0localLen > 0))) || (!((noc0localLen > 0)) && ((noc2nsLen < 4))),                //The ew buffer gets locked in the ns direction if local is not empty 
+							noc0localPriority = (((noc0localLen > 0)) && !((noc2nsLen < 4))) || (!((noc0localLen > 0)) && ((noc2nsLen < 4))),   //Local remains in priority if it is non-empty and is unable to send
+							noc0localLockedns = (((noc0localLen > 0)) && !((noc2nsLen < 4))), // Local gets locked to ns under the same conditions
+							noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc2nsLen < 4) ? 1 : 0)),  	//Local sends the ns direction if it is not empty, and the receiving buffer is not full
+							nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0)),   //The ns direction receives if it is not full (either from ew or local)
+							ewShouldDec0 = ((noc0localLen > 0) ? 0 : 1) *(((noc2nsLen < 4) ? 1 : 0)),		//Ew sends if local is empty and the ns direction is not full
+							nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ), 		//Ns sends local if it is not empty
+							noc0nsPriority = !((noc0localLen > 0)) && ((noc2nsLen < 4))
+							//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) 
+						=}	
+
+				//Local Sends to 2, EW to 0
+				:(1/6):  {= noc0localLockedns = ((noc0localLen > 0)) && !((noc2nsLen < 4)), //Local is locked in the ns direction if it is unable to send
+							noc0localPriority = (((noc0localLen > 0)) && !((noc2nsLen < 4))) || (((noc0localLen > 0)) && !((noc0nsLen > 0))) || ( ( (((noc0localLen > 0))) && (((noc2nsLen < 4))) ) && !((noc0nsLen > 0))), //Local remains in priority under the same conditions
+							noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc2nsLen < 4) ? 1 : 0)),  //Local sends the ns direction if it is not empty, and the receiving buffer is not full
+							nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)), //The ns direction receives if it is not full and local is not empty
+							ewShouldDec0 = ((noc0nsLen > 0)? 0 : 1), //Ew sends local if the ns buffer is empty
+							noc0ewLockedlocal = ((noc0nsLen > 0)), //Ew gets locked to local if the ns buffer is not empty
+							noc0nsPriority = !((noc0nsLen > 0)), //Ns remains in priority if it is empty
+							nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) )    // Ns sends if it is not empty
+							//totalFlitsDelivered0 += 1
+						=}					
+				
+
+				//Local has a 1 or 3 and EW has a 0	
+				:(1/3):  {= noc0localLockedew = ((noc0localLen > 0)) && !((noc1ewLen < 4)), //Local is locked in the ew direction if it is unable to send
+							noc0localPriority = (((noc0localLen > 0)) && !((noc1ewLen < 4))) || (((noc0localLen > 0)) && !((noc0nsLen > 0))) || ( ( (((noc0localLen > 0))) && (((noc1ewLen < 4))) ) && !((noc0nsLen > 0))), //Local remains in priority under the same conditions
+							noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc1ewLen < 4) ? 1 : 0)),  //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)), //The ew direction receives under the same conditions
+							noc0ewLockedlocal = ((noc0nsLen > 0)), //The ew buffer is locked into the local direction if the ns buffer is not empty
+							noc0nsPriority = !((noc0nsLen > 0)),  //The ns buffer remains in priority if it is empty
+							nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ),	//Ns sneds if it is not empty
+							ewShouldDec0 = ((noc0nsLen > 0)? 0 : 1)		//Ew sends if 
+							//totalFlitsDelivered0 += 1
+				=}	
+
+				//Local has a 1 or 3 and EW has a 2
+				:(1/3):  {= noc0localLockedew = ((noc0localLen > 0)) && !((noc1ewLen < 4)), //Local is locked in the ew direction if it is unable to send
+							noc0localPriority = (((noc0localLen > 0)) && !((noc1ewLen < 4))) || (!((noc0localLen > 0)) && ((noc2nsLen < 4))) || ( (((noc0localLen > 0)) && ((noc1ewLen < 4)) && (((noc2nsLen < 4))))), //Local remains in priority under the same conditions
+							noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc1ewLen < 4) ? 1 : 0)),  //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)), //The ew direction recieves under the same conditions
+							ewShouldDec0 = (((noc2nsLen < 4) ? 1 : 0)),  // Ew sends if the ns direction is not full
+							noc0ewLockedns = !((noc2nsLen < 4)), // Ew is locked to ns if it is unable to send
+							nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0)), //The ns direction receives if it is not full
+							noc0nsPriority = ((noc2nsLen < 4)),  //The ns buffer stays in priority if it is empty or ew is able to send
+							nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ), // Ns sends if it is not empty
+							//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) ,
+							optimalRuns0 += ((noc0localLen > 0) ? 1 : 0)*((noc1ewLen < 4) ? 1 : 0)*((noc2nsLen < 4) ? 1 : 0)*((noc0nsLen > 0) ? 1 : 0) 
+				=} 
+
+
+				}	
+			}
+		}
+
+
+
+	}
+
+	else if ((noc0localPriority == false) && (noc0nsPriority == false)) {
+
+			if(noc0localLockedns) {
+
+							if (noc0ewLockedlocal) {
+								tick {= noc0localLockedns = !((noc2nsLen < 4)),
+									noc0localPriority = !((noc2nsLen < 4)),
+									noc0localLen -= (((noc2nsLen < 4) ? 1 : 0)),  
+									nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0)), 
+									ewShouldDec0 = 1, 
+									noc0ewLockedlocal = false,
+									//totalFlitsDelivered0 += 1,
+									noc0nsPriority = ((noc0nsLen > 0)) 
+								=} 
+
+							}
+
+							else if (noc0ewLockedns) {
+
+									tick {= noc0localPriority = ((noc2nsLen < 4)), 
+										noc0localLockedns = true, 
+										ewShouldDec0 = ((noc2nsLen < 4) ? 1 : 0), 
+										noc0ewLockedns = !((noc2nsLen < 4)),
+										nsShouldInc2 = ((noc2nsLen < 4) ? 1 : 0), 
+										nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) )
+										//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) 
+									=}
+
+							}
+
+							else {
+
+								tick palt{
+								//Local and EW both send to 2
+								:(1/2):  {= noc0localPriority = ((noc2nsLen < 4)), 
+										noc0localLockedns = true, 
+										ewShouldDec0 = ((noc2nsLen < 4) ? 1 : 0), 
+										noc0ewLockedns = !((noc2nsLen < 4)),
+										nsShouldInc2 = ((noc2nsLen < 4) ? 1 : 0), 
+										nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) )
+										//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) 
+										=}			
+
+								//Local Sends to 2, EW to 0
+								:(1/2):  {= noc0localLockedns = !((noc2nsLen < 4)),
+											noc0localPriority = !((noc2nsLen < 4)),
+											noc0localLen -= (((noc2nsLen < 4) ? 1 : 0)),  
+											nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0)), 
+											ewShouldDec0 = 1, 
+											//totalFlitsDelivered0 += 1,
+											noc0nsPriority = ((noc0nsLen > 0)) 
+										=} 				
+
+							}
+
+						}
+
+			}
+
+			else if (noc0localLockedew) {
+
+
+					if (noc0ewLockedlocal) {
+
+							// Local Sens EW and EW sends local 
+							tick {=  noc0localLockedew = !((noc1ewLen < 4)),
+										noc0localPriority = !((noc1ewLen < 4)),
+										noc0localLen -= (((noc1ewLen < 4) ? 1 : 0)),  
+										ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0)), 
+										noc0ewLockedlocal = !((noc1ewLen < 4)),
+										ewShouldDec0 = 1, 
+										//totalFlitsDelivered0 += 1,
+										noc0nsPriority = ((noc0nsLen > 0)) 
+									=}  
+
+						
+
+					}
+					else if (noc0ewLockedns) {
+
+							//Local sends EW and EW sends NS
+							tick {=  noc0localLockedew = !((noc1ewLen < 4)),
+										noc0localPriority = !((noc1ewLen < 4)) && ((noc2nsLen < 4)),
+										noc0localLen -= (((noc1ewLen < 4) ? 1 : 0)),  
+										ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0)), 
+										ewShouldDec0 = ((noc2nsLen < 4) ? 1 : 0), 
+										noc0ewLockedns = !((noc2nsLen < 4)),
+										nsShouldInc2 = ((noc2nsLen < 4) ? 1 : 0), 
+										nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ), 
+										//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) ,
+										optimalRuns0 += ((noc1ewLen < 4) ? 1 : 0)*((noc2nsLen < 4) ? 1 : 0)*((noc0nsLen > 0) ? 1 : 0) 
+									=} 
+	
+
+					}
+					else {
+
+						tick palt{
+				
+					
+
+						//Local has a 1 or 3 and EW has a 0
+						:(1/2):  {= 		noc0localLockedew = !((noc1ewLen < 4)),
+										noc0localPriority = !((noc1ewLen < 4)),
+										noc0localLen -= (((noc1ewLen < 4) ? 1 : 0)),  
+										ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0)), 
+										noc0ewLockedlocal = !((noc1ewLen < 4)),
+										ewShouldDec0 = 1, 
+										//totalFlitsDelivered0 += 1,
+										noc0nsPriority = ((noc0nsLen > 0)) 
+								=}
+
+						//Local has a 1 or 3 and EW has a 2
+						:(1/2):  {= 		noc0localLockedew = !((noc1ewLen < 4)),
+										noc0localPriority = !((noc1ewLen < 4)) && ((noc2nsLen < 4)),
+										noc0localLen -= (((noc1ewLen < 4) ? 1 : 0)),  
+										ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0)), 
+										ewShouldDec0 = ((noc2nsLen < 4) ? 1 : 0), 
+										noc0ewLockedns = !((noc2nsLen < 4)),
+										nsShouldInc2 = ((noc2nsLen < 4) ? 1 : 0), 
+										nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ), 
+										//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) ,
+										optimalRuns0 += ((noc1ewLen < 4) ? 1 : 0)*((noc2nsLen < 4) ? 1 : 0)*((noc0nsLen > 0) ? 1 : 0) 
+						=} 
+
+					}
+			}
+
+			
+
+
+			} 
+
+			else {
+
+				if (noc0ewLockedlocal) {
+
+					tick palt {
+						
+						//Local sends NS and EW sends local
+						:(1/3):  {= noc0localLockedns = ((noc0localLen > 0)) && !((noc2nsLen < 4)),
+									noc0localPriority = ((noc0localLen > 0)) && !((noc2nsLen < 4)),
+									noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc2nsLen < 4) ? 1 : 0)),  
+									nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)), 
+									ewShouldDec0 = 1, 
+									//totalFlitsDelivered0 += 1,
+									noc0nsPriority = ((noc0nsLen > 0)) 
+								=} 
+
+						// Local Sens EW and EW sends local 
+						:(2/3):  {=  noc0localLockedew = ((noc0localLen > 0)) && !((noc1ewLen < 4)),
+									noc0localPriority = ((noc0localLen > 0)) && !((noc1ewLen < 4)),
+									noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc1ewLen < 4) ? 1 : 0)),  
+									ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)), 
+									ewShouldDec0 = 1, 
+									//totalFlitsDelivered0 += 1,
+									noc0nsPriority = ((noc0nsLen > 0)) 
+								=}  
+
+					}
+
+				}
+				else if (noc0ewLockedns) {
+
+					tick palt {
+						//Local sends NS and EW sends NS
+						:(1/3):  {= noc0localPriority =((noc0localLen > 0)), 
+									noc0localLockedns = ((noc0localLen > 0)), 
+									noc0ewLockedns = !((noc2nsLen < 4)),
+									ewShouldDec0 = ((noc2nsLen < 4) ? 1 : 0), 
+									nsShouldInc2 = ((noc2nsLen < 4) ? 1 : 0), 
+									nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) )
+									//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) 
+								=}
+						//Local sends EW and EW sends NS
+						:(2/3):  {=  noc0localLockedew = ((noc0localLen > 0)) && !((noc1ewLen < 4)),
+									noc0localPriority = ((noc0localLen > 0)) && !((noc1ewLen < 4)) && ((noc2nsLen < 4)),
+									noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc1ewLen < 4) ? 1 : 0)),  
+									ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)), 
+									ewShouldDec0 = ((noc2nsLen < 4) ? 1 : 0), 
+									noc0ewLockedns = !((noc2nsLen < 4)),
+									nsShouldInc2 = ((noc2nsLen < 4) ? 1 : 0), 
+									nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ),
+									//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) ,
+									optimalRuns0 += ((noc0localLen > 0) ? 1 : 0)*((noc1ewLen < 4) ? 1 : 0)*((noc2nsLen < 4) ? 1 : 0)*((noc0nsLen > 0) ? 1 : 0) 
+								=} 
+
+
+					}
+
+				}
+				else {
+
+					tick palt{
+					//Local and EW both send to 2
+					:(1/6):  {= 		noc0localPriority =((noc0localLen > 0)), 
+									noc0localLockedns = ((noc0localLen > 0)), 
+									noc0ewLockedns = !((noc2nsLen < 4)),
+									ewShouldDec0 = ((noc2nsLen < 4) ? 1 : 0), 
+									nsShouldInc2 = ((noc2nsLen < 4) ? 1 : 0), 
+									nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ) 
+									//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) 
+							=}			
+
+					//Local Sends to 2, EW to 0
+					:(1/6):  {= 		noc0localLockedns = ((noc0localLen > 0)) && !((noc2nsLen < 4)),
+									noc0localPriority = ((noc0localLen > 0)) && !((noc2nsLen < 4)),
+									noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc2nsLen < 4) ? 1 : 0)),  
+									nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)), 
+									ewShouldDec0 = 1, 
+									//totalFlitsDelivered0 += 1,
+									noc0nsPriority = ((noc0nsLen > 0)) 
+							=}					
+				
+
+					//Local has a 1 or 3 and EW has a 0
+					:(1/3):  {= 		noc0localLockedew = ((noc0localLen > 0)) && !((noc1ewLen < 4)),
+									noc0localPriority = ((noc0localLen > 0)) && !((noc1ewLen < 4)),
+									noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc1ewLen < 4) ? 1 : 0)),  
+									ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)), 
+									ewShouldDec0 = 1, 
+									//totalFlitsDelivered0 += 1,
+									noc0nsPriority = ((noc0nsLen > 0)) 
+							=}
+
+					//Local has a 1 or 3 and EW has a 2
+					:(1/3):  {= 		noc0localLockedew = ((noc0localLen > 0)) && !((noc1ewLen < 4)),
+									noc0localPriority = ((noc0localLen > 0)) && !((noc1ewLen < 4)) && ((noc2nsLen < 4)),
+									noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc1ewLen < 4) ? 1 : 0)),  
+									ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)), 
+									ewShouldDec0 = ((noc2nsLen < 4) ? 1 : 0), 
+									noc0ewLockedns = !((noc2nsLen < 4)),
+									nsShouldInc2 = ((noc2nsLen < 4) ? 1 : 0), 
+									nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ), 
+									//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) ,
+									optimalRuns0 += ((noc0localLen > 0) ? 1 : 0)*((noc1ewLen < 4) ? 1 : 0)*((noc2nsLen < 4) ? 1 : 0)*((noc0nsLen > 0) ? 1 : 0) 
+					=} 
+
+				}
+		}
+
+		}
+
+	}
+
+
+	else if ((noc0localPriority == false) && (noc0nsPriority == true)) {
+
+		if(noc0localLockedns) {
+
+			if(noc0ewLockedns) {
+
+				tick {= noc0localPriority = ((noc2nsLen < 4)), 
+					noc0ewLockedns = !((noc2nsLen < 4)),
+					ewShouldDec0 = ((noc2nsLen < 4) ? 1 : 0), 
+					nsShouldInc2 = ((noc2nsLen < 4) ? 1 : 0), 
+					nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ),
+					//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) ,
+					noc0nsPriority = ((noc2nsLen < 4))
+				=} 
+
+
+			}
+			//Logically determined that ew cannot be locked local
+			else {
+
+			tick palt {	//Local and EW both send to 2
+			:(1/2):  {= noc0localPriority = ((noc2nsLen < 4)), 
+					noc0ewLockedns = !((noc2nsLen < 4)),
+					ewShouldDec0 = ((noc2nsLen < 4) ? 1 : 0), 
+					nsShouldInc2 = ((noc2nsLen < 4) ? 1 : 0), 
+					nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ),
+					//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) ,
+					noc0nsPriority = ((noc2nsLen < 4))
+					=}
+					//Local Sends to 2, EW to 0
+			:(1/2):  {= noc0localPriority = !((noc2nsLen < 4)),
+						noc0localLockedns = !((noc2nsLen < 4)),
+						noc0localLen -= ((noc2nsLen < 4) ? 1 : 0),  
+						nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0)), 
+						ewShouldDec0 = ((noc0nsLen > 0)? 0 : 1),
+						noc0ewLockedns = ((noc0nsLen > 0)),
+						nsShouldDec0 = ((noc0nsLen > 0) ? 1 : 0) , 
+						//totalFlitsDelivered0 += 1,
+						noc0nsPriority = !((noc0nsLen > 0))
+				
+					=}	
+			}
+			}
+
+
+
+		}
+
+		else if(noc0localLockedew) {
+
+			if (noc0ewLockedns) {
+
+						//Local sends EW and EW sends NS
+						tick {=  noc0localPriority = !((noc1ewLen < 4)) && ((noc2nsLen < 4)),
+									noc0localLockedew = !((noc1ewLen < 4)),
+									noc0localLen -= (((noc1ewLen < 4) ? 1 : 0)),  
+									ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0)), 
+									noc0ewLockedns = !((noc2nsLen < 4)),
+									ewShouldDec0 = ((noc2nsLen < 4) ? 1 : 0), 
+									nsShouldInc2 = ((noc2nsLen < 4) ? 1 : 0), 
+									nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ), 
+									//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) ,
+									noc0nsPriority = ((noc2nsLen < 4)),
+									optimalRuns0 += ((noc1ewLen < 4) ? 1 : 0)*((noc2nsLen < 4) ? 1 : 0)*((noc0nsLen > 0) ? 1 : 0) 
+								=} 
+
+
+					
+
+				}
+			else {
+				
+					tick palt {				
+				
+
+						//Local has a 1 or 3 and EW has a 0
+						:(1/2):  {=  noc0localPriority = !((noc1ewLen < 4)) && !((noc0nsLen > 0)), 
+									noc0localLockedew = !((noc1ewLen < 4)),
+									noc0localLen -= (((noc1ewLen < 4) ? 1 : 0)),  
+									ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0)), 
+									nsShouldDec0 = ((noc0nsLen > 0) ? 1 : 0) ,
+									noc0nsPriority = !((noc0nsLen > 0)), 
+									ewShouldDec0 = ((noc0nsLen > 0)? 0 : 1), 
+									noc0ewLockedlocal = ((noc0nsLen > 0))
+									//totalFlitsDelivered0 += 1
+								=}	
+
+						//Local has a 1 or 3 and EW has a 2
+						:(1/2):  {= noc0localPriority = !((noc1ewLen < 4)) && ((noc2nsLen < 4)),
+									noc0localLockedew = !((noc1ewLen < 4)),
+									noc0localLen -= (((noc1ewLen < 4) ? 1 : 0)),  
+									ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0)), 
+									noc0ewLockedns = !((noc2nsLen < 4)),
+									ewShouldDec0 = ((noc2nsLen < 4) ? 1 : 0), 
+									nsShouldInc2 = ((noc2nsLen < 4) ? 1 : 0), 
+									nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ), 
+									//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) ,
+									noc0nsPriority = ((noc2nsLen < 4)),
+									optimalRuns0 += ((noc1ewLen < 4) ? 1 : 0)*((noc2nsLen < 4) ? 1 : 0)*((noc0nsLen > 0) ? 1 : 0) 
+								=}  
+
+
+					}
+				}
+
+		}
+
+
+		else {
+		
+			 if (noc0ewLockedns) {
+
+					tick palt {
+						//Local sends NS and EW sends NS
+						:(1/3):  tick {= noc0localPriority = ((noc0localLen > 0)) && ((noc2nsLen < 4)),
+									noc0localLockedns = ((noc0localLen > 0)),
+									noc0ewLockedns = !((noc2nsLen < 4)),
+									ewShouldDec0 = ((noc2nsLen < 4) ? 1 : 0), 
+									nsShouldInc2 = ((noc2nsLen < 4) ? 1 : 0), 
+									nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ),
+									//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) ,
+									noc0nsPriority = ((noc2nsLen < 4))
+								=} 
+						//Local sends EW and EW sends NS
+						:(2/3):  {=  noc0localPriority = ((noc0localLen > 0)) && !((noc1ewLen < 4)) && ((noc2nsLen < 4)),
+									noc0localLockedew = ((noc0localLen > 0)) && !((noc1ewLen < 4)),
+									noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc1ewLen < 4) ? 1 : 0)),  
+									ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)), 
+									noc0ewLockedns = !((noc2nsLen < 4)),
+									ewShouldDec0 = ((noc2nsLen < 4) ? 1 : 0), 
+									nsShouldInc2 = ((noc2nsLen < 4) ? 1 : 0), 
+									nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ), 
+									//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) ,
+									noc0nsPriority = ((noc2nsLen < 4)),
+									optimalRuns0 += ((noc0localLen > 0) ? 1 : 0)*((noc1ewLen < 4) ? 1 : 0)*((noc2nsLen < 4) ? 1 : 0)*((noc0nsLen > 0) ? 1 : 0) 
+								=} 
+
+
+					}
+
+				}
+			else {
+				
+					tick palt {
+						//Local and EW both send to 2
+						:(1/6):  {= noc0localPriority = ((noc0localLen > 0)) && ((noc2nsLen < 4)),
+									noc0localLockedns = ((noc0localLen > 0)),
+									noc0ewLockedns = !((noc2nsLen < 4)),
+									ewShouldDec0 = ((noc2nsLen < 4) ? 1 : 0), 
+									nsShouldInc2 = ((noc2nsLen < 4) ? 1 : 0), 
+									nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ),
+									//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) ,
+									noc0nsPriority = ((noc2nsLen < 4))
+								=}			
+						//Local Sends to 2, EW to 0
+						:(1/6):  {= noc0localPriority = !((noc2nsLen < 4)) && ((noc0localLen > 0)) && !((noc0nsLen > 0)), 
+									noc0localLockedns = ((noc0localLen > 0)) && !((noc2nsLen < 4)),
+									noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc2nsLen < 4) ? 1 : 0)),  
+									nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)), 
+									ewShouldDec0 = ((noc0nsLen > 0)? 0 : 1),
+									noc0ewLockedlocal = ((noc0nsLen > 0)),
+									nsShouldDec0 = ((noc0nsLen > 0) ? 1 : 0) , 
+									//totalFlitsDelivered0 += 1,
+									noc0nsPriority = !((noc0nsLen > 0)) 
+								=}					
+				
+
+						//Local has a 1 or 3 and EW has a 0
+						:(1/3):  {=  noc0localPriority = !((noc1ewLen < 4)) && ((noc0localLen > 0)) && !((noc0nsLen > 0)), 
+									noc0localLockedew = ((noc0localLen > 0)) && !((noc1ewLen < 4)),
+									noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc1ewLen < 4) ? 1 : 0)),  
+									ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)), 
+									nsShouldDec0 = ((noc0nsLen > 0) ? 1 : 0) ,
+									noc0nsPriority = !((noc0nsLen > 0)), 
+									ewShouldDec0 = ((noc0nsLen > 0)? 0 : 1),
+									noc0ewLockedlocal = ((noc0nsLen > 0))
+									//totalFlitsDelivered0 += 1
+								=}	
+
+						//Local has a 1 or 3 and EW has a 2
+						:(1/3):  {= noc0localPriority = ((noc0localLen > 0)) && !((noc1ewLen < 4)) && ((noc2nsLen < 4)),
+									noc0localLockedew = ((noc0localLen > 0)) && !((noc1ewLen < 4)),
+									noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc1ewLen < 4) ? 1 : 0)),  
+									ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)), 
+									noc0ewLockedns = !((noc2nsLen < 4)),
+									ewShouldDec0 = ((noc2nsLen < 4) ? 1 : 0), 
+									nsShouldInc2 = ((noc2nsLen < 4) ? 1 : 0), 
+									nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ), 
+									//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) ,
+									noc0nsPriority = ((noc2nsLen < 4)),
+									optimalRuns0 += ((noc0localLen > 0) ? 1 : 0)*((noc1ewLen < 4) ? 1 : 0)*((noc2nsLen < 4) ? 1 : 0)*((noc0nsLen > 0) ? 1 : 0) 
+								=}  
+
+
+					}
+				}
+
+		}
+
+	}
+	else {   //Localpriority == true && nsPriority == false
+
+		if(noc0localLockedns) {
+
+			if (noc0ewLockedlocal) {
+
+
+						 //Local sends NS and EW sends local
+								tick {= noc0localPriority = true, 
+									noc0localLockedns = !((noc2nsLen < 4)), 
+									noc0localLen -= (((noc2nsLen < 4) ? 1 : 0)),
+									nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0)), 
+									ewShouldDec0 = 1, 
+									noc0ewLockedlocal = false,
+									//totalFlitsDelivered0 += 1,
+									noc0nsPriority = ((noc0nsLen > 0)) 
+								=} 
+
+				}
+
+				else if(noc0ewLockedns) {
+
+							tick {= noc0localPriority = !((noc2nsLen < 4)), 
+									noc0localLockedns = !((noc2nsLen < 4)), 
+									noc0localLen -= (((noc2nsLen < 4) ? 1 : 0)),  
+									nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0)), 
+									noc0ewLockedns = true,
+									nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ), 
+									noc0nsPriority = false
+									//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) 
+								=}	
+
+
+				}
+
+
+				else {
+
+
+					tick palt {
+						//Local and EW both send to 2
+						:(1/2):  {= 	noc0localPriority = !((noc2nsLen < 4)), 
+									noc0localLockedns = !((noc2nsLen < 4)), 
+									noc0localLen -= (((noc2nsLen < 4) ? 1 : 0)),  
+									nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0)), 
+									noc0ewLockedns = true,
+									nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ), 
+									noc0nsPriority = false
+									//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) 
+								=}	
+						//Local Sends to 2, EW to 0
+						:(1/2):  {= noc0localPriority = true, 
+									noc0localLockedns = !((noc2nsLen < 4)), 
+									noc0localLen -= (((noc2nsLen < 4) ? 1 : 0)),
+									nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0)), 
+									ewShouldDec0 = 1, 
+									noc0ewLockedlocal = false,
+									//totalFlitsDelivered0 += 1,
+									noc0nsPriority = ((noc0nsLen > 0)) 
+								=}					
+
+
+					}
+				}
+
+		}
+
+		else if(noc0localLockedew) {
+
+			if (noc0ewLockedlocal) {
+
+						// Local Sends EW and EW sends local
+					tick {= 	noc0localPriority = true, 
+						noc0localLockedew = !((noc1ewLen < 4)),
+						noc0localLen -= (((noc1ewLen < 4) ? 1 : 0)),  
+						ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0)), 
+						ewShouldDec0 = 1, 
+						noc0ewLockedlocal = false,
+						//totalFlitsDelivered0 += 1,
+						noc0nsPriority = ((noc0nsLen > 0)) 
+					=}  
+
+					
+
+				}
+
+				else if(noc0ewLockedns) {
+
+	
+								//Local has a 1 or 3 and EW has a 2
+						tick {=  		noc0localPriority = !(((noc1ewLen < 4)) && !((noc2nsLen < 4))), 
+									noc0localLockedew = !((noc1ewLen < 4)),
+									noc0localLen -= (((noc1ewLen < 4) ? 1 : 0)),  
+									ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0)), 
+									ewShouldDec0 = (((noc2nsLen < 4) ? 1 : 0)), 
+									noc0ewLockedlocal = !((noc2nsLen < 4)),
+									nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0)), 
+									nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ), 
+									noc0nsPriority = false,
+									//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) ,
+									optimalRuns0 += ((noc1ewLen < 4) ? 1 : 0)*((noc2nsLen < 4) ? 1 : 0)*((noc0nsLen > 0) ? 1 : 0) 
+								=}  
+
+
+				}
+
+
+				else {
+
+
+					tick palt {				
+				
+
+						//Local has a 1 or 3 and EW has a 0
+						:(1/2):  {= 	noc0localPriority = true, 
+									noc0localLockedew = !((noc1ewLen < 4)),
+									noc0localLen -= (((noc1ewLen < 4) ? 1 : 0)),  
+									ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0)), 
+									ewShouldDec0 = 1, 
+									noc0ewLockedlocal = false,
+									//totalFlitsDelivered0 += 1,
+									noc0nsPriority = ((noc0nsLen > 0))
+								=} 			
+						//Local has a 1 or 3 and EW has a 2
+						:(1/2):  {=  noc0localPriority = !(((noc1ewLen < 4)) && !((noc2nsLen < 4))), 
+									noc0localLockedew = !((noc1ewLen < 4)),
+									noc0localLen -= (((noc1ewLen < 4) ? 1 : 0)),  
+									ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0)), 
+									ewShouldDec0 = (((noc2nsLen < 4) ? 1 : 0)), 
+									noc0ewLockedlocal = !((noc2nsLen < 4)),
+									nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0)), 
+									nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ), 
+									noc0nsPriority = false,
+									//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) ,
+									optimalRuns0 += ((noc1ewLen < 4) ? 1 : 0)*((noc2nsLen < 4) ? 1 : 0)*((noc0nsLen > 0) ? 1 : 0) 
+								=}  
+
+
+					}
+				}
+
+
+		}
+		
+
+		else {
+			 if (noc0ewLockedlocal) {
+
+					tick palt {
+						 //Local sends NS and EW sends local
+						:(1/3):  tick {= noc0localPriority = true, 
+									noc0localLockedns = ((noc0localLen > 0)) && !((noc2nsLen < 4)), 
+									noc0localLen -= (((noc2nsLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)),
+									nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)), 
+									ewShouldDec0 = 1,
+									noc0ewLockedlocal = false, 
+									//totalFlitsDelivered0 += 1,
+									noc0nsPriority = ((noc0nsLen > 0)) 
+								=} 
+						// Local Sends EW and EW sends local
+						:(2/3):  tick {= noc0localPriority = true, 
+									noc0localLockedew = ((noc0localLen > 0)) && !((noc1ewLen < 4)),
+									noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc1ewLen < 4) ? 1 : 0)),  
+									ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)), 
+									ewShouldDec0 = 1, 
+									noc0ewLockedlocal = false,
+									//totalFlitsDelivered0 += 1,
+									noc0nsPriority = ((noc0nsLen > 0)) 
+								=}  
+
+					}
+
+				}
+
+				else if(noc0ewLockedns) {
+
+
+						tick palt {
+						//Local and EW both send to 2
+						:(1/3):  {= noc0localPriority = (((noc0localLen > 0)) && !((noc2nsLen < 4))) || (!((noc0localLen > 0)) && ((noc2nsLen < 4))), 
+									noc0localLockedns = ((noc0localLen > 0)) && !((noc2nsLen < 4)), 
+									noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc2nsLen < 4) ? 1 : 0)),  
+									nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0)), 
+									noc0ewLockedns = ((noc0localLen > 0)) || (!((noc0localLen > 0)) && !((noc2nsLen < 4))),
+									ewShouldDec0 = ((noc0localLen > 0) ? 0 : 1) *((noc2nsLen < 4) ? 1 : 0),
+									nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ), 
+									noc0nsPriority = false
+									//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) 
+								=}	
+								//Local has a 1 or 3 and EW has a 2
+						:(2/3):  {=  noc0localPriority = (!((noc1ewLen < 4)) && ((noc0localLen > 0))) || (!((noc0localLen > 0)) && ((noc2nsLen < 4))) || (((noc1ewLen < 4)) && ((noc0localLen > 0)) && ((noc2nsLen < 4))), 
+									noc0localLockedew = ((noc0localLen > 0)) && !((noc1ewLen < 4)),
+									noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc1ewLen < 4) ? 1 : 0)),  
+									ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)), 
+									ewShouldDec0 = (((noc2nsLen < 4) ? 1 : 0)), 
+									noc0ewLockedns = !((noc2nsLen < 4)),
+									nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0)), 
+									nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ), 
+									noc0nsPriority = false,
+									//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) ,
+									optimalRuns0 += ((noc1ewLen < 4) ? 1 : 0)*((noc2nsLen < 4) ? 1 : 0)*((noc0nsLen > 0) ? 1 : 0) 
+								=}  
+						}
+
+
+				}
+
+
+				else {
+
+
+					tick palt {
+						//Local and EW both send to 2
+						:(1/6):  {= noc0localPriority = (((noc0localLen > 0)) && !((noc2nsLen < 4))) || (!((noc0localLen > 0)) && ((noc2nsLen < 4))), 
+									noc0localLockedns = ((noc0localLen > 0)) && !((noc2nsLen < 4)), 
+									noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc2nsLen < 4) ? 1 : 0)),  
+									nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0)), 
+									noc0ewLockedns = ((noc0localLen > 0)) || (!((noc0localLen > 0)) && !((noc2nsLen < 4))),
+									ewShouldDec0 = ((noc0localLen > 0) ? 0 : 1) *((noc2nsLen < 4) ? 1 : 0),
+									nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ), 
+									noc0nsPriority = false
+									//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) 
+								=}	
+						//Local Sends to 2, EW to 0
+						:(1/6):  {= noc0localPriority = true, 
+									noc0localLockedns = ((noc0localLen > 0)) && !((noc2nsLen < 4)), 
+									noc0localLen -= (((noc2nsLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)),
+									nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)), 
+									ewShouldDec0 = 1,
+									noc0ewLockedlocal = false, 
+									//totalFlitsDelivered0 += 1,
+									noc0nsPriority = ((noc0nsLen > 0)) 
+								=}					
+				
+
+						//Local has a 1 or 3 and EW has a 0
+						:(1/3):  {= noc0localPriority = true, 
+									noc0localLockedew = ((noc0localLen > 0)) && !((noc1ewLen < 4)),
+									noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc1ewLen < 4) ? 1 : 0)),  
+									ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)), 
+									ewShouldDec0 = 1, 
+									noc0ewLockedlocal = false,
+									//totalFlitsDelivered0 += 1,
+									noc0nsPriority = ((noc0nsLen > 0)) 
+								=} 			
+						//Local has a 1 or 3 and EW has a 2
+						:(1/3):  {=  noc0localPriority = (!((noc1ewLen < 4)) && ((noc0localLen > 0))) || (!((noc0localLen > 0)) && ((noc2nsLen < 4))) || (((noc1ewLen < 4)) && ((noc0localLen > 0)) && ((noc2nsLen < 4))), 
+									noc0localLockedew = ((noc0localLen > 0)) && !((noc1ewLen < 4)),
+									noc0localLen -= (((noc0localLen > 0) ? 1 : 0))*(((noc1ewLen < 4) ? 1 : 0)),  
+									ewShouldInc1 = (((noc1ewLen < 4) ? 1 : 0))*(((noc0localLen > 0) ? 1 : 0)), 
+									ewShouldDec0 = (((noc2nsLen < 4) ? 1 : 0)), 
+									noc0ewLockedns = !((noc2nsLen < 4)),
+									nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0)), 
+									nsShouldDec0 = (((noc0nsLen > 0) ? 1 : 0) ), 
+									noc0nsPriority = false,
+									//totalFlitsDelivered0 += ((noc0nsLen > 0) ? 1 : 0) ,
+									optimalRuns0 += ((noc1ewLen < 4) ? 1 : 0)*((noc2nsLen < 4) ? 1 : 0)*((noc0nsLen > 0) ? 1 : 0) 
+								=}  
+
+
+					}
+				}
+		}
+
+
+	}
+
+
+
+
+
+}
+
+process arbiter1(){
+
+	//tick {= localNotEmptyOne = (noc1localLen > 0) ? 1 : 0 =};
+
+	if (noc1ewLen == 0) {		//If the EW buffer of the NoC is empty
+
+		if (noc1localLockedns == true) {		//If the local buffer is locked sending NS
+
+			tick {= noc1localLockedns = !((noc3nsLen < 4)),   //Sets the priority to false if it was able to send to the ns buffer of the NoC in the y direction
+				noc1localPriority = !((noc3nsLen < 4)) || noc1localPriority, 		//Local gets priority if it is unable to send
+				noc1localLen -= ((noc3nsLen < 4) ? 1 : 0),      //Local sends a flit ns if the receiving buffer is not full
+				nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0)),   //The ns direction receives the flit if it is not already full
+				nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ) 						//The ns buffer sends a flit to local if it is not empty
+				//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) 
+			=}
+
+		}
+
+		else if (noc1localLockedew) {
+
+			tick {=  			noc1localLockedew = !((noc0ewLen < 4)),  // Local is locked it if has a flit and is unable to send it
+							noc1localPriority = !((noc0ewLen < 4)) || noc1localPriority,   // Local gets priority under the same conditions		
+							noc1localLen -= (((noc0ewLen < 4) ? 1 : 0)),   //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
+							ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0)),  //The ew direction receives it under the same conditions
+							nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) )  //The ns buffer sends a flit to local if it is not empty
+							//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) 	
+							
+			=}
+
+
+		} 
+
+		else {
+			tick palt {
+				//Local sends in the NS direction
+				:(1/3): {=  noc1localLockedns = ((noc1localLen > 0)) && !((noc3nsLen < 4)),  // Local is locked it if has a flit and is unable to send it
+							noc1localPriority = (((noc1localLen > 0)) && !((noc3nsLen < 4))) || noc1localPriority,   // Local gets priority under the same conditions
+							noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc3nsLen < 4) ? 1 : 0)),   //Local sends a flit to the ns direction if it is not empty and the receiving buffer is not full
+					   		nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)),  //The ns direction receives the flit under the same conditions
+							nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) )    //The ns buffer sends a flit to local if it is not empty	
+							//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) 
+						=}
+				//Local sends to the ew direction
+				:(2/3): {=  noc1localLockedew = ((noc1localLen > 0)) && !((noc0ewLen < 4)),  // Local is locked it if has a flit and is unable to send it
+							noc1localPriority = (((noc1localLen > 0)) && !((noc0ewLen < 4))) || noc1localPriority,   // Local gets priority under the same conditions
+							noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc0ewLen < 4) ? 1 : 0)),   //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
+							ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)),  //The ew direction receives it under the same conditions
+							nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) )  //The ns buffer sends a flit to local if it is not empty
+							//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) 
+							
+						=}
+			}
+		}
+
+	}
+	else if ((noc1localPriority == true) && (noc1nsPriority == true)) {
+
+		if (noc1localLockedns == true) {
+
+			if (noc1ewLockedns) {
+
+				tick {= noc1localLockedns = !((noc3nsLen < 4)),  	//Local stays locked if it is unable to send
+					noc1localPriority = !((noc3nsLen < 4)), 
+						noc1localLen -= ((noc3nsLen < 4) ? 1 : 0),   //Local sends if the ns direction is not already full
+						nsShouldInc3 = ((noc3nsLen < 4) ? 1 : 0),  //The ns direction receives under the same conditions
+						noc1nsPriority = false, 
+						noc1ewLockedns = true,  
+						nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) )    //The ns buffer sends a flit to local if it is not empty 
+						//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) 
+				=}
+
+			}
+
+			else {
+			tick palt {
+			// Local and EW both send ns	
+			:(1/2):  {= noc1localLockedns = !((noc3nsLen < 4)),  	//Local stays locked if it is unable to send
+						noc1localLen -= ((noc3nsLen < 4) ? 1 : 0),   //Local sends if the ns direction is not already full
+						nsShouldInc3 = ((noc3nsLen < 4) ? 1 : 0),  //The ns direction receives under the same conditions
+						nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ),    //The ns buffer sends a flit to local if it is not empty
+						noc1nsPriority = false, 
+						//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) , 
+						noc1ewLockedns = true,  			//The Ew buffer is locked to send in the ns direction
+						noc1localPriority = !((noc3nsLen < 4)) //Local remains in priority if it did not send
+					=}  
+			 
+			 //Local sends ns,  and EW sends to to local
+			:(1/2):  {= noc1localLockedns =  !((noc3nsLen < 4)),   //Local stays locked if it is unable to send
+						noc1localPriority = !(((noc3nsLen < 4)) && ((noc1nsLen > 0))),  //Local only loses priority if it sends and ew doesn't
+						noc1localLen -= (((noc3nsLen < 4) ? 1 : 0)),   //Local sends ns if it isn't empty and ns isn't full
+						nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0)),  //Ns receives under the same conditions
+						ewShouldDec1 = ((noc1nsLen > 0)? 0 : 1),  	//Ew sends if the ns buffer is empty
+				
+						noc1ewLockedlocal = ((noc1nsLen > 0)),  	//Local is locked if the ns buffer is not empty
+						noc1nsPriority = !((noc1nsLen > 0)),      //NS loses priority if it sends
+						nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) )  		//Ns sends local if it isn't empty
+						//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) 
+					=}    
+			}
+		}
+
+		}
+
+		else if (noc1localLockedew) {
+
+			if(noc1ewLockedns) {	
+
+				//Local has a 1 or 3 and EW has a 2
+				tick {= noc1localLockedew = !((noc0ewLen < 4)),  //Local is locked in the ew direction if it is unable to send
+							noc1localPriority = !(((noc0ewLen < 4)) && !((noc3nsLen < 4))),  //Local remains in priority under the same conditions
+							noc1localLen -= (((noc0ewLen < 4) ? 1 : 0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0)),  //The ew direction recieves under the same conditions
+							ewShouldDec1 = (((noc3nsLen < 4) ? 1 : 0)),   // Ew sends if the ns direction is not full
+							noc1ewLockedns = !((noc3nsLen < 4)),  // Ew is locked to ns if it is unable to send
+							nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0)),  //The ns direction receives if it is not full
+							noc1nsPriority = ((noc3nsLen < 4)),   //The ns buffer stays in priority if it is empty or ew is able to send
+							nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ),  // Ns sends if it is not empty
+							//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) , 
+							optimalRuns1 += ((noc0ewLen < 4) ? 1 : 0)*((noc3nsLen < 4) ? 1 : 0)*((noc1nsLen > 0) ? 1 : 0) 
+
+				=} 
+
+
+			}
+
+			else {
+
+				tick palt { 
+
+				//Local has a 1 or 3 and EW has a 0	
+				:(1/2):  {= noc1localLockedew = !((noc0ewLen < 4)),  //Local is locked in the ew direction if it is unable to send
+							noc1localPriority = !(((noc0ewLen < 4)) && ((noc1nsLen > 0))),  //Local remains in priority under the same conditions
+							noc1localLen -= (((noc0ewLen < 4) ? 1 : 0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0)),  //The ew direction receives under the same conditions
+							noc1ewLockedlocal = ((noc1nsLen > 0)),  //The ew buffer is locked into the local direction if the ns buffer is not empty
+							noc1nsPriority = !((noc1nsLen > 0)),   //The ns buffer remains in priority if it is empty
+							nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ), 	//Ns sneds if it is not empty
+							ewShouldDec1 = ((noc1nsLen > 0)? 0 : 1) 		//Ew sends if 
+							//totalFlitsDelivered1 += 1
+				=}	
+
+				//Local has a 1 or 3 and EW has a 2
+				:(1/2):  {= noc1localLockedew = !((noc0ewLen < 4)),  //Local is locked in the ew direction if it is unable to send
+							noc1localPriority = !(((noc0ewLen < 4)) && !((noc3nsLen < 4))),  //Local remains in priority under the same conditions
+							noc1localLen -= (((noc0ewLen < 4) ? 1 : 0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0)),  //The ew direction recieves under the same conditions
+							ewShouldDec1 = (((noc3nsLen < 4) ? 1 : 0)),   // Ew sends if the ns direction is not full
+							noc1ewLockedns = !((noc3nsLen < 4)),  // Ew is locked to ns if it is unable to send
+							nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0)),  //The ns direction receives if it is not full
+							noc1nsPriority = ((noc3nsLen < 4)),   //The ns buffer stays in priority if it is empty or ew is able to send
+							nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ),  // Ns sends if it is not empty
+							//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) , 
+							optimalRuns1 += ((noc0ewLen < 4) ? 1 : 0)*((noc3nsLen < 4) ? 1 : 0)*((noc1nsLen > 0) ? 1 : 0) 
+				=} 
+
+
+				}	
+			}
+
+		}
+
+		
+
+		else{
+
+			if(noc1ewLockedns) {
+
+				tick palt { 
+				//Local and EW both send to 2	
+				:(1/3): {=	noc1ewLockedns = (((noc1localLen > 0))) || (!((noc1localLen > 0)) && ((noc3nsLen < 4))),                 //The ew buffer gets locked in the ns direction if local is not empty 
+							noc1localPriority = (((noc1localLen > 0)) && !((noc3nsLen < 4))) || (!((noc1localLen > 0)) && ((noc3nsLen < 4))),    //Local remains in priority if it is non-empty and is unable to send
+							noc1localLockedns = (((noc1localLen > 0)) && !((noc3nsLen < 4))),  // Local gets locked to ns under the same conditions
+							noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc3nsLen < 4) ? 1 : 0)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
+							nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0)),    //The ns direction receives if it is not full (either from ew or local)
+							ewShouldDec1 = ((noc1localLen > 0) ? 0 : 1) *(((noc3nsLen < 4) ? 1 : 0)), 		//Ew sends if local is empty and the ns direction is not full
+							nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ),  		//Ns sends local if it is not empty
+							noc1nsPriority = !((noc1localLen > 0)) && ((noc3nsLen < 4)) 
+							//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) 
+						=}		
+
+				//Local has a 1 or 3 and EW has a 2
+				:(2/3):  {= noc1localLockedew = ((noc1localLen > 0)) && !((noc0ewLen < 4)),  //Local is locked in the ew direction if it is unable to send
+							noc1localPriority = (((noc1localLen > 0)) && !((noc0ewLen < 4))) || (!((noc1localLen > 0)) && ((noc3nsLen < 4))) || ( (((noc1localLen > 0)) && ((noc0ewLen < 4)) && (((noc3nsLen < 4))))),  //Local remains in priority under the same conditions
+							noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc0ewLen < 4) ? 1 : 0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)),  //The ew direction recieves under the same conditions
+							ewShouldDec1 = (((noc3nsLen < 4) ? 1 : 0)),   // Ew sends if the ns direction is not full
+							noc1ewLockedns = !((noc3nsLen < 4)),  // Ew is locked to ns if it is unable to send
+							nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0)),  //The ns direction receives if it is not full
+							noc1nsPriority = ((noc3nsLen < 4)),   //The ns buffer stays in priority if it is empty or ew is able to send
+							nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ),  // Ns sends if it is not empty
+							//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) , 
+							optimalRuns1 += ((noc1localLen > 0) ? 1 : 0)*((noc0ewLen < 4) ? 1 : 0)*((noc3nsLen < 4) ? 1 : 0)*((noc1nsLen > 0) ? 1 : 0) 
+				=} 
+
+
+				}	
+
+
+			}
+
+			else {
+
+				tick palt { 
+				//Local and EW both send to 2	
+				:(1/6):  {= noc1ewLockedns = (((noc1localLen > 0))) || (!((noc1localLen > 0)) && ((noc3nsLen < 4))),                 //The ew buffer gets locked in the ns direction if local is not empty 
+							noc1localPriority = (((noc1localLen > 0)) && !((noc3nsLen < 4))) || (!((noc1localLen > 0)) && ((noc3nsLen < 4))),    //Local remains in priority if it is non-empty and is unable to send
+							noc1localLockedns = (((noc1localLen > 0)) && !((noc3nsLen < 4))),  // Local gets locked to ns under the same conditions
+							noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc3nsLen < 4) ? 1 : 0)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
+							nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0)),    //The ns direction receives if it is not full (either from ew or local)
+							ewShouldDec1 = ((noc1localLen > 0) ? 0 : 1) *(((noc3nsLen < 4) ? 1 : 0)), 		//Ew sends if local is empty and the ns direction is not full
+							nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ),  		//Ns sends local if it is not empty
+							noc1nsPriority = !((noc1localLen > 0)) && ((noc3nsLen < 4))
+							//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) 
+						=}	
+
+				//Local Sends to 2,  EW to 0
+				:(1/6):  {= noc1localLockedns = ((noc1localLen > 0)) && !((noc3nsLen < 4)),  //Local is locked in the ns direction if it is unable to send
+							noc1localPriority = (((noc1localLen > 0)) && !((noc3nsLen < 4))) || (((noc1localLen > 0)) && !((noc1nsLen > 0))) || ( ( (((noc1localLen > 0))) && (((noc3nsLen < 4))) ) && !((noc1nsLen > 0))),  //Local remains in priority under the same conditions
+							noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc3nsLen < 4) ? 1 : 0)),   //Local sends the ns direction if it is not empty,  and the receiving buffer is not full
+							nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)),  //The ns direction receives if it is not full and local is not empty
+							ewShouldDec1 = ((noc1nsLen > 0)? 0 : 1),  //Ew sends local if the ns buffer is empty
+							noc1ewLockedlocal = ((noc1nsLen > 0)),  //Ew gets locked to local if the ns buffer is not empty
+							noc1nsPriority = !((noc1nsLen > 0)),  //Ns remains in priority if it is empty
+							nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) )     // Ns sends if it is not empty
+							//totalFlitsDelivered1 += 1
+						=}					
+				
+
+				//Local has a 1 or 3 and EW has a 0	
+				:(1/3):  {= noc1localLockedew = ((noc1localLen > 0)) && !((noc0ewLen < 4)),  //Local is locked in the ew direction if it is unable to send
+							noc1localPriority = (((noc1localLen > 0)) && !((noc0ewLen < 4))) || (((noc1localLen > 0)) && !((noc1nsLen > 0))) || ( ( (((noc1localLen > 0))) && (((noc0ewLen < 4))) ) && !((noc1nsLen > 0))),  //Local remains in priority under the same conditions
+							noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc0ewLen < 4) ? 1 : 0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)),  //The ew direction receives under the same conditions
+							noc1ewLockedlocal = ((noc1nsLen > 0)),  //The ew buffer is locked into the local direction if the ns buffer is not empty
+							noc1nsPriority = !((noc1nsLen > 0)),   //The ns buffer remains in priority if it is empty
+							nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ), 	//Ns sneds if it is not empty
+							ewShouldDec1 = ((noc1nsLen > 0)? 0 : 1)		//Ew sends if 
+							//totalFlitsDelivered1 += 1
+				=}	
+
+				//Local has a 1 or 3 and EW has a 2
+				:(1/3):  {= noc1localLockedew = ((noc1localLen > 0)) && !((noc0ewLen < 4)),  //Local is locked in the ew direction if it is unable to send
+							noc1localPriority = (((noc1localLen > 0)) && !((noc0ewLen < 4))) || (!((noc1localLen > 0)) && ((noc3nsLen < 4))) || ( (((noc1localLen > 0)) && ((noc0ewLen < 4)) && (((noc3nsLen < 4))))),  //Local remains in priority under the same conditions
+							noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc0ewLen < 4) ? 1 : 0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)),  //The ew direction recieves under the same conditions
+							ewShouldDec1 = (((noc3nsLen < 4) ? 1 : 0)),   // Ew sends if the ns direction is not full
+							noc1ewLockedns = !((noc3nsLen < 4)),  // Ew is locked to ns if it is unable to send
+							nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0)),  //The ns direction receives if it is not full
+							noc1nsPriority = ((noc3nsLen < 4)),   //The ns buffer stays in priority if it is empty or ew is able to send
+							nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ),  // Ns sends if it is not empty
+							//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) , 
+							optimalRuns1 += ((noc1localLen > 0) ? 1 : 0)*((noc0ewLen < 4) ? 1 : 0)*((noc3nsLen < 4) ? 1 : 0)*((noc1nsLen > 0) ? 1 : 0) 
+				=} 
+
+
+				}	
+			}
+		}
+
+
+
+	}
+
+	else if ((noc1localPriority == false) && (noc1nsPriority == false)) {
+
+			if(noc1localLockedns) {
+
+							if (noc1ewLockedlocal) {
+								tick {= noc1localLockedns = !((noc3nsLen < 4)), 
+									noc1localPriority = !((noc3nsLen < 4)), 
+									noc1localLen -= (((noc3nsLen < 4) ? 1 : 0)),   
+									nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0)),  
+									ewShouldDec1 = 1,  
+									noc1ewLockedlocal = false, 
+									//totalFlitsDelivered1 += 1, 
+									noc1nsPriority = ((noc1nsLen > 0)) 
+								=} 
+
+							}
+
+							else if (noc1ewLockedns) {
+
+									tick {= noc1localPriority = ((noc3nsLen < 4)),  
+										noc1localLockedns = true,  
+										ewShouldDec1 = ((noc3nsLen < 4) ? 1 : 0),  
+										noc1ewLockedns = !((noc3nsLen < 4)), 
+										nsShouldInc3 = ((noc3nsLen < 4) ? 1 : 0),  
+										nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ) 
+										//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) 
+									=}
+
+							}
+
+							else {
+
+								tick palt{
+								//Local and EW both send to 2
+								:(1/2):  {= noc1localPriority = ((noc3nsLen < 4)),  
+										noc1localLockedns = true,  
+										ewShouldDec1 = ((noc3nsLen < 4) ? 1 : 0),  
+										noc1ewLockedns = !((noc3nsLen < 4)), 
+										nsShouldInc3 = ((noc3nsLen < 4) ? 1 : 0),  
+										nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ) 
+										//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) 
+										=}			
+
+								//Local Sends to 2,  EW to 0
+								:(1/2):  {= noc1localLockedns = !((noc3nsLen < 4)), 
+											noc1localPriority = !((noc3nsLen < 4)), 
+											noc1localLen -= (((noc3nsLen < 4) ? 1 : 0)),   
+											nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0)),  
+											ewShouldDec1 = 1,  
+											//totalFlitsDelivered1 += 1, 
+											noc1nsPriority = ((noc1nsLen > 0)) 
+										=} 				
+
+							}
+
+						}
+
+			}
+
+			else if (noc1localLockedew) {
+
+
+					if (noc1ewLockedlocal) {
+
+							// Local Sens EW and EW sends local 
+							tick {=  noc1localLockedew = !((noc0ewLen < 4)), 
+										noc1localPriority = !((noc0ewLen < 4)), 
+										noc1localLen -= (((noc0ewLen < 4) ? 1 : 0)),   
+										ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0)),  
+										noc1ewLockedlocal = !((noc0ewLen < 4)), 
+										ewShouldDec1 = 1,  
+										//totalFlitsDelivered1 += 1, 
+										noc1nsPriority = ((noc1nsLen > 0)) 
+									=}  
+
+						
+
+					}
+					else if (noc1ewLockedns) {
+
+							//Local sends EW and EW sends NS
+							tick {=  noc1localLockedew = !((noc0ewLen < 4)), 
+										noc1localPriority = !((noc0ewLen < 4)) && ((noc3nsLen < 4)), 
+										noc1localLen -= (((noc0ewLen < 4) ? 1 : 0)),   
+										ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0)),  
+										ewShouldDec1 = ((noc3nsLen < 4) ? 1 : 0),  
+										noc1ewLockedns = !((noc3nsLen < 4)), 
+										nsShouldInc3 = ((noc3nsLen < 4) ? 1 : 0),  
+										nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ),  
+										//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) , 
+										optimalRuns1 += ((noc0ewLen < 4) ? 1 : 0)*((noc3nsLen < 4) ? 1 : 0)*((noc1nsLen > 0) ? 1 : 0) 
+									=} 
+	
+
+					}
+					else {
+
+						tick palt{
+				
+					
+
+						//Local has a 1 or 3 and EW has a 0
+						:(1/2):  {= 		noc1localLockedew = !((noc0ewLen < 4)), 
+										noc1localPriority = !((noc0ewLen < 4)), 
+										noc1localLen -= (((noc0ewLen < 4) ? 1 : 0)),   
+										ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0)),  
+										noc1ewLockedlocal = !((noc0ewLen < 4)), 
+										ewShouldDec1 = 1,  
+										//totalFlitsDelivered1 += 1, 
+										noc1nsPriority = ((noc1nsLen > 0)) 
+								=}
+
+						//Local has a 1 or 3 and EW has a 2
+						:(1/2):  {= 		noc1localLockedew = !((noc0ewLen < 4)), 
+										noc1localPriority = !((noc0ewLen < 4)) && ((noc3nsLen < 4)), 
+										noc1localLen -= (((noc0ewLen < 4) ? 1 : 0)),   
+										ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0)),  
+										ewShouldDec1 = ((noc3nsLen < 4) ? 1 : 0),  
+										noc1ewLockedns = !((noc3nsLen < 4)), 
+										nsShouldInc3 = ((noc3nsLen < 4) ? 1 : 0),  
+										nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ),  
+										//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) , 
+										optimalRuns1 += ((noc0ewLen < 4) ? 1 : 0)*((noc3nsLen < 4) ? 1 : 0)*((noc1nsLen > 0) ? 1 : 0) 
+						=} 
+
+					}
+			}
+
+			
+
+
+			} 
+
+			else {
+
+				if (noc1ewLockedlocal) {
+
+					tick palt {
+						
+						//Local sends NS and EW sends local
+						:(1/3):  {= noc1localLockedns = ((noc1localLen > 0)) && !((noc3nsLen < 4)), 
+									noc1localPriority = ((noc1localLen > 0)) && !((noc3nsLen < 4)), 
+									noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc3nsLen < 4) ? 1 : 0)),   
+									nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)),  
+									ewShouldDec1 = 1,  
+									//totalFlitsDelivered1 += 1, 
+									noc1nsPriority = ((noc1nsLen > 0)) 
+								=} 
+
+						// Local Sens EW and EW sends local 
+						:(2/3):  {=  noc1localLockedew = ((noc1localLen > 0)) && !((noc0ewLen < 4)), 
+									noc1localPriority = ((noc1localLen > 0)) && !((noc0ewLen < 4)), 
+									noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc0ewLen < 4) ? 1 : 0)),   
+									ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)),  
+									ewShouldDec1 = 1,  
+									//totalFlitsDelivered1 += 1, 
+									noc1nsPriority = ((noc1nsLen > 0)) 
+								=}  
+
+					}
+
+				}
+				else if (noc1ewLockedns) {
+
+					tick palt {
+						//Local sends NS and EW sends NS
+						:(1/3):  {= noc1localPriority =((noc1localLen > 0)),  
+									noc1localLockedns = ((noc1localLen > 0)),  
+									noc1ewLockedns = !((noc3nsLen < 4)), 
+									ewShouldDec1 = ((noc3nsLen < 4) ? 1 : 0),  
+									nsShouldInc3 = ((noc3nsLen < 4) ? 1 : 0),  
+									nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) )  
+									//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) 
+								=}
+						//Local sends EW and EW sends NS
+						:(2/3):  {=  noc1localLockedew = ((noc1localLen > 0)) && !((noc0ewLen < 4)), 
+									noc1localPriority = ((noc1localLen > 0)) && !((noc0ewLen < 4)) && ((noc3nsLen < 4)), 
+									noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc0ewLen < 4) ? 1 : 0)),   
+									ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)),  
+									ewShouldDec1 = ((noc3nsLen < 4) ? 1 : 0),  
+									noc1ewLockedns = !((noc3nsLen < 4)), 
+									nsShouldInc3 = ((noc3nsLen < 4) ? 1 : 0),  
+									nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ),  
+									//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) , 
+									optimalRuns1 += ((noc1localLen > 0) ? 1 : 0)*((noc0ewLen < 4) ? 1 : 0)*((noc3nsLen < 4) ? 1 : 0)*((noc1nsLen > 0) ? 1 : 0) 
+								=} 
+
+
+					}
+
+				}
+				else {
+
+					tick palt{
+					//Local and EW both send to 2
+					:(1/6):  {= 		noc1localPriority =((noc1localLen > 0)),  
+									noc1localLockedns = ((noc1localLen > 0)),  
+									noc1ewLockedns = !((noc3nsLen < 4)), 
+									ewShouldDec1 = ((noc3nsLen < 4) ? 1 : 0),  
+									nsShouldInc3 = ((noc3nsLen < 4) ? 1 : 0),  
+									nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) )  
+									//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) 
+							=}			
+
+					//Local Sends to 2,  EW to 0
+					:(1/6):  {= 		noc1localLockedns = ((noc1localLen > 0)) && !((noc3nsLen < 4)), 
+									noc1localPriority = ((noc1localLen > 0)) && !((noc3nsLen < 4)), 
+									noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc3nsLen < 4) ? 1 : 0)),   
+									nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)),  
+									ewShouldDec1 = 1,  
+									//totalFlitsDelivered1 += 1, 
+									noc1nsPriority = ((noc1nsLen > 0)) 
+							=}					
+				
+
+					//Local has a 1 or 3 and EW has a 0
+					:(1/3):  {= 		noc1localLockedew = ((noc1localLen > 0)) && !((noc0ewLen < 4)), 
+									noc1localPriority = ((noc1localLen > 0)) && !((noc0ewLen < 4)), 
+									noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc0ewLen < 4) ? 1 : 0)),   
+									ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)),  
+									ewShouldDec1 = 1,  
+									//totalFlitsDelivered1 += 1, 
+									noc1nsPriority = ((noc1nsLen > 0)) 
+							=}
+
+					//Local has a 1 or 3 and EW has a 2
+					:(1/3):  {= 		noc1localLockedew = ((noc1localLen > 0)) && !((noc0ewLen < 4)), 
+									noc1localPriority = ((noc1localLen > 0)) && !((noc0ewLen < 4)) && ((noc3nsLen < 4)), 
+									noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc0ewLen < 4) ? 1 : 0)),   
+									ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)),  
+									ewShouldDec1 = ((noc3nsLen < 4) ? 1 : 0),  
+									noc1ewLockedns = !((noc3nsLen < 4)), 
+									nsShouldInc3 = ((noc3nsLen < 4) ? 1 : 0),  
+									nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ),  
+									//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) , 
+									optimalRuns1 += ((noc1localLen > 0) ? 1 : 0)*((noc0ewLen < 4) ? 1 : 0)*((noc3nsLen < 4) ? 1 : 0)*((noc1nsLen > 0) ? 1 : 0) 
+					=} 
+
+				}
+		}
+
+		}
+
+	}
+
+
+	else if ((noc1localPriority == false) && (noc1nsPriority == true)) {
+
+		if(noc1localLockedns) {
+
+			if(noc1ewLockedns) {
+
+				tick {= noc1localPriority = ((noc3nsLen < 4)),  
+					noc1ewLockedns = !((noc3nsLen < 4)), 
+					ewShouldDec1 = ((noc3nsLen < 4) ? 1 : 0),  
+					nsShouldInc3 = ((noc3nsLen < 4) ? 1 : 0),  
+					nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ), 
+					//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) , 
+					noc1nsPriority = ((noc3nsLen < 4))
+				=} 
+
+
+			}
+			//Logically determined that ew cannot be locked local
+			else {
+
+			tick palt {	//Local and EW both send to 2
+			:(1/2):  {= noc1localPriority = ((noc3nsLen < 4)),  
+					noc1ewLockedns = !((noc3nsLen < 4)), 
+					ewShouldDec1 = ((noc3nsLen < 4) ? 1 : 0),  
+					nsShouldInc3 = ((noc3nsLen < 4) ? 1 : 0),  
+					nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ), 
+					//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) , 
+					noc1nsPriority = ((noc3nsLen < 4))
+					=}
+					//Local Sends to 2,  EW to 0
+			:(1/2):  {= noc1localPriority = !((noc3nsLen < 4)), 
+						noc1localLockedns = !((noc3nsLen < 4)), 
+						noc1localLen -= ((noc3nsLen < 4) ? 1 : 0),   
+						nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0)),  
+						ewShouldDec1 = ((noc1nsLen > 0)? 0 : 1), 
+						noc1ewLockedns = ((noc1nsLen > 0)), 
+						nsShouldDec1 = ((noc1nsLen > 0) ? 1 : 0) ,  
+						//totalFlitsDelivered1 += 1, 
+						noc1nsPriority = !((noc1nsLen > 0))
+				
+					=}	
+			}
+			}
+
+
+
+		}
+
+		else if(noc1localLockedew) {
+
+			if (noc1ewLockedns) {
+
+						//Local sends EW and EW sends NS
+						tick {=  noc1localPriority = !((noc0ewLen < 4)) && ((noc3nsLen < 4)), 
+									noc1localLockedew = !((noc0ewLen < 4)), 
+									noc1localLen -= (((noc0ewLen < 4) ? 1 : 0)),   
+									ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0)),  
+									noc1ewLockedns = !((noc3nsLen < 4)), 
+									ewShouldDec1 = ((noc3nsLen < 4) ? 1 : 0),  
+									nsShouldInc3 = ((noc3nsLen < 4) ? 1 : 0),  
+									nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ),  
+									//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) , 
+									noc1nsPriority = ((noc3nsLen < 4)), 
+									optimalRuns1 += ((noc0ewLen < 4) ? 1 : 0)*((noc3nsLen < 4) ? 1 : 0)*((noc1nsLen > 0) ? 1 : 0) 
+								=} 
+
+
+					
+
+				}
+			else {
+				
+					tick palt {				
+				
+
+						//Local has a 1 or 3 and EW has a 0
+						:(1/2):  {=  noc1localPriority = !((noc0ewLen < 4)) && !((noc1nsLen > 0)),  
+									noc1localLockedew = !((noc0ewLen < 4)), 
+									noc1localLen -= (((noc0ewLen < 4) ? 1 : 0)),   
+									ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0)),  
+									nsShouldDec1 = ((noc1nsLen > 0) ? 1 : 0) , 
+									noc1nsPriority = !((noc1nsLen > 0)),  
+									ewShouldDec1 = ((noc1nsLen > 0)? 0 : 1),  
+									noc1ewLockedlocal = ((noc1nsLen > 0)) 
+									//totalFlitsDelivered1 += 1
+								=}	
+
+						//Local has a 1 or 3 and EW has a 2
+						:(1/2):  {= noc1localPriority = !((noc0ewLen < 4)) && ((noc3nsLen < 4)), 
+									noc1localLockedew = !((noc0ewLen < 4)), 
+									noc1localLen -= (((noc0ewLen < 4) ? 1 : 0)),   
+									ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0)),  
+									noc1ewLockedns = !((noc3nsLen < 4)), 
+									ewShouldDec1 = ((noc3nsLen < 4) ? 1 : 0),  
+									nsShouldInc3 = ((noc3nsLen < 4) ? 1 : 0),  
+									nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ),  
+									//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) , 
+									noc1nsPriority = ((noc3nsLen < 4)), 
+									optimalRuns1 += ((noc0ewLen < 4) ? 1 : 0)*((noc3nsLen < 4) ? 1 : 0)*((noc1nsLen > 0) ? 1 : 0) 
+								=}  
+
+
+					}
+				}
+
+		}
+
+
+		else {
+		
+			 if (noc1ewLockedns) {
+
+					tick palt {
+						//Local sends NS and EW sends NS
+						:(1/3):  tick {= noc1localPriority = ((noc1localLen > 0)) && ((noc3nsLen < 4)), 
+									noc1localLockedns = ((noc1localLen > 0)), 
+									noc1ewLockedns = !((noc3nsLen < 4)), 
+									ewShouldDec1 = ((noc3nsLen < 4) ? 1 : 0),  
+									nsShouldInc3 = ((noc3nsLen < 4) ? 1 : 0),  
+									nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ), 
+									//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) , 
+									noc1nsPriority = ((noc3nsLen < 4))
+								=} 
+						//Local sends EW and EW sends NS
+						:(2/3):  {=  noc1localPriority = ((noc1localLen > 0)) && !((noc0ewLen < 4)) && ((noc3nsLen < 4)), 
+									noc1localLockedew = ((noc1localLen > 0)) && !((noc0ewLen < 4)), 
+									noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc0ewLen < 4) ? 1 : 0)),   
+									ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)),  
+									noc1ewLockedns = !((noc3nsLen < 4)), 
+									ewShouldDec1 = ((noc3nsLen < 4) ? 1 : 0),  
+									nsShouldInc3 = ((noc3nsLen < 4) ? 1 : 0),  
+									nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ),  
+									//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) , 
+									noc1nsPriority = ((noc3nsLen < 4)), 
+									optimalRuns1 += ((noc1localLen > 0) ? 1 : 0)*((noc0ewLen < 4) ? 1 : 0)*((noc3nsLen < 4) ? 1 : 0)*((noc1nsLen > 0) ? 1 : 0) 
+								=} 
+
+
+					}
+
+				}
+			else {
+				
+					tick palt {
+						//Local and EW both send to 2
+						:(1/6):  {= noc1localPriority = ((noc1localLen > 0)) && ((noc3nsLen < 4)), 
+									noc1localLockedns = ((noc1localLen > 0)), 
+									noc1ewLockedns = !((noc3nsLen < 4)), 
+									ewShouldDec1 = ((noc3nsLen < 4) ? 1 : 0),  
+									nsShouldInc3 = ((noc3nsLen < 4) ? 1 : 0),  
+									nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ), 
+									//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) , 
+									noc1nsPriority = ((noc3nsLen < 4))
+								=}			
+						//Local Sends to 2,  EW to 0
+						:(1/6):  {= noc1localPriority = !((noc3nsLen < 4)) && ((noc1localLen > 0)) && !((noc1nsLen > 0)),  
+									noc1localLockedns = ((noc1localLen > 0)) && !((noc3nsLen < 4)), 
+									noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc3nsLen < 4) ? 1 : 0)),   
+									nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)),  
+									ewShouldDec1 = ((noc1nsLen > 0)? 0 : 1), 
+									noc1ewLockedlocal = ((noc1nsLen > 0)), 
+									nsShouldDec1 = ((noc1nsLen > 0) ? 1 : 0) ,  
+									//totalFlitsDelivered1 += 1, 
+									noc1nsPriority = !((noc1nsLen > 0)) 
+								=}					
+				
+
+						//Local has a 1 or 3 and EW has a 0
+						:(1/3):  {=  noc1localPriority = !((noc0ewLen < 4)) && ((noc1localLen > 0)) && !((noc1nsLen > 0)),  
+									noc1localLockedew = ((noc1localLen > 0)) && !((noc0ewLen < 4)), 
+									noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc0ewLen < 4) ? 1 : 0)),   
+									ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)),  
+									nsShouldDec1 = ((noc1nsLen > 0) ? 1 : 0) , 
+									noc1nsPriority = !((noc1nsLen > 0)),  
+									ewShouldDec1 = ((noc1nsLen > 0)? 0 : 1), 
+									noc1ewLockedlocal = ((noc1nsLen > 0)) 
+									//totalFlitsDelivered1 += 1
+								=}	
+
+						//Local has a 1 or 3 and EW has a 2
+						:(1/3):  {= noc1localPriority = ((noc1localLen > 0)) && !((noc0ewLen < 4)) && ((noc3nsLen < 4)), 
+									noc1localLockedew = ((noc1localLen > 0)) && !((noc0ewLen < 4)), 
+									noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc0ewLen < 4) ? 1 : 0)),   
+									ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)),  
+									noc1ewLockedns = !((noc3nsLen < 4)), 
+									ewShouldDec1 = ((noc3nsLen < 4) ? 1 : 0),  
+									nsShouldInc3 = ((noc3nsLen < 4) ? 1 : 0),  
+									nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ),  
+									//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) , 
+									noc1nsPriority = ((noc3nsLen < 4)), 
+									optimalRuns1 += ((noc1localLen > 0) ? 1 : 0)*((noc0ewLen < 4) ? 1 : 0)*((noc3nsLen < 4) ? 1 : 0)*((noc1nsLen > 0) ? 1 : 0) 
+								=}  
+
+
+					}
+				}
+
+		}
+
+	}
+	else {   //Localpriority == true && nsPriority == false
+
+		if(noc1localLockedns) {
+
+			if (noc1ewLockedlocal) {
+
+
+						 //Local sends NS and EW sends local
+								tick {= noc1localPriority = true,  
+									noc1localLockedns = !((noc3nsLen < 4)),  
+									noc1localLen -= (((noc3nsLen < 4) ? 1 : 0)), 
+									nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0)),  
+									ewShouldDec1 = 1,  
+									noc1ewLockedlocal = false, 
+									//totalFlitsDelivered1 += 1, 
+									noc1nsPriority = ((noc1nsLen > 0)) 
+								=} 
+
+				}
+
+				else if(noc1ewLockedns) {
+
+							tick {= noc1localPriority = !((noc3nsLen < 4)),  
+									noc1localLockedns = !((noc3nsLen < 4)),  
+									noc1localLen -= (((noc3nsLen < 4) ? 1 : 0)),   
+									nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0)),  
+									noc1ewLockedns = true, 
+									nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ),  
+									noc1nsPriority = false 
+									//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) 
+								=}	
+
+
+				}
+
+
+				else {
+
+
+					tick palt {
+						//Local and EW both send to 2
+						:(1/2):  {= 	noc1localPriority = !((noc3nsLen < 4)),  
+									noc1localLockedns = !((noc3nsLen < 4)),  
+									noc1localLen -= (((noc3nsLen < 4) ? 1 : 0)),   
+									nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0)),  
+									noc1ewLockedns = true, 
+									nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ),  
+									noc1nsPriority = false 
+									//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) 
+								=}	
+						//Local Sends to 2,  EW to 0
+						:(1/2):  {= noc1localPriority = true,  
+									noc1localLockedns = !((noc3nsLen < 4)),  
+									noc1localLen -= (((noc3nsLen < 4) ? 1 : 0)), 
+									nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0)),  
+									ewShouldDec1 = 1,  
+									noc1ewLockedlocal = false, 
+									//totalFlitsDelivered1 += 1, 
+									noc1nsPriority = ((noc1nsLen > 0)) 
+								=}					
+
+
+					}
+				}
+
+		}
+
+		else if(noc1localLockedew) {
+
+			if (noc1ewLockedlocal) {
+
+						// Local Sends EW and EW sends local
+					tick {= 	noc1localPriority = true,  
+						noc1localLockedew = !((noc0ewLen < 4)), 
+						noc1localLen -= (((noc0ewLen < 4) ? 1 : 0)),   
+						ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0)),  
+						ewShouldDec1 = 1,  
+						noc1ewLockedlocal = false, 
+						//totalFlitsDelivered1 += 1, 
+						noc1nsPriority = ((noc1nsLen > 0)) 
+					=}  
+
+					
+
+				}
+
+				else if(noc1ewLockedns) {
+
+	
+								//Local has a 1 or 3 and EW has a 2
+						tick {=  		noc1localPriority = !(((noc0ewLen < 4)) && !((noc3nsLen < 4))),  
+									noc1localLockedew = !((noc0ewLen < 4)), 
+									noc1localLen -= (((noc0ewLen < 4) ? 1 : 0)),   
+									ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0)),  
+									ewShouldDec1 = (((noc3nsLen < 4) ? 1 : 0)),  
+									noc1ewLockedlocal = !((noc3nsLen < 4)), 
+									nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0)),  
+									nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ),  
+									noc1nsPriority = false, 
+									//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) , 
+									optimalRuns1 += ((noc0ewLen < 4) ? 1 : 0)*((noc3nsLen < 4) ? 1 : 0)*((noc1nsLen > 0) ? 1 : 0) 
+								=}  
+
+
+				}
+
+
+				else {
+
+
+					tick palt {				
+				
+
+						//Local has a 1 or 3 and EW has a 0
+						:(1/2):  {= 	noc1localPriority = true,  
+									noc1localLockedew = !((noc0ewLen < 4)), 
+									noc1localLen -= (((noc0ewLen < 4) ? 1 : 0)),   
+									ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0)),  
+									ewShouldDec1 = 1,  
+									noc1ewLockedlocal = false, 
+									//totalFlitsDelivered1 += 1, 
+									noc1nsPriority = ((noc1nsLen > 0))
+								=} 			
+						//Local has a 1 or 3 and EW has a 2
+						:(1/2):  {=  noc1localPriority = !(((noc0ewLen < 4)) && !((noc3nsLen < 4))),  
+									noc1localLockedew = !((noc0ewLen < 4)), 
+									noc1localLen -= (((noc0ewLen < 4) ? 1 : 0)),   
+									ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0)),  
+									ewShouldDec1 = (((noc3nsLen < 4) ? 1 : 0)),  
+									noc1ewLockedlocal = !((noc3nsLen < 4)), 
+									nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0)),  
+									nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ),  
+									noc1nsPriority = false, 
+									//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) , 
+									optimalRuns1 += ((noc0ewLen < 4) ? 1 : 0)*((noc3nsLen < 4) ? 1 : 0)*((noc1nsLen > 0) ? 1 : 0) 
+								=}  
+
+
+					}
+				}
+
+
+		}
+		
+
+		else {
+			 if (noc1ewLockedlocal) {
+
+					tick palt {
+						 //Local sends NS and EW sends local
+						:(1/3):  tick {= noc1localPriority = true,  
+									noc1localLockedns = ((noc1localLen > 0)) && !((noc3nsLen < 4)),  
+									noc1localLen -= (((noc3nsLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)), 
+									nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)),  
+									ewShouldDec1 = 1, 
+									noc1ewLockedlocal = false,  
+									//totalFlitsDelivered1 += 1, 
+									noc1nsPriority = ((noc1nsLen > 0)) 
+								=} 
+						// Local Sends EW and EW sends local
+						:(2/3):  tick {= noc1localPriority = true,  
+									noc1localLockedew = ((noc1localLen > 0)) && !((noc0ewLen < 4)), 
+									noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc0ewLen < 4) ? 1 : 0)),   
+									ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)),  
+									ewShouldDec1 = 1,  
+									noc1ewLockedlocal = false, 
+									//totalFlitsDelivered1 += 1, 
+									noc1nsPriority = ((noc1nsLen > 0)) 
+								=}  
+
+					}
+
+				}
+
+				else if(noc1ewLockedns) {
+
+
+						tick palt {
+						//Local and EW both send to 2
+						:(1/3):  {= noc1localPriority = (((noc1localLen > 0)) && !((noc3nsLen < 4))) || (!((noc1localLen > 0)) && ((noc3nsLen < 4))),  
+									noc1localLockedns = ((noc1localLen > 0)) && !((noc3nsLen < 4)),  
+									noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc3nsLen < 4) ? 1 : 0)),   
+									nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0)),  
+									noc1ewLockedns = ((noc1localLen > 0)) || (!((noc1localLen > 0)) && !((noc3nsLen < 4))), 
+									ewShouldDec1 = ((noc1localLen > 0) ? 0 : 1) *((noc3nsLen < 4) ? 1 : 0), 
+									nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ),  
+									noc1nsPriority = false 
+									//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) 
+								=}	
+								//Local has a 1 or 3 and EW has a 2
+						:(2/3):  {=  noc1localPriority = (!((noc0ewLen < 4)) && ((noc1localLen > 0))) || (!((noc1localLen > 0)) && ((noc3nsLen < 4))) || (((noc0ewLen < 4)) && ((noc1localLen > 0)) && ((noc3nsLen < 4))),  
+									noc1localLockedew = ((noc1localLen > 0)) && !((noc0ewLen < 4)), 
+									noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc0ewLen < 4) ? 1 : 0)),   
+									ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)),  
+									ewShouldDec1 = (((noc3nsLen < 4) ? 1 : 0)),  
+									noc1ewLockedns = !((noc3nsLen < 4)), 
+									nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0)),  
+									nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ),  
+									noc1nsPriority = false, 
+									//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) , 
+									optimalRuns1 += ((noc0ewLen < 4) ? 1 : 0)*((noc3nsLen < 4) ? 1 : 0)*((noc1nsLen > 0) ? 1 : 0) 
+								=}  
+						}
+
+
+				}
+
+
+				else {
+
+
+					tick palt {
+						//Local and EW both send to 2
+						:(1/6):  {= noc1localPriority = (((noc1localLen > 0)) && !((noc3nsLen < 4))) || (!((noc1localLen > 0)) && ((noc3nsLen < 4))),  
+									noc1localLockedns = ((noc1localLen > 0)) && !((noc3nsLen < 4)),  
+									noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc3nsLen < 4) ? 1 : 0)),   
+									nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0)),  
+									noc1ewLockedns = ((noc1localLen > 0)) || (!((noc1localLen > 0)) && !((noc3nsLen < 4))), 
+									ewShouldDec1 = ((noc1localLen > 0) ? 0 : 1) *((noc3nsLen < 4) ? 1 : 0), 
+									nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ),  
+									noc1nsPriority = false 
+									//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) 
+								=}	
+						//Local Sends to 2,  EW to 0
+						:(1/6):  {= noc1localPriority = true,  
+									noc1localLockedns = ((noc1localLen > 0)) && !((noc3nsLen < 4)),  
+									noc1localLen -= (((noc3nsLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)), 
+									nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)),  
+									ewShouldDec1 = 1, 
+									noc1ewLockedlocal = false,  
+									//totalFlitsDelivered1 += 1, 
+									noc1nsPriority = ((noc1nsLen > 0)) 
+								=}					
+				
+
+						//Local has a 1 or 3 and EW has a 0
+						:(1/3):  {= noc1localPriority = true,  
+									noc1localLockedew = ((noc1localLen > 0)) && !((noc0ewLen < 4)), 
+									noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc0ewLen < 4) ? 1 : 0)),   
+									ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)),  
+									ewShouldDec1 = 1,  
+									noc1ewLockedlocal = false, 
+									//totalFlitsDelivered1 += 1, 
+									noc1nsPriority = ((noc1nsLen > 0)) 
+								=} 			
+						//Local has a 1 or 3 and EW has a 2
+						:(1/3):  {=  noc1localPriority = (!((noc0ewLen < 4)) && ((noc1localLen > 0))) || (!((noc1localLen > 0)) && ((noc3nsLen < 4))) || (((noc0ewLen < 4)) && ((noc1localLen > 0)) && ((noc3nsLen < 4))),  
+									noc1localLockedew = ((noc1localLen > 0)) && !((noc0ewLen < 4)), 
+									noc1localLen -= (((noc1localLen > 0) ? 1 : 0))*(((noc0ewLen < 4) ? 1 : 0)),   
+									ewShouldInc0 = (((noc0ewLen < 4) ? 1 : 0))*(((noc1localLen > 0) ? 1 : 0)),  
+									ewShouldDec1 = (((noc3nsLen < 4) ? 1 : 0)),  
+									noc1ewLockedns = !((noc3nsLen < 4)), 
+									nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0)),  
+									nsShouldDec1 = (((noc1nsLen > 0) ? 1 : 0) ),  
+									noc1nsPriority = false, 
+									//totalFlitsDelivered1 += ((noc1nsLen > 0) ? 1 : 0) , 
+									optimalRuns1 += ((noc0ewLen < 4) ? 1 : 0)*((noc3nsLen < 4) ? 1 : 0)*((noc1nsLen > 0) ? 1 : 0) 
+								=}  
+
+
+					}
+				}
+		}
+
+
+	}
+
+
+
+
+
+}
+
+process arbiter2(){
+
+	//tick {=  localNotEmptyOne = (noc2localLen > 0) ? 1 : 0 =};
+
+	if (noc2ewLen == 0) {		//If the EW buffer of the NoC is empty
+
+		if (noc2localLockedns == true) {		//If the local buffer is locked sending NS
+
+			tick {=  noc2localLockedns = !((noc0nsLen < 4)),   //Sets the priority to false if it was able to send to the ns buffer of the NoC in the y direction
+				noc2localPriority = !((noc0nsLen < 4)) || noc2localPriority, 		//Local gets priority if it is unable to send
+				noc2localLen -= ((noc0nsLen < 4) ? 1 : 0),      //Local sends a flit ns if the receiving buffer is not full
+				nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0)),   //The ns direction receives the flit if it is not already full
+				nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ) 						//The ns buffer sends a flit to local if it is not empty
+				//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) 
+			=}
+
+		}
+
+		else if (noc2localLockedew) {
+
+			tick {=   			noc2localLockedew = !((noc3ewLen < 4)),  // Local is locked it if has a flit and is unable to send it
+							noc2localPriority = !((noc3ewLen < 4)) || noc2localPriority,   // Local gets priority under the same conditions		
+							noc2localLen -= (((noc3ewLen < 4) ? 1 : 0)),   //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
+							ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0)),  //The ew direction receives it under the same conditions
+							nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) )  //The ns buffer sends a flit to local if it is not empty
+							//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) 	
+							
+			=}
+
+
+		} 
+
+		else {
+			tick palt {
+				//Local sends in the NS direction
+				:(1/3): {=   noc2localLockedns = ((noc2localLen > 0)) && !((noc0nsLen < 4)),  // Local is locked it if has a flit and is unable to send it
+							noc2localPriority = (((noc2localLen > 0)) && !((noc0nsLen < 4))) || noc2localPriority,   // Local gets priority under the same conditions
+							noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc0nsLen < 4) ? 1 : 0)),   //Local sends a flit to the ns direction if it is not empty and the receiving buffer is not full
+					   		nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)),  //The ns direction receives the flit under the same conditions
+							nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) )    //The ns buffer sends a flit to local if it is not empty	
+							//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) 
+						=}
+				//Local sends to the ew direction
+				:(2/3): {=   noc2localLockedew = ((noc2localLen > 0)) && !((noc3ewLen < 4)),  // Local is locked it if has a flit and is unable to send it
+							noc2localPriority = (((noc2localLen > 0)) && !((noc3ewLen < 4))) || noc2localPriority,   // Local gets priority under the same conditions
+							noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc3ewLen < 4) ? 1 : 0)),   //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
+							ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)),  //The ew direction receives it under the same conditions
+							nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) )  //The ns buffer sends a flit to local if it is not empty
+							//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) 
+							
+						=}
+			}
+		}
+
+	}
+	else if ((noc2localPriority == true) && (noc2nsPriority == true)) {
+
+		if (noc2localLockedns == true) {
+
+			if (noc2ewLockedns) {
+
+				tick {=  noc2localLockedns = !((noc0nsLen < 4)),  	//Local stays locked if it is unable to send
+					noc2localPriority = !((noc0nsLen < 4)), 
+						noc2localLen -= ((noc0nsLen < 4) ? 1 : 0),   //Local sends if the ns direction is not already full
+						nsShouldInc0 = ((noc0nsLen < 4) ? 1 : 0),  //The ns direction receives under the same conditions
+						noc2nsPriority = false, 
+						noc2ewLockedns = true,  
+						nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) )    //The ns buffer sends a flit to local if it is not empty 
+						//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) 
+				=}
+
+			}
+
+			else {
+			tick palt {
+			// Local and EW both send ns	
+			:(1/2):  {=  noc2localLockedns = !((noc0nsLen < 4)),  	//Local stays locked if it is unable to send
+						noc2localLen -= ((noc0nsLen < 4) ? 1 : 0),   //Local sends if the ns direction is not already full
+						nsShouldInc0 = ((noc0nsLen < 4) ? 1 : 0),  //The ns direction receives under the same conditions
+						nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ),    //The ns buffer sends a flit to local if it is not empty
+						noc2nsPriority = false, 
+						//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) , 
+						noc2ewLockedns = true,  			//The Ew buffer is locked to send in the ns direction
+						noc2localPriority = !((noc0nsLen < 4)) //Local remains in priority if it did not send
+					=}  
+			 
+			 //Local sends ns,  and EW sends to to local
+			:(1/2):  {=  noc2localLockedns =  !((noc0nsLen < 4)),   //Local stays locked if it is unable to send
+						noc2localPriority = !(((noc0nsLen < 4)) && ((noc2nsLen > 0))),  //Local only loses priority if it sends and ew doesn't
+						noc2localLen -= (((noc0nsLen < 4) ? 1 : 0)),   //Local sends ns if it isn't empty and ns isn't full
+						nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0)),  //Ns receives under the same conditions
+						ewShouldDec2 = ((noc2nsLen > 0)? 0 : 1),  	//Ew sends if the ns buffer is empty
+				
+						noc2ewLockedlocal = ((noc2nsLen > 0)),  	//Local is locked if the ns buffer is not empty
+						noc2nsPriority = !((noc2nsLen > 0)),      //NS loses priority if it sends
+						nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) )  		//Ns sends local if it isn't empty
+						//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) 
+					=}    
+			}
+		}
+
+		}
+
+		else if (noc2localLockedew) {
+
+			if(noc2ewLockedns) {	
+
+				//Local has a 1 or 3 and EW has a 2
+				tick {=  noc2localLockedew = !((noc3ewLen < 4)),  //Local is locked in the ew direction if it is unable to send
+							noc2localPriority = !(((noc3ewLen < 4)) && !((noc0nsLen < 4))),  //Local remains in priority under the same conditions
+							noc2localLen -= (((noc3ewLen < 4) ? 1 : 0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0)),  //The ew direction recieves under the same conditions
+							ewShouldDec2 = (((noc0nsLen < 4) ? 1 : 0)),   // Ew sends if the ns direction is not full
+							noc2ewLockedns = !((noc0nsLen < 4)),  // Ew is locked to ns if it is unable to send
+							nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0)),  //The ns direction receives if it is not full
+							noc2nsPriority = ((noc0nsLen < 4)),   //The ns buffer stays in priority if it is empty or ew is able to send
+							nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ),  // Ns sends if it is not empty
+							//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) , 
+							optimalRuns2 += ((noc3ewLen < 4) ? 1 : 0)*((noc0nsLen < 4) ? 1 : 0)*((noc2nsLen > 0) ? 1 : 0) 
+
+				=} 
+
+
+			}
+
+			else {
+
+				tick palt { 
+
+				//Local has a 1 or 3 and EW has a 0	
+				:(1/2):  {=  noc2localLockedew = !((noc3ewLen < 4)),  //Local is locked in the ew direction if it is unable to send
+							noc2localPriority = !(((noc3ewLen < 4)) && ((noc2nsLen > 0))),  //Local remains in priority under the same conditions
+							noc2localLen -= (((noc3ewLen < 4) ? 1 : 0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0)),  //The ew direction receives under the same conditions
+							noc2ewLockedlocal = ((noc2nsLen > 0)),  //The ew buffer is locked into the local direction if the ns buffer is not empty
+							noc2nsPriority = !((noc2nsLen > 0)),   //The ns buffer remains in priority if it is empty
+							nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ), 	//Ns sneds if it is not empty
+							ewShouldDec2 = ((noc2nsLen > 0)? 0 : 1) 		//Ew sends if 
+							//totalFlitsDelivered2 += 1
+				=}	
+
+				//Local has a 1 or 3 and EW has a 2
+				:(1/2):  {=  noc2localLockedew = !((noc3ewLen < 4)),  //Local is locked in the ew direction if it is unable to send
+							noc2localPriority = !(((noc3ewLen < 4)) && !((noc0nsLen < 4))),  //Local remains in priority under the same conditions
+							noc2localLen -= (((noc3ewLen < 4) ? 1 : 0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0)),  //The ew direction recieves under the same conditions
+							ewShouldDec2 = (((noc0nsLen < 4) ? 1 : 0)),   // Ew sends if the ns direction is not full
+							noc2ewLockedns = !((noc0nsLen < 4)),  // Ew is locked to ns if it is unable to send
+							nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0)),  //The ns direction receives if it is not full
+							noc2nsPriority = ((noc0nsLen < 4)),   //The ns buffer stays in priority if it is empty or ew is able to send
+							nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ),  // Ns sends if it is not empty
+							//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) , 
+							optimalRuns2 += ((noc3ewLen < 4) ? 1 : 0)*((noc0nsLen < 4) ? 1 : 0)*((noc2nsLen > 0) ? 1 : 0) 
+				=} 
+
+
+				}	
+			}
+
+		}
+
+		
+
+		else{
+
+			if(noc2ewLockedns) {
+
+				tick palt { 
+				//Local and EW both send to 2	
+				:(1/3): {= 	noc2ewLockedns = (((noc2localLen > 0))) || (!((noc2localLen > 0)) && ((noc0nsLen < 4))),                 //The ew buffer gets locked in the ns direction if local is not empty 
+							noc2localPriority = (((noc2localLen > 0)) && !((noc0nsLen < 4))) || (!((noc2localLen > 0)) && ((noc0nsLen < 4))),    //Local remains in priority if it is non-empty and is unable to send
+							noc2localLockedns = (((noc2localLen > 0)) && !((noc0nsLen < 4))),  // Local gets locked to ns under the same conditions
+							noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc0nsLen < 4) ? 1 : 0)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
+							nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0)),    //The ns direction receives if it is not full (either from ew or local)
+							ewShouldDec2 = ((noc2localLen > 0) ? 0 : 1) *(((noc0nsLen < 4) ? 1 : 0)), 		//Ew sends if local is empty and the ns direction is not full
+							nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ),  		//Ns sends local if it is not empty
+							noc2nsPriority = !((noc2localLen > 0)) && ((noc0nsLen < 4))
+							//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) 
+						=}		
+
+				//Local has a 1 or 3 and EW has a 2
+				:(2/3):  {=  noc2localLockedew = ((noc2localLen > 0)) && !((noc3ewLen < 4)),  //Local is locked in the ew direction if it is unable to send
+							noc2localPriority = (((noc2localLen > 0)) && !((noc3ewLen < 4))) || (!((noc2localLen > 0)) && ((noc0nsLen < 4))) || ( (((noc2localLen > 0)) && ((noc3ewLen < 4)) && (((noc0nsLen < 4))))),  //Local remains in priority under the same conditions
+							noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc3ewLen < 4) ? 1 : 0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)),  //The ew direction recieves under the same conditions
+							ewShouldDec2 = (((noc0nsLen < 4) ? 1 : 0)),   // Ew sends if the ns direction is not full
+							noc2ewLockedns = !((noc0nsLen < 4)),  // Ew is locked to ns if it is unable to send
+							nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0)),  //The ns direction receives if it is not full
+							noc2nsPriority = ((noc0nsLen < 4)),   //The ns buffer stays in priority if it is empty or ew is able to send
+							nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ),  // Ns sends if it is not empty
+							//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) , 
+							optimalRuns2 += ((noc2localLen > 0) ? 1 : 0)*((noc3ewLen < 4) ? 1 : 0)*((noc0nsLen < 4) ? 1 : 0)*((noc2nsLen > 0) ? 1 : 0) 
+				=} 
+
+
+				}	
+
+
+			}
+
+			else {
+
+				tick palt { 
+				//Local and EW both send to 2	
+				:(1/6):  {=  noc2ewLockedns = (((noc2localLen > 0))) || (!((noc2localLen > 0)) && ((noc0nsLen < 4))),                 //The ew buffer gets locked in the ns direction if local is not empty 
+							noc2localPriority = (((noc2localLen > 0)) && !((noc0nsLen < 4))) || (!((noc2localLen > 0)) && ((noc0nsLen < 4))),    //Local remains in priority if it is non-empty and is unable to send
+							noc2localLockedns = (((noc2localLen > 0)) && !((noc0nsLen < 4))),  // Local gets locked to ns under the same conditions
+							noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc0nsLen < 4) ? 1 : 0)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
+							nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0)),    //The ns direction receives if it is not full (either from ew or local)
+							ewShouldDec2 = ((noc2localLen > 0) ? 0 : 1) *(((noc0nsLen < 4) ? 1 : 0)), 		//Ew sends if local is empty and the ns direction is not full
+							nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ),  		//Ns sends local if it is not empty
+							noc2nsPriority = !((noc2localLen > 0)) && ((noc0nsLen < 4))
+							//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) 
+						=}	
+
+				//Local Sends to 2,  EW to 0
+				:(1/6):  {=  noc2localLockedns = ((noc2localLen > 0)) && !((noc0nsLen < 4)),  //Local is locked in the ns direction if it is unable to send
+							noc2localPriority = (((noc2localLen > 0)) && !((noc0nsLen < 4))) || (((noc2localLen > 0)) && !((noc2nsLen > 0))) || ( ( (((noc2localLen > 0))) && (((noc0nsLen < 4))) ) && !((noc2nsLen > 0))),  //Local remains in priority under the same conditions
+							noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc0nsLen < 4) ? 1 : 0)),   //Local sends the ns direction if it is not empty,  and the receiving buffer is not full
+							nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)),  //The ns direction receives if it is not full and local is not empty
+							ewShouldDec2 = ((noc2nsLen > 0)? 0 : 1),  //Ew sends local if the ns buffer is empty
+							noc2ewLockedlocal = ((noc2nsLen > 0)),  //Ew gets locked to local if the ns buffer is not empty
+							noc2nsPriority = !((noc2nsLen > 0)),  //Ns remains in priority if it is empty
+							nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) )    // Ns sends if it is not empty
+							//totalFlitsDelivered2 += 1
+						=}					
+				
+
+				//Local has a 1 or 3 and EW has a 0	
+				:(1/3):  {=  noc2localLockedew = ((noc2localLen > 0)) && !((noc3ewLen < 4)),  //Local is locked in the ew direction if it is unable to send
+							noc2localPriority = (((noc2localLen > 0)) && !((noc3ewLen < 4))) || (((noc2localLen > 0)) && !((noc2nsLen > 0))) || ( ( (((noc2localLen > 0))) && (((noc3ewLen < 4))) ) && !((noc2nsLen > 0))),  //Local remains in priority under the same conditions
+							noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc3ewLen < 4) ? 1 : 0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)),  //The ew direction receives under the same conditions
+							noc2ewLockedlocal = ((noc2nsLen > 0)),  //The ew buffer is locked into the local direction if the ns buffer is not empty
+							noc2nsPriority = !((noc2nsLen > 0)),   //The ns buffer remains in priority if it is empty
+							nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ), 	//Ns sneds if it is not empty
+							ewShouldDec2 = ((noc2nsLen > 0)? 0 : 1) 		//Ew sends if 
+							//totalFlitsDelivered2 += 1
+				=}	
+
+				//Local has a 1 or 3 and EW has a 2
+				:(1/3):  {=  noc2localLockedew = ((noc2localLen > 0)) && !((noc3ewLen < 4)),  //Local is locked in the ew direction if it is unable to send
+							noc2localPriority = (((noc2localLen > 0)) && !((noc3ewLen < 4))) || (!((noc2localLen > 0)) && ((noc0nsLen < 4))) || ( (((noc2localLen > 0)) && ((noc3ewLen < 4)) && (((noc0nsLen < 4))))),  //Local remains in priority under the same conditions
+							noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc3ewLen < 4) ? 1 : 0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)),  //The ew direction recieves under the same conditions
+							ewShouldDec2 = (((noc0nsLen < 4) ? 1 : 0)),   // Ew sends if the ns direction is not full
+							noc2ewLockedns = !((noc0nsLen < 4)),  // Ew is locked to ns if it is unable to send
+							nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0)),  //The ns direction receives if it is not full
+							noc2nsPriority = ((noc0nsLen < 4)),   //The ns buffer stays in priority if it is empty or ew is able to send
+							nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ),  // Ns sends if it is not empty
+							//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) , 
+							optimalRuns2 += ((noc2localLen > 0) ? 1 : 0)*((noc3ewLen < 4) ? 1 : 0)*((noc0nsLen < 4) ? 1 : 0)*((noc2nsLen > 0) ? 1 : 0) 
+				=} 
+
+
+				}	
+			}
+		}
+
+
+
+	}
+
+	else if ((noc2localPriority == false) && (noc2nsPriority == false)) {
+
+			if(noc2localLockedns) {
+
+							if (noc2ewLockedlocal) {
+								tick {=  noc2localLockedns = !((noc0nsLen < 4)), 
+									noc2localPriority = !((noc0nsLen < 4)), 
+									noc2localLen -= (((noc0nsLen < 4) ? 1 : 0)),   
+									nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0)),  
+									ewShouldDec2 = 1,  
+									noc2ewLockedlocal = false, 
+									//totalFlitsDelivered2 += 1, 
+									noc2nsPriority = ((noc2nsLen > 0)) 
+								=} 
+
+							}
+
+							else if (noc2ewLockedns) {
+
+									tick {=  noc2localPriority = ((noc0nsLen < 4)),  
+										noc2localLockedns = true,  
+										ewShouldDec2 = ((noc0nsLen < 4) ? 1 : 0),  
+										noc2ewLockedns = !((noc0nsLen < 4)), 
+										nsShouldInc0 = ((noc0nsLen < 4) ? 1 : 0),  
+										nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ) 
+										//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) 
+									=}
+
+							}
+
+							else {
+
+								tick palt{
+								//Local and EW both send to 2
+								:(1/2):  {=  noc2localPriority = ((noc0nsLen < 4)),  
+										noc2localLockedns = true,  
+										ewShouldDec2 = ((noc0nsLen < 4) ? 1 : 0),  
+										noc2ewLockedns = !((noc0nsLen < 4)), 
+										nsShouldInc0 = ((noc0nsLen < 4) ? 1 : 0),  
+										nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ) 
+										//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) 
+										=}			
+
+								//Local Sends to 2,  EW to 0
+								:(1/2):  {=  noc2localLockedns = !((noc0nsLen < 4)), 
+											noc2localPriority = !((noc0nsLen < 4)), 
+											noc2localLen -= (((noc0nsLen < 4) ? 1 : 0)),   
+											nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0)),  
+											ewShouldDec2 = 1,  
+											//totalFlitsDelivered2 += 1, 
+											noc2nsPriority = ((noc2nsLen > 0)) 
+										=} 				
+
+							}
+
+						}
+
+			}
+
+			else if (noc2localLockedew) {
+
+
+					if (noc2ewLockedlocal) {
+
+							// Local Sens EW and EW sends local 
+							tick {=   noc2localLockedew = !((noc3ewLen < 4)), 
+										noc2localPriority = !((noc3ewLen < 4)), 
+										noc2localLen -= (((noc3ewLen < 4) ? 1 : 0)),   
+										ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0)),  
+										noc2ewLockedlocal = !((noc3ewLen < 4)), 
+										ewShouldDec2 = 1,  
+										//totalFlitsDelivered2 += 1, 
+										noc2nsPriority = ((noc2nsLen > 0)) 
+									=}  
+
+						
+
+					}
+					else if (noc2ewLockedns) {
+
+							//Local sends EW and EW sends NS
+							tick {=   noc2localLockedew = !((noc3ewLen < 4)), 
+										noc2localPriority = !((noc3ewLen < 4)) && ((noc0nsLen < 4)), 
+										noc2localLen -= (((noc3ewLen < 4) ? 1 : 0)),   
+										ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0)),  
+										ewShouldDec2 = ((noc0nsLen < 4) ? 1 : 0),  
+										noc2ewLockedns = !((noc0nsLen < 4)), 
+										nsShouldInc0 = ((noc0nsLen < 4) ? 1 : 0),  
+										nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ),  
+										//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) , 
+										optimalRuns2 += ((noc3ewLen < 4) ? 1 : 0)*((noc0nsLen < 4) ? 1 : 0)*((noc2nsLen > 0) ? 1 : 0) 
+									=} 
+	
+
+					}
+					else {
+
+						tick palt{
+				
+					
+
+						//Local has a 1 or 3 and EW has a 0
+						:(1/2):  {=  		noc2localLockedew = !((noc3ewLen < 4)), 
+										noc2localPriority = !((noc3ewLen < 4)), 
+										noc2localLen -= (((noc3ewLen < 4) ? 1 : 0)),   
+										ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0)),  
+										noc2ewLockedlocal = !((noc3ewLen < 4)), 
+										ewShouldDec2 = 1,  
+										//totalFlitsDelivered2 += 1, 
+										noc2nsPriority = ((noc2nsLen > 0)) 
+								=}
+
+						//Local has a 1 or 3 and EW has a 2
+						:(1/2):  {=  		noc2localLockedew = !((noc3ewLen < 4)), 
+										noc2localPriority = !((noc3ewLen < 4)) && ((noc0nsLen < 4)), 
+										noc2localLen -= (((noc3ewLen < 4) ? 1 : 0)),   
+										ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0)),  
+										ewShouldDec2 = ((noc0nsLen < 4) ? 1 : 0),  
+										noc2ewLockedns = !((noc0nsLen < 4)), 
+										nsShouldInc0 = ((noc0nsLen < 4) ? 1 : 0),  
+										nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ),  
+										//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) , 
+										optimalRuns2 += ((noc3ewLen < 4) ? 1 : 0)*((noc0nsLen < 4) ? 1 : 0)*((noc2nsLen > 0) ? 1 : 0) 
+						=} 
+
+					}
+			}
+
+			
+
+
+			} 
+
+			else {
+
+				if (noc2ewLockedlocal) {
+
+					tick palt {
+						
+						//Local sends NS and EW sends local
+						:(1/3):  {=  noc2localLockedns = ((noc2localLen > 0)) && !((noc0nsLen < 4)), 
+									noc2localPriority = ((noc2localLen > 0)) && !((noc0nsLen < 4)), 
+									noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc0nsLen < 4) ? 1 : 0)),   
+									nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)),  
+									ewShouldDec2 = 1,  
+									//totalFlitsDelivered2 += 1, 
+									noc2nsPriority = ((noc2nsLen > 0)) 
+								=} 
+
+						// Local Sens EW and EW sends local 
+						:(2/3):  {=   noc2localLockedew = ((noc2localLen > 0)) && !((noc3ewLen < 4)), 
+									noc2localPriority = ((noc2localLen > 0)) && !((noc3ewLen < 4)), 
+									noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc3ewLen < 4) ? 1 : 0)),   
+									ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)),  
+									ewShouldDec2 = 1,  
+									//totalFlitsDelivered2 += 1, 
+									noc2nsPriority = ((noc2nsLen > 0)) 
+								=}  
+
+					}
+
+				}
+				else if (noc2ewLockedns) {
+
+					tick palt {
+						//Local sends NS and EW sends NS
+						:(1/3):  {=  noc2localPriority =((noc2localLen > 0)),  
+									noc2localLockedns = ((noc2localLen > 0)),  
+									noc2ewLockedns = !((noc0nsLen < 4)), 
+									ewShouldDec2 = ((noc0nsLen < 4) ? 1 : 0),  
+									nsShouldInc0 = ((noc0nsLen < 4) ? 1 : 0),  
+									nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) )  
+									//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) 
+								=}
+						//Local sends EW and EW sends NS
+						:(2/3):  {=   noc2localLockedew = ((noc2localLen > 0)) && !((noc3ewLen < 4)), 
+									noc2localPriority = ((noc2localLen > 0)) && !((noc3ewLen < 4)) && ((noc0nsLen < 4)), 
+									noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc3ewLen < 4) ? 1 : 0)),   
+									ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)),  
+									ewShouldDec2 = ((noc0nsLen < 4) ? 1 : 0),  
+									noc2ewLockedns = !((noc0nsLen < 4)), 
+									nsShouldInc0 = ((noc0nsLen < 4) ? 1 : 0),  
+									nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ),  
+									//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) , 
+									optimalRuns2 += ((noc2localLen > 0) ? 1 : 0)*((noc3ewLen < 4) ? 1 : 0)*((noc0nsLen < 4) ? 1 : 0)*((noc2nsLen > 0) ? 1 : 0) 
+								=} 
+
+
+					}
+
+				}
+				else {
+
+					tick palt{
+					//Local and EW both send to 2
+					:(1/6):  {=  		noc2localPriority =((noc2localLen > 0)),  
+									noc2localLockedns = ((noc2localLen > 0)),  
+									noc2ewLockedns = !((noc0nsLen < 4)), 
+									ewShouldDec2 = ((noc0nsLen < 4) ? 1 : 0),  
+									nsShouldInc0 = ((noc0nsLen < 4) ? 1 : 0),  
+									nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) )  
+									//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) 
+							=}			
+
+					//Local Sends to 2,  EW to 0
+					:(1/6):  {=  		noc2localLockedns = ((noc2localLen > 0)) && !((noc0nsLen < 4)), 
+									noc2localPriority = ((noc2localLen > 0)) && !((noc0nsLen < 4)), 
+									noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc0nsLen < 4) ? 1 : 0)),   
+									nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)),  
+									ewShouldDec2 = 1,  
+									//totalFlitsDelivered2 += 1, 
+									noc2nsPriority = ((noc2nsLen > 0)) 
+							=}					
+				
+
+					//Local has a 1 or 3 and EW has a 0
+					:(1/3):  {=  		noc2localLockedew = ((noc2localLen > 0)) && !((noc3ewLen < 4)), 
+									noc2localPriority = ((noc2localLen > 0)) && !((noc3ewLen < 4)), 
+									noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc3ewLen < 4) ? 1 : 0)),   
+									ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)),  
+									ewShouldDec2 = 1,  
+									//totalFlitsDelivered2 += 1, 
+									noc2nsPriority = ((noc2nsLen > 0)) 
+							=}
+
+					//Local has a 1 or 3 and EW has a 2
+					:(1/3):  {=  		noc2localLockedew = ((noc2localLen > 0)) && !((noc3ewLen < 4)), 
+									noc2localPriority = ((noc2localLen > 0)) && !((noc3ewLen < 4)) && ((noc0nsLen < 4)), 
+									noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc3ewLen < 4) ? 1 : 0)),   
+									ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)),  
+									ewShouldDec2 = ((noc0nsLen < 4) ? 1 : 0),  
+									noc2ewLockedns = !((noc0nsLen < 4)), 
+									nsShouldInc0 = ((noc0nsLen < 4) ? 1 : 0),  
+									nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ),  
+									//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) , 
+									optimalRuns2 += ((noc2localLen > 0) ? 1 : 0)*((noc3ewLen < 4) ? 1 : 0)*((noc0nsLen < 4) ? 1 : 0)*((noc2nsLen > 0) ? 1 : 0) 
+					=} 
+
+				}
+		}
+
+		}
+
+	}
+
+
+	else if ((noc2localPriority == false) && (noc2nsPriority == true)) {
+
+		if(noc2localLockedns) {
+
+			if(noc2ewLockedns) {
+
+				tick {=  noc2localPriority = ((noc0nsLen < 4)),  
+					noc2ewLockedns = !((noc0nsLen < 4)), 
+					ewShouldDec2 = ((noc0nsLen < 4) ? 1 : 0),  
+					nsShouldInc0 = ((noc0nsLen < 4) ? 1 : 0),  
+					nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ), 
+					//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) , 
+					noc2nsPriority = ((noc0nsLen < 4))
+				=} 
+
+
+			}
+			//Logically determined that ew cannot be locked local
+			else {
+
+			tick palt {	//Local and EW both send to 2
+			:(1/2):  {=  noc2localPriority = ((noc0nsLen < 4)),  
+					noc2ewLockedns = !((noc0nsLen < 4)), 
+					ewShouldDec2 = ((noc0nsLen < 4) ? 1 : 0),  
+					nsShouldInc0 = ((noc0nsLen < 4) ? 1 : 0),  
+					nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ), 
+					//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) , 
+					noc2nsPriority = ((noc0nsLen < 4))
+					=}
+					//Local Sends to 2,  EW to 0
+			:(1/2):  {=  noc2localPriority = !((noc0nsLen < 4)), 
+						noc2localLockedns = !((noc0nsLen < 4)), 
+						noc2localLen -= ((noc0nsLen < 4) ? 1 : 0),   
+						nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0)),  
+						ewShouldDec2 = ((noc2nsLen > 0)? 0 : 1), 
+						noc2ewLockedns = ((noc2nsLen > 0)), 
+						nsShouldDec2 = ((noc2nsLen > 0) ? 1 : 0) ,  
+						//totalFlitsDelivered2 += 1, 
+						noc2nsPriority = !((noc2nsLen > 0))
+				
+					=}	
+			}
+			}
+
+
+
+		}
+
+		else if(noc2localLockedew) {
+
+			if (noc2ewLockedns) {
+
+						//Local sends EW and EW sends NS
+						tick {=   noc2localPriority = !((noc3ewLen < 4)) && ((noc0nsLen < 4)), 
+									noc2localLockedew = !((noc3ewLen < 4)), 
+									noc2localLen -= (((noc3ewLen < 4) ? 1 : 0)),   
+									ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0)),  
+									noc2ewLockedns = !((noc0nsLen < 4)), 
+									ewShouldDec2 = ((noc0nsLen < 4) ? 1 : 0),  
+									nsShouldInc0 = ((noc0nsLen < 4) ? 1 : 0),  
+									nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ),  
+									//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) , 
+									noc2nsPriority = ((noc0nsLen < 4)), 
+									optimalRuns2 += ((noc3ewLen < 4) ? 1 : 0)*((noc0nsLen < 4) ? 1 : 0)*((noc2nsLen > 0) ? 1 : 0) 
+								=} 
+
+
+					
+
+				}
+			else {
+				
+					tick palt {				
+				
+
+						//Local has a 1 or 3 and EW has a 0
+						:(1/2):  {=   noc2localPriority = !((noc3ewLen < 4)) && !((noc2nsLen > 0)),  
+									noc2localLockedew = !((noc3ewLen < 4)), 
+									noc2localLen -= (((noc3ewLen < 4) ? 1 : 0)),   
+									ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0)),  
+									nsShouldDec2 = ((noc2nsLen > 0) ? 1 : 0) , 
+									noc2nsPriority = !((noc2nsLen > 0)),  
+									ewShouldDec2 = ((noc2nsLen > 0)? 0 : 1),  
+									noc2ewLockedlocal = ((noc2nsLen > 0)) 
+									//totalFlitsDelivered2 += 1
+								=}	
+
+						//Local has a 1 or 3 and EW has a 2
+						:(1/2):  {=  noc2localPriority = !((noc3ewLen < 4)) && ((noc0nsLen < 4)), 
+									noc2localLockedew = !((noc3ewLen < 4)), 
+									noc2localLen -= (((noc3ewLen < 4) ? 1 : 0)),   
+									ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0)),  
+									noc2ewLockedns = !((noc0nsLen < 4)), 
+									ewShouldDec2 = ((noc0nsLen < 4) ? 1 : 0),  
+									nsShouldInc0 = ((noc0nsLen < 4) ? 1 : 0),  
+									nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ),  
+									//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) , 
+									noc2nsPriority = ((noc0nsLen < 4)), 
+									optimalRuns2 += ((noc3ewLen < 4) ? 1 : 0)*((noc0nsLen < 4) ? 1 : 0)*((noc2nsLen > 0) ? 1 : 0) 
+								=}  
+
+
+					}
+				}
+
+		}
+
+
+		else {
+		
+			 if (noc2ewLockedns) {
+
+					tick palt {
+						//Local sends NS and EW sends NS
+						:(1/3):  tick {=  noc2localPriority = ((noc2localLen > 0)) && ((noc0nsLen < 4)), 
+									noc2localLockedns = ((noc2localLen > 0)), 
+									noc2ewLockedns = !((noc0nsLen < 4)), 
+									ewShouldDec2 = ((noc0nsLen < 4) ? 1 : 0),  
+									nsShouldInc0 = ((noc0nsLen < 4) ? 1 : 0),  
+									nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ), 
+									//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) , 
+									noc2nsPriority = ((noc0nsLen < 4))
+								=} 
+						//Local sends EW and EW sends NS
+						:(2/3):  {=   noc2localPriority = ((noc2localLen > 0)) && !((noc3ewLen < 4)) && ((noc0nsLen < 4)), 
+									noc2localLockedew = ((noc2localLen > 0)) && !((noc3ewLen < 4)), 
+									noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc3ewLen < 4) ? 1 : 0)),   
+									ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)),  
+									noc2ewLockedns = !((noc0nsLen < 4)), 
+									ewShouldDec2 = ((noc0nsLen < 4) ? 1 : 0),  
+									nsShouldInc0 = ((noc0nsLen < 4) ? 1 : 0),  
+									nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ),  
+									//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) , 
+									noc2nsPriority = ((noc0nsLen < 4)), 
+									optimalRuns2 += ((noc2localLen > 0) ? 1 : 0)*((noc3ewLen < 4) ? 1 : 0)*((noc0nsLen < 4) ? 1 : 0)*((noc2nsLen > 0) ? 1 : 0) 
+								=} 
+
+
+					}
+
+				}
+			else {
+				
+					tick palt {
+						//Local and EW both send to 2
+						:(1/6):  {=  noc2localPriority = ((noc2localLen > 0)) && ((noc0nsLen < 4)), 
+									noc2localLockedns = ((noc2localLen > 0)), 
+									noc2ewLockedns = !((noc0nsLen < 4)), 
+									ewShouldDec2 = ((noc0nsLen < 4) ? 1 : 0),  
+									nsShouldInc0 = ((noc0nsLen < 4) ? 1 : 0),  
+									nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ), 
+									//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) , 
+									noc2nsPriority = ((noc0nsLen < 4))
+								=}			
+						//Local Sends to 2,  EW to 0
+						:(1/6):  {=  noc2localPriority = !((noc0nsLen < 4)) && ((noc2localLen > 0)) && !((noc2nsLen > 0)),  
+									noc2localLockedns = ((noc2localLen > 0)) && !((noc0nsLen < 4)), 
+									noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc0nsLen < 4) ? 1 : 0)),   
+									nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)),  
+									ewShouldDec2 = ((noc2nsLen > 0)? 0 : 1), 
+									noc2ewLockedlocal = ((noc2nsLen > 0)), 
+									nsShouldDec2 = ((noc2nsLen > 0) ? 1 : 0) ,  
+									//totalFlitsDelivered2 += 1, 
+									noc2nsPriority = !((noc2nsLen > 0)) 
+								=}					
+				
+
+						//Local has a 1 or 3 and EW has a 0
+						:(1/3):  {=   noc2localPriority = !((noc3ewLen < 4)) && ((noc2localLen > 0)) && !((noc2nsLen > 0)),  
+									noc2localLockedew = ((noc2localLen > 0)) && !((noc3ewLen < 4)), 
+									noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc3ewLen < 4) ? 1 : 0)),   
+									ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)),  
+									nsShouldDec2 = ((noc2nsLen > 0) ? 1 : 0) , 
+									noc2nsPriority = !((noc2nsLen > 0)),  
+									ewShouldDec2 = ((noc2nsLen > 0)? 0 : 1), 
+									noc2ewLockedlocal = ((noc2nsLen > 0)) 
+									//totalFlitsDelivered2 += 1
+								=}	
+
+						//Local has a 1 or 3 and EW has a 2
+						:(1/3):  {=  noc2localPriority = ((noc2localLen > 0)) && !((noc3ewLen < 4)) && ((noc0nsLen < 4)), 
+									noc2localLockedew = ((noc2localLen > 0)) && !((noc3ewLen < 4)), 
+									noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc3ewLen < 4) ? 1 : 0)),   
+									ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)),  
+									noc2ewLockedns = !((noc0nsLen < 4)), 
+									ewShouldDec2 = ((noc0nsLen < 4) ? 1 : 0),  
+									nsShouldInc0 = ((noc0nsLen < 4) ? 1 : 0),  
+									nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ),  
+									//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) , 
+									noc2nsPriority = ((noc0nsLen < 4)), 
+									optimalRuns2 += ((noc2localLen > 0) ? 1 : 0)*((noc3ewLen < 4) ? 1 : 0)*((noc0nsLen < 4) ? 1 : 0)*((noc2nsLen > 0) ? 1 : 0) 
+								=}  
+
+
+					}
+				}
+
+		}
+
+	}
+	else {   //Localpriority == true && nsPriority == false
+
+		if(noc2localLockedns) {
+
+			if (noc2ewLockedlocal) {
+
+
+						 //Local sends NS and EW sends local
+								tick {=  noc2localPriority = true,  
+									noc2localLockedns = !((noc0nsLen < 4)),  
+									noc2localLen -= (((noc0nsLen < 4) ? 1 : 0)), 
+									nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0)),  
+									ewShouldDec2 = 1,  
+									noc2ewLockedlocal = false, 
+									//totalFlitsDelivered2 += 1, 
+									noc2nsPriority = ((noc2nsLen > 0)) 
+								=} 
+
+				}
+
+				else if(noc2ewLockedns) {
+
+							tick {=  noc2localPriority = !((noc0nsLen < 4)),  
+									noc2localLockedns = !((noc0nsLen < 4)),  
+									noc2localLen -= (((noc0nsLen < 4) ? 1 : 0)),   
+									nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0)),  
+									noc2ewLockedns = true, 
+									nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ),  
+									noc2nsPriority = false 
+									//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) 
+								=}	
+
+
+				}
+
+
+				else {
+
+
+					tick palt {
+						//Local and EW both send to 2
+						:(1/2):  {=  	noc2localPriority = !((noc0nsLen < 4)),  
+									noc2localLockedns = !((noc0nsLen < 4)),  
+									noc2localLen -= (((noc0nsLen < 4) ? 1 : 0)),   
+									nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0)),  
+									noc2ewLockedns = true, 
+									nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ),  
+									noc2nsPriority = false 
+									//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) 
+								=}	
+						//Local Sends to 2,  EW to 0
+						:(1/2):  {=  noc2localPriority = true,  
+									noc2localLockedns = !((noc0nsLen < 4)),  
+									noc2localLen -= (((noc0nsLen < 4) ? 1 : 0)), 
+									nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0)),  
+									ewShouldDec2 = 1,  
+									noc2ewLockedlocal = false, 
+									//totalFlitsDelivered2 += 1, 
+									noc2nsPriority = ((noc2nsLen > 0)) 
+								=}					
+
+
+					}
+				}
+
+		}
+
+		else if(noc2localLockedew) {
+
+			if (noc2ewLockedlocal) {
+
+						// Local Sends EW and EW sends local
+					tick {=  	noc2localPriority = true,  
+						noc2localLockedew = !((noc3ewLen < 4)), 
+						noc2localLen -= (((noc3ewLen < 4) ? 1 : 0)),   
+						ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0)),  
+						ewShouldDec2 = 1,  
+						noc2ewLockedlocal = false, 
+						//totalFlitsDelivered2 += 1, 
+						noc2nsPriority = ((noc2nsLen > 0)) 
+					=}  
+
+					
+
+				}
+
+				else if(noc2ewLockedns) {
+
+	
+								//Local has a 1 or 3 and EW has a 2
+						tick {=   		noc2localPriority = !(((noc3ewLen < 4)) && !((noc0nsLen < 4))),  
+									noc2localLockedew = !((noc3ewLen < 4)), 
+									noc2localLen -= (((noc3ewLen < 4) ? 1 : 0)),   
+									ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0)),  
+									ewShouldDec2 = (((noc0nsLen < 4) ? 1 : 0)),  
+									noc2ewLockedlocal = !((noc0nsLen < 4)), 
+									nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0)),  
+									nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ),  
+									noc2nsPriority = false, 
+									//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) , 
+									optimalRuns2 += ((noc3ewLen < 4) ? 1 : 0)*((noc0nsLen < 4) ? 1 : 0)*((noc2nsLen > 0) ? 1 : 0) 
+								=}  
+
+
+				}
+
+
+				else {
+
+
+					tick palt {				
+				
+
+						//Local has a 1 or 3 and EW has a 0
+						:(1/2):  {=  	noc2localPriority = true,  
+									noc2localLockedew = !((noc3ewLen < 4)), 
+									noc2localLen -= (((noc3ewLen < 4) ? 1 : 0)),   
+									ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0)),  
+									ewShouldDec2 = 1,  
+									noc2ewLockedlocal = false, 
+									//totalFlitsDelivered2 += 1, 
+									noc2nsPriority = ((noc2nsLen > 0))
+								=} 			
+						//Local has a 1 or 3 and EW has a 2
+						:(1/2):  {=   noc2localPriority = !(((noc3ewLen < 4)) && !((noc0nsLen < 4))),  
+									noc2localLockedew = !((noc3ewLen < 4)), 
+									noc2localLen -= (((noc3ewLen < 4) ? 1 : 0)),   
+									ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0)),  
+									ewShouldDec2 = (((noc0nsLen < 4) ? 1 : 0)),  
+									noc2ewLockedlocal = !((noc0nsLen < 4)), 
+									nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0)),  
+									nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ),  
+									noc2nsPriority = false, 
+									//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) , 
+									optimalRuns2 += ((noc3ewLen < 4) ? 1 : 0)*((noc0nsLen < 4) ? 1 : 0)*((noc2nsLen > 0) ? 1 : 0) 
+								=}  
+
+
+					}
+				}
+
+
+		}
+		
+
+		else {
+			 if (noc2ewLockedlocal) {
+
+					tick palt {
+						 //Local sends NS and EW sends local
+						:(1/3):  tick {=  noc2localPriority = true,  
+									noc2localLockedns = ((noc2localLen > 0)) && !((noc0nsLen < 4)),  
+									noc2localLen -= (((noc0nsLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)), 
+									nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)),  
+									ewShouldDec2 = 1, 
+									noc2ewLockedlocal = false,  
+									//totalFlitsDelivered2 += 1, 
+									noc2nsPriority = ((noc2nsLen > 0)) 
+								=} 
+						// Local Sends EW and EW sends local
+						:(2/3):  tick {=  noc2localPriority = true,  
+									noc2localLockedew = ((noc2localLen > 0)) && !((noc3ewLen < 4)), 
+									noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc3ewLen < 4) ? 1 : 0)),   
+									ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)),  
+									ewShouldDec2 = 1,  
+									noc2ewLockedlocal = false, 
+									//totalFlitsDelivered2 += 1, 
+									noc2nsPriority = ((noc2nsLen > 0)) 
+								=}  
+
+					}
+
+				}
+
+				else if(noc2ewLockedns) {
+
+
+						tick palt {
+						//Local and EW both send to 2
+						:(1/3):  {=  noc2localPriority = (((noc2localLen > 0)) && !((noc0nsLen < 4))) || (!((noc2localLen > 0)) && ((noc0nsLen < 4))),  
+									noc2localLockedns = ((noc2localLen > 0)) && !((noc0nsLen < 4)),  
+									noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc0nsLen < 4) ? 1 : 0)),   
+									nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0)),  
+									noc2ewLockedns = ((noc2localLen > 0)) || (!((noc2localLen > 0)) && !((noc0nsLen < 4))), 
+									ewShouldDec2 = ((noc2localLen > 0) ? 0 : 1) *((noc0nsLen < 4) ? 1 : 0), 
+									nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ),  
+									noc2nsPriority = false 
+									//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) 
+								=}	
+								//Local has a 1 or 3 and EW has a 2
+						:(2/3):  {=   noc2localPriority = (!((noc3ewLen < 4)) && ((noc2localLen > 0))) || (!((noc2localLen > 0)) && ((noc0nsLen < 4))) || (((noc3ewLen < 4)) && ((noc2localLen > 0)) && ((noc0nsLen < 4))),  
+									noc2localLockedew = ((noc2localLen > 0)) && !((noc3ewLen < 4)), 
+									noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc3ewLen < 4) ? 1 : 0)),   
+									ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)),  
+									ewShouldDec2 = (((noc0nsLen < 4) ? 1 : 0)),  
+									noc2ewLockedns = !((noc0nsLen < 4)), 
+									nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0)),  
+									nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ),  
+									noc2nsPriority = false, 
+									//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) , 
+									optimalRuns2 += ((noc3ewLen < 4) ? 1 : 0)*((noc0nsLen < 4) ? 1 : 0)*((noc2nsLen > 0) ? 1 : 0) 
+								=}  
+						}
+
+
+				}
+
+
+				else {
+
+
+					tick palt {
+						//Local and EW both send to 2
+						:(1/6):  {=  noc2localPriority = (((noc2localLen > 0)) && !((noc0nsLen < 4))) || (!((noc2localLen > 0)) && ((noc0nsLen < 4))),  
+									noc2localLockedns = ((noc2localLen > 0)) && !((noc0nsLen < 4)),  
+									noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc0nsLen < 4) ? 1 : 0)),   
+									nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0)),  
+									noc2ewLockedns = ((noc2localLen > 0)) || (!((noc2localLen > 0)) && !((noc0nsLen < 4))), 
+									ewShouldDec2 = ((noc2localLen > 0) ? 0 : 1) *((noc0nsLen < 4) ? 1 : 0), 
+									nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ),  
+									noc2nsPriority = false 
+									//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) 
+								=}	
+						//Local Sends to 2,  EW to 0
+						:(1/6):  {=  noc2localPriority = true,  
+									noc2localLockedns = ((noc2localLen > 0)) && !((noc0nsLen < 4)),  
+									noc2localLen -= (((noc0nsLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)), 
+									nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)),  
+									ewShouldDec2 = 1, 
+									noc2ewLockedlocal = false,  
+									//totalFlitsDelivered2 += 1, 
+									noc2nsPriority = ((noc2nsLen > 0)) 
+								=}					
+				
+
+						//Local has a 1 or 3 and EW has a 0
+						:(1/3):  {=  noc2localPriority = true,  
+									noc2localLockedew = ((noc2localLen > 0)) && !((noc3ewLen < 4)), 
+									noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc3ewLen < 4) ? 1 : 0)),   
+									ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)),  
+									ewShouldDec2 = 1,  
+									noc2ewLockedlocal = false, 
+									//totalFlitsDelivered2 += 1, 
+									noc2nsPriority = ((noc2nsLen > 0)) 
+								=} 			
+						//Local has a 1 or 3 and EW has a 2
+						:(1/3):  {=   noc2localPriority = (!((noc3ewLen < 4)) && ((noc2localLen > 0))) || (!((noc2localLen > 0)) && ((noc0nsLen < 4))) || (((noc3ewLen < 4)) && ((noc2localLen > 0)) && ((noc0nsLen < 4))),  
+									noc2localLockedew = ((noc2localLen > 0)) && !((noc3ewLen < 4)), 
+									noc2localLen -= (((noc2localLen > 0) ? 1 : 0))*(((noc3ewLen < 4) ? 1 : 0)),   
+									ewShouldInc3 = (((noc3ewLen < 4) ? 1 : 0))*(((noc2localLen > 0) ? 1 : 0)),  
+									ewShouldDec2 = (((noc0nsLen < 4) ? 1 : 0)),  
+									noc2ewLockedns = !((noc0nsLen < 4)), 
+									nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0)),  
+									nsShouldDec2 = (((noc2nsLen > 0) ? 1 : 0) ),  
+									noc2nsPriority = false, 
+									//totalFlitsDelivered2 += ((noc2nsLen > 0) ? 1 : 0) , 
+									optimalRuns2 += ((noc3ewLen < 4) ? 1 : 0)*((noc0nsLen < 4) ? 1 : 0)*((noc2nsLen > 0) ? 1 : 0) 
+								=}  
+
+
+					}
+				}
+		}
+
+
+	}
+
+
+
+
+
+}
+
+process arbiter3(){
+
+	//tick {=  localNotEmptyOne = (noc3localLen > 0) ? 1 : 0 =};
+
+	if (noc3ewLen == 0) {		//If the EW buffer of the NoC is empty
+
+		if (noc3localLockedns == true) {		//If the local buffer is locked sending NS
+
+			tick {=  noc3localLockedns = !((noc1nsLen < 4)),   //Sets the priority to false if it was able to send to the ns buffer of the NoC in the y direction
+				noc3localPriority = !((noc1nsLen < 4)) || noc3localPriority, 		//Local gets priority if it is unable to send
+				noc3localLen -= ((noc1nsLen < 4) ? 1 : 0),      //Local sends a flit ns if the receiving buffer is not full
+				nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0)),   //The ns direction receives the flit if it is not already full
+				nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ) 						//The ns buffer sends a flit to local if it is not empty
+				//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) 
+			=}
+
+		}
+
+		else if (noc3localLockedew) {
+
+			tick {=   			noc3localLockedew = !((noc2ewLen < 4)),  // Local is locked it if has a flit and is unable to send it
+							noc3localPriority = !((noc2ewLen < 4)) || noc3localPriority,   // Local gets priority under the same conditions		
+							noc3localLen -= (((noc2ewLen < 4) ? 1 : 0)),   //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
+							ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0)),  //The ew direction receives it under the same conditions
+							nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) )  //The ns buffer sends a flit to local if it is not empty
+							//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) 	
+							
+			=}
+
+
+		} 
+
+		else {
+			tick palt {
+				//Local sends in the NS direction
+				:(1/3): {=   noc3localLockedns = ((noc3localLen > 0)) && !((noc1nsLen < 4)),  // Local is locked it if has a flit and is unable to send it
+							noc3localPriority = (((noc3localLen > 0)) && !((noc1nsLen < 4))) || noc3localPriority,   // Local gets priority under the same conditions
+							noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc1nsLen < 4) ? 1 : 0)),   //Local sends a flit to the ns direction if it is not empty and the receiving buffer is not full
+					   		nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)),  //The ns direction receives the flit under the same conditions
+							nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) )    //The ns buffer sends a flit to local if it is not empty	
+							//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) 
+						=}
+				//Local sends to the ew direction
+				:(2/3): {=   noc3localLockedew = ((noc3localLen > 0)) && !((noc2ewLen < 4)),  // Local is locked it if has a flit and is unable to send it
+							noc3localPriority = (((noc3localLen > 0)) && !((noc2ewLen < 4))) || noc3localPriority,   // Local gets priority under the same conditions
+							noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc2ewLen < 4) ? 1 : 0)),   //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
+							ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)),  //The ew direction receives it under the same conditions
+							nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) )  //The ns buffer sends a flit to local if it is not empty
+							//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) 
+							
+						=}
+			}
+		}
+
+	}
+	else if ((noc3localPriority == true) && (noc3nsPriority == true)) {
+
+		if (noc3localLockedns == true) {
+
+			if (noc3ewLockedns) {
+
+				tick {=  noc3localLockedns = !((noc1nsLen < 4)),  	//Local stays locked if it is unable to send
+					noc3localPriority = !((noc1nsLen < 4)), 
+						noc3localLen -= ((noc1nsLen < 4) ? 1 : 0),   //Local sends if the ns direction is not already full
+						nsShouldInc1 = ((noc1nsLen < 4) ? 1 : 0),  //The ns direction receives under the same conditions
+						noc3nsPriority = false, 
+						noc3ewLockedns = true,  
+						nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) )    //The ns buffer sends a flit to local if it is not empty 
+						//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) 
+				=}
+
+			}
+
+			else {
+			tick palt {
+			// Local and EW both send ns	
+			:(1/2):  {=  noc3localLockedns = !((noc1nsLen < 4)),  	//Local stays locked if it is unable to send
+						noc3localLen -= ((noc1nsLen < 4) ? 1 : 0),   //Local sends if the ns direction is not already full
+						nsShouldInc1 = ((noc1nsLen < 4) ? 1 : 0),  //The ns direction receives under the same conditions
+						nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ),    //The ns buffer sends a flit to local if it is not empty
+						noc3nsPriority = false, 
+						//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) , 
+						noc3ewLockedns = true,  			//The Ew buffer is locked to send in the ns direction
+						noc3localPriority = !((noc1nsLen < 4)) //Local remains in priority if it did not send
+					=}  
+			 
+			 //Local sends ns,  and EW sends to to local
+			:(1/2):  {=  noc3localLockedns =  !((noc1nsLen < 4)),   //Local stays locked if it is unable to send
+						noc3localPriority = !(((noc1nsLen < 4)) && ((noc3nsLen > 0))),  //Local only loses priority if it sends and ew doesn't
+						noc3localLen -= (((noc1nsLen < 4) ? 1 : 0)),   //Local sends ns if it isn't empty and ns isn't full
+						nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0)),  //Ns receives under the same conditions
+						ewShouldDec3 = ((noc3nsLen > 0)? 0 : 1),  	//Ew sends if the ns buffer is empty
+				
+						noc3ewLockedlocal = ((noc3nsLen > 0)),  	//Local is locked if the ns buffer is not empty
+						noc3nsPriority = !((noc3nsLen > 0)),      //NS loses priority if it sends
+						nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) )  		//Ns sends local if it isn't empty
+						//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) 
+					=}    
+			}
+		}
+
+		}
+
+		else if (noc3localLockedew) {
+
+			if(noc3ewLockedns) {	
+
+				//Local has a 1 or 3 and EW has a 2
+				tick {=  noc3localLockedew = !((noc2ewLen < 4)),  //Local is locked in the ew direction if it is unable to send
+							noc3localPriority = !(((noc2ewLen < 4)) && !((noc1nsLen < 4))),  //Local remains in priority under the same conditions
+							noc3localLen -= (((noc2ewLen < 4) ? 1 : 0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0)),  //The ew direction recieves under the same conditions
+							ewShouldDec3 = (((noc1nsLen < 4) ? 1 : 0)),   // Ew sends if the ns direction is not full
+							noc3ewLockedns = !((noc1nsLen < 4)),  // Ew is locked to ns if it is unable to send
+							nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0)),  //The ns direction receives if it is not full
+							noc3nsPriority = ((noc1nsLen < 4)),   //The ns buffer stays in priority if it is empty or ew is able to send
+							nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ),  // Ns sends if it is not empty
+							//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) , 
+							optimalRuns3 += ((noc2ewLen < 4) ? 1 : 0)*((noc1nsLen < 4) ? 1 : 0)*((noc3nsLen > 0) ? 1 : 0) 
+
+				=} 
+
+
+			}
+
+			else {
+
+				tick palt { 
+
+				//Local has a 1 or 3 and EW has a 0	
+				:(1/2):  {=  noc3localLockedew = !((noc2ewLen < 4)),  //Local is locked in the ew direction if it is unable to send
+							noc3localPriority = !(((noc2ewLen < 4)) && ((noc3nsLen > 0))),  //Local remains in priority under the same conditions
+							noc3localLen -= (((noc2ewLen < 4) ? 1 : 0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0)),  //The ew direction receives under the same conditions
+							noc3ewLockedlocal = ((noc3nsLen > 0)),  //The ew buffer is locked into the local direction if the ns buffer is not empty
+							noc3nsPriority = !((noc3nsLen > 0)),   //The ns buffer remains in priority if it is empty
+							nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ), 	//Ns sneds if it is not empty
+							ewShouldDec3 = ((noc3nsLen > 0)? 0 : 1) 		//Ew sends if 
+							//totalFlitsDelivered3 += 1
+				=}	
+
+				//Local has a 1 or 3 and EW has a 2
+				:(1/2):  {=  noc3localLockedew = !((noc2ewLen < 4)),  //Local is locked in the ew direction if it is unable to send
+							noc3localPriority = !(((noc2ewLen < 4)) && !((noc1nsLen < 4))),  //Local remains in priority under the same conditions
+							noc3localLen -= (((noc2ewLen < 4) ? 1 : 0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0)),  //The ew direction recieves under the same conditions
+							ewShouldDec3 = (((noc1nsLen < 4) ? 1 : 0)),   // Ew sends if the ns direction is not full
+							noc3ewLockedns = !((noc1nsLen < 4)),  // Ew is locked to ns if it is unable to send
+							nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0)),  //The ns direction receives if it is not full
+							noc3nsPriority = ((noc1nsLen < 4)),   //The ns buffer stays in priority if it is empty or ew is able to send
+							nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ),  // Ns sends if it is not empty
+							//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) , 
+							optimalRuns3 += ((noc2ewLen < 4) ? 1 : 0)*((noc1nsLen < 4) ? 1 : 0)*((noc3nsLen > 0) ? 1 : 0) 
+				=} 
+
+
+				}	
+			}
+
+		}
+
+		
+
+		else{
+
+			if(noc3ewLockedns) {
+
+				tick palt { 
+				//Local and EW both send to 2	
+				:(1/3): {= 	noc3ewLockedns = (((noc3localLen > 0))) || (!((noc3localLen > 0)) && ((noc1nsLen < 4))),                 //The ew buffer gets locked in the ns direction if local is not empty 
+							noc3localPriority = (((noc3localLen > 0)) && !((noc1nsLen < 4))) || (!((noc3localLen > 0)) && ((noc1nsLen < 4))),    //Local remains in priority if it is non-empty and is unable to send
+							noc3localLockedns = (((noc3localLen > 0)) && !((noc1nsLen < 4))),  // Local gets locked to ns under the same conditions
+							noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc1nsLen < 4) ? 1 : 0)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
+							nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0)),    //The ns direction receives if it is not full (either from ew or local)
+							ewShouldDec3 = ((noc3localLen > 0) ? 0 : 1) *(((noc1nsLen < 4) ? 1 : 0)), 		//Ew sends if local is empty and the ns direction is not full
+							nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ),  		//Ns sends local if it is not empty
+							noc3nsPriority = !((noc3localLen > 0)) && ((noc1nsLen < 4)) 
+							//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) 
+						=}		
+
+				//Local has a 1 or 3 and EW has a 2
+				:(2/3):  {=  noc3localLockedew = ((noc3localLen > 0)) && !((noc2ewLen < 4)),  //Local is locked in the ew direction if it is unable to send
+							noc3localPriority = (((noc3localLen > 0)) && !((noc2ewLen < 4))) || (!((noc3localLen > 0)) && ((noc1nsLen < 4))) || ( (((noc3localLen > 0)) && ((noc2ewLen < 4)) && (((noc1nsLen < 4))))),  //Local remains in priority under the same conditions
+							noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc2ewLen < 4) ? 1 : 0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)),  //The ew direction recieves under the same conditions
+							ewShouldDec3 = (((noc1nsLen < 4) ? 1 : 0)),   // Ew sends if the ns direction is not full
+							noc3ewLockedns = !((noc1nsLen < 4)),  // Ew is locked to ns if it is unable to send
+							nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0)),  //The ns direction receives if it is not full
+							noc3nsPriority = ((noc1nsLen < 4)),   //The ns buffer stays in priority if it is empty or ew is able to send
+							nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ),  // Ns sends if it is not empty
+							//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) , 
+							optimalRuns3 += ((noc3localLen > 0) ? 1 : 0)*((noc2ewLen < 4) ? 1 : 0)*((noc1nsLen < 4) ? 1 : 0)*((noc3nsLen > 0) ? 1 : 0) 
+				=} 
+
+
+				}	
+
+
+			}
+
+			else {
+
+				tick palt { 
+				//Local and EW both send to 2	
+				:(1/6):  {=  noc3ewLockedns = (((noc3localLen > 0))) || (!((noc3localLen > 0)) && ((noc1nsLen < 4))),                 //The ew buffer gets locked in the ns direction if local is not empty 
+							noc3localPriority = (((noc3localLen > 0)) && !((noc1nsLen < 4))) || (!((noc3localLen > 0)) && ((noc1nsLen < 4))),    //Local remains in priority if it is non-empty and is unable to send
+							noc3localLockedns = (((noc3localLen > 0)) && !((noc1nsLen < 4))),  // Local gets locked to ns under the same conditions
+							noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc1nsLen < 4) ? 1 : 0)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
+							nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0)),    //The ns direction receives if it is not full (either from ew or local)
+							ewShouldDec3 = ((noc3localLen > 0) ? 0 : 1) *(((noc1nsLen < 4) ? 1 : 0)), 		//Ew sends if local is empty and the ns direction is not full
+							nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ),  		//Ns sends local if it is not empty
+							noc3nsPriority = !((noc3localLen > 0)) && ((noc1nsLen < 4))
+							//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) 
+						=}	
+
+				//Local Sends to 2,  EW to 0
+				:(1/6):  {=  noc3localLockedns = ((noc3localLen > 0)) && !((noc1nsLen < 4)),  //Local is locked in the ns direction if it is unable to send
+							noc3localPriority = (((noc3localLen > 0)) && !((noc1nsLen < 4))) || (((noc3localLen > 0)) && !((noc3nsLen > 0))) || ( ( (((noc3localLen > 0))) && (((noc1nsLen < 4))) ) && !((noc3nsLen > 0))),  //Local remains in priority under the same conditions
+							noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc1nsLen < 4) ? 1 : 0)),   //Local sends the ns direction if it is not empty,  and the receiving buffer is not full
+							nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)),  //The ns direction receives if it is not full and local is not empty
+							ewShouldDec3 = ((noc3nsLen > 0)? 0 : 1),  //Ew sends local if the ns buffer is empty
+							noc3ewLockedlocal = ((noc3nsLen > 0)),  //Ew gets locked to local if the ns buffer is not empty
+							noc3nsPriority = !((noc3nsLen > 0)),  //Ns remains in priority if it is empty
+							nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) )     // Ns sends if it is not empty
+							//totalFlitsDelivered3 += 1
+						=}					
+				
+
+				//Local has a 1 or 3 and EW has a 0	
+				:(1/3):  {=  noc3localLockedew = ((noc3localLen > 0)) && !((noc2ewLen < 4)),  //Local is locked in the ew direction if it is unable to send
+							noc3localPriority = (((noc3localLen > 0)) && !((noc2ewLen < 4))) || (((noc3localLen > 0)) && !((noc3nsLen > 0))) || ( ( (((noc3localLen > 0))) && (((noc2ewLen < 4))) ) && !((noc3nsLen > 0))),  //Local remains in priority under the same conditions
+							noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc2ewLen < 4) ? 1 : 0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)),  //The ew direction receives under the same conditions
+							noc3ewLockedlocal = ((noc3nsLen > 0)),  //The ew buffer is locked into the local direction if the ns buffer is not empty
+							noc3nsPriority = !((noc3nsLen > 0)),   //The ns buffer remains in priority if it is empty
+							nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ), 	//Ns sneds if it is not empty
+							ewShouldDec3 = ((noc3nsLen > 0)? 0 : 1) 		//Ew sends if 
+							//totalFlitsDelivered3 += 1
+				=}	
+
+				//Local has a 1 or 3 and EW has a 2
+				:(1/3):  {=  noc3localLockedew = ((noc3localLen > 0)) && !((noc2ewLen < 4)),  //Local is locked in the ew direction if it is unable to send
+							noc3localPriority = (((noc3localLen > 0)) && !((noc2ewLen < 4))) || (!((noc3localLen > 0)) && ((noc1nsLen < 4))) || ( (((noc3localLen > 0)) && ((noc2ewLen < 4)) && (((noc1nsLen < 4))))),  //Local remains in priority under the same conditions
+							noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc2ewLen < 4) ? 1 : 0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)),  //The ew direction recieves under the same conditions
+							ewShouldDec3 = (((noc1nsLen < 4) ? 1 : 0)),   // Ew sends if the ns direction is not full
+							noc3ewLockedns = !((noc1nsLen < 4)),  // Ew is locked to ns if it is unable to send
+							nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0)),  //The ns direction receives if it is not full
+							noc3nsPriority = ((noc1nsLen < 4)),   //The ns buffer stays in priority if it is empty or ew is able to send
+							nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ),  // Ns sends if it is not empty
+							//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) , 
+							optimalRuns3 += ((noc3localLen > 0) ? 1 : 0)*((noc2ewLen < 4) ? 1 : 0)*((noc1nsLen < 4) ? 1 : 0)*((noc3nsLen > 0) ? 1 : 0) 
+				=} 
+
+
+				}	
+			}
+		}
+
+
+
+	}
+
+	else if ((noc3localPriority == false) && (noc3nsPriority == false)) {
+
+			if(noc3localLockedns) {
+
+							if (noc3ewLockedlocal) {
+								tick {=  noc3localLockedns = !((noc1nsLen < 4)), 
+									noc3localPriority = !((noc1nsLen < 4)), 
+									noc3localLen -= (((noc1nsLen < 4) ? 1 : 0)),   
+									nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0)),  
+									ewShouldDec3 = 1,  
+									noc3ewLockedlocal = false, 
+									//totalFlitsDelivered3 += 1, 
+									noc3nsPriority = ((noc3nsLen > 0)) 
+								=} 
+
+							}
+
+							else if (noc3ewLockedns) {
+
+									tick {=  noc3localPriority = ((noc1nsLen < 4)),  
+										noc3localLockedns = true,  
+										ewShouldDec3 = ((noc1nsLen < 4) ? 1 : 0),  
+										noc3ewLockedns = !((noc1nsLen < 4)), 
+										nsShouldInc1 = ((noc1nsLen < 4) ? 1 : 0),  
+										nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ) 
+										//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) 
+									=}
+
+							}
+
+							else {
+
+								tick palt{
+								//Local and EW both send to 2
+								:(1/2):  {=  noc3localPriority = ((noc1nsLen < 4)),  
+										noc3localLockedns = true,  
+										ewShouldDec3 = ((noc1nsLen < 4) ? 1 : 0),  
+										noc3ewLockedns = !((noc1nsLen < 4)), 
+										nsShouldInc1 = ((noc1nsLen < 4) ? 1 : 0),  
+										nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ) 
+										//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) 
+										=}			
+
+								//Local Sends to 2,  EW to 0
+								:(1/2):  {=  noc3localLockedns = !((noc1nsLen < 4)), 
+											noc3localPriority = !((noc1nsLen < 4)), 
+											noc3localLen -= (((noc1nsLen < 4) ? 1 : 0)),   
+											nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0)),  
+											ewShouldDec3 = 1,  
+											//totalFlitsDelivered3 += 1, 
+											noc3nsPriority = ((noc3nsLen > 0)) 
+										=} 				
+
+							}
+
+						}
+
+			}
+
+			else if (noc3localLockedew) {
+
+
+					if (noc3ewLockedlocal) {
+
+							// Local Sens EW and EW sends local 
+							tick {=   noc3localLockedew = !((noc2ewLen < 4)), 
+										noc3localPriority = !((noc2ewLen < 4)), 
+										noc3localLen -= (((noc2ewLen < 4) ? 1 : 0)),   
+										ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0)),  
+										noc3ewLockedlocal = !((noc2ewLen < 4)), 
+										ewShouldDec3 = 1,  
+										//totalFlitsDelivered3 += 1, 
+										noc3nsPriority = ((noc3nsLen > 0)) 
+									=}  
+
+						
+
+					}
+					else if (noc3ewLockedns) {
+
+							//Local sends EW and EW sends NS
+							tick {=   noc3localLockedew = !((noc2ewLen < 4)), 
+										noc3localPriority = !((noc2ewLen < 4)) && ((noc1nsLen < 4)), 
+										noc3localLen -= (((noc2ewLen < 4) ? 1 : 0)),   
+										ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0)),  
+										ewShouldDec3 = ((noc1nsLen < 4) ? 1 : 0),  
+										noc3ewLockedns = !((noc1nsLen < 4)), 
+										nsShouldInc1 = ((noc1nsLen < 4) ? 1 : 0),  
+										nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ),  
+										//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) , 
+										optimalRuns3 += ((noc2ewLen < 4) ? 1 : 0)*((noc1nsLen < 4) ? 1 : 0)*((noc3nsLen > 0) ? 1 : 0) 
+									=} 
+	
+
+					}
+					else {
+
+						tick palt{
+				
+					
+
+						//Local has a 1 or 3 and EW has a 0
+						:(1/2):  {=  		noc3localLockedew = !((noc2ewLen < 4)), 
+										noc3localPriority = !((noc2ewLen < 4)), 
+										noc3localLen -= (((noc2ewLen < 4) ? 1 : 0)),   
+										ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0)),  
+										noc3ewLockedlocal = !((noc2ewLen < 4)), 
+										ewShouldDec3 = 1,  
+										//totalFlitsDelivered3 += 1, 
+										noc3nsPriority = ((noc3nsLen > 0)) 
+								=}
+
+						//Local has a 1 or 3 and EW has a 2
+						:(1/2):  {=  		noc3localLockedew = !((noc2ewLen < 4)), 
+										noc3localPriority = !((noc2ewLen < 4)) && ((noc1nsLen < 4)), 
+										noc3localLen -= (((noc2ewLen < 4) ? 1 : 0)),   
+										ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0)),  
+										ewShouldDec3 = ((noc1nsLen < 4) ? 1 : 0),  
+										noc3ewLockedns = !((noc1nsLen < 4)), 
+										nsShouldInc1 = ((noc1nsLen < 4) ? 1 : 0),  
+										nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ),  
+										//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) , 
+										optimalRuns3 += ((noc2ewLen < 4) ? 1 : 0)*((noc1nsLen < 4) ? 1 : 0)*((noc3nsLen > 0) ? 1 : 0) 
+						=} 
+
+					}
+			}
+
+			
+
+
+			} 
+
+			else {
+
+				if (noc3ewLockedlocal) {
+
+					tick palt {
+						
+						//Local sends NS and EW sends local
+						:(1/3):  {=  noc3localLockedns = ((noc3localLen > 0)) && !((noc1nsLen < 4)), 
+									noc3localPriority = ((noc3localLen > 0)) && !((noc1nsLen < 4)), 
+									noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc1nsLen < 4) ? 1 : 0)),   
+									nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)),  
+									ewShouldDec3 = 1,  
+									//totalFlitsDelivered3 += 1, 
+									noc3nsPriority = ((noc3nsLen > 0)) 
+								=} 
+
+						// Local Sens EW and EW sends local 
+						:(2/3):  {=   noc3localLockedew = ((noc3localLen > 0)) && !((noc2ewLen < 4)), 
+									noc3localPriority = ((noc3localLen > 0)) && !((noc2ewLen < 4)), 
+									noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc2ewLen < 4) ? 1 : 0)),   
+									ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)),  
+									ewShouldDec3 = 1,  
+									//totalFlitsDelivered3 += 1, 
+									noc3nsPriority = ((noc3nsLen > 0)) 
+								=}  
+
+					}
+
+				}
+				else if (noc3ewLockedns) {
+
+					tick palt {
+						//Local sends NS and EW sends NS
+						:(1/3):  {=  noc3localPriority =((noc3localLen > 0)),  
+									noc3localLockedns = ((noc3localLen > 0)),  
+									noc3ewLockedns = !((noc1nsLen < 4)), 
+									ewShouldDec3 = ((noc1nsLen < 4) ? 1 : 0),  
+									nsShouldInc1 = ((noc1nsLen < 4) ? 1 : 0),  
+									nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) )  
+									//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) 
+								=}
+						//Local sends EW and EW sends NS
+						:(2/3):  {=   noc3localLockedew = ((noc3localLen > 0)) && !((noc2ewLen < 4)), 
+									noc3localPriority = ((noc3localLen > 0)) && !((noc2ewLen < 4)) && ((noc1nsLen < 4)), 
+									noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc2ewLen < 4) ? 1 : 0)),   
+									ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)),  
+									ewShouldDec3 = ((noc1nsLen < 4) ? 1 : 0),  
+									noc3ewLockedns = !((noc1nsLen < 4)), 
+									nsShouldInc1 = ((noc1nsLen < 4) ? 1 : 0),  
+									nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ),  
+									//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) , 
+									optimalRuns3 += ((noc3localLen > 0) ? 1 : 0)*((noc2ewLen < 4) ? 1 : 0)*((noc1nsLen < 4) ? 1 : 0)*((noc3nsLen > 0) ? 1 : 0) 
+								=} 
+
+
+					}
+
+				}
+				else {
+
+					tick palt{
+					//Local and EW both send to 2
+					:(1/6):  {=  		noc3localPriority =((noc3localLen > 0)),  
+									noc3localLockedns = ((noc3localLen > 0)),  
+									noc3ewLockedns = !((noc1nsLen < 4)), 
+									ewShouldDec3 = ((noc1nsLen < 4) ? 1 : 0),  
+									nsShouldInc1 = ((noc1nsLen < 4) ? 1 : 0),  
+									nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) )  
+									//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) 
+							=}			
+
+					//Local Sends to 2,  EW to 0
+					:(1/6):  {=  		noc3localLockedns = ((noc3localLen > 0)) && !((noc1nsLen < 4)), 
+									noc3localPriority = ((noc3localLen > 0)) && !((noc1nsLen < 4)), 
+									noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc1nsLen < 4) ? 1 : 0)),   
+									nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)),  
+									ewShouldDec3 = 1,  
+									//totalFlitsDelivered3 += 1, 
+									noc3nsPriority = ((noc3nsLen > 0)) 
+							=}					
+				
+
+					//Local has a 1 or 3 and EW has a 0
+					:(1/3):  {=  		noc3localLockedew = ((noc3localLen > 0)) && !((noc2ewLen < 4)), 
+									noc3localPriority = ((noc3localLen > 0)) && !((noc2ewLen < 4)), 
+									noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc2ewLen < 4) ? 1 : 0)),   
+									ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)),  
+									ewShouldDec3 = 1,  
+									//totalFlitsDelivered3 += 1, 
+									noc3nsPriority = ((noc3nsLen > 0)) 
+							=}
+
+					//Local has a 1 or 3 and EW has a 2
+					:(1/3):  {=  		noc3localLockedew = ((noc3localLen > 0)) && !((noc2ewLen < 4)), 
+									noc3localPriority = ((noc3localLen > 0)) && !((noc2ewLen < 4)) && ((noc1nsLen < 4)), 
+									noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc2ewLen < 4) ? 1 : 0)),   
+									ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)),  
+									ewShouldDec3 = ((noc1nsLen < 4) ? 1 : 0),  
+									noc3ewLockedns = !((noc1nsLen < 4)), 
+									nsShouldInc1 = ((noc1nsLen < 4) ? 1 : 0),  
+									nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ),  
+									//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) , 
+									optimalRuns3 += ((noc3localLen > 0) ? 1 : 0)*((noc2ewLen < 4) ? 1 : 0)*((noc1nsLen < 4) ? 1 : 0)*((noc3nsLen > 0) ? 1 : 0) 
+					=} 
+
+				}
+		}
+
+		}
+
+	}
+
+
+	else if ((noc3localPriority == false) && (noc3nsPriority == true)) {
+
+		if(noc3localLockedns) {
+
+			if(noc3ewLockedns) {
+
+				tick {=  noc3localPriority = ((noc1nsLen < 4)),  
+					noc3ewLockedns = !((noc1nsLen < 4)), 
+					ewShouldDec3 = ((noc1nsLen < 4) ? 1 : 0),  
+					nsShouldInc1 = ((noc1nsLen < 4) ? 1 : 0),  
+					nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ), 
+					//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) , 
+					noc3nsPriority = ((noc1nsLen < 4))
+				=} 
+
+
+			}
+			//Logically determined that ew cannot be locked local
+			else {
+
+			tick palt {	//Local and EW both send to 2
+			:(1/2):  {=  noc3localPriority = ((noc1nsLen < 4)),  
+					noc3ewLockedns = !((noc1nsLen < 4)), 
+					ewShouldDec3 = ((noc1nsLen < 4) ? 1 : 0),  
+					nsShouldInc1 = ((noc1nsLen < 4) ? 1 : 0),  
+					nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ), 
+					//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) , 
+					noc3nsPriority = ((noc1nsLen < 4))
+					=}
+					//Local Sends to 2,  EW to 0
+			:(1/2):  {=  noc3localPriority = !((noc1nsLen < 4)), 
+						noc3localLockedns = !((noc1nsLen < 4)), 
+						noc3localLen -= ((noc1nsLen < 4) ? 1 : 0),   
+						nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0)),  
+						ewShouldDec3 = ((noc3nsLen > 0)? 0 : 1), 
+						noc3ewLockedns = ((noc3nsLen > 0)), 
+						nsShouldDec3 = ((noc3nsLen > 0) ? 1 : 0) ,  
+						//totalFlitsDelivered3 += 1, 
+						noc3nsPriority = !((noc3nsLen > 0))
+				
+					=}	
+			}
+			}
+
+
+
+		}
+
+		else if(noc3localLockedew) {
+
+			if (noc3ewLockedns) {
+
+						//Local sends EW and EW sends NS
+						tick {=   noc3localPriority = !((noc2ewLen < 4)) && ((noc1nsLen < 4)), 
+									noc3localLockedew = !((noc2ewLen < 4)), 
+									noc3localLen -= (((noc2ewLen < 4) ? 1 : 0)),   
+									ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0)),  
+									noc3ewLockedns = !((noc1nsLen < 4)), 
+									ewShouldDec3 = ((noc1nsLen < 4) ? 1 : 0),  
+									nsShouldInc1 = ((noc1nsLen < 4) ? 1 : 0),  
+									nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ),  
+									//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) , 
+									noc3nsPriority = ((noc1nsLen < 4)), 
+									optimalRuns3 += ((noc2ewLen < 4) ? 1 : 0)*((noc1nsLen < 4) ? 1 : 0)*((noc3nsLen > 0) ? 1 : 0) 
+								=} 
+
+
+					
+
+				}
+			else {
+				
+					tick palt {				
+				
+
+						//Local has a 1 or 3 and EW has a 0
+						:(1/2):  {=   noc3localPriority = !((noc2ewLen < 4)) && !((noc3nsLen > 0)),  
+									noc3localLockedew = !((noc2ewLen < 4)), 
+									noc3localLen -= (((noc2ewLen < 4) ? 1 : 0)),   
+									ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0)),  
+									nsShouldDec3 = ((noc3nsLen > 0) ? 1 : 0) , 
+									noc3nsPriority = !((noc3nsLen > 0)),  
+									ewShouldDec3 = ((noc3nsLen > 0)? 0 : 1),  
+									noc3ewLockedlocal = ((noc3nsLen > 0))
+									//totalFlitsDelivered3 += 1
+								=}	
+
+						//Local has a 1 or 3 and EW has a 2
+						:(1/2):  {=  noc3localPriority = !((noc2ewLen < 4)) && ((noc1nsLen < 4)), 
+									noc3localLockedew = !((noc2ewLen < 4)), 
+									noc3localLen -= (((noc2ewLen < 4) ? 1 : 0)),   
+									ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0)),  
+									noc3ewLockedns = !((noc1nsLen < 4)), 
+									ewShouldDec3 = ((noc1nsLen < 4) ? 1 : 0),  
+									nsShouldInc1 = ((noc1nsLen < 4) ? 1 : 0),  
+									nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ),  
+									//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) , 
+									noc3nsPriority = ((noc1nsLen < 4)), 
+									optimalRuns3 += ((noc2ewLen < 4) ? 1 : 0)*((noc1nsLen < 4) ? 1 : 0)*((noc3nsLen > 0) ? 1 : 0) 
+								=}  
+
+
+					}
+				}
+
+		}
+
+
+		else {
+		
+			 if (noc3ewLockedns) {
+
+					tick palt {
+						//Local sends NS and EW sends NS
+						:(1/3):  tick {=  noc3localPriority = ((noc3localLen > 0)) && ((noc1nsLen < 4)), 
+									noc3localLockedns = ((noc3localLen > 0)), 
+									noc3ewLockedns = !((noc1nsLen < 4)), 
+									ewShouldDec3 = ((noc1nsLen < 4) ? 1 : 0),  
+									nsShouldInc1 = ((noc1nsLen < 4) ? 1 : 0),  
+									nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ), 
+									//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) , 
+									noc3nsPriority = ((noc1nsLen < 4))
+								=} 
+						//Local sends EW and EW sends NS
+						:(2/3):  {=   noc3localPriority = ((noc3localLen > 0)) && !((noc2ewLen < 4)) && ((noc1nsLen < 4)), 
+									noc3localLockedew = ((noc3localLen > 0)) && !((noc2ewLen < 4)), 
+									noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc2ewLen < 4) ? 1 : 0)),   
+									ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)),  
+									noc3ewLockedns = !((noc1nsLen < 4)), 
+									ewShouldDec3 = ((noc1nsLen < 4) ? 1 : 0),  
+									nsShouldInc1 = ((noc1nsLen < 4) ? 1 : 0),  
+									nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ),  
+									//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) , 
+									noc3nsPriority = ((noc1nsLen < 4)), 
+									optimalRuns3 += ((noc3localLen > 0) ? 1 : 0)*((noc2ewLen < 4) ? 1 : 0)*((noc1nsLen < 4) ? 1 : 0)*((noc3nsLen > 0) ? 1 : 0) 
+								=} 
+
+
+					}
+
+				}
+			else {
+				
+					tick palt {
+						//Local and EW both send to 2
+						:(1/6):  {=  noc3localPriority = ((noc3localLen > 0)) && ((noc1nsLen < 4)), 
+									noc3localLockedns = ((noc3localLen > 0)), 
+									noc3ewLockedns = !((noc1nsLen < 4)), 
+									ewShouldDec3 = ((noc1nsLen < 4) ? 1 : 0),  
+									nsShouldInc1 = ((noc1nsLen < 4) ? 1 : 0),  
+									nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ), 
+									//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) , 
+									noc3nsPriority = ((noc1nsLen < 4))
+								=}			
+						//Local Sends to 2,  EW to 0
+						:(1/6):  {=  noc3localPriority = !((noc1nsLen < 4)) && ((noc3localLen > 0)) && !((noc3nsLen > 0)),  
+									noc3localLockedns = ((noc3localLen > 0)) && !((noc1nsLen < 4)), 
+									noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc1nsLen < 4) ? 1 : 0)),   
+									nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)),  
+									ewShouldDec3 = ((noc3nsLen > 0)? 0 : 1), 
+									noc3ewLockedlocal = ((noc3nsLen > 0)), 
+									nsShouldDec3 = ((noc3nsLen > 0) ? 1 : 0) ,  
+									//totalFlitsDelivered3 += 1, 
+									noc3nsPriority = !((noc3nsLen > 0)) 
+								=}					
+				
+
+						//Local has a 1 or 3 and EW has a 0
+						:(1/3):  {=   noc3localPriority = !((noc2ewLen < 4)) && ((noc3localLen > 0)) && !((noc3nsLen > 0)),  
+									noc3localLockedew = ((noc3localLen > 0)) && !((noc2ewLen < 4)), 
+									noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc2ewLen < 4) ? 1 : 0)),   
+									ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)),  
+									nsShouldDec3 = ((noc3nsLen > 0) ? 1 : 0) , 
+									noc3nsPriority = !((noc3nsLen > 0)),  
+									ewShouldDec3 = ((noc3nsLen > 0)? 0 : 1), 
+									noc3ewLockedlocal = ((noc3nsLen > 0)) 
+									//totalFlitsDelivered3 += 1
+								=}	
+
+						//Local has a 1 or 3 and EW has a 2
+						:(1/3):  {=  noc3localPriority = ((noc3localLen > 0)) && !((noc2ewLen < 4)) && ((noc1nsLen < 4)), 
+									noc3localLockedew = ((noc3localLen > 0)) && !((noc2ewLen < 4)), 
+									noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc2ewLen < 4) ? 1 : 0)),   
+									ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)),  
+									noc3ewLockedns = !((noc1nsLen < 4)), 
+									ewShouldDec3 = ((noc1nsLen < 4) ? 1 : 0),  
+									nsShouldInc1 = ((noc1nsLen < 4) ? 1 : 0),  
+									nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ),  
+									//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) , 
+									noc3nsPriority = ((noc1nsLen < 4)), 
+									optimalRuns3 += ((noc3localLen > 0) ? 1 : 0)*((noc2ewLen < 4) ? 1 : 0)*((noc1nsLen < 4) ? 1 : 0)*((noc3nsLen > 0) ? 1 : 0) 
+								=}  
+
+
+					}
+				}
+
+		}
+
+	}
+	else {   //Localpriority == true && nsPriority == false
+
+		if(noc3localLockedns) {
+
+			if (noc3ewLockedlocal) {
+
+
+						 //Local sends NS and EW sends local
+								tick {=  noc3localPriority = true,  
+									noc3localLockedns = !((noc1nsLen < 4)),  
+									noc3localLen -= (((noc1nsLen < 4) ? 1 : 0)), 
+									nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0)),  
+									ewShouldDec3 = 1,  
+									noc3ewLockedlocal = false, 
+									//totalFlitsDelivered3 += 1, 
+									noc3nsPriority = ((noc3nsLen > 0)) 
+								=} 
+
+				}
+
+				else if(noc3ewLockedns) {
+
+							tick {=  noc3localPriority = !((noc1nsLen < 4)),  
+									noc3localLockedns = !((noc1nsLen < 4)),  
+									noc3localLen -= (((noc1nsLen < 4) ? 1 : 0)),   
+									nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0)),  
+									noc3ewLockedns = true, 
+									nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ),  
+									noc3nsPriority = false 
+									//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) 
+								=}	
+
+
+				}
+
+
+				else {
+
+
+					tick palt {
+						//Local and EW both send to 2
+						:(1/2):  {=  	noc3localPriority = !((noc1nsLen < 4)),  
+									noc3localLockedns = !((noc1nsLen < 4)),  
+									noc3localLen -= (((noc1nsLen < 4) ? 1 : 0)),   
+									nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0)),  
+									noc3ewLockedns = true, 
+									nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ),  
+									noc3nsPriority = false 
+									//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) 
+								=}	
+						//Local Sends to 2,  EW to 0
+						:(1/2):  {=  noc3localPriority = true,  
+									noc3localLockedns = !((noc1nsLen < 4)),  
+									noc3localLen -= (((noc1nsLen < 4) ? 1 : 0)), 
+									nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0)),  
+									ewShouldDec3 = 1,  
+									noc3ewLockedlocal = false, 
+									//totalFlitsDelivered3 += 1, 
+									noc3nsPriority = ((noc3nsLen > 0)) 
+								=}					
+
+
+					}
+				}
+
+		}
+
+		else if(noc3localLockedew) {
+
+			if (noc3ewLockedlocal) {
+
+						// Local Sends EW and EW sends local
+					tick {=  	noc3localPriority = true,  
+						noc3localLockedew = !((noc2ewLen < 4)), 
+						noc3localLen -= (((noc2ewLen < 4) ? 1 : 0)),   
+						ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0)),  
+						ewShouldDec3 = 1,  
+						noc3ewLockedlocal = false, 
+						//totalFlitsDelivered3 += 1, 
+						noc3nsPriority = ((noc3nsLen > 0)) 
+					=}  
+
+					
+
+				}
+
+				else if(noc3ewLockedns) {
+
+	
+								//Local has a 1 or 3 and EW has a 2
+						tick {=   		noc3localPriority = !(((noc2ewLen < 4)) && !((noc1nsLen < 4))),  
+									noc3localLockedew = !((noc2ewLen < 4)), 
+									noc3localLen -= (((noc2ewLen < 4) ? 1 : 0)),   
+									ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0)),  
+									ewShouldDec3 = (((noc1nsLen < 4) ? 1 : 0)),  
+									noc3ewLockedlocal = !((noc1nsLen < 4)), 
+									nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0)),  
+									nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ),  
+									noc3nsPriority = false, 
+									//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) , 
+									optimalRuns3 += ((noc2ewLen < 4) ? 1 : 0)*((noc1nsLen < 4) ? 1 : 0)*((noc3nsLen > 0) ? 1 : 0) 
+								=}  
+
+
+				}
+
+
+				else {
+
+
+					tick palt {				
+				
+
+						//Local has a 1 or 3 and EW has a 0
+						:(1/2):  {=  	noc3localPriority = true,  
+									noc3localLockedew = !((noc2ewLen < 4)), 
+									noc3localLen -= (((noc2ewLen < 4) ? 1 : 0)),   
+									ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0)),  
+									ewShouldDec3 = 1,  
+									noc3ewLockedlocal = false, 
+									//totalFlitsDelivered3 += 1, 
+									noc3nsPriority = ((noc3nsLen > 0))
+								=} 			
+						//Local has a 1 or 3 and EW has a 2
+						:(1/2):  {=   noc3localPriority = !(((noc2ewLen < 4)) && !((noc1nsLen < 4))),  
+									noc3localLockedew = !((noc2ewLen < 4)), 
+									noc3localLen -= (((noc2ewLen < 4) ? 1 : 0)),   
+									ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0)),  
+									ewShouldDec3 = (((noc1nsLen < 4) ? 1 : 0)),  
+									noc3ewLockedlocal = !((noc1nsLen < 4)), 
+									nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0)),  
+									nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ),  
+									noc3nsPriority = false, 
+									//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) , 
+									optimalRuns3 += ((noc2ewLen < 4) ? 1 : 0)*((noc1nsLen < 4) ? 1 : 0)*((noc3nsLen > 0) ? 1 : 0) 
+								=}  
+
+
+					}
+				}
+
+
+		}
+		
+
+		else {
+			 if (noc3ewLockedlocal) {
+
+					tick palt {
+						 //Local sends NS and EW sends local
+						:(1/3):  tick {=  noc3localPriority = true,  
+									noc3localLockedns = ((noc3localLen > 0)) && !((noc1nsLen < 4)),  
+									noc3localLen -= (((noc1nsLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)), 
+									nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)),  
+									ewShouldDec3 = 1, 
+									noc3ewLockedlocal = false,  
+									//totalFlitsDelivered3 += 1, 
+									noc3nsPriority = ((noc3nsLen > 0)) 
+								=} 
+						// Local Sends EW and EW sends local
+						:(2/3):  tick {=  noc3localPriority = true,  
+									noc3localLockedew = ((noc3localLen > 0)) && !((noc2ewLen < 4)), 
+									noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc2ewLen < 4) ? 1 : 0)),   
+									ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)),  
+									ewShouldDec3 = 1,  
+									noc3ewLockedlocal = false, 
+									//totalFlitsDelivered3 += 1, 
+									noc3nsPriority = ((noc3nsLen > 0)) 
+								=}  
+
+					}
+
+				}
+
+				else if(noc3ewLockedns) {
+
+
+						tick palt {
+						//Local and EW both send to 2
+						:(1/3):  {=  noc3localPriority = (((noc3localLen > 0)) && !((noc1nsLen < 4))) || (!((noc3localLen > 0)) && ((noc1nsLen < 4))),  
+									noc3localLockedns = ((noc3localLen > 0)) && !((noc1nsLen < 4)),  
+									noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc1nsLen < 4) ? 1 : 0)),   
+									nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0)),  
+									noc3ewLockedns = ((noc3localLen > 0)) || (!((noc3localLen > 0)) && !((noc1nsLen < 4))), 
+									ewShouldDec3 = ((noc3localLen > 0) ? 0 : 1) *((noc1nsLen < 4) ? 1 : 0), 
+									nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ),  
+									noc3nsPriority = false 
+									//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) 
+								=}	
+								//Local has a 1 or 3 and EW has a 2
+						:(2/3):  {=   noc3localPriority = (!((noc2ewLen < 4)) && ((noc3localLen > 0))) || (!((noc3localLen > 0)) && ((noc1nsLen < 4))) || (((noc2ewLen < 4)) && ((noc3localLen > 0)) && ((noc1nsLen < 4))),  
+									noc3localLockedew = ((noc3localLen > 0)) && !((noc2ewLen < 4)), 
+									noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc2ewLen < 4) ? 1 : 0)),   
+									ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)),  
+									ewShouldDec3 = (((noc1nsLen < 4) ? 1 : 0)),  
+									noc3ewLockedns = !((noc1nsLen < 4)), 
+									nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0)),  
+									nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ),  
+									noc3nsPriority = false, 
+									//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) , 
+									optimalRuns3 += ((noc2ewLen < 4) ? 1 : 0)*((noc1nsLen < 4) ? 1 : 0)*((noc3nsLen > 0) ? 1 : 0) 
+								=}  
+						}
+
+
+				}
+
+
+				else {
+
+
+					tick palt {
+						//Local and EW both send to 2
+						:(1/6):  {=  noc3localPriority = (((noc3localLen > 0)) && !((noc1nsLen < 4))) || (!((noc3localLen > 0)) && ((noc1nsLen < 4))),  
+									noc3localLockedns = ((noc3localLen > 0)) && !((noc1nsLen < 4)),  
+									noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc1nsLen < 4) ? 1 : 0)),   
+									nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0)),  
+									noc3ewLockedns = ((noc3localLen > 0)) || (!((noc3localLen > 0)) && !((noc1nsLen < 4))), 
+									ewShouldDec3 = ((noc3localLen > 0) ? 0 : 1) *((noc1nsLen < 4) ? 1 : 0), 
+									nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ),  
+									noc3nsPriority = false 
+									//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) 
+								=}	
+						//Local Sends to 2,  EW to 0
+						:(1/6):  {=  noc3localPriority = true,  
+									noc3localLockedns = ((noc3localLen > 0)) && !((noc1nsLen < 4)),  
+									noc3localLen -= (((noc1nsLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)), 
+									nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)),  
+									ewShouldDec3 = 1, 
+									noc3ewLockedlocal = false,  
+									//totalFlitsDelivered3 += 1, 
+									noc3nsPriority = ((noc3nsLen > 0)) 
+								=}					
+				
+
+						//Local has a 1 or 3 and EW has a 0
+						:(1/3):  {=  noc3localPriority = true,  
+									noc3localLockedew = ((noc3localLen > 0)) && !((noc2ewLen < 4)), 
+									noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc2ewLen < 4) ? 1 : 0)),   
+									ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)),  
+									ewShouldDec3 = 1,  
+									noc3ewLockedlocal = false, 
+									//totalFlitsDelivered3 += 1, 
+									noc3nsPriority = ((noc3nsLen > 0)) 
+								=} 			
+						//Local has a 1 or 3 and EW has a 2
+						:(1/3):  {=   noc3localPriority = (!((noc2ewLen < 4)) && ((noc3localLen > 0))) || (!((noc3localLen > 0)) && ((noc1nsLen < 4))) || (((noc2ewLen < 4)) && ((noc3localLen > 0)) && ((noc1nsLen < 4))),  
+									noc3localLockedew = ((noc3localLen > 0)) && !((noc2ewLen < 4)), 
+									noc3localLen -= (((noc3localLen > 0) ? 1 : 0))*(((noc2ewLen < 4) ? 1 : 0)),   
+									ewShouldInc2 = (((noc2ewLen < 4) ? 1 : 0))*(((noc3localLen > 0) ? 1 : 0)),  
+									ewShouldDec3 = (((noc1nsLen < 4) ? 1 : 0)),  
+									noc3ewLockedns = !((noc1nsLen < 4)), 
+									nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0)),  
+									nsShouldDec3 = (((noc3nsLen > 0) ? 1 : 0) ),  
+									noc3nsPriority = false, 
+									//totalFlitsDelivered3 += ((noc3nsLen > 0) ? 1 : 0) , 
+									optimalRuns3 += ((noc2ewLen < 4) ? 1 : 0)*((noc1nsLen < 4) ? 1 : 0)*((noc3nsLen > 0) ? 1 : 0) 
+								=}  
+
+
+					}
+				}
+		}
+
+
+	}
+
+
+
+
+
+}
+
+
+
+
+
+
+
+par{
+:: 	Top()
+::  Arbiter0()
+::  Arbiter1()
+::  Arbiter2()
+::  Arbiter3() 
+}
