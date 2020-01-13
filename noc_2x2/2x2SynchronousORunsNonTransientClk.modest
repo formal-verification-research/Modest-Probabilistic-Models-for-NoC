@@ -7,13 +7,12 @@ const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
 const int clkLower = 100; 
-const int clkUpper = 110;
+const int clkUpper = 105;
 int(clkLower..clkUpper) clk;
 //transient int(0..1) clk;
 
 
 action tick;
-action begin;
 
 
 /*transient int //totalFlitsDelivered0 = 0;
