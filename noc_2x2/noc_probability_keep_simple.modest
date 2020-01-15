@@ -56,12 +56,12 @@ process Clock(){
 process Top(){
 //	initialize();
 	do{
+		populate();
 		arbiter(0);
 		arbiter(1);
 		arbiter(2);
 		arbiter(3);
 		
-		populate();
 		tick;
 		
 		if(clk>=clkUpper){
@@ -116,7 +116,9 @@ process subPopulate(int routerID){
 	else {tau};
 	if(noc[routerID].localB1 == false){
 		{= 	noc[routerID].localB1 = noc[routerID].localB2,
-			noc[routerID].localB2 = noc[routerID].localB3
+			noc[routerID].localB2 = noc[routerID].localB3,
+			noc[routerID].localB3 = noc[routerID].localB4,
+			noc[routerID].localB4 = false
 		=}
 	}
 	else {tau};
@@ -135,7 +137,9 @@ process subPopulate(int routerID){
 	else {tau};
 	if(noc[routerID].ewB1 == false){
 		{= 	noc[routerID].ewB1 = noc[routerID].ewB2,
-			noc[routerID].ewB2 = noc[routerID].ewB3
+			noc[routerID].ewB2 = noc[routerID].ewB3,
+			noc[routerID].ewB3 = noc[routerID].ewB4,
+			noc[routerID].ewB4 = false
 		=}
 	}
 	else {tau};
@@ -154,7 +158,9 @@ process subPopulate(int routerID){
 	else {tau};
 	if(noc[routerID].nsB1 == false){
 		{= 	noc[routerID].nsB1 = noc[routerID].nsB2,
-			noc[routerID].nsB2 = noc[routerID].nsB3
+			noc[routerID].nsB2 = noc[routerID].nsB3,
+			noc[routerID].nsB3 = noc[routerID].nsB4,
+			noc[routerID].nsB4 = false
 		=}
 	}
 	else {tau}
