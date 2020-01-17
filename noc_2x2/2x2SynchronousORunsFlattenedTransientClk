@@ -8,8 +8,8 @@ const int INJECTIONRATEDENOMINATOR = 2;
 
 const int clkLower = 100; 
 const int clkUpper = 108;
-int(clkLower..clkUpper) clk;
-//transient int(0..1) clk;
+//int(clkLower..clkUpper) clk;
+transient int(0..1) clk;
 
 
 action tick;
@@ -41,6 +41,8 @@ transient int (0..1) optimalRuns1 = 0;
 transient int (0..1) optimalRuns2 = 0;
 transient int (0..1) optimalRuns3 = 0;
 int (0..10) optimalRuns = 0;
+
+bool shouldPop = true;
 
 
 transient int(0..1) nsShouldDec0 = 0; 
@@ -109,7 +111,7 @@ process Top(){
 
 		populate();
 
-		if (clkUpper-clk <= 0) {
+		if (1 == 0) {
 		 stop
 		}
 		else {
@@ -127,7 +129,7 @@ process Arbiter0() {
 
 		arbiter0();
 
-		if (clkUpper-clk <= 0) {
+		if (1 == 0) {
 		 stop
 		}
 		else {
@@ -146,7 +148,7 @@ process Arbiter1() {
 
 		arbiter1();
 
-		if (clkUpper-clk <= 0) {
+		if (1 == 0) {
 		 stop
 		}
 		else {
@@ -164,7 +166,7 @@ process Arbiter2() {
 	//do{
 
 		arbiter2();
-		if (clkUpper-clk <= 0) {
+		if (1 == 0) {
 		 stop
 		}
 		else {
@@ -182,7 +184,7 @@ process Arbiter3() {
 	//do{
 
 		arbiter3();
-		if (clkUpper-clk <= 0) {
+		if (1 == 0) {
 		 stop
 		}
 		else {
@@ -203,7 +205,7 @@ process Arbiter3() {
 
 process populate() {
 
-	if(clk%2 == 0) {
+	if(shouldPop) {
 
 		 tick {= 
 
@@ -225,7 +227,9 @@ process populate() {
 
 		1: optimalRuns += ((optimalRuns < 10) ? 1: 0)*(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
 
-		1: clk++
+		1: shouldPop = false,
+
+		1: clk = 1
 
 		=}
 
@@ -246,7 +250,9 @@ process populate() {
 
 		1: optimalRuns += ((optimalRuns < 10) ? 1: 0)*(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
 
-		1: clk++
+		1: shouldPop = true,
+
+		1: clk = 1
 
 		=}
 
@@ -4197,3 +4203,4 @@ par{
 ::  Arbiter2()
 ::  Arbiter3() 
 }
+
