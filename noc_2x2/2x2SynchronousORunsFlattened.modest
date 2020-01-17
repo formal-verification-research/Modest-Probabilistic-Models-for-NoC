@@ -13,7 +13,7 @@ int(clkLower..clkUpper) clk;
 
 
 action tick;
-action begin;
+//action begin;
 
 
 /*transient int //totalFlitsDelivered0 = 0;
@@ -40,7 +40,7 @@ transient int (0..1) optimalRuns0 = 0;
 transient int (0..1) optimalRuns1 = 0;
 transient int (0..1) optimalRuns2 = 0;
 transient int (0..1) optimalRuns3 = 0;
-int optimalRuns;
+int (0..10) optimalRuns = 0;
 
 
 transient int(0..1) nsShouldDec0 = 0; 
@@ -223,7 +223,7 @@ process populate() {
 		1: noc2ewLen += (ewShouldInc2 - ewShouldDec2),
 		1: noc3ewLen += (ewShouldInc3 - ewShouldDec3),
 
-		1: optimalRuns += (optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+		1: optimalRuns += ((optimalRuns < 10) ? 1: 0)*(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
 
 		1: clk++
 
@@ -244,7 +244,7 @@ process populate() {
 		1: noc2ewLen += (ewShouldInc2 - ewShouldDec2),
 		1: noc3ewLen += (ewShouldInc3 - ewShouldDec3),
 
-		1: optimalRuns += (optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+		1: optimalRuns += ((optimalRuns < 10) ? 1: 0)*(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
 
 		1: clk++
 
