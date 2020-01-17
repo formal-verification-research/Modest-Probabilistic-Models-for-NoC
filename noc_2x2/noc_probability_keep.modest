@@ -7,7 +7,7 @@ const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
 const int clkLower = 100;
-const int clkUpper = 107;
+const int clkUpper = 110;
 int(clkLower..clkUpper) clk;
 //transient int(0..1) clk;
 
@@ -17,7 +17,7 @@ action tick;
 
 //int totalFlitsDelivered = 0;
 
-datatype node = {	bool localB1, bool localB2, bool localB3, bool localB4, bool localLockedns, 
+datatype node = {	bool localB1, bool localB2, bool localB3, bool localB4, bool localLockedns, bool localLockedew,
 					bool ewB1, bool ewB2, bool ewB3, bool ewB4, bool ewLockedns, bool ewLockedlocal, 
 					bool nsB1, bool nsB2, bool nsB3, bool nsB4, bool a1, bool a2, bool a3
 //					, int local_ew_count, int local_ns_count, int ew_ns_count, int ew_local_count, int ns_local_count
@@ -167,31 +167,41 @@ process subPopulate(int routerID){
 
 process arbiter(int n){
 	
-	if(noc[n].localB1 == true && noc[n].ewB1 == true && noc[n].nsB1 == true){ //chance for both types of conflicts
-		if(noc[n].localLockedns == true && noc[n].ewLockedns == true){
-			local_ew_conflict_ns_serviced(n)
-		}
-		else if(noc[n].localLockedns == true && noc[n].ewLockedlocal == true){ 
-			//nsB1, ewB1 conflict -- localB1 to nsB1
+	if(noc[n].localB1 == true && noc[n].ewB1 == true && noc[n].nsB1 == true){ //All buffers have flits
+		if(noc[n].localLockedns == true && noc[n].ewLockedlocal == true){
 			ew_ns_conflict_local_ns(n)
 		}
-		else if(noc[n].localLockedns == false && noc[n].ewLockedns == true){
+		else if(noc[n].localLockedns == true && noc[n].ewLockedns == true){
+			local_ew_conflict_ns_serviced(n)
+		}
+		else if(noc[n].localLockedew == true && noc[n].ewLockedlocal == true){
+			ew_ns_conflict_local_ew(n)
+		}
+		else if(noc[n].localLockedew == true && noc[n].ewLockedns == true){
+			no_conflict_all(n)
+		}
+		else if(noc[n].localLockedns == true && noc[n].ewLockedlocal == false && noc[n].ewLockedns == false){
 			palt{
-				:(2/3):	no_conflict_all(n)
-				:(1/3):	local_ew_conflict_ns_serviced(n)
+				:(1/2): local_ew_conflict_ns_serviced(n)
+				:(1/2): ew_ns_conflict_local_ns(n)
 			}
 		}
-		else if(noc[n].localLockedns == false && noc[n].ewLockedlocal == true){
-			//ewB1, nsB1 conflict
+		else if(noc[n].localLockedew == true && noc[n].ewLockedlocal == false && noc[n].ewLockedns == false){
+			palt{
+				:(1/2): ew_ns_conflict_local_ew(n)
+				:(1/2): no_conflict_all(n)
+			}
+		}
+		else if(noc[n].localLockedns == false && noc[n].localLockedew == false && noc[n].ewLockedlocal == true){
 			palt{
 				:(2/3): ew_ns_conflict_local_ew(n)
 				:(1/3): ew_ns_conflict_local_ns(n)
 			}
 		}
-		else if (noc[n].localLockedns == true && noc[n].ewLockedlocal == false && noc[n].ewLockedns == false){
+		else if(noc[n].localLockedns == false && noc[n].localLockedew == false && noc[n].ewLockedns == true){
 			palt{
-				:(1/2):	ew_ns_conflict_local_ns(n)
-				:(1/2):	local_ew_conflict_ns_serviced(n)
+				:(2/3): no_conflict_all(n)
+				:(1/3): local_ew_conflict_ns_serviced(n)
 			}
 		}
 		else{
@@ -204,30 +214,41 @@ process arbiter(int n){
 		}
 	}
 	
-	else if(noc[n].localB1 == true && noc[n].ewB1 == true && noc[n].nsB1 == false){ //chance for localB1 and ewB1 conflict
-		if(noc[n].localLockedns == true && noc[n].ewLockedns == true){		//locked in conflict					May not actually be a reachable condition
-			local_ew_conflict_ns_empty(n)
-		}
-		else if(noc[n].localLockedns == true && noc[n].ewLockedlocal == true){	//no conflcit
+	else if(noc[n].localB1 == true && noc[n].ewB1 == true && noc[n].nsB1 == false){ //local and ew buffers have flits
+		if(noc[n].localLockedns == true && noc[n].ewLockedlocal == true){
 			no_conflict_localns_ewlocal(n)
 		}
-		else if(noc[n].localLockedns == false && noc[n].ewLockedns == true){
+		else if(noc[n].localLockedns == true && noc[n].ewLockedns == true){
+			local_ew_conflict_ns_empty(n)
+		}
+		else if(noc[n].localLockedew == true && noc[n].ewLockedlocal == true){
+			no_conflict_localew_ewlocal(n)
+		}
+		else if(noc[n].localLockedew == true && noc[n].ewLockedns == true){
+			no_conflict_localew_ewns(n)
+		}
+		else if(noc[n].localLockedns == true && noc[n].ewLockedlocal == false && noc[n].ewLockedns == false){
 			palt{
-				:(2/3):	no_conflict_localew_ewns(n)
-				:(1/3):	local_ew_conflict_ns_empty(n)
+				:(1/2): local_ew_conflict_ns_empty(n)
+				:(1/2): no_conflict_localns_ewlocal(n)
 			}
 		}
-		else if(noc[n].localLockedns == false && noc[n].ewLockedlocal == true){
+		else if(noc[n].localLockedew == true && noc[n].ewLockedlocal == false && noc[n].ewLockedns == false){
+			palt{
+				:(1/2): no_conflict_localew_ewns(n)
+				:(1/2): no_conflict_localew_ewlocal(n)
+			}
+		}
+		else if(noc[n].localLockedns == false && noc[n].localLockedew == false && noc[n].ewLockedlocal == true){
 			palt{
 				:(2/3): no_conflict_localew_ewlocal(n)
 				:(1/3): no_conflict_localns_ewlocal(n)
 			}
-			
 		}
-		else if(noc[n].localLockedns == true && noc[n].ewLockedlocal == false && noc[n].ewLockedns == false){
+		else if(noc[n].localLockedns == false && noc[n].localLockedew == false && noc[n].ewLockedns == true){
 			palt{
-				:(1/2):	no_conflict_localns_ewlocal(n)
-				:(1/2):	local_ew_conflict_ns_empty(n)
+				:(2/3): no_conflict_localew_ewns(n)
+				:(1/3): local_ew_conflict_ns_empty(n)
 			}
 		}
 		else{
@@ -236,12 +257,27 @@ process arbiter(int n){
 				:(1/3):	no_conflict_localew_ewns(n)
 				:(1/6):	no_conflict_localns_ewlocal(n)
 				:(1/6): local_ew_conflict_ns_empty(n)
-			}						
+			}
 		}
-	
 	}
 	
-	else if (noc[n].localB1 == false && noc[n].ewB1 == true && noc[n].nsB1 == true){ //chance for ewB1 and nsB1 conflict
+	
+	else if(noc[n].localB1 == true && noc[n].ewB1 == false && noc[n].nsB1 == true){ //local and ns buffers have flits
+		if(noc[n].localLockedns == true){
+			no_conflict_localns_ns(n)
+		}
+		else if(noc[n].localLockedew == true){
+			no_conflict_localew_ns(n)
+		}
+		else{
+			palt{
+				:(2/3): no_conflict_localew_ns(n)
+				:(1/3): no_conflict_localns_ns(n)
+			}
+		}
+	}
+		
+	else if(noc[n].localB1 == false && noc[n].ewB1 == true && noc[n].nsB1 == true){ //ew and ns buffers have flits
 		if(noc[n].ewLockedlocal == true){
 			ew_ns_conflcit_local_empty(n)
 		}
@@ -250,46 +286,25 @@ process arbiter(int n){
 		}
 		else{
 			palt{
-				:(1/2): no_conflict_ewns_ns(n)
 				:(1/2): ew_ns_conflcit_local_empty(n)
+				:(1/2): no_conflict_ewns_ns(n)
 			}
 		}
 	}
 	
-	else{		//no chance for conflict
-	
-		if(noc[n].localB1 == true && noc[n].ewB1 == true && noc[n].nsB1 == true){
-			no_conflict_all(n)
-		}
-		else if(noc[n].localB1 == true && noc[n].ewB1 == true && noc[n].nsB1 == false){
-			palt{
-				:(1/2):no_conflict_localew_ewlocal(n)
-				:(1/2):no_conflict_localew_ewns(n)
-			}
-		}
-		
-		else if(noc[n].localB1 == true && noc[n].ewB1 == false && noc[n].nsB1 == true){
-			palt{
-				:(2/3):no_conflict_localew_ns(n)
-				:(1/3):no_conflict_localns_ns(n)
-			}
-		}
-		else if(noc[n].localB1 == true && noc[n].ewB1 == false && noc[n].nsB1 == false){
-			no_conflict_local_only(n)
-		}
-		
-		else if(noc[n].localB1 == false && noc[n].ewB1 == true && noc[n].nsB1 == true){
-			no_conflict_ewns_ns(n)
-		}
-		
-		else if(noc[n].localB1 == false && noc[n].ewB1 == true && noc[n].nsB1 == false){
-			no_conflict_ew_only(n)
-		}
-		else if(noc[n].localB1 == false && noc[n].ewB1 == false && noc[n].nsB1 == true){
-			no_conflict_ns_only(n)
-		}
-		else{tau}
+	else if(noc[n].localB1 == true && noc[n].ewB1 == false && noc[n].nsB1 == false){ //Only the local buffer has a flit
+		no_conflict_local_only(n)
 	}
+	
+	else if(noc[n].localB1 == false && noc[n].ewB1 == true && noc[n].nsB1 == false){ //Only the ew buffer has a flit
+		no_conflict_ew_only(n)
+	}
+	
+	else if(noc[n].localB1 == false && noc[n].ewB1 == false && noc[n].nsB1 == true){ //Only the ns buffer has a flit
+		no_conflict_ns_only(n)
+	}
+	
+	else {tau} //No flits
 }
 
 //Flit forwarding processes
@@ -366,6 +381,7 @@ process ew_ns_conflict_local_ew(int n){
 	if(noc[n].a3){
 		{= 
 		noc[n].localB1 = noc[ewChannel(n)].ewB4,
+		noc[n].localLockedew = noc[ewChannel(n)].ewB4,
 		1: noc[ewChannel(n)].ewB4 = true, 		//service localB1 buffer in ewB1 direction
 //		noc[n].local_ew_count++,
 		
@@ -469,7 +485,9 @@ process ew_ns_conflcit_local_empty(int n){ //Start here for re-calculating prior
 process no_conflict_all(int n){
 	{=		//no conlfict 
 	noc[n].localB1 = noc[ewChannel(n)].ewB4,
+	noc[n].localLockedew = noc[ewChannel(n)].ewB4,
 	1: noc[ewChannel(n)].ewB4 = true, 		//service localB1 buffer in ewB1 direction
+	
 //	noc[n].local_ew_count++,
 	
 	 	//service es buffer in nsB1 direction
@@ -515,6 +533,7 @@ process no_conflict_localns_ewlocal(int n){
 process no_conflict_localew_ewlocal(int n){
 	{= 	//localB1 forward ewB1, ewB1 forward localB1
 	noc[n].localB1 = noc[ewChannel(n)].ewB4,
+	noc[n].localLockedew = noc[ewChannel(n)].ewB4,
 	1: noc[ewChannel(n)].ewB4 = true, 
 //	noc[n].local_ew_count++,
 	
@@ -534,7 +553,8 @@ process no_conflict_localew_ewlocal(int n){
 
 process no_conflict_localew_ewns(int n){
 	{=
-	noc[n].localB1 = noc[ewChannel(n)].ewB4,	
+	noc[n].localB1 = noc[ewChannel(n)].ewB4,
+	noc[n].localLockedew = noc[ewChannel(n)].ewB4,
 	1: noc[ewChannel(n)].ewB4 = true, 
 //	noc[n].local_ew_count++,
 	
@@ -573,6 +593,7 @@ process no_conflict_ewns_ns(int n){
 process no_conflict_localew_ns(int n){
 	{=
 	noc[n].localB1 = noc[ewChannel(n)].ewB4, 
+	noc[n].localLockedew = noc[ewChannel(n)].ewB4,
 	1: noc[ewChannel(n)].ewB4 = true,
 //	noc[n].local_ew_count++,
 	
@@ -616,10 +637,23 @@ process no_conflict_local_only(int n){
 		//noc[n].a3 = noc[n].a3		//redundant		
 		=}
 	}
+	else if(noc[n].localLockedew == true){
+		{= 		//forward ewB1 direction
+		noc[n].localB1 = noc[ewChannel(n)].ewB4, 
+		noc[n].localLockedew = noc[ewChannel(n)].ewB4,
+//		noc[n].local_ew_count++,
+		1: noc[ewChannel(n)].ewB4 = true,
+		
+		noc[n].a1 = noc[ewChannel(n)].ewB4 || noc[n].a1,
+		noc[n].a2 = !(noc[ewChannel(n)].ewB4) && noc[n].a2
+		//noc[n].a3 = noc[n].a3		//redundant
+		=}
+	}
 	else{
 		palt{
 			:(2/3): {= 		//forward ewB1 direction
 					noc[n].localB1 = noc[ewChannel(n)].ewB4, 
+					noc[n].localLockedew = noc[ewChannel(n)].ewB4,
 //					noc[n].local_ew_count++,
 					1: noc[ewChannel(n)].ewB4 = true,
 					
