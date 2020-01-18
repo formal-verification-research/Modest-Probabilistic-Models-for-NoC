@@ -7,7 +7,7 @@ const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
 const int clkLower = 100; 
-const int clkUpper = 108;
+const int clkUpper = 115;
 int(clkLower..clkUpper) clk;
 //transient int(0..1) clk;
 
@@ -93,8 +93,8 @@ transient int (0..1) ewShouldInc3 = 0;
 
 
 // ------ Begin: properties ---------
-property Pr1 = Pmax(<> (clk >= clkUpper) );
-//property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] ((optimalRuns) >= 1));
+//property Pr1 = Pmax(<> (clk >= clkUpper) );
+property p1 = Pmax(<>((optimalRuns) >= 1));
 //property p2 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (optimalRuns == 1));
 //property p3 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] ((optimalRuns0 == 1) | (optimalRuns1==1) | (optimalRuns2==1) | (optimalRuns3==1)));
 // ------ End: properties ---------
@@ -208,10 +208,10 @@ process populate() {
 		 tick {= 
 
 
-		1: noc0localLen += ((noc0localLen < 4) ? 1 : 0),		//Adds a flit to the local buffer of each NoC, if they are not already full
-		1: noc1localLen += ((noc1localLen < 4) ? 1 : 0),
-		1: noc2localLen += ((noc2localLen < 4) ? 1 : 0),
-		1: noc3localLen += ((noc3localLen < 4) ? 1 : 0),
+		-1: noc0localLen += ((noc0localLen < 4) ? 1 : 0),		//Adds a flit to the local buffer of each NoC, if they are not already full
+		-1: noc1localLen += ((noc1localLen < 4) ? 1 : 0),
+		-1: noc2localLen += ((noc2localLen < 4) ? 1 : 0),
+		-1: noc3localLen += ((noc3localLen < 4) ? 1 : 0),
 
 		1: noc0nsLen += (nsShouldInc0 - nsShouldDec0),
 		1: noc1nsLen += (nsShouldInc1 - nsShouldDec1),
