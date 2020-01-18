@@ -197,10 +197,10 @@ process populate() {
 		 tick {= 
 
 
-		1: noc[0].localLen += localNotFull1(0),		//Adds a flit to the local buffer of each NoC, if they are not already full
-		1: noc[1].localLen += localNotFull1(1),
-		1: noc[2].localLen += localNotFull1(2),
-		1: noc[3].localLen += localNotFull1(3),
+		-1: noc[0].localLen += localNotFull1(0),		//Adds a flit to the local buffer of each NoC, if they are not already full
+		-1: noc[1].localLen += localNotFull1(1),
+		-1: noc[2].localLen += localNotFull1(2),
+		-1: noc[3].localLen += localNotFull1(3),
 
 		1: noc[0].nsLen += (nsShouldInc0 - nsShouldDec0),
 		1: noc[1].nsLen += (nsShouldInc1 - nsShouldDec1),
