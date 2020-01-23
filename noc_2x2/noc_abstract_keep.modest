@@ -8,7 +8,7 @@ option "dtmc";
 
 // ---- Begin Varialbes ----
 const int clkLower = 100; 
-const int clkUpper = 105;
+const int clkUpper = 109;
 int(clkLower..clkUpper) clk;
 //transient int(0..1) clk;
 
@@ -529,11 +529,12 @@ process Arbiter_corner0(){
 		// service the local buffer
 		if(r0l1 || r0l3){	//local.dest = 1 || local.dest = 3 --------- local -> ew ---------
 			if(r1wb3 == false){
+				enque_r1wb(r0l3);
 				{=
 				r0l1 = false,
 				r0l3 = false
-				=};
-				enque_r1wb(r0l3)}
+				=}
+				}
 			else {tau};
 			
 			if(r0e0){		//east.dest = 0                    ----- ew -> local -----
@@ -596,10 +597,10 @@ process Arbiter_corner0(){
 		}
 		else if(r0l2){	//local.dest = 2
 			if(r2nb3 == false){
+				enque_r2nb();
 				{=
 				r0l2 = false
-				=};
-				enque_r2nb()
+				=}
 				}
 				else {tau};
 				
@@ -778,7 +779,13 @@ process Arbiter_corner1(){
 	else{
 		// service the local buffer
 		if(r1l0 || r1l2){	//local.dest = 1 || local.dest = 3 --------- local -> ew ---------
-			if(r0eb3 == false){enque_r0eb(r1l2)}
+			if(r0eb3 == false){
+				enque_r0eb(r1l2);
+				{=
+				r1l0 = false,
+				r1l2 = false
+				=}
+				}
 			else {tau};
 			
 			if(r1w1){		//west.dest = 1                    ----- ew -> local -----
@@ -840,8 +847,13 @@ process Arbiter_corner1(){
 			}
 		}
 		else if(r1l2){	//local.dest = 2
-			if(r3nb3 == false){enque_r3nb()}
-				else {tau};
+			if(r3nb3 == false){
+				enque_r3nb();
+				{=
+				r1l2 = false
+				=}
+				}
+			else {tau};
 				
 			if(r1w1){		//west.dest = 0
 				{= 
@@ -1017,7 +1029,13 @@ process Arbiter_corner2(){
 	else{
 		// service the local buffer
 		if(r2l3 || r2l1){	//local.dest = 1 || local.dest = 3 --------- local -> ew ---------
-			if(r3wb3 == false){enque_r3wb(r2l1)}
+			if(r3wb3 == false){
+				enque_r3wb(r2l1);
+				{=
+				r2l3 = false,
+				r2l1 = false
+				=}
+			}
 			else {tau};
 			
 			if(r2e2){		//east.dest = 0                    ----- ew -> local -----
@@ -1079,8 +1097,13 @@ process Arbiter_corner2(){
 			}
 		}
 		else if(r2l0){	//local.dest = 2
-			if(r0sb3 == false){enque_r0sb()}
-				else {tau};
+			if(r0sb3 == false){
+				enque_r0sb();
+				{=
+				r2l0 = false
+				=}
+			}
+			else {tau};
 				
 			if(r2e2){		//east.dest = 0
 				{= 
@@ -1256,7 +1279,13 @@ process Arbiter_corner3(){
 	else{
 		// service the local buffer
 		if(r3l2 || r3l0){	//local.dest = 1 || local.dest = 3 --------- local -> ew ---------
-			if(r2eb3 == false){enque_r2eb(r3l0)}
+			if(r2eb3 == false){
+				enque_r2eb(r3l0);
+				{=
+				r3l2 = false,
+				r3l0 = false
+				=}
+			}
 			else {tau};
 			
 			if(r3w3){		//west.dest = 3                    ----- ew -> local -----
@@ -1318,8 +1347,13 @@ process Arbiter_corner3(){
 			}
 		}
 		else if(r3l1){	//local.dest = 1
-			if(r1sb3 == false){enque_r1sb()}
-				else {tau};
+			if(r1sb3 == false){
+				enque_r1sb();
+				{=
+				r3l1 = false
+				=}
+			}
+			else {tau};
 				
 			if(r3w3){		//west.dest = 3
 				{= 
