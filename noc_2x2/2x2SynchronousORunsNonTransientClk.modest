@@ -653,7 +653,7 @@ process arbiter0(){
 									noc[0].localPriority = localNotEmpty(0) && !nsNotFull(2),
 									noc[0].localLen -= (localNotEmpty1(0))*(nsNotFull1(2)),  
 									nsShouldInc2 = (nsNotFull1(2))*(localNotEmpty1(0)), 
-									ewLockedlocal = false,
+									noc[0].ewLockedlocal = false,
 									ewShouldDec0 = 1, 
 									//totalFlitsDelivered0 += 1,
 									noc[0].nsPriority = nsNotEmpty(0) 
@@ -664,7 +664,7 @@ process arbiter0(){
 									noc[0].localPriority = localNotEmpty(0) && !ewNotFull(1),
 									noc[0].localLen -= (localNotEmpty1(0))*(ewNotFull1(1)),  
 									ewShouldInc1 = (ewNotFull1(1))*(localNotEmpty1(0)), 
-									ewLockedlocal = false,
+									noc[0].ewLockedlocal = false,
 									ewShouldDec0 = 1, 
 									//totalFlitsDelivered0 += 1,
 									noc[0].nsPriority = nsNotEmpty(0) 
@@ -1637,7 +1637,7 @@ process arbiter1(){
 									noc[1].localPriority = localNotEmpty(1) && !nsNotFull(3), 
 									noc[1].localLen -= (localNotEmpty1(1))*(nsNotFull1(3)),   
 									nsShouldInc3 = (nsNotFull1(3))*(localNotEmpty1(1)), 
-									ewLockedlocal = false, 
+									noc[1].ewLockedlocal = false, 
 									ewShouldDec1 = 1,  
 									//totalFlitsDelivered1 += 1, 
 									noc[1].nsPriority = nsNotEmpty(1) 
@@ -1648,7 +1648,7 @@ process arbiter1(){
 									noc[1].localPriority = localNotEmpty(1) && !ewNotFull(0), 
 									noc[1].localLen -= (localNotEmpty1(1))*(ewNotFull1(0)),   
 									ewShouldInc0 = (ewNotFull1(0))*(localNotEmpty1(1)),  
-									ewLockedlocal = false,
+									noc[1].ewLockedlocal = false,
 									ewShouldDec1 = 1,  
 									//totalFlitsDelivered1 += 1, 
 									noc[1].nsPriority = nsNotEmpty(1) 
@@ -2621,7 +2621,7 @@ process arbiter2(){
 									noc[2].localPriority = localNotEmpty(2) && !nsNotFull(0), 
 									noc[2].localLen -= (localNotEmpty1(2))*(nsNotFull1(0)),   
 									nsShouldInc0 = (nsNotFull1(0))*(localNotEmpty1(2)), 
-									ewLockedlocal = false, 
+									noc[2].ewLockedlocal = false, 
 									ewShouldDec2 = 1,  
 									//totalFlitsDelivered2 += 1, 
 									noc[2].nsPriority = nsNotEmpty(2) 
@@ -2632,7 +2632,7 @@ process arbiter2(){
 									noc[2].localPriority = localNotEmpty(2) && !ewNotFull(3), 
 									noc[2].localLen -= (localNotEmpty1(2))*(ewNotFull1(3)),   
 									ewShouldInc3 = (ewNotFull1(3))*(localNotEmpty1(2)), 
-									ewLockedlocal = false, 
+									noc[2].ewLockedlocal = false, 
 									ewShouldDec2 = 1,  
 									//totalFlitsDelivered2 += 1, 
 									noc[2].nsPriority = nsNotEmpty(2) 
@@ -3605,7 +3605,7 @@ process arbiter3(){
 									noc[3].localPriority = localNotEmpty(3) && !nsNotFull(1), 
 									noc[3].localLen -= (localNotEmpty1(3))*(nsNotFull1(1)),   
 									nsShouldInc1 = (nsNotFull1(1))*(localNotEmpty1(3)),
-									ewLockedlocal = false,  
+									noc[3].ewLockedlocal = false,  
 									ewShouldDec3 = 1,  
 									//totalFlitsDelivered3 += 1, 
 									noc[3].nsPriority = nsNotEmpty(3) 
@@ -3616,7 +3616,7 @@ process arbiter3(){
 									noc[3].localPriority = localNotEmpty(3) && !ewNotFull(2), 
 									noc[3].localLen -= (localNotEmpty1(3))*(ewNotFull1(2)),   
 									ewShouldInc2 = (ewNotFull1(2))*(localNotEmpty1(3)), 
-									ewLockedlocal = false, 
+									noc[3].ewLockedlocal = false, 
 									ewShouldDec3 = 1,  
 									//totalFlitsDelivered3 += 1, 
 									noc[3].nsPriority = nsNotEmpty(3) 
