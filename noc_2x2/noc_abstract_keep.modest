@@ -8,7 +8,7 @@ option "dtmc";
 
 // ---- Begin Varialbes ----
 const int clkLower = 100; 
-const int clkUpper = 110;
+const int clkUpper = 105;
 int(clkLower..clkUpper) clk;
 //transient int(0..1) clk;
 
@@ -450,15 +450,15 @@ process Arbiter_corner0(){
 		else{tau};
 		
 		//service the south buffer
-			if(r0s0){		//south.dest = 0
-				{= 
-				r0s0 = false
-//				, totalFlitsDelivered ++
-				=}
-			}
-			else{			//south.dest = null
-				tau
-			};
+		if(r0s0){		//south.dest = 0
+			{= 
+			r0s0 = false
+//			, totalFlitsDelivered ++
+			=}
+		}
+		else{			//south.dest = null
+			tau
+		};
 			
 		{=
 		r0a1 = (!(r2nb3) && !(r0a1) && !(r0a2)) || (!(r2nb3) && r0a2 && !(r0a3)) || (r2nb3 && r0a1) || (r2nb3 && r0a2 && r0a3),
@@ -528,7 +528,12 @@ process Arbiter_corner0(){
 	else{
 		// service the local buffer
 		if(r0l1 || r0l3){	//local.dest = 1 || local.dest = 3 --------- local -> ew ---------
-			if(r1wb3 == false){enque_r1wb(r0l3)}
+			if(r1wb3 == false){
+				{=
+				r0l1 = false,
+				r0l3 = false
+				=};
+				enque_r1wb(r0l3)}
 			else {tau};
 			
 			if(r0e0){		//east.dest = 0                    ----- ew -> local -----
@@ -550,13 +555,13 @@ process Arbiter_corner0(){
 				if(r0s0){		//south.dest = 0
 					{= 
 					r0s0 = false,
-///					totalFlitsDelivered++,
+//					totalFlitsDelivered++,
 					//local->ew, ew->ns, ns->local
 					r0a1 = (!(r2nb3) && r0a1) || (!(r2nb3) && r1wb3) || (r1wb3 && r0a1) || (r1wb3 && r0a2 && r0a3),
 					r0a2 = (!(r2nb3) && !(r1wb3) && r0a2) || (r2nb3 && !(r1wb3) && r0a1) || (r2nb3 && r0a2 && !(r0a3)) || (r2nb3 && r1wb3 && !(r0a1) && !(r0a2)),
 					r0a3 = r2nb3 && r0a3
 					
-					, optimalRuns++
+//					, optimalRuns++
 					=}
 				}
 				else{			//south.dest = null
@@ -590,7 +595,12 @@ process Arbiter_corner0(){
 			}
 		}
 		else if(r0l2){	//local.dest = 2
-			if(r2nb3 == false){enque_r2nb()}
+			if(r2nb3 == false){
+				{=
+				r0l2 = false
+				=};
+				enque_r2nb()
+				}
 				else {tau};
 				
 			if(r0e0){		//east.dest = 0
@@ -796,7 +806,7 @@ process Arbiter_corner1(){
 					r1a2 = (!(r3nb3) && !(r0eb3) && r1a2) || (r3nb3 && !(r0eb3) && r1a1) || (r3nb3 && r1a2 && !(r1a3)) || (r3nb3 && r0eb3 && !(r1a1) && !(r1a2)),
 					r1a3 = r3nb3 && r1a3
 					
-					, optimalRuns++
+//					, optimalRuns++
 					=}
 				}
 				else{			//south.dest = null
@@ -1035,7 +1045,7 @@ process Arbiter_corner2(){
 					r2a2 = (!(r0sb3) && !(r3wb3) && r2a2) || (r0sb3 && !(r3wb3) && r2a1) || (r0sb3 && r2a2 && !(r2a3)) || (r0sb3 && r3wb3 && !(r2a1) && !(r2a2)),
 					r2a3 = r0sb3 && r2a3
 					
-					, optimalRuns++
+//					, optimalRuns++
 					=}
 				}
 				else{			//south.dest = null
@@ -1274,7 +1284,7 @@ process Arbiter_corner3(){
 					r3a2 = (!(r1sb3) && !(r2eb3) && r3a2) || (r1sb3 && !(r2eb3) && r3a1) || (r1sb3 && r3a2 && !(r3a3)) || (r1sb3 && r2eb3 && !(r3a1) && !(r3a2)),
 					r3a3 = r1sb3 && r3a3
 					
-					, optimalRuns++
+//					, optimalRuns++
 					=}
 				}
 				else{			//north.dest = null
