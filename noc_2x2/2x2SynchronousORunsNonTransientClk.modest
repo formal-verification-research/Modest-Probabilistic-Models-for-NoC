@@ -7,7 +7,7 @@ const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
 const int clkLower = 100; 
-const int clkUpper = 115;
+const int clkUpper = 105;
 int(clkLower..clkUpper) clk;
 //transient int(0..1) clk;
 
@@ -83,7 +83,7 @@ function int(0..1) nsNotEmpty0(int(0..4) n) =    (noc[n].nsLen > 0)? 0 : 1;
 
 // ------ Begin: properties ---------
 property Pr1 = Pmax(<> (clk >= clkUpper) );
-property p1 = Pmax(<>((optimalRuns) >= 1));
+//property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] ((optimalRuns) >= 1));
 //property p2 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (optimalRuns == 1));
 //property p3 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] ((optimalRuns0 == 1) | (optimalRuns1==1) | (optimalRuns2==1) | (optimalRuns3==1)));
 // ------ End: properties ---------
@@ -319,6 +319,7 @@ process arbiter0(){
 
 			}
 
+
 			else {
 			tick palt {
 			// Local and EW both send ns	
@@ -354,7 +355,7 @@ process arbiter0(){
 
 				//Local has a 1 or 3 and EW has a 2
 				tick {= noc[0].localLockedew = !ewNotFull(1), //Local is locked in the ew direction if it is unable to send
-							noc[0].localPriority = !(!ewNotFull(1) && nsNotFull(2)), //Local remains in priority under the same conditions
+							noc[0].localPriority = !(ewNotFull(1) && !nsNotFull(2)), //Local remains in priority under the same conditions
 							noc[0].localLen -= (ewNotFull1(1)),  //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc1 = (ewNotFull1(1)), //The ew direction recieves under the same conditions
 							ewShouldDec0 = (nsNotFull1(2)),  // Ew sends if the ns direction is not full
@@ -388,7 +389,7 @@ process arbiter0(){
 
 				//Local has a 1 or 3 and EW has a 2
 				:(1/2):  {= noc[0].localLockedew = !ewNotFull(1), //Local is locked in the ew direction if it is unable to send
-							noc[0].localPriority = !(!ewNotFull(1) && nsNotFull(2)), //Local remains in priority under the same conditions
+							noc[0].localPriority = !(ewNotFull(1) && !nsNotFull(2)), //Local remains in priority under the same conditions
 							noc[0].localLen -= (ewNotFull1(1)),  //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc1 = (ewNotFull1(1)), //The ew direction recieves under the same conditions
 							ewShouldDec0 = (nsNotFull1(2)),  // Ew sends if the ns direction is not full
@@ -1336,7 +1337,7 @@ process arbiter1(){
 
 				//Local has a 1 or 3 and EW has a 2
 				tick {= noc[1].localLockedew = !ewNotFull(0),  //Local is locked in the ew direction if it is unable to send
-							noc[1].localPriority = !(!ewNotFull(0) && nsNotFull(3)),  //Local remains in priority under the same conditions
+							noc[1].localPriority = !(ewNotFull(0) && !nsNotFull(3)),  //Local remains in priority under the same conditions
 							noc[1].localLen -= (ewNotFull1(0)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc0 = (ewNotFull1(0)),  //The ew direction recieves under the same conditions
 							ewShouldDec1 = (nsNotFull1(3)),   // Ew sends if the ns direction is not full
@@ -1370,7 +1371,7 @@ process arbiter1(){
 
 				//Local has a 1 or 3 and EW has a 2
 				:(1/2):  {= noc[1].localLockedew = !ewNotFull(0),  //Local is locked in the ew direction if it is unable to send
-							noc[1].localPriority = !(!ewNotFull(0) && nsNotFull(3)),  //Local remains in priority under the same conditions
+							noc[1].localPriority = !(ewNotFull(0) && !nsNotFull(3)),  //Local remains in priority under the same conditions
 							noc[1].localLen -= (ewNotFull1(0)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc0 = (ewNotFull1(0)),  //The ew direction recieves under the same conditions
 							ewShouldDec1 = (nsNotFull1(3)),   // Ew sends if the ns direction is not full
@@ -2318,7 +2319,7 @@ process arbiter2(){
 
 				//Local has a 1 or 3 and EW has a 2
 				tick {=  noc[2].localLockedew = !ewNotFull(3),  //Local is locked in the ew direction if it is unable to send
-							noc[2].localPriority = !(!ewNotFull(3) && nsNotFull(0)),  //Local remains in priority under the same conditions
+							noc[2].localPriority = !(ewNotFull(3) && !nsNotFull(0)),  //Local remains in priority under the same conditions
 							noc[2].localLen -= (ewNotFull1(3)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc3 = (ewNotFull1(3)),  //The ew direction recieves under the same conditions
 							ewShouldDec2 = (nsNotFull1(0)),   // Ew sends if the ns direction is not full
@@ -2352,7 +2353,7 @@ process arbiter2(){
 
 				//Local has a 1 or 3 and EW has a 2
 				:(1/2):  {=  noc[2].localLockedew = !ewNotFull(3),  //Local is locked in the ew direction if it is unable to send
-							noc[2].localPriority = !(!ewNotFull(3) && nsNotFull(0)),  //Local remains in priority under the same conditions
+							noc[2].localPriority = !(ewNotFull(3) && !nsNotFull(0)),  //Local remains in priority under the same conditions
 							noc[2].localLen -= (ewNotFull1(3)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc3 = (ewNotFull1(3)),  //The ew direction recieves under the same conditions
 							ewShouldDec2 = (nsNotFull1(0)),   // Ew sends if the ns direction is not full
@@ -3300,7 +3301,7 @@ process arbiter3(){
 
 				//Local has a 1 or 3 and EW has a 2
 				tick {=  noc[3].localLockedew = !ewNotFull(2),  //Local is locked in the ew direction if it is unable to send
-							noc[3].localPriority = !(!ewNotFull(2) && nsNotFull(1)),  //Local remains in priority under the same conditions
+							noc[3].localPriority = !(ewNotFull(2) && !nsNotFull(1)),  //Local remains in priority under the same conditions
 							noc[3].localLen -= (ewNotFull1(2)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc2 = (ewNotFull1(2)),  //The ew direction recieves under the same conditions
 							ewShouldDec3 = (nsNotFull1(1)),   // Ew sends if the ns direction is not full
@@ -3334,7 +3335,7 @@ process arbiter3(){
 
 				//Local has a 1 or 3 and EW has a 2
 				:(1/2):  {=  noc[3].localLockedew = !ewNotFull(2),  //Local is locked in the ew direction if it is unable to send
-							noc[3].localPriority = !(!ewNotFull(2) && nsNotFull(1)),  //Local remains in priority under the same conditions
+							noc[3].localPriority = !(ewNotFull(2) && !nsNotFull(1)),  //Local remains in priority under the same conditions
 							noc[3].localLen -= (ewNotFull1(2)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc2 = (ewNotFull1(2)),  //The ew direction recieves under the same conditions
 							ewShouldDec3 = (nsNotFull1(1)),   // Ew sends if the ns direction is not full
