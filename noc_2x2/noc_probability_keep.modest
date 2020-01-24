@@ -6,8 +6,9 @@ const int NOCSIZE = 2;
 const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
+const int DUR;
 const int clkLower = 100;
-const int clkUpper = 112;
+const int clkUpper = clkLower + DUR;
 int(clkLower..clkUpper) clk;
 //transient int(0..1) clk;
 
@@ -504,7 +505,7 @@ process no_conflict_all(int n){
 	noc[n].a2 = (!(noc[nsChannel(n)].nsB4) && !(noc[ewChannel(n)].ewB4) && noc[n].a2) || (noc[nsChannel(n)].nsB4 && !(noc[ewChannel(n)].ewB4) && noc[n].a1) || (noc[nsChannel(n)].nsB4 && noc[n].a2 && !(noc[n].a3)) || (noc[nsChannel(n)].nsB4 && noc[ewChannel(n)].ewB4 && !(noc[n].a1) && !(noc[n].a2)),
 	noc[n].a3 = !(noc[nsChannel(n)].nsB4) && noc[n].a3,
 	
-	optimalRuns++
+	optimalRuns+= (!noc[ewChannel(n)].ewB4 && !noc[nsChannel(n)].nsB4) ? 1 : 0
 	
 	=}
 }

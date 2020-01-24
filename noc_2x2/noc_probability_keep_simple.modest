@@ -6,8 +6,9 @@ const int NOCSIZE = 2;
 const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
+const int DUR;
 const int clkLower = 100; 
-const int clkUpper = 112;
+const int clkUpper = clkLower + DUR;
 int(clkLower..clkUpper) clk;
 //transient int(0..1) clk;
 
@@ -379,7 +380,7 @@ process ew_ns_conflict_local_ew(int n){
 		{= 
 		noc[n].localB1 = noc[ewChannel(n)].ewB4,
 		noc[n].localLockedew = noc[ewChannel(n)].ewB4,
-		noc[n].localPriority = noc[ewChannel(n)].ewB4 || noc[n].localPriority,
+		noc[n].localPriority = (noc[ewChannel(n)].ewB4 && noc[n].localPriority),
 		1: noc[ewChannel(n)].ewB4 = true, 		//service localB1 buffer in ewB1 direction
 //		noc[n].local_ew_count++,
 		
@@ -394,7 +395,7 @@ process ew_ns_conflict_local_ew(int n){
 	else{
 		{= 
 		noc[n].localB1 = noc[ewChannel(n)].ewB4,
-		noc[n].localPriority = noc[ewChannel(n)].ewB4 && noc[nsChannel(n)].nsB4,
+		noc[n].localPriority = noc[ewChannel(n)].ewB4 || (!noc[ewChannel(n)].ewB4 && noc[n].localPriority),
 		1: noc[ewChannel(n)].ewB4 = true, 		//service localB1 buffer in ewB1 direction
 //		noc[n].local_ew_count++,
 		
@@ -412,7 +413,7 @@ process ew_ns_conflict_local_ns(int n){
 		{= 
 		noc[n].localB1 = noc[nsChannel(n)].nsB4,
 		noc[n].localLockedns = noc[nsChannel(n)].nsB4,
-		noc[n].localPriority = noc[n].localPriority || noc[nsChannel(n)].nsB4,
+		noc[n].localPriority = noc[n].localPriority && noc[nsChannel(n)].nsB4,
 		1: noc[nsChannel(n)].nsB4 = true, 	//service localB1 buffer in nsB1 direction
 //		noc[n].local_ns_count++,
 		
@@ -429,7 +430,7 @@ process ew_ns_conflict_local_ns(int n){
 		{= 
 		noc[n].localB1 = noc[nsChannel(n)].nsB4,
 		noc[n].localLockedns = noc[nsChannel(n)].nsB4,
-		noc[n].localPriority = noc[n].localPriority && noc[nsChannel(n)].nsB4,
+		noc[n].localPriority = (noc[n].localPriority && !noc[nsChannel(n)].nsB4) || noc[nsChannel(n)].nsB4,
 		1: noc[nsChannel(n)].nsB4 = true, 	//service localB1 buffer in nsB1 direction
 //		noc[n].local_ns_count++,
 		
@@ -458,7 +459,7 @@ process ew_ns_conflcit_local_empty(int n){
 	}	
 	else{
 		{=
-		noc[n].localPriority = true,
+		noc[n].localPriority = noc[n].localPriority,
 		
 //		totalFlitsDelivered++,				//service ewB1 buffer
 		noc[n].ewB1 = false,
@@ -474,7 +475,7 @@ process no_conflict_all(int n){
 	{=		//no conlfict 
 	noc[n].localB1 = noc[ewChannel(n)].ewB4,
 	noc[n].localLockedew = noc[ewChannel(n)].ewB4,
-	noc[n].localPriority = (noc[n].localPriority && noc[ewChannel(n)].ewB4) || (noc[n].localPriority && !(noc[nsChannel(n)].nsB4)) || (!(noc[ewChannel(n)].ewB4) && noc[nsChannel(n)].nsB4),
+	noc[n].localPriority = (noc[n].localPriority && noc[ewChannel(n)].ewB4) || (noc[n].localPriority && !(noc[nsChannel(n)].nsB4)) || ((noc[ewChannel(n)].ewB4) && !noc[nsChannel(n)].nsB4),
 	1: noc[ewChannel(n)].ewB4 = true, 		//service localB1 buffer in ewB1 direction
 //	noc[n].local_ew_count++,
 	
@@ -489,7 +490,7 @@ process no_conflict_all(int n){
 	noc[n].nsPriority = (!(noc[nsChannel(n)].nsB4) && noc[n].nsPriority) || false,
 //	noc[n].ns_local_count++,
 	
-	optimalRuns++
+	optimalRuns+= (!noc[ewChannel(n)].ewB4 && !noc[nsChannel(n)].nsB4) ? 1 : 0
 	
 	=}
 }
@@ -498,7 +499,7 @@ process no_conflict_localns_ewlocal(int n){
 	{=	//localB1 forward nsB1, ewB1 forward localB1
 	noc[n].localB1 = noc[nsChannel(n)].nsB4,
 	noc[n].localLockedns = noc[nsChannel(n)].nsB4,
-	noc[n].localPriority = noc[nsChannel(n)].nsB4 || noc[n].localPriority,
+	noc[n].localPriority = noc[nsChannel(n)].nsB4 || (noc[n].localPriority && !noc[nsChannel(n)].nsB4),
 	1: noc[nsChannel(n)].nsB4 = true,
 //	noc[n].local_ns_count++,
 	
@@ -515,7 +516,7 @@ process no_conflict_localew_ewlocal(int n){
 	{= 	//localB1 forward ewB1, ewB1 forward localB1
 	noc[n].localB1 = noc[ewChannel(n)].ewB4,
 	noc[n].localLockedew = noc[ewChannel(n)].ewB4,
-	noc[n].localPriority = noc[ewChannel(n)].ewB4 || noc[n].localPriority,
+	noc[n].localPriority = noc[ewChannel(n)].ewB4 || (noc[n].localPriority && !noc[ewChannel(n)].ewB4),
 	1: noc[ewChannel(n)].ewB4 = true, 
 //	noc[n].local_ew_count++,
 	
@@ -532,7 +533,7 @@ process no_conflict_localew_ewns(int n){
 	{=
 	noc[n].localB1 = noc[ewChannel(n)].ewB4,
 	noc[n].localLockedew = noc[ewChannel(n)].ewB4,	
-	noc[n].localPriority = (noc[n].localPriority && noc[ewChannel(n)].ewB4) || (noc[n].localPriority && !(noc[nsChannel(n)].nsB4)) || (!(noc[ewChannel(n)].ewB4) && noc[nsChannel(n)].nsB4),
+	noc[n].localPriority = (noc[n].localPriority && noc[ewChannel(n)].ewB4) || (noc[n].localPriority && !(noc[nsChannel(n)].nsB4)) || ((noc[ewChannel(n)].ewB4) && !noc[nsChannel(n)].nsB4),
 	1: noc[ewChannel(n)].ewB4 = true, 
 //	noc[n].local_ew_count++,
 	
@@ -568,7 +569,7 @@ process no_conflict_localew_ns(int n){
 	{=
 	noc[n].localB1 = noc[ewChannel(n)].ewB4, 
 	noc[n].localLockedew = noc[ewChannel(n)].ewB4,
-	noc[n].localPriority = noc[ewChannel(n)].ewB4,
+	noc[n].localPriority = noc[ewChannel(n)].ewB4 || (noc[ewChannel(n)].ewB4 && noc[n].localPriority),
 	1: noc[ewChannel(n)].ewB4 = true,
 //	noc[n].local_ew_count++,
 	
@@ -582,7 +583,7 @@ process no_conflict_localns_ns(int n){
 	{=
 	noc[n].localB1 = noc[nsChannel(n)].nsB4, 
 	noc[n].localLockedns = noc[nsChannel(n)].nsB4,
-	noc[n].localPriority = noc[nsChannel(n)].nsB4,
+	noc[n].localPriority = noc[nsChannel(n)].nsB4 || (noc[nsChannel(n)].nsB4 && noc[n].localPriority),
 	1: noc[nsChannel(n)].nsB4 = true,
 //	noc[n].local_ns_count++,
 	
@@ -597,7 +598,7 @@ process no_conflict_local_only(int n){
 		{= 
 		noc[n].localB1 = noc[nsChannel(n)].nsB4, 
 		noc[n].localLockedns = noc[nsChannel(n)].nsB4,
-		noc[n].localPriority = noc[nsChannel(n)].nsB4,
+		noc[n].localPriority = noc[nsChannel(n)].nsB4 || noc[n].localPriority,
 //		noc[n].local_ns_count++,
 		1: noc[nsChannel(n)].nsB4 = true				
 		=}
@@ -606,7 +607,7 @@ process no_conflict_local_only(int n){
 		{= 		//forward ewB1 direction
 		noc[n].localB1 = noc[ewChannel(n)].ewB4, 
 		noc[n].localLockedew = noc[ewChannel(n)].ewB4,
-		noc[n].localPriority = noc[ewChannel(n)].ewB4,
+		noc[n].localPriority = noc[ewChannel(n)].ewB4 || noc[n].localPriority,
 //		noc[n].local_ew_count++,
 		1: noc[ewChannel(n)].ewB4 = true
 		=}
@@ -616,14 +617,14 @@ process no_conflict_local_only(int n){
 			:(2/3): {= 		//forward ewB1 direction
 					noc[n].localB1 = noc[ewChannel(n)].ewB4, 
 					noc[n].localLockedew = noc[ewChannel(n)].ewB4,
-					noc[n].localPriority = noc[ewChannel(n)].ewB4,
+					noc[n].localPriority = noc[ewChannel(n)].ewB4 || noc[n].localPriority,
 //					noc[n].local_ew_count++,
 					1: noc[ewChannel(n)].ewB4 = true
 					=}
 			:(1/3): {= 					//forward nsB1 direction
 					noc[n].localB1 = noc[nsChannel(n)].nsB4, 
 					noc[n].localLockedns = noc[nsChannel(n)].nsB4,
-					noc[n].localPriority = noc[nsChannel(n)].nsB4,
+					noc[n].localPriority = noc[nsChannel(n)].nsB4 || noc[n].localPriority,
 //					noc[n].local_ns_count++,
 					1: noc[nsChannel(n)].nsB4 = true
 					=}
