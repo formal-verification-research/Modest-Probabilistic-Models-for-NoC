@@ -562,7 +562,7 @@ process Arbiter_corner0(){
 					r0a2 = (!(r2nb3) && !(r1wb3) && r0a2) || (r2nb3 && !(r1wb3) && r0a1) || (r2nb3 && r0a2 && !(r0a3)) || (r2nb3 && r1wb3 && !(r0a1) && !(r0a2)),
 					r0a3 = r2nb3 && r0a3
 					
-//					, optimalRuns++
+					, optimalRuns++
 					=}
 				}
 				else{			//south.dest = null
@@ -813,7 +813,7 @@ process Arbiter_corner1(){
 					r1a2 = (!(r3nb3) && !(r0eb3) && r1a2) || (r3nb3 && !(r0eb3) && r1a1) || (r3nb3 && r1a2 && !(r1a3)) || (r3nb3 && r0eb3 && !(r1a1) && !(r1a2)),
 					r1a3 = r3nb3 && r1a3
 					
-//					, optimalRuns++
+					, optimalRuns++
 					=}
 				}
 				else{			//south.dest = null
@@ -1063,7 +1063,7 @@ process Arbiter_corner2(){
 					r2a2 = (!(r0sb3) && !(r3wb3) && r2a2) || (r0sb3 && !(r3wb3) && r2a1) || (r0sb3 && r2a2 && !(r2a3)) || (r0sb3 && r3wb3 && !(r2a1) && !(r2a2)),
 					r2a3 = r0sb3 && r2a3
 					
-//					, optimalRuns++
+					, optimalRuns++
 					=}
 				}
 				else{			//south.dest = null
@@ -1313,7 +1313,7 @@ process Arbiter_corner3(){
 					r3a2 = (!(r1sb3) && !(r2eb3) && r3a2) || (r1sb3 && !(r2eb3) && r3a1) || (r1sb3 && r3a2 && !(r3a3)) || (r1sb3 && r2eb3 && !(r3a1) && !(r3a2)),
 					r3a3 = r1sb3 && r3a3
 					
-//					, optimalRuns++
+					, optimalRuns++
 					=}
 				}
 				else{			//north.dest = null
