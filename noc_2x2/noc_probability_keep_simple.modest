@@ -412,7 +412,7 @@ process ew_ns_conflict_local_ns(int n){
 		{= 
 		noc[n].localB1 = noc[nsChannel(n)].nsB4,
 		noc[n].localLockedns = noc[nsChannel(n)].nsB4,
-		noc[n].localPriority = noc[n].localPriority || noc[nsChannel(n)].nsB4,
+		noc[n].localPriority = noc[n].localPriority && noc[nsChannel(n)].nsB4,
 		1: noc[nsChannel(n)].nsB4 = true, 	//service localB1 buffer in nsB1 direction
 //		noc[n].local_ns_count++,
 		
@@ -429,7 +429,7 @@ process ew_ns_conflict_local_ns(int n){
 		{= 
 		noc[n].localB1 = noc[nsChannel(n)].nsB4,
 		noc[n].localLockedns = noc[nsChannel(n)].nsB4,
-		noc[n].localPriority = noc[n].localPriority && noc[nsChannel(n)].nsB4,
+		noc[n].localPriority = (noc[n].localPriority && !noc[nsChannel(n)].nsB4) || noc[nsChannel(n)].nsB4,
 		1: noc[nsChannel(n)].nsB4 = true, 	//service localB1 buffer in nsB1 direction
 //		noc[n].local_ns_count++,
 		
@@ -458,7 +458,7 @@ process ew_ns_conflcit_local_empty(int n){
 	}	
 	else{
 		{=
-		noc[n].localPriority = true,
+		noc[n].localPriority = noc[n].localPriority,
 		
 //		totalFlitsDelivered++,				//service ewB1 buffer
 		noc[n].ewB1 = false,
@@ -474,7 +474,7 @@ process no_conflict_all(int n){
 	{=		//no conlfict 
 	noc[n].localB1 = noc[ewChannel(n)].ewB4,
 	noc[n].localLockedew = noc[ewChannel(n)].ewB4,
-	noc[n].localPriority = (noc[n].localPriority && noc[ewChannel(n)].ewB4) || (noc[n].localPriority && !(noc[nsChannel(n)].nsB4)) || (!(noc[ewChannel(n)].ewB4) && noc[nsChannel(n)].nsB4),
+	noc[n].localPriority = (noc[n].localPriority && noc[ewChannel(n)].ewB4) || (noc[n].localPriority && !(noc[nsChannel(n)].nsB4)) || ((noc[ewChannel(n)].ewB4) && !noc[nsChannel(n)].nsB4),
 	1: noc[ewChannel(n)].ewB4 = true, 		//service localB1 buffer in ewB1 direction
 //	noc[n].local_ew_count++,
 	
