@@ -824,7 +824,7 @@ process arbiter0(){
 					noc0nsPriority = ((noc2nsLen < 4))
 					=}
 					//Local Sends to 2, EW to 0
-			:(1/2):  {= noc0localPriority = !((noc2nsLen < 4)) && !((noc0snLen > 0)),
+			:(1/2):  {= noc0localPriority = !((noc2nsLen < 4)) && !((noc0nsLen > 0)),
 						noc0localLockedns = !((noc2nsLen < 4)),
 						noc0localLen -= ((noc2nsLen < 4) ? 1 : 0),  
 						nsShouldInc2 = (((noc2nsLen < 4) ? 1 : 0)), 
@@ -1808,7 +1808,7 @@ process arbiter1(){
 					noc1nsPriority = ((noc3nsLen < 4))
 					=}
 					//Local Sends to 2,  EW to 0
-			:(1/2):  {= noc1localPriority = !((noc3nsLen < 4)) && !((noc1snLen > 0)), 
+			:(1/2):  {= noc1localPriority = !((noc3nsLen < 4)) && !((noc1nsLen > 0)), 
 						noc1localLockedns = !((noc3nsLen < 4)), 
 						noc1localLen -= ((noc3nsLen < 4) ? 1 : 0),   
 						nsShouldInc3 = (((noc3nsLen < 4) ? 1 : 0)),  
@@ -2792,7 +2792,7 @@ process arbiter2(){
 					noc2nsPriority = ((noc0nsLen < 4))
 					=}
 					//Local Sends to 2,  EW to 0
-			:(1/2):  {=  noc2localPriority = !((noc0nsLen < 4)) && !((noc2snLen > 0)), 
+			:(1/2):  {=  noc2localPriority = !((noc0nsLen < 4)) && !((noc2nsLen > 0)), 
 						noc2localLockedns = !((noc0nsLen < 4)), 
 						noc2localLen -= ((noc0nsLen < 4) ? 1 : 0),   
 						nsShouldInc0 = (((noc0nsLen < 4) ? 1 : 0)),  
@@ -3776,7 +3776,7 @@ process arbiter3(){
 					noc3nsPriority = ((noc1nsLen < 4))
 					=}
 					//Local Sends to 2,  EW to 0
-			:(1/2):  {=  noc3localPriority = !((noc1nsLen < 4)) && !((noc3snLen > 0)), 
+			:(1/2):  {=  noc3localPriority = !((noc1nsLen < 4)) && !((noc3nsLen > 0)), 
 						noc3localLockedns = !((noc1nsLen < 4)), 
 						noc3localLen -= ((noc1nsLen < 4) ? 1 : 0),   
 						nsShouldInc1 = (((noc1nsLen < 4) ? 1 : 0)),  
