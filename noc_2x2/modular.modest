@@ -1,0 +1,317 @@
+option "dtmc";
+
+//Top level varables
+//const int BUFFERLENGTH = 4;
+//const int NOCSIZE = 2;
+//const int INJECTIONRATENUMERATOR = 1;
+//const int INJECTIONRATEDENOMINATOR = 2;
+
+const int DUR;
+const int NsRateDenominator;
+const int EwRateDenominator;
+const int clkLower = 100; 
+const int clkUpper = clkLower + DUR;
+int(clkLower..clkUpper) clk;
+//transient int(0..1) clk;
+
+
+action tick;
+action tock;
+action tack;
+
+
+/*transient int //totalFlitsDelivered0 = 0;
+transient int //totalFlitsDelivered1 = 0;
+transient int //totalFlitsDelivered2 = 0;
+transient int //totalFlitsDelivered3 = 0;
+int //totalFlitsDelivered;*/
+
+
+
+int(0..4) localLen;
+int(0..4) ewLen;
+int(0..4) nsLen;
+bool localPriority;
+bool nsPriority;
+bool ewLockedns;
+bool ewLockedlocal;
+bool localLockedns;
+//bool localLockedew;
+
+
+
+
+int(1..2) localWillSend = 1; //0 indicates it's empty, 1 indicates it sends ew, 2 indicated ns
+int(1..2) ewWillSend = 1; //0 indicates it's empty, 1 indicates it sends local, 2 indicates ns
+
+
+// ------ Begin: properties ---------
+property Pr1 = Pmax(<> (clk >= clkUpper) );
+// ------ End: properties ---------
+
+process LocalBuffer() {
+
+		if(clk%2 == 0) {
+
+		 	tick {= 
+
+					localLen += (localLen < 4) ? 1 : 0		//Adds a flit to the local buffer of each NoC, if they are not already full
+
+				=}
+
+		}
+		else {
+
+			tick
+		};
+
+		localBuffer();
+
+		tack {= clk++ =};
+
+		if (clkUpper-clk <= 0) {
+		 stop
+		}
+		else {
+		LocalBuffer()
+		}
+
+}
+
+process EwBuffer() {
+
+		tick;
+		ewBuffer();
+		receiveEw();
+
+		if (clkUpper-clk <= 0) {
+		 stop
+		}
+		else {
+		EwBuffer()
+		}
+			
+}
+
+process NsBuffer() {
+
+		tick;
+		tock;
+		receiveNs();
+
+		if (clkUpper-clk <= 0) {
+		 stop
+		}
+		else {
+		NsBuffer()
+		}
+			
+}
+
+process Send() {
+		tick;
+		tock;
+		send();
+
+		if (clkUpper-clk <= 0) {
+		 stop
+		}
+		else {
+		Send()
+		}
+}
+
+
+
+process localBuffer() {
+
+
+	if (localLen != 0) {
+
+
+		if(localLockedns) {
+			tock {= localWillSend = 2 =}
+		}
+		else {
+			tock palt{
+				:(1/3): {= localWillSend = 2 =}
+				:(2/3): {= localWillSend = 1 =}
+			}
+		}
+
+	} 
+
+	else {
+		tock
+	}
+
+}
+
+process ewBuffer() {
+
+
+	if (ewLen != 0) {
+
+		if(ewLockedlocal) {
+			tock {= ewWillSend = 1 =}
+		}
+		else if(ewLockedns) {
+			tock {= ewWillSend = 2 =}
+		}
+		else {
+			tock palt {
+				:(1/2): {= ewWillSend = 1 =}
+				:(1/2): {= ewWillSend = 2 =}
+			}
+		}
+	} 
+
+	else {
+		tock
+	}
+
+}
+
+process send() {
+
+	if(ewLen == 0) {
+		if(localLen == 0) {
+			if(nsLen == 0) {
+				tack
+			}
+			else {
+				tack {= nsLen-=1 =}
+			}
+		}
+		else if(localWillSend == 1) {//local tries ew
+			if(nsLen == 0) {
+				tack {= localLen-=1 =}
+			}
+			else {
+				tack {= nsLen-=1, localLen-=1 =}
+			}
+		}
+		else { //local tries ns
+			if(nsLen == 0) {
+				tack {= localLen-=1, localLockedns = false =}
+			}
+			else {
+				tack {= nsLen-=1, localLen-=1, localLockedns = false =}
+			}
+		}
+
+	}
+	else if(ewWillSend == 1){  //Ew tries local
+		if(localLen == 0) {
+			if(nsLen == 0) {
+				tack {= ewLen-=1, ewLockedlocal = false =}
+			}
+			else {
+				if(nsPriority) {
+					tack {= nsLen-=1, localPriority = false, nsPriority = false, ewLockedlocal = true =}
+				}
+				else {
+					tack {= ewLen-=1, nsPriority = true, ewLockedlocal = false =}
+				}
+			}
+		}
+		else if(localWillSend == 1) {//local tries ew
+			if(nsLen == 0) {
+				tack {= ewLen-=1, localLen-=1, ewLockedlocal = false =}
+			}
+			else {
+				if(nsPriority) {
+					tack {= nsLen-=1, localLen-= 1, localPriority = false, nsPriority = false, ewLockedlocal = true =}
+				}
+				else {
+					tack {= ewLen-=1, localLen-= 1, nsPriority = true, ewLockedlocal = false =}
+				}
+			}
+		}
+		else {//local tries ns
+			if(nsLen == 0) {
+				tack {= ewLen-=1, localLen-=1, localLockedns=false, ewLockedlocal = false  =}
+			}
+			else {
+				if(nsPriority) {
+					tack {= nsLen-=1, localLen-=1, nsPriority = false, localPriority = false, localLockedns = false, ewLockedlocal = true =}
+				}
+				else {
+					tack {= ewLen-=1, localLen-=1, nsPriority = true, ewLockedlocal = false, localLockedns = false =}
+				}
+			}	
+		}		
+	}
+	else{ //ew tries ns
+		if(localLen == 0) {
+			if(nsLen == 0) {
+				tack {= ewLen-=1, ewLockedns = false =}
+			}
+			else {
+				tack {= ewLen-=1, nsLen-=1, ewLockedns = false =}
+			}
+		}
+		else if(localWillSend == 1) { //local tries ew
+			if(nsLen == 0) {
+				tack {= ewLen-=1, localLen-=1, ewLockedns = false=}
+			}
+			else {
+				tack {= nsLen-=1, ewLen-=1, localLen-=1, ewLockedns = false=}
+			}
+		}
+		else {//local tries ns
+			if(nsLen == 0) {
+				if(localPriority) {
+					tack {= localLen-=1, localPriority = false, nsPriority = false, ewLockedns = true, localLockedns = false =}
+				}
+				else {
+					tack {= ewLen-=1, localPriority = true, ewLockedns = false, localLockedns = true =}
+				}
+			}
+			else {
+				if(localPriority) {
+					tack {= localLen-=1, nsLen-=1, localPriority = false, nsPriority = false, ewLockedns = true, localLockedns = false =}
+				}
+				else {
+					tack {= ewLen-=1, nsLen-= 1, localPriority = true, ewLockedns = false, localLockedns = true =}
+				}
+			}	
+		}	
+	}
+
+}
+
+process receiveNs() {
+
+	if(nsLen < 4) {
+		tack palt {
+			:(1/NsRateDenominator): {= 1: nsLen+=1 =}
+		}
+	}
+	else { tack }
+
+}
+
+process receiveEw() {
+
+	if(ewLen < 4) {
+		tack palt {
+			:(1/EwRateDenominator): {= 1: ewLen+=1 =}
+		}
+	}
+	else { tack }
+
+}
+
+	
+
+
+
+
+
+par{
+:: Send()	
+::  LocalBuffer()
+::  EwBuffer()
+::  NsBuffer()
+}
