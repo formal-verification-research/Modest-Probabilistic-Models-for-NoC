@@ -13,7 +13,7 @@ const int clkLower = 100;
 const int clkUpper = clkLower + DUR;
 int(clkLower..clkUpper) clk;
 //transient int(0..1) clk;
-
+transient int(0..1) clk2;
 
 action tick;
 action tock;
@@ -39,14 +39,32 @@ bool localLockedns;
 //bool localLockedew;
 
 
-
+int(0..1) sentEw;
+int(0..1) sentNs;
 
 int(1..2) localWillSend = 1; //0 indicates it's empty, 1 indicates it sends ew, 2 indicated ns
 int(1..2) ewWillSend = 1; //0 indicates it's empty, 1 indicates it sends local, 2 indicates ns
 
 
 // ------ Begin: properties ---------
-property Pr1 = Pmax(<> (clk >= clkUpper) );
+//property Pr1 = Pmax(<> (clk >= clkUpper) );
+//property Pr2 = Pmax(<>[S(sentEw) <= clkUpper-clkLower] ((clk) >= clkUpper) );
+//property Pr3 = Xmax(S(sentEw), clk>=clkUpper);
+//property Pr4 = Xmax(S(sentNs), clk>=clkUpper);
+property Pr5 = Pmax(<>[S(clk2) <= (clkUpper-clkLower)] (sentEw == 1));
+//property Pr6 = Pmax(<>[S(clk2) <= (clkUpper-clkLower)] (sentNs == 1));
+property Pr7 = Pmax(<> (sentEw==1 && clk == 100));
+property Pr8 = Pmax(<> (sentEw==1 && clk == 101));
+property Pr9 = Pmax(<> (sentEw==1 && clk == 102));
+property Pr10 = Pmax(<> (sentEw==1 && clk == 103));
+property Pr11 = Pmax(<> (sentEw==1 && clk == 104));
+property Pr12 = Pmax(<> (sentEw==1 && clk == 105));
+property Pr13 = Pmax(<> (sentEw==1 && clk == 106));
+property Pr14 = Pmax(<> (sentEw==1 && clk == 107));
+property Pr15 = Pmax(<> (sentEw==1 && clk == 1010));
+property Pr16 = Pmax(<> (sentEw==1 && clk == 1011));
+property Pr17 = Pmax(<> (sentEw==1 && clk == 1012));
+property Pr18 = Pmax(<> (sentEw==1 && clk == 1013));
 // ------ End: properties ---------
 
 process LocalBuffer() {
@@ -55,19 +73,21 @@ process LocalBuffer() {
 
 		 	tick {= 
 
-					localLen += (localLen < 4) ? 1 : 0		//Adds a flit to the local buffer of each NoC, if they are not already full
+					localLen += (localLen < 4) ? 1 : 0,		//Adds a flit to the local buffer of each NoC, if they are not already full
+					sentNs = 0,
+					sentEw = 0
 
 				=}
 
 		}
 		else {
 
-			tick
+			tick {= sentNs = 0, sentEw = 0 =}
 		};
 
 		localBuffer();
 
-		tack {= clk++ =};
+		tack {= clk++, clk2 =1 =};
 
 		if (clkUpper-clk <= 0) {
 		 stop
@@ -185,18 +205,18 @@ process send() {
 		}
 		else if(localWillSend == 1) {//local tries ew
 			if(nsLen == 0) {
-				tack {= localLen-=1 =}
+				tack {= localLen-=1, sentEw = 1 =}
 			}
 			else {
-				tack {= nsLen-=1, localLen-=1 =}
+				tack {= nsLen-=1, localLen-=1, sentEw = 1 =}
 			}
 		}
 		else { //local tries ns
 			if(nsLen == 0) {
-				tack {= localLen-=1, localLockedns = false =}
+				tack {= localLen-=1, localLockedns = false, sentNs = 1 =}
 			}
 			else {
-				tack {= nsLen-=1, localLen-=1, localLockedns = false =}
+				tack {= nsLen-=1, localLen-=1, localLockedns = false, sentNs = 1 =}
 			}
 		}
 
@@ -217,27 +237,27 @@ process send() {
 		}
 		else if(localWillSend == 1) {//local tries ew
 			if(nsLen == 0) {
-				tack {= ewLen-=1, localLen-=1, ewLockedlocal = false =}
+				tack {= ewLen-=1, localLen-=1, ewLockedlocal = false, sentEw = 1 =}
 			}
 			else {
 				if(nsPriority) {
-					tack {= nsLen-=1, localLen-= 1, localPriority = false, nsPriority = false, ewLockedlocal = true =}
+					tack {= nsLen-=1, localLen-= 1, localPriority = false, sentEw = 1, nsPriority = false, ewLockedlocal = true =}
 				}
 				else {
-					tack {= ewLen-=1, localLen-= 1, nsPriority = true, ewLockedlocal = false =}
+					tack {= ewLen-=1, localLen-= 1, nsPriority = true, ewLockedlocal = false, sentEw = 1 =}
 				}
 			}
 		}
 		else {//local tries ns
 			if(nsLen == 0) {
-				tack {= ewLen-=1, localLen-=1, localLockedns=false, ewLockedlocal = false  =}
+				tack {= ewLen-=1, localLen-=1, localLockedns=false, ewLockedlocal = false, sentNs = 1  =}
 			}
 			else {
 				if(nsPriority) {
-					tack {= nsLen-=1, localLen-=1, nsPriority = false, localPriority = false, localLockedns = false, ewLockedlocal = true =}
+					tack {= nsLen-=1, localLen-=1, nsPriority = false, localPriority = false, localLockedns = false, ewLockedlocal = true, sentNs = 1 =}
 				}
 				else {
-					tack {= ewLen-=1, localLen-=1, nsPriority = true, ewLockedlocal = false, localLockedns = false =}
+					tack {= ewLen-=1, localLen-=1, nsPriority = true, ewLockedlocal = false, localLockedns = false, sentNs = 1 =}
 				}
 			}	
 		}		
@@ -245,35 +265,35 @@ process send() {
 	else{ //ew tries ns
 		if(localLen == 0) {
 			if(nsLen == 0) {
-				tack {= ewLen-=1, ewLockedns = false =}
+				tack {= ewLen-=1, ewLockedns = false, sentNs = 1 =}
 			}
 			else {
-				tack {= ewLen-=1, nsLen-=1, ewLockedns = false =}
+				tack {= ewLen-=1, nsLen-=1, ewLockedns = false, sentNs = 1 =}
 			}
 		}
 		else if(localWillSend == 1) { //local tries ew
 			if(nsLen == 0) {
-				tack {= ewLen-=1, localLen-=1, ewLockedns = false=}
+				tack {= ewLen-=1, localLen-=1, ewLockedns = false, sentNs = 1, sentEw = 1=}
 			}
 			else {
-				tack {= nsLen-=1, ewLen-=1, localLen-=1, ewLockedns = false=}
+				tack {= nsLen-=1, ewLen-=1, localLen-=1, ewLockedns = false, sentNs = 1, sentEw = 1=}
 			}
 		}
 		else {//local tries ns
 			if(nsLen == 0) {
 				if(localPriority) {
-					tack {= localLen-=1, localPriority = false, nsPriority = false, ewLockedns = true, localLockedns = false =}
+					tack {= localLen-=1, localPriority = false, nsPriority = false, ewLockedns = true, localLockedns = false, sentNs = 1 =}
 				}
 				else {
-					tack {= ewLen-=1, localPriority = true, ewLockedns = false, localLockedns = true =}
+					tack {= ewLen-=1, localPriority = true, ewLockedns = false, localLockedns = true, sentNs = 1 =}
 				}
 			}
 			else {
 				if(localPriority) {
-					tack {= localLen-=1, nsLen-=1, localPriority = false, nsPriority = false, ewLockedns = true, localLockedns = false =}
+					tack {= localLen-=1, nsLen-=1, localPriority = false, nsPriority = false, ewLockedns = true, localLockedns = false, sentNs = 1 =}
 				}
 				else {
-					tack {= ewLen-=1, nsLen-= 1, localPriority = true, ewLockedns = false, localLockedns = true =}
+					tack {= ewLen-=1, nsLen-= 1, localPriority = true, ewLockedns = false, localLockedns = true, sentNs = 1 =}
 				}
 			}	
 		}	
@@ -284,8 +304,25 @@ process send() {
 process receiveNs() {
 
 	if(nsLen < 4) {
-		tack palt {
-			:(1/NsRateDenominator): {= 1: nsLen+=1 =}
+		if (clk == 100 || clk == 102 ) {
+			tack
+		}
+		else if (clk == 101) {
+			tack palt {
+				:(1/3): {= 1: nsLen +=1 =}
+			}
+		}
+		else {
+			if(clk%2 == 0) {
+				tack palt {
+					:(1/6): {= 1: nsLen+=1 =}
+				}
+			}
+			else {
+				tack palt {
+					:(2/3): {= 1: nsLen+= 1 =}
+				}
+			}
 		}
 	}
 	else { tack }
@@ -295,9 +332,12 @@ process receiveNs() {
 process receiveEw() {
 
 	if(ewLen < 4) {
-		tack palt {
-			:(1/EwRateDenominator): {= 1: ewLen+=1 =}
+		if(clk%2 == 1) {
+			tack palt {
+				:(2/3): {= 1: ewLen+=1 =}
+			}
 		}
+		else {tack}
 	}
 	else { tack }
 
