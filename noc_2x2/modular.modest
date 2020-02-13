@@ -7,8 +7,8 @@ option "dtmc";
 //const int INJECTIONRATEDENOMINATOR = 2;
 
 const int DUR;
-const int NsRateDenominator;
-const int EwRateDenominator;
+//const int NsRateDenominator;
+//const int EwRateDenominator;
 const int clkLower = 100; 
 const int clkUpper = clkLower + DUR;
 int(clkLower..clkUpper) clk;
@@ -51,7 +51,7 @@ int(1..2) ewWillSend = 1; //0 indicates it's empty, 1 indicates it sends local, 
 //property Pr2 = Pmax(<>[S(sentEw) <= clkUpper-clkLower] ((clk) >= clkUpper) );
 //property Pr3 = Xmax(S(sentEw), clk>=clkUpper);
 //property Pr4 = Xmax(S(sentNs), clk>=clkUpper);
-property Pr5 = Pmax(<>[S(clk2) <= (clkUpper-clkLower)] (sentEw == 1));
+//property Pr5 = Pmax(<>[S(clk2) <= (clkUpper-clkLower)] (sentEw == 1));
 //property Pr6 = Pmax(<>[S(clk2) <= (clkUpper-clkLower)] (sentNs == 1));
 property Pr7 = Pmax(<> (sentEw==1 && clk == 100));
 property Pr8 = Pmax(<> (sentEw==1 && clk == 101));
@@ -65,6 +65,7 @@ property Pr15 = Pmax(<> (sentEw==1 && clk == 1010));
 property Pr16 = Pmax(<> (sentEw==1 && clk == 1011));
 property Pr17 = Pmax(<> (sentEw==1 && clk == 1012));
 property Pr18 = Pmax(<> (sentEw==1 && clk == 1013));
+propert Pr19 = Pmax(<> (nsLen >= 4));
 // ------ End: properties ---------
 
 process LocalBuffer() {
