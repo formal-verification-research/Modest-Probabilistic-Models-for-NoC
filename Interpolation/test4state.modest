@@ -1,16 +1,17 @@
 //Version of the concrete model to calculate probabilities for the 4 state abstract model
 
 datatype buffer = {int(-1..3) val, int(0..3) id, bool serviced, int(0..3) priority, int timesServiced};		//Datatype for a buffer with the next buffer value, id of the buffer, whether the buffer was serviced last clock cycle or not, and the priority number of the buffer
-int unserviced;		//Number of unserviced buffers, iterates down when unserviced buffer's priority is set
-int totalUnserviced;	//Total number of unserviced buffers in a clock cycle
-int totalServiced = 0;
-int optimalRuns = 0;
+int(0..2) unserviced;		//Number of unserviced buffers, iterates down when unserviced buffer's priority is set
+int(0..2) totalUnserviced;	//Total number of unserviced buffers in a clock cycle
+//int totalServiced = 0;
+//int optimalRuns = 0;
 const int clkLower = 100; 
-const int clkUpper = 102;
+const int clkUpper = 101;
 int(clkLower..clkUpper) clk;
 
-int(0..3) state;
-int(0..3) pstate;
+const int totalStates = 4;
+int(0..totalStates-1) state;
+int(0..totalStates-1) pstate;
 //int(0..3) pPstate;
 //int(0..3) p3state;
 //int(0..3) p4state;
@@ -37,8 +38,8 @@ action tick;
 
 property State0 = Pmax(<> ((clk >= clkUpper) && (state == 0)));
 property State1 = Pmax(<> ((clk >= clkUpper) && (state == 1)));
-property State3 = Pmax(<> ((clk >= clkUpper) && (state == 2)));
-property State2 = Pmax(<> ((clk >= clkUpper) && (state == 3)));
+property State2 = Pmax(<> ((clk >= clkUpper) && (state == 2)));
+property State3 = Pmax(<> ((clk >= clkUpper) && (state == 3)));
 
 
 //2 clock cycles
@@ -59,74 +60,6 @@ property State2 = Pmax(<> ((clk >= clkUpper) && (state == 3)));
 //property State2_2 = Pmax(<> ((clk >= clkUpper) && (pstate == 2) && (state == 2)));
 */
 
-//3 clock cycles
-/*
-property State0_2_0 = Pmax(<> ((clk >= clkUpper) && (pPstate == 0) && (pstate == 2) && (state == 0)));
-property State0_2_1 = Pmax(<> ((clk >= clkUpper) && (pPstate == 0) && (pstate == 2) && (state == 1)));
-property State0_2_3 = Pmax(<> ((clk >= clkUpper) && (pPstate == 0) && (pstate == 2) && (state == 3)));
-property State0_2_2 = Pmax(<> ((clk >= clkUpper) && (pPstate == 0) && (pstate == 2) && (state == 2)));
-
-property State1_2_0 = Pmax(<> ((clk >= clkUpper) && (pPstate == 1) && (pstate == 2) && (state == 0)));
-property State1_2_1 = Pmax(<> ((clk >= clkUpper) && (pPstate == 1) && (pstate == 2) && (state == 1)));
-property State1_2_3 = Pmax(<> ((clk >= clkUpper) && (pPstate == 1) && (pstate == 2) && (state == 3)));
-property State1_2_2 = Pmax(<> ((clk >= clkUpper) && (pPstate == 1) && (pstate == 2) && (state == 2)));
-
-property State3_2_0 = Pmax(<> ((clk >= clkUpper) && (pPstate == 3) && (pstate == 2) && (state == 0)));
-property State3_2_1 = Pmax(<> ((clk >= clkUpper) && (pPstate == 3) && (pstate == 2) && (state == 1)));
-property State3_2_3 = Pmax(<> ((clk >= clkUpper) && (pPstate == 3) && (pstate == 2) && (state == 3)));
-property State3_2_2 = Pmax(<> ((clk >= clkUpper) && (pPstate == 3) && (pstate == 2) && (state == 2)));
-
-property State2_2_0 = Pmax(<> ((clk >= clkUpper) && (pPstate == 2) && (pstate == 2) && (state == 0)));
-property State2_2_1 = Pmax(<> ((clk >= clkUpper) && (pPstate == 2) && (pstate == 2) && (state == 1)));
-property State2_2_3 = Pmax(<> ((clk >= clkUpper) && (pPstate == 2) && (pstate == 2) && (state == 3)));
-property State2_2_2 = Pmax(<> ((clk >= clkUpper) && (pPstate == 2) && (pstate == 2) && (state == 2)));
-*/
-
-//4 clock cycles
-/*
-property State0_2_2_0 = Pmax(<> ((clk >= clkUpper) && (p3state == 0) && (pPstate == 2) && (pstate == 2) && (state == 0)));
-property State0_2_2_1 = Pmax(<> ((clk >= clkUpper) && (p3state == 0) && (pPstate == 2) && (pstate == 2) && (state == 1)));
-property State0_2_2_3 = Pmax(<> ((clk >= clkUpper) && (p3state == 0) && (pPstate == 2) && (pstate == 2) && (state == 3)));
-property State0_2_2_2 = Pmax(<> ((clk >= clkUpper) && (p3state == 0) && (pPstate == 2) && (pstate == 2) && (state == 2)));
-
-property State1_2_2_0 = Pmax(<> ((clk >= clkUpper) && (p3state == 1) && (pPstate == 2) && (pstate == 2) && (state == 0)));
-property State1_2_2_1 = Pmax(<> ((clk >= clkUpper) && (p3state == 1) && (pPstate == 2) && (pstate == 2) && (state == 1)));
-property State1_2_2_3 = Pmax(<> ((clk >= clkUpper) && (p3state == 1) && (pPstate == 2) && (pstate == 2) && (state == 3)));
-property State1_2_2_2 = Pmax(<> ((clk >= clkUpper) && (p3state == 1) && (pPstate == 2) && (pstate == 2) && (state == 2)));
-
-property State3_2_2_0 = Pmax(<> ((clk >= clkUpper) && (p3state == 3) && (pPstate == 2) && (pstate == 2) && (state == 0)));
-property State3_2_2_1 = Pmax(<> ((clk >= clkUpper) && (p3state == 3) && (pPstate == 2) && (pstate == 2) && (state == 1)));
-property State3_2_2_3 = Pmax(<> ((clk >= clkUpper) && (p3state == 3) && (pPstate == 2) && (pstate == 2) && (state == 3)));
-property State3_2_2_2 = Pmax(<> ((clk >= clkUpper) && (p3state == 3) && (pPstate == 2) && (pstate == 2) && (state == 2)));
-
-property State2_2_2_0 = Pmax(<> ((clk >= clkUpper) && (p3state == 2) && (pPstate == 2) && (pstate == 2) && (state == 0)));
-property State2_2_2_1 = Pmax(<> ((clk >= clkUpper) && (p3state == 2) && (pPstate == 2) && (pstate == 2) && (state == 1)));
-property State2_2_2_3 = Pmax(<> ((clk >= clkUpper) && (p3state == 2) && (pPstate == 2) && (pstate == 2) && (state == 3)));
-property State2_2_2_2 = Pmax(<> ((clk >= clkUpper) && (p3state == 2) && (pPstate == 2) && (pstate == 2) && (state == 2)));
-*/
-
-//5 clock cycles
-/*
-property State0_2_2_0 = Pmax(<> ((clk >= clkUpper) && (p4state == 0) && (p3state == 2) && (pPstate == 2) && (pstate == 2) && (state == 0)));
-property State0_2_2_1 = Pmax(<> ((clk >= clkUpper) && (p4state == 0) && (p3state == 2) && (pPstate == 2) && (pstate == 2) && (state == 1)));
-property State0_2_2_3 = Pmax(<> ((clk >= clkUpper) && (p4state == 0) && (p3state == 2) && (pPstate == 2) && (pstate == 2) && (state == 3)));
-property State0_2_2_2 = Pmax(<> ((clk >= clkUpper) && (p4state == 0) && (p3state == 2) && (pPstate == 2) && (pstate == 2) && (state == 2)));
-
-property State1_2_2_0 = Pmax(<> ((clk >= clkUpper) && (p4state == 1) && (p3state == 2) && (pPstate == 2) && (pstate == 2) && (state == 0)));
-property State1_2_2_1 = Pmax(<> ((clk >= clkUpper) && (p4state == 1) && (p3state == 2) && (pPstate == 2) && (pstate == 2) && (state == 1)));
-property State1_2_2_3 = Pmax(<> ((clk >= clkUpper) && (p4state == 1) && (p3state == 2) && (pPstate == 2) && (pstate == 2) && (state == 3)));
-property State1_2_2_2 = Pmax(<> ((clk >= clkUpper) && (p4state == 1) && (p3state == 2) && (pPstate == 2) && (pstate == 2) && (state == 2)));
-
-property State3_2_2_0 = Pmax(<> ((clk >= clkUpper) && (p4state == 3) && (p3state == 2) && (pPstate == 2) && (pstate == 2) && (state == 0)));
-property State3_2_2_1 = Pmax(<> ((clk >= clkUpper) && (p4state == 3) && (p3state == 2) && (pPstate == 2) && (pstate == 2) && (state == 1)));
-property State3_2_2_3 = Pmax(<> ((clk >= clkUpper) && (p4state == 3) && (p3state == 2) && (pPstate == 2) && (pstate == 2) && (state == 3)));
-property State3_2_2_2 = Pmax(<> ((clk >= clkUpper) && (p4state == 3) && (p3state == 2) && (pPstate == 2) && (pstate == 2) && (state == 2)));
-
-property State2_2_2_0 = Pmax(<> ((clk >= clkUpper) && (p4state == 2) && (p3state == 2) && (pPstate == 2) && (pstate == 2) && (state == 0)));
-property State2_2_2_1 = Pmax(<> ((clk >= clkUpper) && (p4state == 2) && (p3state == 2) && (pPstate == 2) && (pstate == 2) && (state == 1)));
-property State2_2_2_3 = Pmax(<> ((clk >= clkUpper) && (p4state == 2) && (p3state == 2) && (pPstate == 2) && (pstate == 2) && (state == 3)));
-property State2_2_2_2 = Pmax(<> ((clk >= clkUpper) && (p4state == 2) && (p3state == 2) && (pPstate == 2) && (pstate == 2) && (state == 2)));
-*/
 
 //property Runs1 = Pmax(<> (optimalRuns == 1));		//Probablility that there was at least 1 cycle where all buffers were serviced
 //property Runs2 = Pmax(<> (optimalRuns == 2));		//Probablility that there was at least 2 cycles where all buffers were serviced
@@ -163,7 +96,7 @@ process Arbiter(){
 		//Buffer priority 0
 		//<Service Buffer a[0]>--------------------------------------------------------
 		{= 
-		a[0].timesServiced++,
+		//a[0].timesServiced++,
 		a[0].serviced = true 
 		=};
 		
@@ -176,7 +109,7 @@ process Arbiter(){
 		}
 		else {
 			{= 
-			a[1].timesServiced++,		//Service Buffer
+			//a[1].timesServiced++,		//Service Buffer
 			a[1].serviced = true 
 			=}
 		};
@@ -191,7 +124,7 @@ process Arbiter(){
 		}
 		else {
 			{= 
-			a[2].timesServiced++,		//Service Buffer
+			//a[2].timesServiced++,		//Service Buffer
 			a[2].serviced = true 
 			=}
 		};
@@ -206,7 +139,7 @@ process Arbiter(){
 		}
 		else {
 			{= 
-			a[3].timesServiced++,		//Service Buffer
+			//a[3].timesServiced++,		//Service Buffer
 			a[3].serviced = true 
 			=}
 		};
@@ -214,13 +147,13 @@ process Arbiter(){
 		
 		{= 
 		totalUnserviced = unserviced,
-		totalServiced = totalServiced + 4 - unserviced
+		pstate = state
+		//, totalServiced = totalServiced + 4 - unserviced
 		=};
 		
 		//{= p4state = p3state =};
 		//{= p3state = pPstate =};
 		//{= pPstate = pstate =};
-		{= pstate = state =};
 		
 		//Increment optimal runs if there were no conflitcs -------------------------------------------------------------------
 		
@@ -252,32 +185,21 @@ process Arbiter(){
 
 		if (totalUnserviced == 0){
 			{= 
-			optimalRuns++,
-			totalUnserviced = unserviced,
-			totalServiced = totalServiced + 4 - unserviced,
+			//optimalRuns++,
 			state = 0
 			=}
 		}
 		else if(totalUnserviced == 1){
-			tick{=
-			state = 1,						
-			totalUnserviced = unserviced,
-			totalServiced = totalServiced + 4 - unserviced
-			=}
+			tick{= state = 1 =}
+		}
+		else if(totalUnserviced == 2 && !(a[0].val == a[1].val){
+			tick{= state = 2 =}
 		}
 		else if(totalUnserviced == 2 && a[0].val == a[1].val){
-			tick{=
-			state = 3,						
-			totalUnserviced = unserviced,
-			totalServiced = totalServiced + 4 - unserviced
-			=}
+			tick{= state = 3 =}
 		}
 		else {
-			tick{=
-			state = 2,						
-			totalUnserviced = unserviced,
-			totalServiced = totalServiced + 4 - unserviced
-			=}
+			tau
 		};
 			
 		
