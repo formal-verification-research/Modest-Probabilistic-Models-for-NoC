@@ -6,7 +6,7 @@ int totalUnserviced;	//Total number of unserviced buffers in a clock cycle
 int totalServiced = 0;
 int optimalRuns = 0;
 const int clkLower = 100; 
-const int clkUpper = 107;
+const int clkUpper = 102;
 int(clkLower..clkUpper) clk;
 
 int(0..3) state;

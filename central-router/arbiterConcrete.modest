@@ -1,8 +1,7 @@
 //concrete version of the arbiter without buffers modeled
 
 datatype buffer = {int(0..3) val, int(0..3) id, bool serviced, int(0..3) priority, int timesServiced};		//Datatype for a buffer with the next buffer value, id of the buffer, whether the buffer was serviced last clock cycle or not, and the priority number of the buffer
-int unserviced;		//Number of unserviced buffers, iterates down when unserviced buffer's priority is set
-int totalUnserviced;	//Total number of unserviced buffers in a clock cycle
+int unserviced;		//Number of unserviced buffers, iterates down when unserviced buffer's priority is set int totalUnserviced;	//Total number of unserviced buffers in a clock cycle
 int totalServiced = 0;
 int optimalRuns = 0;
 const int clkLower = 100; 
