@@ -155,8 +155,7 @@ process Arbiter(){
 		//{= p3state = pPstate =};
 		//{= pPstate = pstate =};
 		
-		//Increment optimal runs if there were no conflitcs -------------------------------------------------------------------
-		
+
 		
 		//Set priority values for the next run and update the value of the buffers----------------------------------------------
 		setPriority(0);
@@ -183,8 +182,9 @@ process Arbiter(){
 		
 		{= a = temp =};
 
+
 		if (totalUnserviced == 0){
-			{= 
+			tick {= 
 			//optimalRuns++,
 			state = 0
 			=}
@@ -192,12 +192,14 @@ process Arbiter(){
 		else if(totalUnserviced == 1){
 			tick{= state = 1 =}
 		}
-		else if(totalUnserviced == 2 && !(a[0].val == a[1].val){
+		else if(totalUnserviced == 2 && !(a[0].val == a[1].val)){
 			tick{= state = 2 =}
 		}
 		else if(totalUnserviced == 2 && a[0].val == a[1].val){
 			tick{= state = 3 =}
 		}
+		//Add new states here
+
 		else {
 			tau
 		};
