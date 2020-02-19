@@ -53,18 +53,72 @@ int(1..2) ewWillSend = 1; //0 indicates it's empty, 1 indicates it sends local, 
 //property Pr4 = Xmax(S(sentNs), clk>=clkUpper);
 //property Pr5 = Pmax(<>[S(clk2) <= (clkUpper-clkLower)] (sentEw == 1));
 //property Pr6 = Pmax(<>[S(clk2) <= (clkUpper-clkLower)] (sentNs == 1));
-property Pr7 = Pmax(<> (sentEw==1 && clk == 100));
-property Pr8 = Pmax(<> (sentEw==1 && clk == 101));
-property Pr9 = Pmax(<> (sentEw==1 && clk == 102));
-property Pr10 = Pmax(<> (sentEw==1 && clk == 103));
-property Pr11 = Pmax(<> (sentEw==1 && clk == 104));
-property Pr12 = Pmax(<> (sentEw==1 && clk == 105));
-property Pr13 = Pmax(<> (sentEw==1 && clk == 106));
-property Pr14 = Pmax(<> (sentEw==1 && clk == 107));
-property Pr15 = Pmax(<> (sentEw==1 && clk == 1010));
-property Pr16 = Pmax(<> (sentEw==1 && clk == 1011));
-property Pr17 = Pmax(<> (sentEw==1 && clk == 1012));
-property Pr18 = Pmax(<> (sentEw==1 && clk == 1013));
+property pr11 = Pmax(<> (nsLen ==4 && clk == 112));
+property pr12 = Pmax(<> (nsLen == 4 && clk == 113));
+property pr13 = Pmax(<> (nsLen ==4 && clk == 114));
+property pr14 = Pmax(<> (nsLen ==4 && clk == 115));
+property pr15 = Pmax(<> (nsLen == 4 && clk == 116));
+property pr16 = Pmax(<> (nsLen == 4 && clk == 117));
+property pr17 = Pmax(<> (nsLen == 4 && clk == 118));
+property pr18 = Pmax(<> (nsLen ==4 && clk == 119));
+property pr19 = Pmax(<> (nsLen ==4 && clk == 120));
+property pr20 = Pmax(<> (nsLen == 4 && clk == 121));
+property pr21 = Pmax(<> (nsLen ==4 && clk == 122));
+property pr22 = Pmax(<> (nsLen ==4 && clk == 123));
+property pr23 = Pmax(<> (nsLen == 4 && clk == 124));
+property pr24 = Pmax(<> (nsLen == 4 && clk == 125));
+property pr25 = Pmax(<> (nsLen == 4 && clk == 126));
+property pr26 = Pmax(<> (nsLen ==4 && clk == 127));
+property pr27 = Pmax(<> (nsLen ==4 && clk == 128));
+property pr28 = Pmax(<> (nsLen == 4 && clk == 129));
+property pr29 = Pmax(<> (nsLen ==4 && clk == 130));
+property pr30 = Pmax(<> (nsLen ==4 && clk == 131));
+property pr31 = Pmax(<> (nsLen == 4 && clk == 132));
+property pr32 = Pmax(<> (nsLen == 4 && clk == 133));
+property pr33 = Pmax(<> (nsLen == 4 && clk == 134));
+property pr34 = Pmax(<> (nsLen ==4 && clk == 135));
+property pr35 = Pmax(<> (nsLen ==4 && clk == 136));
+property pr36 = Pmax(<> (nsLen == 4 && clk == 137));
+property pr37 = Pmax(<> (nsLen ==4 && clk == 138));
+property pr38 = Pmax(<> (nsLen ==4 && clk == 139));
+property pr39 = Pmax(<> (nsLen == 4 && clk == 140));
+property pr40 = Pmax(<> (nsLen == 4 && clk == 141));
+property pr41 = Pmax(<> (nsLen == 4 && clk == 142));
+property pr42 = Pmax(<> (nsLen ==4 && clk == 143));
+property pr43 = Pmax(<> (nsLen ==4 && clk == 144));
+property pr44 = Pmax(<> (nsLen == 4 && clk == 145));
+property pr45 = Pmax(<> (nsLen ==4 && clk == 146));
+property pr46 = Pmax(<> (nsLen ==4 && clk == 147));
+property pr47 = Pmax(<> (nsLen == 4 && clk == 148));
+property pr48 = Pmax(<> (nsLen == 4 && clk == 149));
+property pr49 = Pmax(<> (nsLen == 4 && clk == 150));
+property pr50 = Pmax(<> (nsLen ==4 && clk == 151));
+property pr51 = Pmax(<> (nsLen ==4 && clk == 152));
+property pr52 = Pmax(<> (nsLen == 4 && clk == 153));
+property pr53 = Pmax(<> (nsLen ==4 && clk == 154));
+property pr54 = Pmax(<> (nsLen ==4 && clk == 155));
+property pr55 = Pmax(<> (nsLen == 4 && clk == 156));
+property pr56 = Pmax(<> (nsLen == 4 && clk == 157));
+property pr57 = Pmax(<> (nsLen == 4 && clk == 158));
+property pr58 = Pmax(<> (nsLen ==4 && clk == 159));
+property pr59 = Pmax(<> (nsLen ==4 && clk == 160));
+property pr60 = Pmax(<> (nsLen == 4 && clk == 161));
+property pr61 = Pmax(<> (nsLen ==4 && clk == 162));
+property pr62 = Pmax(<> (nsLen ==4 && clk == 163));
+property pr63 = Pmax(<> (nsLen ==4 && clk == 164));
+property pr64 = Pmax(<> (nsLen ==4 && clk == 165));
+property pr65 = Pmax(<> (nsLen == 4 && clk == 166));
+property pr66 = Pmax(<> (nsLen ==4 && clk == 167));
+property pr67 = Pmax(<> (nsLen ==4 && clk == 168));
+property pr68 = Pmax(<> (nsLen ==4 && clk == 169));
+property pr69 = Pmax(<> (nsLen == 4 && clk == 250));
+property pr70 = Pmax(<> (nsLen ==4 && clk == 251));
+property pr71 = Pmax(<> (nsLen ==4 && clk == 252));
+property Pr15 = Pmax(<> (nsLen ==4 && clk == 1010));
+property Pr16 = Pmax(<> (nsLen ==4 && clk == 1011));
+//property Pr17 = Pmax(<> (nsLen == 4 && clk == 1012));
+//property Pr18 = Pmax(<> (nsLen == 4 && clk == 1013));
+
 propert Pr19 = Pmax(<> (nsLen >= 4));
 // ------ End: properties ---------
 
@@ -299,6 +353,10 @@ process send() {
 			}	
 		}	
 	}
+
+}
+
+process nsFull() {
 
 }
 
