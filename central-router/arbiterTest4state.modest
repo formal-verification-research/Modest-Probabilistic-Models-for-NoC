@@ -6,7 +6,7 @@ int totalUnserviced;	//Total number of unserviced buffers in a clock cycle
 int totalServiced = 0;
 int optimalRuns = 0;
 const int clkLower = 100; 
-const int clkUpper = 107;
+const int clkUpper = 101;
 int(clkLower..clkUpper) clk;
 
 int(0..3) state;
@@ -25,7 +25,7 @@ action tick;
 // ------ Begin: properties ---------
 //property Pr1 = Pmax(<> (clk >= clkUpper));
 
-property TotalServiced = Pmax(<> (totalServiced >= ((clkUpper-clkLower)*3)));		//Probablility that the arbiter servieces at least 15 buffers out of a possible 20. probablity the arbiter is at least 75% efficient
+//property TotalServiced = Pmax(<> (totalServiced >= ((clkUpper-clkLower)*3)));		//Probablility that the arbiter servieces at least 15 buffers out of a possible 20. probablity the arbiter is at least 75% efficient
 
 //property conflict1 = Pmax(<> (totalUnserviced == 1 && clk >= clkUpper));
 
@@ -34,14 +34,14 @@ property TotalServiced = Pmax(<> (totalServiced >= ((clkUpper-clkLower)*3)));		/
 //property triway = Pmax(<> (tri == true && clk >= clkUpper));
 
 //1 clock cycle
-/*
+
 property State0 = Pmax(<> ((clk >= clkUpper) && (state == 0)));
 property State1 = Pmax(<> ((clk >= clkUpper) && (state == 1)));
 property StateTri = Pmax(<> ((clk >= clkUpper) && (state == 2)));
 property State2a = Pmax(<> ((clk >= clkUpper) && (state == 3)));
-property State2a = Pmax(<> ((clk >= clkUpper) && (state == 3)));
-property State2a = Pmax(<> ((clk >= clkUpper) && (state == 3)));
-*/
+//property State2a = Pmax(<> ((clk >= clkUpper) && (state == 3)));
+//property State2a = Pmax(<> ((clk >= clkUpper) && (state == 3)));
+
 
 //2 clock cycles
 /*

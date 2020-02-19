@@ -1,0 +1,479 @@
+
+option "dtmc";
+
+//Top level varables
+const int BUFFERLENGTH = 4;
+const int NOCSIZE = 2;
+const int INJECTIONRATENUMERATOR = 1;
+const int INJECTIONRATEDENOMINATOR = 2;
+
+const int clkLower = 100; 
+const int clkUpper = 105;
+int(clkLower..clkUpper) clk;
+//transient int(0..1) clk;
+
+int(0..10) optimalRuns;
+
+action tick;
+
+int totalFlitsDelivered = 0;
+
+datatype node = {bool localB1, bool localB2, bool localB3, bool localB4, bool localLockedns, bool ewB1, bool ewB2, bool ewB3, bool ewB4, bool ewLockedns, bool ewLockedlocal, bool nsB1, bool nsB2, bool nsB3, bool nsB4, bool localPriority, bool nsPriority};
+
+node r0, r1, r2, r3;
+
+node[] noc;
+
+// ------ Begin: properties ---------
+property p1 = Pmax (<> (optim >= 1));
+//property Pr1 = Pmax(<> (totalFlitsDelivered >= 25));
+//property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 2));
+// ------ End: properties ---------
+
+function int nsChannel(int n) = (((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2));
+
+function int ewChannel(int n) = (n % 2)*(n - 1) + (-(n % 2) + 1)*(n + 1);
+
+process Clock(){	
+	
+	//tick{= clk = 1 =};
+	//Clock()
+	
+	
+	tick {= clk++ =};
+	if (clk <= clkUpper) {
+	   Clock()
+	}
+	else {
+	   stop
+	} 
+	
+}
+
+process Top(){
+	initialize();
+	do{
+		populate();
+		arbiter(0);
+		arbiter(1);
+		arbiter(2);
+		arbiter(3);
+		
+		tick;
+		
+		if(clk>=clkUpper){
+			stop
+		}
+		else{
+			tau
+
+		} 	
+		
+	}
+}
+
+process initialize(){
+	{=
+	noc = [r0, r1, r2, r3]
+	=}
+}
+
+process populate(){
+	
+	if((clk % INJECTIONRATEDENOMINATOR) < INJECTIONRATENUMERATOR){
+		{=
+		noc[0].localB4 = true,
+		noc[1].localB4 = true,
+		noc[2].localB4 = true,
+		noc[3].localB4 = true
+		=}
+	}
+	else {tau};
+		
+	subPopulate(0);
+	subPopulate(1);
+	subPopulate(2);
+	subPopulate(3)
+}
+
+process subPopulate(int routerID){
+	if(noc[routerID].localB3 == false){
+		{= noc[routerID].localB3 = noc[routerID].localB4 =}
+	}
+	else {tau};
+	if(noc[routerID].localB2 == false){
+		{= noc[routerID].localB2 = noc[routerID].localB3 =}
+	}
+	else {tau};
+	if(noc[routerID].localB1 == false){
+		{= noc[routerID].localB1 = noc[routerID].localB2 =}
+	}
+	else {tau};
+	
+	if(noc[routerID].ewB3 == false){
+		{= noc[routerID].ewB3 = noc[routerID].ewB4 =}
+	}
+	else {tau};
+	if(noc[routerID].ewB2 == false){
+		{= noc[routerID].ewB2 = noc[routerID].ewB3 =}
+	}
+	else {tau};
+	if(noc[routerID].ewB1 == false){
+		{= noc[routerID].ewB1 = noc[routerID].ewB2 =}
+	}
+	else {tau};
+	
+	if(noc[routerID].nsB3 == false){
+		{= noc[routerID].nsB3 = noc[routerID].nsB4 =}
+	}
+	else {tau};
+	if(noc[routerID].nsB2 == false){
+		{= noc[routerID].nsB2 = noc[routerID].nsB3 =}
+	}
+	else {tau};
+	if(noc[routerID].nsB1 == false){
+		{= noc[routerID].nsB1 = noc[routerID].nsB2 =}
+	}
+	else {tau}
+		
+}
+
+process arbiter(int n){
+	
+	if(noc[n].localB1 == true && noc[n].ewB1 == true && noc[n].nsB1 == true){ //chance for both types of conflicts
+		if(noc[n].localLockedns == true && noc[n].ewLockedns == true){
+			local_ew_conflict_ns_serviced(n)
+		}
+		else if(noc[n].localLockedns == true && noc[n].ewLockedlocal == true){ 
+			//nsB1, ewB1 conflict -- localB1 to nsB1
+			ew_ns_conflict_local_ns(n)
+		}
+		else if(noc[n].localLockedns == false && noc[n].ewLockedns == true){
+			palt{
+				:(2/3):	no_conflict_all(n)
+				:(1/3):	local_ew_conflict_ns_serviced(n)
+			}
+		}
+		else if(noc[n].localLockedns == false && noc[n].ewLockedlocal == true){
+			//ewB1, nsB1 conflict
+			palt{
+				:(2/3): ew_ns_conflict_local_ew(n)
+				:(1/3): ew_ns_conflict_local_ns(n)
+			}
+		}
+		else if (noc[n].localLockedns == true && noc[n].ewLockedlocal == false && noc[n].ewLockedns == false){
+			palt{
+				:(1/2):	ew_ns_conflict_local_ns(n)
+				:(1/2):	local_ew_conflict_ns_serviced(n)
+			}
+		}
+		else{
+			palt{
+				:(1/3):	no_conflict_all(n)		
+				:(1/6): local_ew_conflict_ns_serviced(n)
+				:(1/3): ew_ns_conflict_local_ew(n)
+				:(1/6): ew_ns_conflict_local_ew(n)
+			}
+		}
+	}
+	
+	else if(noc[n].localB1 == true && noc[n].ewB1 == true && noc[n].nsB1 == false){ //chance for localB1 and ewB1 conflict
+		if(noc[n].localLockedns == true && noc[n].ewLockedns == true){		//locked in conflict					May not actually be a reachable condition
+			local_ew_conflict_ns_empty(n)
+		}
+		else if(noc[n].localLockedns == true && noc[n].ewLockedlocal == true){	//no conflcit
+			no_conflict_localns_ewlocal(n)
+		}
+		else if(noc[n].localLockedns == false && noc[n].ewLockedns == true){
+			palt{
+				:(2/3):	no_conflict_localew_ewns(n)
+				:(1/3):	local_ew_conflict_ns_empty(n)
+			}
+		}
+		else if(noc[n].localLockedns == false && noc[n].ewLockedlocal == true){
+			palt{
+				:(2/3): no_conflict_localew_ewlocal(n)
+				:(1/3): no_conflict_localns_ewlocal(n)
+			}
+			
+		}
+		else if(noc[n].localLockedns == true && noc[n].ewLockedlocal == false && noc[n].ewLockedns == false){
+			palt{
+				:(1/2):	no_conflict_localns_ewlocal(n)
+				:(1/2):	local_ew_conflict_ns_empty(n)
+			}
+		}
+		else{
+			palt{
+				:(1/3):	no_conflict_localew_ewlocal(n)
+				:(1/3):	no_conflict_localew_ewns(n)
+				:(1/6):	no_conflict_localns_ewlocal(n)
+				:(1/6): local_ew_conflict_ns_empty(n)
+			}						
+		}
+	
+	}
+	
+	else if (noc[n].localB1 == false && noc[n].ewB1 == true && noc[n].nsB1 == true){ //chance for ewB1 and nsB1 conflict
+		if(noc[n].ewLockedlocal == true){
+			ew_ns_conflcit_local_empty(n)
+		}
+		else if(noc[n].ewLockedns == true){
+			no_conflict_ewns_ns(n)
+		}
+		else{
+			palt{
+				:(1/2): no_conflict_ewns_ns(n)
+				:(1/2): ew_ns_conflcit_local_empty(n)
+			}
+		}
+	}
+	
+	else{		//no chance for conflict
+		if(noc[n].localB1 == true){
+			if(noc[n].localLockedns == true){
+				{= noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, noc[n].localB1 = false, noc[n].localLockedns = false =}
+			}
+			else{
+				palt{
+					:(2/3): {= noc[(n % 2)*(n - 1) + (-(n % 2) + 1)*(n + 1)].ewB4 = true, noc[n].localB1 = false =}		//forward ewB1 direction
+					:(1/3): {= noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, noc[n].localB1 = false =}		//forward nsB1 direction
+				}
+			}
+		}
+		else{tau};
+	
+		if(noc[n].ewB1 == true){
+			if(noc[n].ewLockedlocal == true){
+				{= totalFlitsDelivered++, noc[n].ewLockedlocal = false =}
+			}
+			else if(noc[n].ewLockedns == true){
+				{= noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, noc[n].localB1 = false, noc[n].ewLockedns = false =}
+			}
+			else{
+				palt{
+					:(1/2): {= noc[((int)(n/2))*(n - 2) + (-((int)(n/2)) + 1)*(n + 2)].nsB4 = true, noc[n].ewB1 = false =}		//forward nsB1 direction
+					:(1/2): {= totalFlitsDelivered++ =}
+				}
+			}
+		}
+		else{tau};
+	
+		if(noc[n].nsB1 == true){
+			{= totalFlitsDelivered++ =}
+		}
+		else{tau}
+	}
+}
+
+//Flit forwarding processes
+process local_ew_conflict_ns_serviced(int n){
+	if(noc[n].localPriority){				//localB1 and ewB1 conflict
+		{=
+		totalFlitsDelivered++,			//service nsB1 buffer
+		noc[n].nsB1 = false,
+		
+		noc[n].localB1 = (noc[nsChannel(n)].nsB4),  	//service localB1 buffer
+		noc[n].localPriority = (noc[nsChannel(n)].nsB4),  //Local retains priority if it is able to send
+		noc[n].localLockedns = (noc[nsChannel(n)].nsB4),
+		noc[nsChannel(n)].nsB4 = true,		
+		
+		noc[n].ewLockedns = true		//lock ewB1 to the nsB1 direction for next cycle.
+		=}
+	}
+	else{
+		{=
+		totalFlitsDelivered++,			//service nsB1 buffer
+		noc[n].nsB1 = false,
+		
+		noc[n].ewB1 = (noc[nsChannel(n)].nsB4),
+		noc[n].ewLockedns = noc[nsChannel(n)].nsB4,
+		
+		noc[n].localLockedns = true,		//lock localB1 to the nsB1 direction for next cycle.
+		noc[n].localPriority = !(noc[nsChannel(n)].nsB4),		//Local gets priority if the ew is able to send
+		
+		
+		noc[nsChannel(n)].nsB4 = true 	//service es buffer
+		
+		=}
+	}
+}
+
+process local_ew_conflict_ns_empty(int n){
+	if(noc[n].localPriority){				//localB1 and ewB1 conflict
+				{=
+				noc[n].localB1 = noc[nsChannel(n)].nsB4,
+				noc[n].localLockedns = noc[nsChannel(n)].nsB4,
+				
+				noc[n].ewLockedns = true,		//lock ewB1 to the nsB1 direction for next cycle.
+				
+				noc[n].localPriority = (noc[nsChannel(n)].nsB4),  //Local retains priority if it is able to send
+				
+				noc[nsChannel(n)].nsB4 = true 	//service localB1 buffer
+				=}
+			}
+			else{
+				{=
+				
+				noc[n].ewB1 = noc[nsChannel(n)].nsB4,
+				noc[n].ewLockedns = noc[nsChannel(n)].nsB4,
+				
+				noc[n].localLockedns = true,		//lock localB1 to the nsB1 direction for next cycle.
+				noc[n].localPriority = !(noc[nsChannel(n)].nsB4),		//Local gets priority if the ew is able to send
+				
+				noc[nsChannel(n)].nsB4 = true 	//service es buffer
+				=}
+			}
+}
+
+process ew_ns_conflict_local_ew(int n){ 
+	if(noc[n].nsPriority){
+		{= 
+		noc[n].localB1 = noc[ewChannel(n)].ewB4,
+		noc[ewChannel(n)].ewB4 = true, 		//service localB1 buffer in ewB1 direction
+		
+		totalFlitsDelivered ++,				//service nsB1 buffer
+		noc[n].nsB1 = false,
+		noc[n].nsPriority = false,
+		
+		noc[n].ewLockedlocal = true			//lock ewB1 to localB1 for next cycle
+		=}	
+	}
+	else{
+		{= 
+		noc[n].localB1 = noc[ewChannel(n)].ewB4,
+		noc[ewChannel(n)].ewB4 = true, 		//service localB1 buffer in ewB1 direction
+		
+		totalFlitsDelivered ++,				//service ewB1 buffer
+		noc[n].ewB1 = false,
+		noc[n].nsPriority = true,
+		
+		noc[n].ewLockedlocal = false
+		=}	
+	}
+}
+
+process ew_ns_conflict_local_ns(int n){
+	if(noc[n].nsPriority){						
+		{= 
+		noc[n].localB1 = noc[nsChannel(n)].nsB4,
+		noc[n].localLockedns = noc[nsChannel(n)].nsB4,
+		noc[nsChannel(n)].nsB4 = true, 	//service localB1 buffer in nsB1 direction
+		
+		totalFlitsDelivered++,				//service nsB1 buffer
+		noc[n].nsB1 = false,
+		noc[n].nsPriority = false,
+		
+		noc[n].ewLockedlocal = true			//lock ewB1 to localB1 for next cycle
+		
+		=}
+	}
+	else{
+		{= 
+		noc[n].localB1 = noc[nsChannel(n)].nsB4,
+		noc[n].localLockedns = noc[nsChannel(n)].nsB4,
+		noc[nsChannel(n)].nsB4 = true, 	//service localB1 buffer in nsB1 direction
+		
+		totalFlitsDelivered++,				//service ewB1 buffer
+		noc[n].ewB1 = false,
+		noc[n].ewLockedlocal = false,
+		
+		noc[n].nsPriority = true
+		=}
+	}
+}
+
+process ew_ns_conflcit_local_empty(int n){
+	if(noc[n].nsPriority){						//MAY NEED TO CHANGE -----------------------------------------------------------------------------
+		{=
+		totalFlitsDelivered++,				//service nsB1 buffer
+		noc[n].nsB1 = false,
+		noc[n].nsPriority = false,
+		
+		noc[n].ewLockedlocal = true			//lock ewB1 to localB1 for next cycle
+		=}
+	}	
+	else{
+		{=
+		totalFlitsDelivered++,				//service ewB1 buffer
+		noc[n].ewB1 = false,
+		noc[n].ewLockedlocal = false,
+		
+		noc[n].nsPriority = true
+		=}
+	}
+}
+
+process no_conflict_all(int n){
+	{=		//no conlfict 
+	noc[n].localB1 = noc[ewChannel(n)].ewB4,
+	noc[ewChannel(n)].ewB4 = true, 		//service localB1 buffer in ewB1 direction
+	
+	 	//service es buffer in nsB1 direction
+	noc[n].ewB1 = noc[nsChannel(n)].nsB4,
+	noc[n].ewLockedns = noc[nsChannel(n)].nsB4,
+	noc[nsChannel(n)].nsB4 = true,
+	
+	totalFlitsDelivered++,			//service nsB1 buffer
+	noc[n].nsB1 = false,
+	optimalRuns++
+	
+	=}
+}
+
+process no_conflict_localns_ewlocal(int n){
+	{=	//localB1 forward nsB1, ewB1 forward localB1
+	noc[n].localB1 = noc[nsChannel(n)].nsB4,
+	noc[n].localLockedns = noc[nsChannel(n)].nsB4,
+	noc[nsChannel(n)].nsB4 = true,
+	
+	totalFlitsDelivered++,
+	noc[n].ewB1 = false,
+	noc[n].ewLockedlocal = false
+	//, optimalRuns++
+	
+	=}
+}
+
+process no_conflict_localew_ewlocal(int n){
+	{= 	//localB1 forward ewB1, ewB1 forward localB1
+	noc[n].localB1 = noc[ewChannel(n)].ewB4,
+	noc[ewChannel(n)].ewB4 = true, 
+	
+	totalFlitsDelivered++,
+	noc[n].ewB1 = false,
+	noc[n].ewLockedlocal = false
+	//, optimalRuns++
+	
+	=}
+}
+
+process no_conflict_localew_ewns(int n){
+	{=
+	noc[n].localB1 = noc[ewChannel(n)].ewB4,
+	noc[ewChannel(n)].ewB4 = true, 
+	
+	noc[n].ewB1 = noc[nsChannel(n)].nsB4, 
+	noc[n].ewLockedns = noc[nsChannel(n)].nsB4,
+	noc[nsChannel(n)].nsB4 = true
+	
+	//, optimalRuns++
+	=}
+}
+
+process no_conflict_ewns_ns(int n){
+	{=	//no conflict
+	noc[n].ewB1 = noc[nsChannel(n)].nsB4, 
+	noc[n].ewLockedns = noc[nsChannel(n)].nsB4,
+	noc[nsChannel(n)].nsB4 = true, 
+	
+	totalFlitsDelivered++,
+	noc[n].nsB1 = false
+	//, optimalRuns++
+	=}
+}
+
+par{
+::	Clock()
+:: 	Top()
+}
