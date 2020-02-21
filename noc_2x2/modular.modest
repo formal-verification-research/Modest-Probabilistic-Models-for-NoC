@@ -44,7 +44,7 @@ int(0..1) sentNs;
 
 int(1..2) localWillSend = 1; //0 indicates it's empty, 1 indicates it sends ew, 2 indicated ns
 int(1..2) ewWillSend = 1; //0 indicates it's empty, 1 indicates it sends local, 2 indicates ns
-transient int(0..1) nsFull = 0;
+int(0..1) nsFull = 0;
 
 // ------ Begin: properties ---------
 //property Pr1 = Pmax(<> (clk >= clkUpper) );
@@ -114,24 +114,24 @@ property pr68 = Pmax(<> (nsLen ==4 && clk == 230));
 property pr69 = Pmax(<> (nsLen == 4 && clk == 231));
 property pr70 = Pmax(<> (nsLen ==4 && clk == 232));
 property pr71 = Pmax(<> (nsLen ==4 && clk == 233));*/
-property pr11 = Pmax(<> (sentNs == 1 && clk == 173));
-property pr12 = Pmax(<> (sentNs == 1 && clk == 174));
-property pr13 = Pmax(<> (sentNs == 1 && clk == 175));
-property pr14 = Pmax(<> (sentNs == 1 && clk == 176));
-property pr15 = Pmax(<> (sentNs == 1 && clk == 177));
-property pr16 = Pmax(<> (sentNs == 1 && clk == 178));
-property pr17 = Pmax(<> (sentNs == 1 && clk == 179));
-property pr18 = Pmax(<> (sentNs == 1 && clk == 180));
-property pr19 = Pmax(<> (sentNs == 1 && clk == 181));
-property pr20 = Pmax(<> (sentNs == 1 && clk == 182));
-property pr21 = Pmax(<> (sentNs == 1 && clk == 183));
-property pr22 = Pmax(<> (sentNs == 1 && clk == 184));
-property pr23 = Pmax(<> (sentNs == 1 && clk == 185));
-property pr24 = Pmax(<> (sentNs == 1 && clk == 186));
-property pr25 = Pmax(<> (sentNs == 1 && clk == 187));
-property pr26 = Pmax(<> (sentNs == 1 && clk == 188));
-property pr27 = Pmax(<> (sentNs == 1 && clk == 189));
-property pr28 = Pmax(<> (sentNs == 1 && clk == 190));
+property pr11 = Pmax(<> (sentNs == 1 && clk == 100));
+property pr12 = Pmax(<> (sentNs == 1 && clk == 101));
+property pr13 = Pmax(<> (sentNs == 1 && clk == 102));
+property pr14 = Pmax(<> (sentNs == 1 && clk == 103));
+property pr15 = Pmax(<> (sentNs == 1 && clk == 104));
+property pr16 = Pmax(<> (sentNs == 1 && clk == 105));
+property pr17 = Pmax(<> (sentNs == 1 && clk == 106));
+property pr18 = Pmax(<> (sentNs == 1 && clk == 107));
+property pr19 = Pmax(<> (sentNs == 1 && clk == 108));
+property pr20 = Pmax(<> (sentNs == 1 && clk == 109));
+property pr21 = Pmax(<> (sentNs == 1 && clk == 110));
+property pr22 = Pmax(<> (sentNs == 1 && clk == 111));
+property pr23 = Pmax(<> (sentNs == 1 && clk == 112));
+property pr24 = Pmax(<> (sentNs == 1 && clk == 113));
+property pr25 = Pmax(<> (sentNs == 1 && clk == 114));
+property pr26 = Pmax(<> (sentNs == 1 && clk == 115));
+property pr27 = Pmax(<> (sentNs == 1 && clk == 116));
+property pr28 = Pmax(<> (sentNs == 1 && clk == 117));
 property pr29 = Pmax(<> (sentNs == 1 && clk == 191));
 property pr30 = Pmax(<> (sentNs == 1 && clk == 192));
 property pr31 = Pmax(<> (sentNs == 1 && clk == 193));
@@ -216,7 +216,7 @@ process LocalBuffer() {
 
 process EwBuffer() {
 
-		tick;
+		tick {= nsFull = 0 =};
 		ewBuffer();
 		receiveEw();
 
@@ -257,7 +257,18 @@ process Send() {
 		}
 }
 
+process NsFull() {
+                tick;
+                tock;
+                nsFull();
 
+                if (clkUpper-clk <= 0) {
+                 stop
+                }
+                else {
+                NsFull()
+                }
+}
 
 process localBuffer() {
 
@@ -496,7 +507,7 @@ process nsFull() {
 		}
 	}
 	else if (clk < 112) {
-		tack {= nsFull = 0 =}
+		tack {= -1: nsFull = 0 =}
 	}	
 	else if( clk == 112) {
 		tack palt {
@@ -1124,4 +1135,5 @@ par{
 ::  LocalBuffer()
 ::  EwBuffer()
 ::  NsBuffer()
+:: NsFull()
 }
