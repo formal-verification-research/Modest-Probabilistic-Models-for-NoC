@@ -53,7 +53,68 @@ int(0..1) nsFull = 0;
 //property Pr4 = Xmax(S(sentNs), clk>=clkUpper);
 //property Pr5 = Pmax(<>[S(clk2) <= (clkUpper-clkLower)] (sentEw == 1));
 //property Pr6 = Pmax(<>[S(clk2) <= (clkUpper-clkLower)] (sentNs == 1));
-property pr11 = Pmax(<> (nsLen ==4 && clk == 173));
+property pr11 = Pmax(<> (nsLen ==4 && clk == 112));
+property pr12 = Pmax(<> (nsLen == 4 && clk == 113));
+property pr13 = Pmax(<> (nsLen ==4 && clk == 114));
+property pr14 = Pmax(<> (nsLen ==4 && clk == 115));
+property pr15 = Pmax(<> (nsLen == 4 && clk == 116));
+property pr16 = Pmax(<> (nsLen == 4 && clk == 117));
+property pr17 = Pmax(<> (nsLen == 4 && clk == 118));
+property pr18 = Pmax(<> (nsLen ==4 && clk == 119));
+property pr19 = Pmax(<> (nsLen ==4 && clk == 120));
+property pr20 = Pmax(<> (nsLen == 4 && clk == 121));
+property pr21 = Pmax(<> (nsLen ==4 && clk == 122));
+property pr22 = Pmax(<> (nsLen ==4 && clk == 123));
+property pr23 = Pmax(<> (nsLen == 4 && clk == 124));
+property pr24 = Pmax(<> (nsLen == 4 && clk == 125));
+property pr25 = Pmax(<> (nsLen == 4 && clk == 126));
+property pr26 = Pmax(<> (nsLen ==4 && clk == 127));
+property pr27 = Pmax(<> (nsLen ==4 && clk == 128));
+property pr28 = Pmax(<> (nsLen == 4 && clk == 129));
+property pr29 = Pmax(<> (nsLen ==4 && clk == 130));
+property pr30 = Pmax(<> (nsLen ==4 && clk == 131));
+property pr31 = Pmax(<> (nsLen == 4 && clk == 132));
+property pr32 = Pmax(<> (nsLen == 4 && clk == 133));
+property pr33 = Pmax(<> (nsLen == 4 && clk == 134));
+property pr34 = Pmax(<> (nsLen ==4 && clk == 135));
+property pr35 = Pmax(<> (nsLen ==4 && clk == 136));
+property pr36 = Pmax(<> (nsLen == 4 && clk == 137));
+property pr37 = Pmax(<> (nsLen ==4 && clk == 138));
+property pr38 = Pmax(<> (nsLen ==4 && clk == 139));
+property pr39 = Pmax(<> (nsLen == 4 && clk == 140));
+property pr40 = Pmax(<> (nsLen == 4 && clk == 141));
+property pr41 = Pmax(<> (nsLen == 4 && clk == 142));
+property pr42 = Pmax(<> (nsLen ==4 && clk == 143));
+property pr43 = Pmax(<> (nsLen ==4 && clk == 144));
+property pr44 = Pmax(<> (nsLen == 4 && clk == 145));
+property pr45 = Pmax(<> (nsLen ==4 && clk == 146));
+property pr46 = Pmax(<> (nsLen ==4 && clk == 147));
+property pr47 = Pmax(<> (nsLen == 4 && clk == 148));
+property pr48 = Pmax(<> (nsLen == 4 && clk == 149));
+property pr49 = Pmax(<> (nsLen == 4 && clk == 150));
+property pr50 = Pmax(<> (nsLen ==4 && clk == 151));
+property pr51 = Pmax(<> (nsLen ==4 && clk == 152));
+property pr52 = Pmax(<> (nsLen == 4 && clk == 153));
+property pr53 = Pmax(<> (nsLen ==4 && clk == 154));
+property pr54 = Pmax(<> (nsLen ==4 && clk == 155));
+property pr55 = Pmax(<> (nsLen == 4 && clk == 156));
+property pr56 = Pmax(<> (nsLen == 4 && clk == 157));
+property pr57 = Pmax(<> (nsLen == 4 && clk == 158));
+property pr58 = Pmax(<> (nsLen ==4 && clk == 159));
+property pr59 = Pmax(<> (nsLen ==4 && clk == 160));
+property pr60 = Pmax(<> (nsLen == 4 && clk == 161));
+property pr61 = Pmax(<> (nsLen ==4 && clk == 162));
+property pr62 = Pmax(<> (nsLen ==4 && clk == 163));
+property pr63 = Pmax(<> (nsLen ==4 && clk == 164));
+property pr64 = Pmax(<> (nsLen ==4 && clk == 165));
+property pr65 = Pmax(<> (nsLen == 4 && clk == 166));
+property pr66 = Pmax(<> (nsLen ==4 && clk == 167));
+property pr67 = Pmax(<> (nsLen ==4 && clk == 168));
+property pr68 = Pmax(<> (nsLen ==4 && clk == 169));
+property pr69 = Pmax(<> (nsLen == 4 && clk == 170));
+property pr70 = Pmax(<> (nsLen ==4 && clk == 171));
+property pr71 = Pmax(<> (nsLen ==4 && clk == 172));
+/*property pr11 = Pmax(<> (nsLen ==4 && clk == 173));
 property pr12 = Pmax(<> (nsLen == 4 && clk == 174));
 property pr13 = Pmax(<> (nsLen ==4 && clk == 175));
 property pr14 = Pmax(<> (nsLen ==4 && clk == 176));
@@ -113,7 +174,7 @@ property pr67 = Pmax(<> (nsLen ==4 && clk == 229));
 property pr68 = Pmax(<> (nsLen ==4 && clk == 230));
 property pr69 = Pmax(<> (nsLen == 4 && clk == 231));
 property pr70 = Pmax(<> (nsLen ==4 && clk == 232));
-property pr71 = Pmax(<> (nsLen ==4 && clk == 233));/*
+property pr71 = Pmax(<> (nsLen ==4 && clk == 233));*//*
 property pr11 = Pmax(<> (sentNs == 1 && clk == 100));
 property pr12 = Pmax(<> (sentNs == 1 && clk == 101));
 property pr13 = Pmax(<> (sentNs == 1 && clk == 102));
@@ -832,270 +893,325 @@ process send() {
 		}
 	}
 	else if( clk == 173) {
-		tock palt {
-		:(0.032467531644180786): {= nsFull = 1 =}
-		}
+	tock palt {
+	:(": 0.032467531644180786): {= nsFull = 1 =}
+		:(1 -": 0.032467531644180786): {= nsFull = 0 =}
 	}
-	else if( clk == 174) {
-		tock palt {
-		:(0.4675324673371838): {= nsFull = 1 =}
-		}
+}
+else if( clk == 174) {
+	tock palt {
+	:(0.4675324673371838): {= nsFull = 1 =}
+		:(1 -0.4675324673371838): {= nsFull = 0 =}
 	}
-	else if( clk == 175) {
-		tock palt {
-		:(0.03246753204317032): {= nsFull = 1 =}
-		}
+}
+else if( clk == 175) {
+	tock palt {
+	:(0.03246753204317032): {= nsFull = 1 =}
+		:(1 -0.03246753204317032): {= nsFull = 0 =}
 	}
-	else if( clk == 176) {
-		tock palt {
-		:(0.46753246743295945): {= nsFull = 1 =}
-		}
+}
+else if( clk == 176) {
+	tock palt {
+	:(0.46753246743295945): {= nsFull = 1 =}
+		:(1 -0.46753246743295945): {= nsFull = 0 =}
 	}
-	else if( clk == 177) {
-		tock palt {
-		:(0.032467532249063236): {= nsFull = 1 =}
-		}
+}
+else if( clk == 177) {
+	tock palt {
+	:(0.032467532249063236): {= nsFull = 1 =}
+		:(1 -0.032467532249063236): {= nsFull = 0 =}
 	}
-	else if( clk == 178) {
-		tock palt {
-		:(0.46753246748172506): {= nsFull = 1 =}
-		}
+}
+else if( clk == 178) {
+	tock palt {
+	:(0.46753246748172506): {= nsFull = 1 =}
+		:(1 -0.46753246748172506): {= nsFull = 0 =}
 	}
-	else if( clk == 179) {
-		tock palt {
-		:(0.032467532355182765): {= nsFull = 1 =}
-		}
+}
+else if( clk == 179) {
+	tock palt {
+	:(0.032467532355182765): {= nsFull = 1 =}
+		:(1 -0.032467532355182765): {= nsFull = 0 =}
 	}
-	else if( clk == 180) {
-		tock palt {
-		:(0.46753246750657274): {= nsFull = 1 =}
-		}
+}
+else if( clk == 180) {
+	tock palt {
+	:(0.46753246750657274): {= nsFull = 1 =}
+		:(1 -0.46753246750657274): {= nsFull = 0 =}
 	}
-	else if( clk == 181) {
-		tock palt {
-		:(0.03246753240981537): {= nsFull = 1 =}
-		}
+}
+else if( clk == 181) {
+	tock palt {
+	:(0.03246753240981537): {= nsFull = 1 =}
+		:(1 -0.03246753240981537): {= nsFull = 0 =}
 	}
-	else if( clk == 182) {
-		tock palt {
-		:(0.4675324675192426): {= nsFull = 1 =}
-		}
+}
+else if( clk == 182) {
+	tock palt {
+	:(0.4675324675192426): {= nsFull = 1 =}
+		:(1 -0.4675324675192426): {= nsFull = 0 =}
 	}
-	else if( clk == 183) {
-		tock palt {
-		:(0.03246753243791087): {= nsFull = 1 =}
-		}
+}
+else if( clk == 183) {
+	tock palt {
+	:(0.03246753243791087): {= nsFull = 1 =}
+		:(1 -0.03246753243791087): {= nsFull = 0 =}
 	}
-	else if( clk == 184) {
-		tock palt {
-		:(0.4675324675257079): {= nsFull = 1 =}
-		}
+}
+else if( clk == 184) {
+	tock palt {
+	:(0.4675324675257079): {= nsFull = 1 =}
+		:(1 -0.4675324675257079): {= nsFull = 0 =}
 	}
-	else if( clk == 185) {
-		tock palt {
-		:(0.032467532452344405): {= nsFull = 1 =}
-		}
+}
+else if( clk == 185) {
+	tock palt {
+	:(0.032467532452344405): {= nsFull = 1 =}
+		:(1 -0.032467532452344405): {= nsFull = 0 =}
 	}
-	else if( clk == 186) {
-		tock palt {
-		:(0.46753246752900945): {= nsFull = 1 =}
-		}
+}
+else if( clk == 186) {
+	tock palt {
+	:(0.46753246752900945): {= nsFull = 1 =}
+		:(1 -0.46753246752900945): {= nsFull = 0 =}
 	}
-	else if( clk == 187) {
-		tock palt {
-		:(0.03246753245975205): {= nsFull = 1 =}
-		}
+}
+else if( clk == 187) {
+	tock palt {
+	:(0.03246753245975205): {= nsFull = 1 =}
+		:(1 -0.03246753245975205): {= nsFull = 0 =}
 	}
-	else if( clk == 188) {
-		tock palt {
-		:(0.46753246753069677): {= nsFull = 1 =}
-		}
+}
+else if( clk == 188) {
+	tock palt {
+	:(0.46753246753069677): {= nsFull = 1 =}
+		:(1 -0.46753246753069677): {= nsFull = 0 =}
 	}
-	else if( clk == 189) {
-		tock palt {
-		:(0.03246753246355024): {= nsFull = 1 =}
-		}
+}
+else if( clk == 189) {
+	tock palt {
+	:(0.03246753246355024): {= nsFull = 1 =}
+		:(1 -0.03246753246355024): {= nsFull = 0 =}
 	}
-	else if( clk == 190) {
-		tock palt {
-		:(0.46753246753155964): {= nsFull = 1 =}
-		}
+}
+else if( clk == 190) {
+	tock palt {
+	:(0.46753246753155964): {= nsFull = 1 =}
+		:(1 -0.46753246753155964): {= nsFull = 0 =}
 	}
-	else if( clk == 191) {
-		tock palt {
-		:(0.03246753246549597): {= nsFull = 1 =}
-		}
+}
+else if( clk == 191) {
+	tock palt {
+	:(0.03246753246549597): {= nsFull = 1 =}
+		:(1 -0.03246753246549597): {= nsFull = 0 =}
 	}
-	else if( clk == 192) {
-		tock palt {
-		:(0.4675324675320014): {= nsFull = 1 =}
-		}
+}
+else if( clk == 192) {
+	tock palt {
+	:(0.4675324675320014): {= nsFull = 1 =}
+		:(1 -0.4675324675320014): {= nsFull = 0 =}
 	}
-	else if( clk == 193) {
-		tock palt {
-		:(0.03246753246649183): {= nsFull = 1 =}
-		}
+}
+else if( clk == 193) {
+	tock palt {
+	:(0.03246753246649183): {= nsFull = 1 =}
+		:(1 -0.03246753246649183): {= nsFull = 0 =}
 	}
-	else if( clk == 194) {
-		tock palt {
-		:(0.46753246753222766): {= nsFull = 1 =}
-		}
+}
+else if( clk == 194) {
+	tock palt {
+	:(0.46753246753222766): {= nsFull = 1 =}
+		:(1 -0.46753246753222766): {= nsFull = 0 =}
 	}
-	else if( clk == 195) {
-		tock palt {
-		:(0.032467532467001126): {= nsFull = 1 =}
-		}
+}
+else if( clk == 195) {
+	tock palt {
+	:(0.032467532467001126): {= nsFull = 1 =}
+		:(1 -0.032467532467001126): {= nsFull = 0 =}
 	}
-	else if( clk == 196) {
-		tock palt {
-		:(0.46753246753234357): {= nsFull = 1 =}
-		}
+}
+else if( clk == 196) {
+	tock palt {
+	:(0.46753246753234357): {= nsFull = 1 =}
+		:(1 -0.46753246753234357): {= nsFull = 0 =}
 	}
-	else if( clk == 197) {
-		tock palt {
-		:(0.03246753246726136): {= nsFull = 1 =}
-		}
+}
+else if( clk == 197) {
+	tock palt {
+	:(0.03246753246726136): {= nsFull = 1 =}
+		:(1 -0.03246753246726136): {= nsFull = 0 =}
 	}
-	else if( clk == 198) {
-		tock palt {
-		:(0.4675324675324031): {= nsFull = 1 =}
-		}
+}
+else if( clk == 198) {
+	tock palt {
+	:(0.4675324675324031): {= nsFull = 1 =}
+		:(1 -0.4675324675324031): {= nsFull = 0 =}
 	}
-	else if( clk == 199) {
-		tock palt {
-		:(0.03246753246739423): {= nsFull = 1 =}
-		}
+}
+else if( clk == 199) {
+	tock palt {
+	:(0.03246753246739423): {= nsFull = 1 =}
+		:(1 -0.03246753246739423): {= nsFull = 0 =}
 	}
-	else if( clk == 200) {
-		tock palt {
-		:(0.46753246753243355): {= nsFull = 1 =}
-		}
+}
+else if( clk == 200) {
+	tock palt {
+	:(0.46753246753243355): {= nsFull = 1 =}
+		:(1 -0.46753246753243355): {= nsFull = 0 =}
 	}
-	else if( clk == 201) {
-		tock palt {
-		:(0.03246753246746201): {= nsFull = 1 =}
-		}
+}
+else if( clk == 201) {
+	tock palt {
+	:(0.03246753246746201): {= nsFull = 1 =}
+		:(1 -0.03246753246746201): {= nsFull = 0 =}
 	}
-	else if( clk == 202) {
-		tock palt {
-		:(0.46753246753244926): {= nsFull = 1 =}
-		}
+}
+else if( clk == 202) {
+	tock palt {
+	:(0.46753246753244926): {= nsFull = 1 =}
+		:(1 -0.46753246753244926): {= nsFull = 0 =}
 	}
-	else if( clk == 203) {
-		tock palt {
-		:(0.03246753246749655): {= nsFull = 1 =}
-		}
+}
+else if( clk == 203) {
+	tock palt {
+	:(0.03246753246749655): {= nsFull = 1 =}
+		:(1 -0.03246753246749655): {= nsFull = 0 =}
 	}
-	else if( clk == 204) {
-		tock palt {
-		:(0.46753246753245736): {= nsFull = 1 =}
-		}
+}
+else if( clk == 204) {
+	tock palt {
+	:(0.46753246753245736): {= nsFull = 1 =}
+		:(1 -0.46753246753245736): {= nsFull = 0 =}
 	}
-	else if( clk == 205) {
-		tock palt {
-		:(0.03246753246751416): {= nsFull = 1 =}
-		}
+}
+else if( clk == 205) {
+	tock palt {
+	:(0.03246753246751416): {= nsFull = 1 =}
+		:(1 -0.03246753246751416): {= nsFull = 0 =}
 	}
-	else if( clk == 206) {
-		tock palt {
-		:(0.4675324675324615): {= nsFull = 1 =}
-		}
+}
+else if( clk == 206) {
+	tock palt {
+	:(0.4675324675324615): {= nsFull = 1 =}
+		:(1 -0.4675324675324615): {= nsFull = 0 =}
 	}
-	else if( clk == 207) {
-		tock palt {
-		:(0.03246753246752311): {= nsFull = 1 =}
-		}
+}
+else if( clk == 207) {
+	tock palt {
+	:(0.03246753246752311): {= nsFull = 1 =}
+		:(1 -0.03246753246752311): {= nsFull = 0 =}
 	}
-	else if( clk == 208) {
-		tock palt {
-		:(0.4675324675324636): {= nsFull = 1 =}
-		}
+}
+else if( clk == 208) {
+	tock palt {
+	:(0.4675324675324636): {= nsFull = 1 =}
+		:(1 -0.4675324675324636): {= nsFull = 0 =}
 	}
-	else if( clk == 209) {
-		tock palt {
-		:(0.03246753246752767): {= nsFull = 1 =}
-		}
+}
+else if( clk == 209) {
+	tock palt {
+	:(0.03246753246752767): {= nsFull = 1 =}
+		:(1 -0.03246753246752767): {= nsFull = 0 =}
 	}
-	else if( clk == 210) {
-		tock palt {
-		:(0.4675324675324647): {= nsFull = 1 =}
-		}
+}
+else if( clk == 210) {
+	tock palt {
+	:(0.4675324675324647): {= nsFull = 1 =}
+		:(1 -0.4675324675324647): {= nsFull = 0 =}
 	}
-	else if( clk == 211) {
-		tock palt {
-		:(0.03246753246752998): {= nsFull = 1 =}
-		}
+}
+else if( clk == 211) {
+	tock palt {
+	:(0.03246753246752998): {= nsFull = 1 =}
+		:(1 -0.03246753246752998): {= nsFull = 0 =}
 	}
-	else if( clk == 212) {
-		tock palt {
-		:(0.4675324675324652): {= nsFull = 1 =}
-		}
+}
+else if( clk == 212) {
+	tock palt {
+	:(0.4675324675324652): {= nsFull = 1 =}
+		:(1 -0.4675324675324652): {= nsFull = 0 =}
 	}
-	else if( clk == 213) {
-		tock palt {
-		:(0.03246753246753116): {= nsFull = 1 =}
-		}
+}
+else if( clk == 213) {
+	tock palt {
+	:(0.03246753246753116): {= nsFull = 1 =}
+		:(1 -0.03246753246753116): {= nsFull = 0 =}
 	}
-	else if( clk == 214) {
-		tock palt {
-		:(0.46753246753246547): {= nsFull = 1 =}
-		}
+}
+else if( clk == 214) {
+	tock palt {
+	:(0.46753246753246547): {= nsFull = 1 =}
+		:(1 -0.46753246753246547): {= nsFull = 0 =}
 	}
-	else if( clk == 215) {
-		tock palt {
-		:(0.03246753246753176): {= nsFull = 1 =}
-		}
+}
+else if( clk == 215) {
+	tock palt {
+	:(0.03246753246753176): {= nsFull = 1 =}
+		:(1 -0.03246753246753176): {= nsFull = 0 =}
 	}
-	else if( clk == 216) {
-		tock palt {
-		:(0.4675324675324656): {= nsFull = 1 =}
-		}
+}
+else if( clk == 216) {
+	tock palt {
+	:(0.4675324675324656): {= nsFull = 1 =}
+		:(1 -0.4675324675324656): {= nsFull = 0 =}
 	}
-	else if( clk == 217) {
-		tock palt {
-		:(0.03246753246753206): {= nsFull = 1 =}
-		}
+}
+else if( clk == 217) {
+	tock palt {
+	:(0.03246753246753206): {= nsFull = 1 =}
+		:(1 -0.03246753246753206): {= nsFull = 0 =}
 	}
-	else if( clk == 218) {
-		tock palt {
-		:(0.4675324675324657): {= nsFull = 1 =}
-		}
+}
+else if( clk == 218) {
+	tock palt {
+	:(0.4675324675324657): {= nsFull = 1 =}
+		:(1 -0.4675324675324657): {= nsFull = 0 =}
 	}
-	else if( clk == 219) {
-		tock palt {
-		:(0.032467532467532215): {= nsFull = 1 =}
-		}
+}
+else if( clk == 219) {
+	tock palt {
+	:(0.032467532467532215): {= nsFull = 1 =}
+		:(1 -0.032467532467532215): {= nsFull = 0 =}
 	}
-	else if( clk == 220) {
-		tock palt {
-		:(0.4675324675324657): {= nsFull = 1 =}
-		}
+}
+else if( clk == 220) {
+	tock palt {
+	:(0.4675324675324657): {= nsFull = 1 =}
+		:(1 -0.4675324675324657): {= nsFull = 0 =}
 	}
-	else if( clk == 221) {
-		tock palt {
-		:(0.03246753246753229): {= nsFull = 1 =}
-		}
+}
+else if( clk == 221) {
+	tock palt {
+	:(0.03246753246753229): {= nsFull = 1 =}
+		:(1 -0.03246753246753229): {= nsFull = 0 =}
 	}
-	else if( clk == 222) {
-		tock palt {
-		:(0.4675324675324657): {= nsFull = 1 =}
-		}
+}
+else if( clk == 222) {
+	tock palt {
+	:(0.4675324675324657): {= nsFull = 1 =}
+		:(1 -0.4675324675324657): {= nsFull = 0 =}
 	}
-	else if( clk == 223) {
-		tock palt {
-		:(0.03246753246753231): {= nsFull = 1 =}
-		}
+}
+else if( clk == 223) {
+	tock palt {
+	:(0.03246753246753231): {= nsFull = 1 =}
+		:(1 -0.03246753246753231): {= nsFull = 0 =}
 	}
-	else if( clk == 224) {
-		tock palt {
-		:(0.4675324675324657): {= nsFull = 1 =}
-		}
+}
+else if( clk == 224) {
+	tock palt {
+	:(0.4675324675324657): {= nsFull = 1 =}
+		:(1 -0.4675324675324657): {= nsFull = 0 =}
 	}
-	else {
-		tock palt {
-		:(0.032467532467532347): {= nsFull = 1 =}
-		}
+}
+else {
+	tock palt {
+	:(0.032467532467532347): {= nsFull = 1 =}
+		:(1 -0.032467532467532347): {= nsFull = 0 =}
 	}
+}
+
+}
 
 }*/
 
