@@ -216,7 +216,7 @@ process LocalBuffer() {
 
 process EwBuffer() {
 
-		tick;
+		tick {= nsFull = 0 =};
 		ewBuffer();
 		receiveEw();
 
@@ -480,17 +480,19 @@ process send() {
 
 }
 
-process nsFull() {
+/*process nsFull() {
 
 	if(clk > 225) {
 		if(clk%2 == 0) {
 			tock palt {
 				:(0.4675324675324657): {= nsFull = 1 =}
+				:(1- ): {= nsFull = 0=}
 			}
 		}
 		else {
 			tock palt {
 				:(0.03246753246753237): {= nsFull = 1 =}
+				:(1- ): {= nsFull = 0=}
 			}
 		}
 	}
@@ -500,136 +502,163 @@ process nsFull() {
 	else if( clk == 112) {
 		tock palt {
 		:( 0.24999999999999994): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 113) {
 		tock palt {
 		:(0.003472222222222222): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 114) {
 		tock palt {
 		:(0.3402777777777777): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 115) {
 		tock palt {
 		:(0.00935570987654321): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 116) {
 		tock palt {
 		:(0.3968942901234567): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 117) {
 		tock palt {
 		:(0.015641075102880653): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 118) {
 		tock palt {
 		:(0.4296714248971192): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 119) {
 		tock palt {
 		:(0.021031592935528115): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 120) {
 		tock palt {
 		:(0.44771840706447164): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 121) {
 		tock palt {
 		:(0.025089663351623222): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 122) {
 		tock palt {
 		:(0.45733221164837645): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 123) {
 		tock palt {
 		:(0.027894024586572155): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 124) {
 		tock palt {
 		:(0.4623403504134274): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 125) {
 		tock palt {
 		:(0.029719379806654206): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 126) {
 		tock palt {
 		:(0.46490952644334543): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 127) {
 		tock palt {
 		:(0.030856519684658065): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 128) {
 		tock palt {
 		:(0.4662137928153416): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 129) {
 		tock palt {
 		:(0.031541733004029654): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 130) {
 		tock palt {
 		:(0.46687135293346993): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 131) {
 		tock palt {
 		:(0.03194405509683443): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 132) {
 		tock palt {
 		:(0.4672014527156651): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 133) {
 		tock palt {
 		:(0.03217545928150467): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 134) {
 		tock palt {
 		:(0.4673667770466198): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 135) {
 		tock palt {
 		:(0.03230636232396465): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 136) {
 		tock palt {
 		:(0.46744949705103467): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 137) {
 		tock palt {
 		:(0.03237941502264021): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 138) {
 		tock palt {
 		:(0.4674908852703279): {= nsFull = 1 =}
+		:(1- ): {= nsFull = 0=}
 		}
 	}
 	else if( clk == 139) {
@@ -1068,7 +1097,7 @@ process nsFull() {
 		}
 	}
 
-}
+}*/
 
 process receiveNs() {
 
