@@ -53,7 +53,7 @@ int(0..1) nsFull = 0;
 //property Pr4 = Xmax(S(sentNs), clk>=clkUpper);
 //property Pr5 = Pmax(<>[S(clk2) <= (clkUpper-clkLower)] (sentEw == 1));
 //property Pr6 = Pmax(<>[S(clk2) <= (clkUpper-clkLower)] (sentNs == 1));
-/*property pr11 = Pmax(<> (nsLen ==4 && clk == 173));
+property pr11 = Pmax(<> (nsLen ==4 && clk == 173));
 property pr12 = Pmax(<> (nsLen == 4 && clk == 174));
 property pr13 = Pmax(<> (nsLen ==4 && clk == 175));
 property pr14 = Pmax(<> (nsLen ==4 && clk == 176));
@@ -113,7 +113,7 @@ property pr67 = Pmax(<> (nsLen ==4 && clk == 229));
 property pr68 = Pmax(<> (nsLen ==4 && clk == 230));
 property pr69 = Pmax(<> (nsLen == 4 && clk == 231));
 property pr70 = Pmax(<> (nsLen ==4 && clk == 232));
-property pr71 = Pmax(<> (nsLen ==4 && clk == 233));*/
+property pr71 = Pmax(<> (nsLen ==4 && clk == 233));/*
 property pr11 = Pmax(<> (sentNs == 1 && clk == 100));
 property pr12 = Pmax(<> (sentNs == 1 && clk == 101));
 property pr13 = Pmax(<> (sentNs == 1 && clk == 102));
@@ -174,7 +174,7 @@ property pr67 = Pmax(<> (sentNs == 1 && clk == 229));
 property pr68 = Pmax(<> (sentNs == 1 && clk == 230));
 property pr69 = Pmax(<> (sentNs == 1&& clk == 231));
 property pr70 = Pmax(<> (sentNs == 1 && clk == 232));
-property pr71 = Pmax(<> (sentNs == 1 && clk == 233));
+property pr71 = Pmax(<> (sentNs == 1 && clk == 233));*/
 //property Pr15 = Pmax(<> (nsLen ==4 && clk == 1010));
 //property Pr16 = Pmax(<> (nsLen ==4 && clk == 1011));
 //property Pr17 = Pmax(<> (nsLen == 4 && clk == 1012));
@@ -232,7 +232,7 @@ process EwBuffer() {
 process NsBuffer() {
 
 		tick;
-		nsFull();
+		tock;
 		receiveNs();
 
 		if (clkUpper-clk <= 0) {
