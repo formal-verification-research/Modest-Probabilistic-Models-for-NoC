@@ -293,7 +293,7 @@ process EwBuffer() {
 process NsBuffer() {
 
 		tick;
-		tock;
+		nsFull();
 		receiveNs();
 
 		if (clkUpper-clk <= 0) {
@@ -929,7 +929,7 @@ process nsFull() {
 
 	else if( clk == 173) {
 	tock palt {
-	:(: 0.032467531644180786): {= nsFull = 1 =}
+	:( 0.032467531644180786): {= nsFull = 1 =}
 		:(1 - 0.032467531644180786): {= nsFull = 0 =}
 	}
 	}
