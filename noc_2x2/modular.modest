@@ -53,7 +53,7 @@ int(0..1) nsFull = 0;
 //property Pr4 = Xmax(S(sentNs), clk>=clkUpper);
 //property Pr5 = Pmax(<>[S(clk2) <= (clkUpper-clkLower)] (sentEw == 1));
 //property Pr6 = Pmax(<>[S(clk2) <= (clkUpper-clkLower)] (sentNs == 1));
-property pr11 = Pmax(<> (nsLen ==4 && clk == 112));
+/*property pr11 = Pmax(<> (nsLen ==4 && clk == 112));
 property pr12 = Pmax(<> (nsLen == 4 && clk == 113));
 property pr13 = Pmax(<> (nsLen ==4 && clk == 114));
 property pr14 = Pmax(<> (nsLen ==4 && clk == 115));
@@ -113,7 +113,7 @@ property pr67 = Pmax(<> (nsLen ==4 && clk == 168));
 property pr68 = Pmax(<> (nsLen ==4 && clk == 169));
 property pr69 = Pmax(<> (nsLen == 4 && clk == 170));
 property pr70 = Pmax(<> (nsLen ==4 && clk == 171));
-property pr71 = Pmax(<> (nsLen ==4 && clk == 172));
+property pr71 = Pmax(<> (nsLen ==4 && clk == 172));*/
 /*property pr11 = Pmax(<> (nsLen ==4 && clk == 173));
 property pr12 = Pmax(<> (nsLen == 4 && clk == 174));
 property pr13 = Pmax(<> (nsLen ==4 && clk == 175));
@@ -174,7 +174,7 @@ property pr67 = Pmax(<> (nsLen ==4 && clk == 229));
 property pr68 = Pmax(<> (nsLen ==4 && clk == 230));
 property pr69 = Pmax(<> (nsLen == 4 && clk == 231));
 property pr70 = Pmax(<> (nsLen ==4 && clk == 232));
-property pr71 = Pmax(<> (nsLen ==4 && clk == 233));*//*
+property pr71 = Pmax(<> (nsLen ==4 && clk == 233));*/
 property pr11 = Pmax(<> (sentNs == 1 && clk == 100));
 property pr12 = Pmax(<> (sentNs == 1 && clk == 101));
 property pr13 = Pmax(<> (sentNs == 1 && clk == 102));
@@ -235,7 +235,7 @@ property pr67 = Pmax(<> (sentNs == 1 && clk == 229));
 property pr68 = Pmax(<> (sentNs == 1 && clk == 230));
 property pr69 = Pmax(<> (sentNs == 1&& clk == 231));
 property pr70 = Pmax(<> (sentNs == 1 && clk == 232));
-property pr71 = Pmax(<> (sentNs == 1 && clk == 233));*/
+property pr71 = Pmax(<> (sentNs == 1 && clk == 233));
 //property Pr15 = Pmax(<> (nsLen ==4 && clk == 1010));
 //property Pr16 = Pmax(<> (nsLen ==4 && clk == 1011));
 //property Pr17 = Pmax(<> (nsLen == 4 && clk == 1012));
@@ -541,19 +541,19 @@ process send() {
 
 }
 
-/*process nsFull() {
+process nsFull() {
 
 	if(clk > 225) {
 		if(clk%2 == 0) {
 			tock palt {
 				:(0.4675324675324657): {= nsFull = 1 =}
-				:(1- ): {= nsFull = 0=}
+				:(1 - 0.4675324675324657): {= nsFull = 0=}
 			}
 		}
 		else {
 			tock palt {
 				:(0.03246753246753237): {= nsFull = 1 =}
-				:(1- ): {= nsFull = 0=}
+				:(1 - 0.03246753246753237): {= nsFull = 0=}
 			}
 		}
 	}
@@ -561,659 +561,693 @@ process send() {
 		tock {= nsFull = 0 =}
 	}	
 	else if( clk == 112) {
-		tock palt {
-		:( 0.24999999999999994): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
-		}
+	tock palt {
+	:( 0.24999999999999994): {= nsFull = 1 =}
+		:(1 - 0.24999999999999994): {= nsFull = 0 =}
+	}
 	}
 	else if( clk == 113) {
 		tock palt {
 		:(0.003472222222222222): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.003472222222222222): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 114) {
 		tock palt {
 		:(0.3402777777777777): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.3402777777777777): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 115) {
 		tock palt {
 		:(0.00935570987654321): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.00935570987654321): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 116) {
 		tock palt {
 		:(0.3968942901234567): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.3968942901234567): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 117) {
 		tock palt {
 		:(0.015641075102880653): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.015641075102880653): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 118) {
 		tock palt {
 		:(0.4296714248971192): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.4296714248971192): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 119) {
 		tock palt {
 		:(0.021031592935528115): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.021031592935528115): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 120) {
 		tock palt {
 		:(0.44771840706447164): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.44771840706447164): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 121) {
 		tock palt {
 		:(0.025089663351623222): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.025089663351623222): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 122) {
 		tock palt {
 		:(0.45733221164837645): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.45733221164837645): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 123) {
 		tock palt {
 		:(0.027894024586572155): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.027894024586572155): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 124) {
 		tock palt {
 		:(0.4623403504134274): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.4623403504134274): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 125) {
 		tock palt {
 		:(0.029719379806654206): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.029719379806654206): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 126) {
 		tock palt {
 		:(0.46490952644334543): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.46490952644334543): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 127) {
 		tock palt {
 		:(0.030856519684658065): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.030856519684658065): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 128) {
 		tock palt {
 		:(0.4662137928153416): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.4662137928153416): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 129) {
 		tock palt {
 		:(0.031541733004029654): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.031541733004029654): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 130) {
 		tock palt {
 		:(0.46687135293346993): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.46687135293346993): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 131) {
 		tock palt {
 		:(0.03194405509683443): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.03194405509683443): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 132) {
 		tock palt {
 		:(0.4672014527156651): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.4672014527156651): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 133) {
 		tock palt {
 		:(0.03217545928150467): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.03217545928150467): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 134) {
 		tock palt {
 		:(0.4673667770466198): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.4673667770466198): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 135) {
 		tock palt {
 		:(0.03230636232396465): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.03230636232396465): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 136) {
 		tock palt {
 		:(0.46744949705103467): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.46744949705103467): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 137) {
 		tock palt {
 		:(0.03237941502264021): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.03237941502264021): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 138) {
 		tock palt {
 		:(0.4674908852703279): {= nsFull = 1 =}
-		:(1- ): {= nsFull = 0=}
+			:(1 -0.4674908852703279): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 139) {
 		tock palt {
 		:(0.03241972970750037): {= nsFull = 1 =}
+			:(1 -0.03241972970750037): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 140) {
 		tock palt {
 		:(0.4675116057417177): {= nsFull = 1 =}
+			:(1 -0.4675116057417177): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 141) {
 		tock palt {
 		:(0.03244177132118782): {= nsFull = 1 =}
+			:(1 -0.03244177132118782): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 142) {
 		tock palt {
 		:(0.467521989054788): {= nsFull = 1 =}
+			:(1 -0.467521989054788): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 143) {
 		tock palt {
 		:(0.032453728313638006): {= nsFull = 1 =}
+			:(1 -0.032453728313638006): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 144) {
 		tock palt {
 		:(0.4675271982000331): {= nsFull = 1 =}
+			:(1 -0.4675271982000331): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 145) {
 		tock palt {
 		:(0.032460171718723826): {= nsFull = 1 =}
+			:(1 -0.032460171718723826): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 146) {
 		tock palt {
 		:(0.46752981470095306): {= nsFull = 1 =}
+			:(1 -0.46752981470095306): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 147) {
 		tock palt {
 		:(0.032463624269572465): {= nsFull = 1 =}
+			:(1 -0.032463624269572465): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 148) {
 		tock palt {
 		:(0.46753113052168643): {= nsFull = 1 =}
+			:(1 -0.46753113052168643): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 149) {
 		tock palt {
 		:(0.032465465184267794): {= nsFull = 1 =}
+			:(1 -0.032465465184267794): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 150) {
 		tock palt {
 		:(0.46753179300207165): {= nsFull = 1 =}
+			:(1 -0.46753179300207165): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 151) {
 		tock palt {
 		:(0.03246644258369551): {= nsFull = 1 =}
+			:(1 -0.03246644258369551): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 152) {
 		tock palt {
 		:(0.4675321269048289): {= nsFull = 1 =}
+			:(1 -0.4675321269048289): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 153) {
 		tock palt {
 		:(0.032466959573774525): {= nsFull = 1 =}
+			:(1 -0.032466959573774525): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 154) {
 		tock palt {
 		:(0.4675322953681647): {= nsFull = 1 =}
+			:(1 -0.4675322953681647): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 155) {
 		tock palt {
 		:(0.032467232127352294): {= nsFull = 1 =}
+			:(1 -0.032467232127352294): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 156) {
 		tock palt {
 		:(0.46753238044245565): {= nsFull = 1 =}
+			:(1 -0.46753238044245565): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 157) {
 		tock palt {
 		:(0.03246737539156222): {= nsFull = 1 =}
+			:(1 -0.03246737539156222): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 158) {
 		tock palt {
 		:(0.46753242344276064): {= nsFull = 1 =}
+			:(1 -0.46753242344276064): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 159) {
 		tock palt {
 		:(0.032467450496958386): {= nsFull = 1 =}
+			:(1 -0.032467450496958386): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 160) {
 		tock palt {
 		:(0.4675324451949122): {= nsFull = 1 =}
+			:(1 -0.4675324451949122): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 161) {
 		tock palt {
 		:(0.03246748977622162): {= nsFull = 1 =}
+			:(1 -0.03246748977622162): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 162) {
 		tock palt {
 		:(0.4675324562070679): {= nsFull = 1 =}
+			:(1 -0.4675324562070679): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 163) {
 		tock palt {
 		:(0.03246751027409987): {= nsFull = 1 =}
+			:(1 -0.03246751027409987): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 164) {
 		tock palt {
 		:(0.4675324617862217): {= nsFull = 1 =}
+			:(1 -0.4675324617862217): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 165) {
 		tock palt {
 		:(0.032467520949618245): {= nsFull = 1 =}
+			:(1 -0.032467520949618245): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 166) {
 		tock palt {
 		:(0.4675324646148807): {= nsFull = 1 =}
+			:(1 -0.4675324646148807): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 167) {
 		tock palt {
 		:(0.03246752649936903): {= nsFull = 1 =}
+			:(1 -0.03246752649936903): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 168) {
 		tock palt {
 		:(0.46753246605004917): {= nsFull = 1 =}
+			:(1 -0.46753246605004917): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 169) {
 		tock palt {
 		:(0.03246752937957238): {= nsFull = 1 =}
+			:(1 -0.03246752937957238): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 170) {
 		tock palt {
 		:(0.4675324667787208): {= nsFull = 1 =}
+			:(1 -0.4675324667787208): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 171) {
 		tock palt {
 		:(0.0324675308719921): {= nsFull = 1 =}
+			:(1 -0.0324675308719921): {= nsFull = 0 =}
 		}
 	}
 	else if( clk == 172) {
 		tock palt {
 		:(0.46753246714894614): {= nsFull = 1 =}
+			:(1 -0.46753246714894614): {= nsFull = 0 =}
 		}
 	}
+
 	else if( clk == 173) {
 	tock palt {
-	:(": 0.032467531644180786): {= nsFull = 1 =}
-		:(1 -": 0.032467531644180786): {= nsFull = 0 =}
+	:(: 0.032467531644180786): {= nsFull = 1 =}
+		:(1 - 0.032467531644180786): {= nsFull = 0 =}
 	}
-}
-else if( clk == 174) {
-	tock palt {
-	:(0.4675324673371838): {= nsFull = 1 =}
-		:(1 -0.4675324673371838): {= nsFull = 0 =}
 	}
-}
-else if( clk == 175) {
-	tock palt {
-	:(0.03246753204317032): {= nsFull = 1 =}
-		:(1 -0.03246753204317032): {= nsFull = 0 =}
+	else if( clk == 174) {
+		tock palt {
+		:(0.4675324673371838): {= nsFull = 1 =}
+			:(1 -0.4675324673371838): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 176) {
-	tock palt {
-	:(0.46753246743295945): {= nsFull = 1 =}
-		:(1 -0.46753246743295945): {= nsFull = 0 =}
+	else if( clk == 175) {
+		tock palt {
+		:(0.03246753204317032): {= nsFull = 1 =}
+			:(1 -0.03246753204317032): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 177) {
-	tock palt {
-	:(0.032467532249063236): {= nsFull = 1 =}
-		:(1 -0.032467532249063236): {= nsFull = 0 =}
+	else if( clk == 176) {
+		tock palt {
+		:(0.46753246743295945): {= nsFull = 1 =}
+			:(1 -0.46753246743295945): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 178) {
-	tock palt {
-	:(0.46753246748172506): {= nsFull = 1 =}
-		:(1 -0.46753246748172506): {= nsFull = 0 =}
+	else if( clk == 177) {
+		tock palt {
+		:(0.032467532249063236): {= nsFull = 1 =}
+			:(1 -0.032467532249063236): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 179) {
-	tock palt {
-	:(0.032467532355182765): {= nsFull = 1 =}
-		:(1 -0.032467532355182765): {= nsFull = 0 =}
+	else if( clk == 178) {
+		tock palt {
+		:(0.46753246748172506): {= nsFull = 1 =}
+			:(1 -0.46753246748172506): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 180) {
-	tock palt {
-	:(0.46753246750657274): {= nsFull = 1 =}
-		:(1 -0.46753246750657274): {= nsFull = 0 =}
+	else if( clk == 179) {
+		tock palt {
+		:(0.032467532355182765): {= nsFull = 1 =}
+			:(1 -0.032467532355182765): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 181) {
-	tock palt {
-	:(0.03246753240981537): {= nsFull = 1 =}
-		:(1 -0.03246753240981537): {= nsFull = 0 =}
+	else if( clk == 180) {
+		tock palt {
+		:(0.46753246750657274): {= nsFull = 1 =}
+			:(1 -0.46753246750657274): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 182) {
-	tock palt {
-	:(0.4675324675192426): {= nsFull = 1 =}
-		:(1 -0.4675324675192426): {= nsFull = 0 =}
+	else if( clk == 181) {
+		tock palt {
+		:(0.03246753240981537): {= nsFull = 1 =}
+			:(1 -0.03246753240981537): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 183) {
-	tock palt {
-	:(0.03246753243791087): {= nsFull = 1 =}
-		:(1 -0.03246753243791087): {= nsFull = 0 =}
+	else if( clk == 182) {
+		tock palt {
+		:(0.4675324675192426): {= nsFull = 1 =}
+			:(1 -0.4675324675192426): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 184) {
-	tock palt {
-	:(0.4675324675257079): {= nsFull = 1 =}
-		:(1 -0.4675324675257079): {= nsFull = 0 =}
+	else if( clk == 183) {
+		tock palt {
+		:(0.03246753243791087): {= nsFull = 1 =}
+			:(1 -0.03246753243791087): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 185) {
-	tock palt {
-	:(0.032467532452344405): {= nsFull = 1 =}
-		:(1 -0.032467532452344405): {= nsFull = 0 =}
+	else if( clk == 184) {
+		tock palt {
+		:(0.4675324675257079): {= nsFull = 1 =}
+			:(1 -0.4675324675257079): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 186) {
-	tock palt {
-	:(0.46753246752900945): {= nsFull = 1 =}
-		:(1 -0.46753246752900945): {= nsFull = 0 =}
+	else if( clk == 185) {
+		tock palt {
+		:(0.032467532452344405): {= nsFull = 1 =}
+			:(1 -0.032467532452344405): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 187) {
-	tock palt {
-	:(0.03246753245975205): {= nsFull = 1 =}
-		:(1 -0.03246753245975205): {= nsFull = 0 =}
+	else if( clk == 186) {
+		tock palt {
+		:(0.46753246752900945): {= nsFull = 1 =}
+			:(1 -0.46753246752900945): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 188) {
-	tock palt {
-	:(0.46753246753069677): {= nsFull = 1 =}
-		:(1 -0.46753246753069677): {= nsFull = 0 =}
+	else if( clk == 187) {
+		tock palt {
+		:(0.03246753245975205): {= nsFull = 1 =}
+			:(1 -0.03246753245975205): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 189) {
-	tock palt {
-	:(0.03246753246355024): {= nsFull = 1 =}
-		:(1 -0.03246753246355024): {= nsFull = 0 =}
+	else if( clk == 188) {
+		tock palt {
+		:(0.46753246753069677): {= nsFull = 1 =}
+			:(1 -0.46753246753069677): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 190) {
-	tock palt {
-	:(0.46753246753155964): {= nsFull = 1 =}
-		:(1 -0.46753246753155964): {= nsFull = 0 =}
+	else if( clk == 189) {
+		tock palt {
+		:(0.03246753246355024): {= nsFull = 1 =}
+			:(1 -0.03246753246355024): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 191) {
-	tock palt {
-	:(0.03246753246549597): {= nsFull = 1 =}
-		:(1 -0.03246753246549597): {= nsFull = 0 =}
+	else if( clk == 190) {
+		tock palt {
+		:(0.46753246753155964): {= nsFull = 1 =}
+			:(1 -0.46753246753155964): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 192) {
-	tock palt {
-	:(0.4675324675320014): {= nsFull = 1 =}
-		:(1 -0.4675324675320014): {= nsFull = 0 =}
+	else if( clk == 191) {
+		tock palt {
+		:(0.03246753246549597): {= nsFull = 1 =}
+			:(1 -0.03246753246549597): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 193) {
-	tock palt {
-	:(0.03246753246649183): {= nsFull = 1 =}
-		:(1 -0.03246753246649183): {= nsFull = 0 =}
+	else if( clk == 192) {
+		tock palt {
+		:(0.4675324675320014): {= nsFull = 1 =}
+			:(1 -0.4675324675320014): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 194) {
-	tock palt {
-	:(0.46753246753222766): {= nsFull = 1 =}
-		:(1 -0.46753246753222766): {= nsFull = 0 =}
+	else if( clk == 193) {
+		tock palt {
+		:(0.03246753246649183): {= nsFull = 1 =}
+			:(1 -0.03246753246649183): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 195) {
-	tock palt {
-	:(0.032467532467001126): {= nsFull = 1 =}
-		:(1 -0.032467532467001126): {= nsFull = 0 =}
+	else if( clk == 194) {
+		tock palt {
+		:(0.46753246753222766): {= nsFull = 1 =}
+			:(1 -0.46753246753222766): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 196) {
-	tock palt {
-	:(0.46753246753234357): {= nsFull = 1 =}
-		:(1 -0.46753246753234357): {= nsFull = 0 =}
+	else if( clk == 195) {
+		tock palt {
+		:(0.032467532467001126): {= nsFull = 1 =}
+			:(1 -0.032467532467001126): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 197) {
-	tock palt {
-	:(0.03246753246726136): {= nsFull = 1 =}
-		:(1 -0.03246753246726136): {= nsFull = 0 =}
+	else if( clk == 196) {
+		tock palt {
+		:(0.46753246753234357): {= nsFull = 1 =}
+			:(1 -0.46753246753234357): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 198) {
-	tock palt {
-	:(0.4675324675324031): {= nsFull = 1 =}
-		:(1 -0.4675324675324031): {= nsFull = 0 =}
+	else if( clk == 197) {
+		tock palt {
+		:(0.03246753246726136): {= nsFull = 1 =}
+			:(1 -0.03246753246726136): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 199) {
-	tock palt {
-	:(0.03246753246739423): {= nsFull = 1 =}
-		:(1 -0.03246753246739423): {= nsFull = 0 =}
+	else if( clk == 198) {
+		tock palt {
+		:(0.4675324675324031): {= nsFull = 1 =}
+			:(1 -0.4675324675324031): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 200) {
-	tock palt {
-	:(0.46753246753243355): {= nsFull = 1 =}
-		:(1 -0.46753246753243355): {= nsFull = 0 =}
+	else if( clk == 199) {
+		tock palt {
+		:(0.03246753246739423): {= nsFull = 1 =}
+			:(1 -0.03246753246739423): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 201) {
-	tock palt {
-	:(0.03246753246746201): {= nsFull = 1 =}
-		:(1 -0.03246753246746201): {= nsFull = 0 =}
+	else if( clk == 200) {
+		tock palt {
+		:(0.46753246753243355): {= nsFull = 1 =}
+			:(1 -0.46753246753243355): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 202) {
-	tock palt {
-	:(0.46753246753244926): {= nsFull = 1 =}
-		:(1 -0.46753246753244926): {= nsFull = 0 =}
+	else if( clk == 201) {
+		tock palt {
+		:(0.03246753246746201): {= nsFull = 1 =}
+			:(1 -0.03246753246746201): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 203) {
-	tock palt {
-	:(0.03246753246749655): {= nsFull = 1 =}
-		:(1 -0.03246753246749655): {= nsFull = 0 =}
+	else if( clk == 202) {
+		tock palt {
+		:(0.46753246753244926): {= nsFull = 1 =}
+			:(1 -0.46753246753244926): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 204) {
-	tock palt {
-	:(0.46753246753245736): {= nsFull = 1 =}
-		:(1 -0.46753246753245736): {= nsFull = 0 =}
+	else if( clk == 203) {
+		tock palt {
+		:(0.03246753246749655): {= nsFull = 1 =}
+			:(1 -0.03246753246749655): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 205) {
-	tock palt {
-	:(0.03246753246751416): {= nsFull = 1 =}
-		:(1 -0.03246753246751416): {= nsFull = 0 =}
+	else if( clk == 204) {
+		tock palt {
+		:(0.46753246753245736): {= nsFull = 1 =}
+			:(1 -0.46753246753245736): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 206) {
-	tock palt {
-	:(0.4675324675324615): {= nsFull = 1 =}
-		:(1 -0.4675324675324615): {= nsFull = 0 =}
+	else if( clk == 205) {
+		tock palt {
+		:(0.03246753246751416): {= nsFull = 1 =}
+			:(1 -0.03246753246751416): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 207) {
-	tock palt {
-	:(0.03246753246752311): {= nsFull = 1 =}
-		:(1 -0.03246753246752311): {= nsFull = 0 =}
+	else if( clk == 206) {
+		tock palt {
+		:(0.4675324675324615): {= nsFull = 1 =}
+			:(1 -0.4675324675324615): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 208) {
-	tock palt {
-	:(0.4675324675324636): {= nsFull = 1 =}
-		:(1 -0.4675324675324636): {= nsFull = 0 =}
+	else if( clk == 207) {
+		tock palt {
+		:(0.03246753246752311): {= nsFull = 1 =}
+			:(1 -0.03246753246752311): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 209) {
-	tock palt {
-	:(0.03246753246752767): {= nsFull = 1 =}
-		:(1 -0.03246753246752767): {= nsFull = 0 =}
+	else if( clk == 208) {
+		tock palt {
+		:(0.4675324675324636): {= nsFull = 1 =}
+			:(1 -0.4675324675324636): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 210) {
-	tock palt {
-	:(0.4675324675324647): {= nsFull = 1 =}
-		:(1 -0.4675324675324647): {= nsFull = 0 =}
+	else if( clk == 209) {
+		tock palt {
+		:(0.03246753246752767): {= nsFull = 1 =}
+			:(1 -0.03246753246752767): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 211) {
-	tock palt {
-	:(0.03246753246752998): {= nsFull = 1 =}
-		:(1 -0.03246753246752998): {= nsFull = 0 =}
+	else if( clk == 210) {
+		tock palt {
+		:(0.4675324675324647): {= nsFull = 1 =}
+			:(1 -0.4675324675324647): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 212) {
-	tock palt {
-	:(0.4675324675324652): {= nsFull = 1 =}
-		:(1 -0.4675324675324652): {= nsFull = 0 =}
+	else if( clk == 211) {
+		tock palt {
+		:(0.03246753246752998): {= nsFull = 1 =}
+			:(1 -0.03246753246752998): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 213) {
-	tock palt {
-	:(0.03246753246753116): {= nsFull = 1 =}
-		:(1 -0.03246753246753116): {= nsFull = 0 =}
+	else if( clk == 212) {
+		tock palt {
+		:(0.4675324675324652): {= nsFull = 1 =}
+			:(1 -0.4675324675324652): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 214) {
-	tock palt {
-	:(0.46753246753246547): {= nsFull = 1 =}
-		:(1 -0.46753246753246547): {= nsFull = 0 =}
+	else if( clk == 213) {
+		tock palt {
+		:(0.03246753246753116): {= nsFull = 1 =}
+			:(1 -0.03246753246753116): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 215) {
-	tock palt {
-	:(0.03246753246753176): {= nsFull = 1 =}
-		:(1 -0.03246753246753176): {= nsFull = 0 =}
+	else if( clk == 214) {
+		tock palt {
+		:(0.46753246753246547): {= nsFull = 1 =}
+			:(1 -0.46753246753246547): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 216) {
-	tock palt {
-	:(0.4675324675324656): {= nsFull = 1 =}
-		:(1 -0.4675324675324656): {= nsFull = 0 =}
+	else if( clk == 215) {
+		tock palt {
+		:(0.03246753246753176): {= nsFull = 1 =}
+			:(1 -0.03246753246753176): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 217) {
-	tock palt {
-	:(0.03246753246753206): {= nsFull = 1 =}
-		:(1 -0.03246753246753206): {= nsFull = 0 =}
+	else if( clk == 216) {
+		tock palt {
+		:(0.4675324675324656): {= nsFull = 1 =}
+			:(1 -0.4675324675324656): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 218) {
-	tock palt {
-	:(0.4675324675324657): {= nsFull = 1 =}
-		:(1 -0.4675324675324657): {= nsFull = 0 =}
+	else if( clk == 217) {
+		tock palt {
+		:(0.03246753246753206): {= nsFull = 1 =}
+			:(1 -0.03246753246753206): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 219) {
-	tock palt {
-	:(0.032467532467532215): {= nsFull = 1 =}
-		:(1 -0.032467532467532215): {= nsFull = 0 =}
+	else if( clk == 218) {
+		tock palt {
+		:(0.4675324675324657): {= nsFull = 1 =}
+			:(1 -0.4675324675324657): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 220) {
-	tock palt {
-	:(0.4675324675324657): {= nsFull = 1 =}
-		:(1 -0.4675324675324657): {= nsFull = 0 =}
+	else if( clk == 219) {
+		tock palt {
+		:(0.032467532467532215): {= nsFull = 1 =}
+			:(1 -0.032467532467532215): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 221) {
-	tock palt {
-	:(0.03246753246753229): {= nsFull = 1 =}
-		:(1 -0.03246753246753229): {= nsFull = 0 =}
+	else if( clk == 220) {
+		tock palt {
+		:(0.4675324675324657): {= nsFull = 1 =}
+			:(1 -0.4675324675324657): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 222) {
-	tock palt {
-	:(0.4675324675324657): {= nsFull = 1 =}
-		:(1 -0.4675324675324657): {= nsFull = 0 =}
+	else if( clk == 221) {
+		tock palt {
+		:(0.03246753246753229): {= nsFull = 1 =}
+			:(1 -0.03246753246753229): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 223) {
-	tock palt {
-	:(0.03246753246753231): {= nsFull = 1 =}
-		:(1 -0.03246753246753231): {= nsFull = 0 =}
+	else if( clk == 222) {
+		tock palt {
+		:(0.4675324675324657): {= nsFull = 1 =}
+			:(1 -0.4675324675324657): {= nsFull = 0 =}
+		}
 	}
-}
-else if( clk == 224) {
-	tock palt {
-	:(0.4675324675324657): {= nsFull = 1 =}
-		:(1 -0.4675324675324657): {= nsFull = 0 =}
+	else if( clk == 223) {
+		tock palt {
+		:(0.03246753246753231): {= nsFull = 1 =}
+			:(1 -0.03246753246753231): {= nsFull = 0 =}
+		}
 	}
-}
-else {
-	tock palt {
-	:(0.032467532467532347): {= nsFull = 1 =}
-		:(1 -0.032467532467532347): {= nsFull = 0 =}
+	else if( clk == 224) {
+		tock palt {
+		:(0.4675324675324657): {= nsFull = 1 =}
+			:(1 -0.4675324675324657): {= nsFull = 0 =}
+		}
 	}
-}
+	else {
+		tock palt {
+		:(0.032467532467532347): {= nsFull = 1 =}
+			:(1 -0.032467532467532347): {= nsFull = 0 =}
+		}
+	}
 
 }
 
-}*/
 
 process receiveNs() {
 
