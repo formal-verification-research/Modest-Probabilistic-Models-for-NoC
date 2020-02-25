@@ -299,11 +299,11 @@ property pr68 = Pmax(<> (nsLen ==4 && clk == 230));
 property pr69 = Pmax(<> (nsLen == 4 && clk == 231));
 property pr70 = Pmax(<> (nsLen ==4 && clk == 232));
 property pr71 = Pmax(<> (nsLen ==4 && clk == 233));*/
-property pr14 = Pmax(<> ((optimalRuns>=1));
-//property Pr15 = Pmax(<> (nsLen ==4 && clk == 1010));
-//property Pr16 = Pmax(<> (nsLen ==4 && clk == 1011));
-//property Pr17 = Pmax(<> (nsLen == 4 && clk == 1012));
-//property Pr18 = Pmax(<> (nsLen == 4 && clk == 1013));
+//property pr14 = Pmax(<> ((optimalRuns>=1));
+property Pr15 = Pmax(<> (ewSent == 1 && clk == 1010));
+property Pr16 = Pmax(<> (ewSent == 1 && clk == 1011));
+property Pr17 = Pmax(<> (ewSent == 1 == 4 && clk == 1012));
+property Pr18 = Pmax(<> (ewSent == 1 && clk == 1013));
 
 //propert Pr19 = Pmax(<> (nsLen >= 4));
 // ------ End: properties ---------
@@ -605,7 +605,7 @@ process send() {
 
 }
 
-process nsFull() {
+/*process nsFull() {
 
 	if(clk > 225) {
 		if(clk%2 == 0) {
@@ -1310,7 +1310,7 @@ process nsFull() {
 		}
 	}
 
-}
+}*/
 
 
 process receiveNs() {
