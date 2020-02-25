@@ -232,7 +232,7 @@ process Arbiter3() {
 
 process populate() {
 
-	if(clk%2 == 0) {
+	if(clk%4 == 0) {
 
 		 tick {= 
 
