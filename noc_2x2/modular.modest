@@ -308,7 +308,7 @@ property Pr18 = Pmax(<> (sentEw == 1&& clk == 103));
 
 process LocalBuffer() {
 
-
+		populate();
 		localBuffer();
 
 
@@ -323,6 +323,7 @@ process LocalBuffer() {
 
 process EwBuffer() {
 
+		tick;
 		ewBuffer();
 
 
@@ -337,6 +338,8 @@ process EwBuffer() {
 
 
 process Send() {
+
+		tick;
 		send();
 
 		if (clkUpper-clk <= 0) {
@@ -349,6 +352,7 @@ process Send() {
 
 process Receive() {
 
+	tick;
 	receive();
 
 		if (clkUpper-clk <= 0) {
@@ -359,6 +363,15 @@ process Receive() {
 		}
 
 
+}
+
+process populate() {
+	if(clk%2 == 0) {
+	tick {=	localLen += (localLen < 4) ? 1 : 0,		//Adds a flit to the local buffer of each NoC, if they are not already full
+			sentNs = 0,
+			sentEw = 0
+		=}
+	}
 }
 
 
@@ -375,7 +388,7 @@ process localBuffer() {
 		}
 		else {
 			tack palt{
-				:(1/3): {= localWillSend = 2 , 2; clk++ =}
+				:(1/3): {= localWillSend = 2 , 2: clk++ =}
 				:(2/3): {= localWillSend = 1, 2: clk++ =}
 			}
 		}
@@ -383,7 +396,7 @@ process localBuffer() {
 	} 
 
 	else {
-		tock {= 2: clk++ =}
+		tack {= 2: clk++ =}
 	}
 
 }
@@ -408,7 +421,7 @@ process ewBuffer() {
 	} 
 
 	else {
-		tock
+		tack
 	}
 
 }
@@ -429,7 +442,7 @@ process send() {
 				tack {= 1: localLen-=1, 1: sentEw = 1 =}
 			}
 			else {
-				tack {= 1; nsLen-=1, 1: localLen-=1, 1: sentEw = 1 =}
+				tack {= 1: nsLen-=1, 1: localLen-=1, 1: sentEw = 1 =}
 			}
 		}
 		else { //local tries ns
@@ -1302,29 +1315,19 @@ process receive() {
 
 		 	tack palt{
 
-					:(1/3): {=	-1: localLen += (localLen < 4) ? 1 : 0,		//Adds a flit to the local buffer of each NoC, if they are not already full
-						-1: sentNs = 0,
-						-1: sentEw = 0
-					=}
-
-					:(2/3): {= -1: localLen += (localLen < 4) ? 1 : 0,		//Adds a flit to the local buffer of each NoC, if they are not already full
-						-1: sentNs = 0,
-						-1: sentEw = 0,
+					:(2/3): {= 
 						2: ewLen += 1
 						 =}
 
 				}
 		}
 		else {
-			tack {=	-1: localLen += (localLen < 4) ? 1 : 0,		//Adds a flit to the local buffer of each NoC, if they are not already full
-						-1: sentNs = 0,
-						-1: sentEw = 0
-					=}
+			tack
 		}
 	}
 	else {
 
-		tack {= -1: sentNs = 0, sentEw = 0 =}
+		tack
 	}
 
 }
