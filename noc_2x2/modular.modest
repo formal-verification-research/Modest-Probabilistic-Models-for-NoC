@@ -183,7 +183,7 @@ property pr68 = Pmax(<> (nsLen ==4 && clk == 230));
 property pr69 = Pmax(<> (nsLen == 4 && clk == 231));
 property pr70 = Pmax(<> (nsLen ==4 && clk == 232));
 property pr71 = Pmax(<> (nsLen ==4 && clk == 233));*/
-
+/*
 property Pr15 = Pmax(<> (sentNs == 1&& clk == 100));
 property Pr16 = Pmax(<> (sentNs== 1 && clk == 101));
 property Pr17 = Pmax(<> (sentNs == 1&& clk == 102));
@@ -193,9 +193,9 @@ property Pr20 = Pmax(<> (sentNs == 1&& clk == 105));
 property Pr21 = Pmax(<> (sentNs == 1&& clk == 106));
 property Pr22 = Pmax(<> (sentNs== 1 && clk == 107));
 property Pr23 = Pmax(<> (sentNs == 1&& clk == 108));
-property Pr23 = Pmax(<> (sentNs == 1&& clk == 109));
-property Pr24 = Pmax(<> (sentNs == 1&& clk == 110));
-property Pr25 = Pmax(<> (sentNs == 1&& clk == 111));
+property Pr24 = Pmax(<> (sentNs == 1&& clk == 109));
+property Pr25 = Pmax(<> (sentNs == 1&& clk == 110));
+property Pr26 = Pmax(<> (sentNs == 1&& clk == 111));
 property pr11 = Pmax(<> (sentNs == 1 && clk == 112));
 property pr12 = Pmax(<> (sentNs == 1 && clk == 113));
 property pr13 = Pmax(<> (sentNs == 1 && clk == 114));
@@ -256,8 +256,8 @@ property pr67 = Pmax(<> (sentNs == 1 && clk == 168));
 property pr68 = Pmax(<> (sentNs == 1 && clk == 169));
 property pr69 = Pmax(<> (sentNs == 1 && clk == 170));
 property pr70 = Pmax(<> (sentNs == 1 && clk == 171));
-property pr71 = Pmax(<> (sentNs == 1 && clk == 172));
-property pr11 = Pmax(<> (sentNs == 1 && clk == 173));
+property pr71 = Pmax(<> (sentNs == 1 && clk == 172));*/
+/*property pr11 = Pmax(<> (sentNs == 1 && clk == 173));
 property pr12 = Pmax(<> (sentNs == 1 && clk == 174));
 property pr13 = Pmax(<> (sentNs == 1 && clk == 175));
 property pr14 = Pmax(<> (sentNs == 1 && clk == 176));
@@ -325,7 +325,8 @@ property Pr17 = Pmax(<> (sentNs == 1&& clk == 102));
 property Pr18 = Pmax(<> (sentNs == 1&& clk == 103));
 property Pr19 = Pmax(<> (sentNs == 1&& clk == 104));
 property Pr20 = Pmax(<> (sentNs == 1&& clk == 105));
-
+*/
+property op = Pmax(<> (optimalRuns>=1));
 //propert Pr19 = Pmax(<> (nsLen >= 4));
 // ------ End: properties ---------
 
@@ -645,7 +646,7 @@ if( clk > 211) {
 	}
 }
 else if (clk < 107) {
-	tock
+	tock {= nsFull = 0 =}
 }
 
 	else if( clk == 107) {
