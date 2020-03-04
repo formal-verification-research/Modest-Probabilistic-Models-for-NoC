@@ -1,12 +1,12 @@
 //Version of the concrete model to calculate probabilities for the 4 state abstract model
 
 // datatype buffer = {int(-1..3) val, int(0..3) id, bool serviced, int(0..3) priority, int timesServiced};		//Datatype for a buffer with the next buffer value, id of the buffer, whether the buffer was serviced last clock cycle or not, and the priority number of the buffer
-int(0..2) unserviced;		//Number of unserviced buffers, iterates down when unserviced buffer's priority is set
-int(0..2) totalUnserviced;	//Total number of unserviced buffers in a clock cycle
+int(0..4) unserviced;		//Number of unserviced buffers, iterates down when unserviced buffer's priority is set
+int(0..4) totalUnserviced;	//Total number of unserviced buffers in a clock cycle
 //int totalServiced = 0;
 //int optimalRuns = 0;
 const int clkLower = 100; 
-const int clkUpper = 101;
+const int clkUpper = 104;
 int(clkLower..clkUpper) clk;
 
 const int totalStates = 4;
@@ -30,7 +30,7 @@ int(0..3) temp0_id, temp1_id, temp2_id, temp3_id, temp0_priority, temp1_priority
 bool temp0_serviced, temp1_serviced, temp2_serviced, temp3_serviced;
 
 
-action tick;
+action tick, tock;
 
 // ------ Begin: properties ---------
 //property Pr1 = Pmax(<> (clk >= clkUpper));
@@ -106,7 +106,8 @@ process Arbiter(){
 		//<Service Buffer a[0]>--------------------------------------------------------
 		{= 
 		//a[0].timesServiced++,
-		a0_serviced = true 
+		a0_serviced = true
+			,unserviced = 0
 		=};
 		
 		//<Service buffer <a[1]> ------------------------------------------------------
@@ -183,7 +184,15 @@ process Arbiter(){
 		
 		//Rewrite buffer array with new priority values-------------------------------------------------------------------------
 		//buffer 0
-		if(a0_priority == 1){
+		if(a0_priority == 0){
+			{=
+			temp0_val = a0_val,
+			temp0_id = a0_id,
+			temp0_serviced = a0_serviced,
+			temp0_priority = a0_priority
+			=}
+		}
+		else if(a0_priority == 1){
 			{=
 			temp1_val = a0_val,
 			temp1_id = a0_id,
@@ -207,7 +216,6 @@ process Arbiter(){
 			temp3_priority = a0_priority
 			=}
 		}
-		//priority and values stay the same
 		else{tau};
 		
 		
@@ -218,6 +226,14 @@ process Arbiter(){
 			temp0_id = a1_id,
 			temp0_serviced = a1_serviced,
 			temp0_priority = a1_priority
+			=}
+		}
+		else if(a1_priority == 1){
+			{=
+			temp1_val = a1_val,
+			temp1_id = a1_id,
+			temp1_serviced = a1_serviced,
+			temp1_priority = a1_priority
 			=}
 		}
 		else if(a1_priority == 2){
@@ -236,7 +252,6 @@ process Arbiter(){
 			temp3_priority = a1_priority
 			=}
 		}
-		//priority and values stay the same
 		else{tau};
 		
 		
@@ -257,6 +272,14 @@ process Arbiter(){
 			temp1_priority = a2_priority
 			=}
 		}
+		else if(a2_priority == 2){
+			{=
+			temp2_val = a2_val,
+			temp2_id = a2_id,
+			temp2_serviced = a2_serviced,
+			temp2_priority = a2_priority
+			=}
+		}
 		else if(a2_priority == 3){
 			{=
 			temp3_val = a2_val,
@@ -265,7 +288,6 @@ process Arbiter(){
 			temp3_priority = a2_priority
 			=}
 		}
-		//priority and values stay the same
 		else{tau};
 		
 		//buffer3
@@ -293,7 +315,14 @@ process Arbiter(){
 			temp2_priority = a3_priority
 			=}
 		}
-		//priority and values stay the same
+		else if(a3_priority == 3){
+			{=
+			temp3_val = a3_val,
+			temp3_id = a3_id,
+			temp3_serviced = a3_serviced,
+			temp3_priority = a3_priority
+			=}
+		}
 		else{tau};
 		
 		//set arbiters for next cycle:
@@ -325,7 +354,11 @@ process Arbiter(){
 		else {
 			tau
 		};
-			
+		
+		if(a0_val == a0_id || a1_val == a1_id || a2_val == a2_id){
+			tock
+		}
+		else{tau};
 		
 		
 		if (clk >= clkUpper) {
@@ -348,15 +381,44 @@ process initialize(){
 	a2_id = 2, 
 	a3_id = 3,  
 	
+	a0_priority = 0,
+	a1_priority = 1,
+	a2_priority = 2,
+	a3_priority = 3,
 	
-	a0_val = DiscreteUniform(1, 3),
-	a1_val = (DiscreteUniform(1, 3) + 1) % 4,
-	a2_val = (DiscreteUniform(1, 3) + 2) % 4,
-	a3_val = DiscreteUniform(0, 2),
+	
+//	a0_val = DiscreteUniform(1, 3),
+//	a1_val = (DiscreteUniform(1, 3) + 1) % 4,
+//	a2_val = (DiscreteUniform(1, 3) + 2) % 4,
+//	a3_val = DiscreteUniform(0, 2),
 	
 	
 	unserviced = 0
-	=}
+	=};
+	
+	palt{
+		:(1/3): {= a0_val = 1 =}
+		:(1/3): {= a0_val = 2 =}
+		:(1/3): {= a0_val = 3 =}
+	};
+	
+	palt{
+		:(1/3): {= a1_val = 0 =}
+		:(1/3): {= a1_val = 2 =}
+		:(1/3): {= a1_val = 3 =}
+	};
+	
+	palt{
+		:(1/3): {= a2_val = 0 =}
+		:(1/3): {= a2_val = 1 =}
+		:(1/3): {= a2_val = 3 =}
+	};
+	
+	palt{
+		:(1/3): {= a3_val = 0 =}
+		:(1/3): {= a3_val = 1 =}
+		:(1/3): {= a3_val = 2 =}
+	}
 
 	
 }
@@ -364,11 +426,12 @@ process initialize(){
 //Sets the new priority value of buffer a[i] and updates the value if the buffer was serviced ------------------------------------------------------------------------------------
 process setPriority0(){
 	if (a0_serviced == true){
-		{= 
-		a0_val = (DiscreteUniform(1, 3) + a0_id) % 4,	//Update value	
-		a0_priority = unserviced 						//Set new priority
-		=}
 		//<update buffer value and dequeue buffer>
+		palt{
+			:(1/3): {= a0_val = (1 + a0_id) % 4, a0_priority = unserviced + a0_priority =}
+			:(1/3): {= a0_val = (2 + a0_id) % 4, a0_priority = unserviced + a0_priority =}
+			:(1/3): {= a0_val = (3 + a0_id) % 4, a0_priority = unserviced + a0_priority =}
+		}
 	}
 	else {
 		{= 
@@ -380,11 +443,12 @@ process setPriority0(){
 
 process setPriority1(){
 	if (a1_serviced == true){
-		{= 
-		a1_val = (DiscreteUniform(1, 3) + a1_id) % 4,	//Update value	
-		a1_priority = unserviced 						//Set new priority
-		=}
 		//<update buffer value and dequeue buffer>
+		palt{
+			:(1/3): {= a1_val = (1 + a1_id) % 4, a1_priority = unserviced + a1_priority =}
+			:(1/3): {= a1_val = (2 + a1_id) % 4, a1_priority = unserviced + a1_priority =}
+			:(1/3): {= a1_val = (3 + a1_id) % 4, a1_priority = unserviced + a1_priority =}
+		}
 	}
 	else {
 		{= 
@@ -396,11 +460,12 @@ process setPriority1(){
 
 process setPriority2(){
 	if (a2_serviced == true){
-		{= 
-		a2_val = (DiscreteUniform(1, 3) + a2_id) % 4,	//Update value	
-		a2_priority = unserviced 						//Set new priority
-		=}
 		//<update buffer value and dequeue buffer>
+		palt{
+			:(1/3): {= a2_val = (1 + a2_id) % 4, a2_priority = unserviced + a2_priority =}
+			:(1/3): {= a2_val = (2 + a2_id) % 4, a2_priority = unserviced + a2_priority =}
+			:(1/3): {= a2_val = (3 + a2_id) % 4, a2_priority = unserviced + a2_priority =}
+		}
 	}
 	else {
 		{= 
@@ -412,11 +477,12 @@ process setPriority2(){
 
 process setPriority3(){
 	if (a3_serviced == true){
-		{= 
-		a3_val = (DiscreteUniform(1, 3) + a3_id) % 4,	//Update value	
-		a3_priority = unserviced 						//Set new priority
-		=}
 		//<update buffer value and dequeue buffer>
+		palt{
+			:(1/3): {= a3_val = (1 + a3_id) % 4, a3_priority = unserviced + a3_priority =}
+			:(1/3): {= a3_val = (2 + a3_id) % 4, a3_priority = unserviced + a3_priority =}
+			:(1/3): {= a3_val = (3 + a3_id) % 4, a3_priority = unserviced + a3_priority =}
+		}
 	}
 	else {
 		{= 
