@@ -84,7 +84,7 @@ process initialize(){
 */
 process populate(){
 	
-	if((clk % INJECTIONRATEDENOMINATOR) < INJECTIONRATENUMERATOR){
+	if((clk % 10) <= 2){
 		{=
 		noc[0].localB4 = true,
 		noc[1].localB4 = true,
