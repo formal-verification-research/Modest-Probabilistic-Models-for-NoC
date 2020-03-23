@@ -9,7 +9,7 @@ const int INJECTIONRATEDENOMINATOR = 2;
 const int DUR;
 const int clkLower = 100; 
 const int clkUpper = clkLower + DUR;
-int(clkLower..clkUpper) clk;
+int/*(clkLower..clkUpper)*/ clk;
 transient int clk2;
 //transient int(0..1) clk;
 
@@ -31,7 +31,7 @@ transient int (0..1) optimalRuns0 = 0;
 transient int (0..1) optimalRuns1 = 0;
 transient int (0..1) optimalRuns2 = 0;
 transient int (0..1) optimalRuns3 = 0;
-int optimalRuns;
+int optimalRuns (0..4) = 0;
 
 
 transient int(0..1) nsShouldDec0 = 0; 
@@ -253,7 +253,7 @@ process populate() {
 		1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
 		1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
 
-		1: optimalRuns += (optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+		1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
 
 		1: clk += (clk == 9)? (-9): 1,
 		1: clk2 = 1
@@ -275,7 +275,7 @@ process populate() {
 		1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
 		1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
 
-		1: optimalRuns += (optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+		1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
 
 		1: clk += (clk == 9)? (-9): 1,
 		1: clk2 = 1
