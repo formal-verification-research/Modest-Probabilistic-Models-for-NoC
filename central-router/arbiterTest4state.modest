@@ -213,56 +213,19 @@ process Arbiter(){
 			=}
 		};
 		
-		/*
+		
 		{= 
 		totalUnserviced = unserviced,
 		totalServiced = totalServiced + 4 - unserviced
 		=};
-		*/
+		
 		//{= p4state = p3state =};
 		//{= p3state = pPstate =};
 		//{= pPstate = pstate =};
 		{= pstate = state =};
 		
 		//Increment optimal runs if there were no conflitcs -------------------------------------------------------------------
-		if (unserviced == 0){
-			{= 
-			optimalRuns++,
-			totalUnserviced = unserviced,
-			totalServiced = totalServiced + 4 - unserviced,
-			state = 0
-			=}
-		}
-		else {
-			if ( unserviced == 1){
-				{=
-				state = 1,						
-				totalUnserviced = unserviced,
-				totalServiced = totalServiced + 4 - unserviced
-				=}
-			}
-			else{
-				if(unserviced == 2){
-					if((a[0].val == a[1].val && a[1].val == a[2].val) || (a[0].val == a[1].val && a[1].val == a[3].val) || (a[0].val == a[2].val && a[2].val == a[3].val)|| (a[1].val == a[2].val && a[2].val == a[3].val)){
-						{=
-						state = 3,						
-						totalUnserviced = unserviced,
-						totalServiced = totalServiced + 4 - unserviced
-						=}
-					}
-					else {
-						{=
-						state = 2,						
-						totalUnserviced = unserviced,
-						totalServiced = totalServiced + 4 - unserviced
-						=}
-					}
-				}
-				else {
-					tau
-				}
-			}
-		};
+		
 		
 		//Set priority values for the next run and update the value of the buffers----------------------------------------------
 		setPriority(0);
@@ -287,7 +250,38 @@ process Arbiter(){
 		temp[a[3].priority] = a[3] 
 		=};
 		
-		tick {= a = temp =};
+		{= a = temp =};
+
+		if (totalUnserviced == 0){
+			{= 
+			optimalRuns++,
+			totalUnserviced = unserviced,
+			totalServiced = totalServiced + 4 - unserviced,
+			state = 0
+			=}
+		}
+		else if(totalUnserviced == 1){
+			tick{=
+			state = 1,						
+			totalUnserviced = unserviced,
+			totalServiced = totalServiced + 4 - unserviced
+			=}
+		}
+		else if(totalUnserviced == 2 && a[0].val == a[1].val){
+			tick{=
+			state = 3,						
+			totalUnserviced = unserviced,
+			totalServiced = totalServiced + 4 - unserviced
+			=}
+		}
+		else {
+			tick{=
+			state = 2,						
+			totalUnserviced = unserviced,
+			totalServiced = totalServiced + 4 - unserviced
+			=}
+		};
+			
 		
 		
 		if (clk >= clkUpper) {
