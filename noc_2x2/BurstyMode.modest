@@ -7,6 +7,9 @@ const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
 const int DUR;
+const int Mvar;
+const int Nvar;
+const int Startvar;
 const int clkLower = 0; 
 const int clkUpper = clkLower + DUR;
 int (clkLower..clkUpper) clk;
@@ -233,7 +236,7 @@ process Arbiter3() {
 
 process populate() {
 
-	if(clk%2 == 0) {
+	if( (clk%(Mvar+Nvar) <= Startvar+Mvar-1) && (clk%(Mvar+Nvar) >= Startvar) ) {
 
 		 tick {= 
 
@@ -255,7 +258,7 @@ process populate() {
 
 		1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
 
-		1: clk += (clk == 1)? (-1): 1,
+		1: clk += (clk == Mvar+Nvar - 1)? (-(Mvar+Nvar-1)): 1,
 		1: clk2 = 1
 
 		=}
@@ -277,7 +280,7 @@ process populate() {
 
 		1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
 
-		1: clk += (clk == 1)? (-1): 1,
+		1: clk += (clk == Mvar+Nvar - 1)? (-(Mvar+Nvar-1)): 1,
 		1: clk2 = 1
 
 		=}
