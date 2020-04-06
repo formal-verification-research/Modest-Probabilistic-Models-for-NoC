@@ -131,7 +131,7 @@
 			(and (and a10 a20) a30)
 			(and (and a01 a21) a31)
 		)
-		or
+		(or
 			(and (and a02 a12) a32)
 			(and (and a03 a13) a23)
 		)
