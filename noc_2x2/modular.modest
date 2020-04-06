@@ -13,7 +13,7 @@ const int clkLower = 100;
 const int clkUpper = clkLower + DUR;
 int(clkLower..clkUpper) clk;
 //transient int(0..1) clk;
-transient int(0..1) clk2;
+//transient int(0..1) clk2;
 
 action tick;
 action tock;
@@ -44,7 +44,9 @@ int(0..1) sentNs;
 
 int(1..2) localWillSend = 1; //0 indicates it's empty, 1 indicates it sends ew, 2 indicated ns
 int(1..2) ewWillSend = 1; //0 indicates it's empty, 1 indicates it sends local, 2 indicates ns
+int(0..1) nsFull = 0;
 
+int optimalRuns = 0;
 
 // ------ Begin: properties ---------
 //property Pr1 = Pmax(<> (clk >= clkUpper) );
@@ -53,19 +55,279 @@ int(1..2) ewWillSend = 1; //0 indicates it's empty, 1 indicates it sends local, 
 //property Pr4 = Xmax(S(sentNs), clk>=clkUpper);
 //property Pr5 = Pmax(<>[S(clk2) <= (clkUpper-clkLower)] (sentEw == 1));
 //property Pr6 = Pmax(<>[S(clk2) <= (clkUpper-clkLower)] (sentNs == 1));
-property Pr7 = Pmax(<> (sentEw==1 && clk == 100));
-property Pr8 = Pmax(<> (sentEw==1 && clk == 101));
-property Pr9 = Pmax(<> (sentEw==1 && clk == 102));
-property Pr10 = Pmax(<> (sentEw==1 && clk == 103));
-property Pr11 = Pmax(<> (sentEw==1 && clk == 104));
-property Pr12 = Pmax(<> (sentEw==1 && clk == 105));
-property Pr13 = Pmax(<> (sentEw==1 && clk == 106));
-property Pr14 = Pmax(<> (sentEw==1 && clk == 107));
-property Pr15 = Pmax(<> (sentEw==1 && clk == 1010));
-property Pr16 = Pmax(<> (sentEw==1 && clk == 1011));
-property Pr17 = Pmax(<> (sentEw==1 && clk == 1012));
-property Pr18 = Pmax(<> (sentEw==1 && clk == 1013));
-propert Pr19 = Pmax(<> (nsLen >= 4));
+//property pr05 = Pmax(<> (nsLen == 4 && clk == 106));
+/*property pr06 = Pmax(<> (nsLen ==4 && clk == 107));
+property pr07 = Pmax(<> (nsLen == 4 && clk == 108));
+property pr08 = Pmax(<> (nsLen ==4 && clk == 109));
+property pr09 = Pmax(<> (nsLen ==4 && clk == 110));
+property pr10 = Pmax(<> (nsLen == 4 && clk == 111));
+property pr11 = Pmax(<> (nsLen ==4 && clk == 112));
+property pr12 = Pmax(<> (nsLen == 4 && clk == 113));
+property pr13 = Pmax(<> (nsLen ==4 && clk == 114));
+property pr14 = Pmax(<> (nsLen ==4 && clk == 115));
+property pr15 = Pmax(<> (nsLen == 4 && clk == 116));
+property pr16 = Pmax(<> (nsLen == 4 && clk == 117));
+property pr17 = Pmax(<> (nsLen == 4 && clk == 118));
+property pr18 = Pmax(<> (nsLen ==4 && clk == 119));
+property pr19 = Pmax(<> (nsLen ==4 && clk == 120));
+property pr20 = Pmax(<> (nsLen == 4 && clk == 121));
+property pr21 = Pmax(<> (nsLen ==4 && clk == 122));
+property pr22 = Pmax(<> (nsLen ==4 && clk == 123));
+property pr23 = Pmax(<> (nsLen == 4 && clk == 124));
+property pr24 = Pmax(<> (nsLen == 4 && clk == 125));
+property pr25 = Pmax(<> (nsLen == 4 && clk == 126));
+property pr26 = Pmax(<> (nsLen ==4 && clk == 127));
+property pr27 = Pmax(<> (nsLen ==4 && clk == 128));
+property pr28 = Pmax(<> (nsLen == 4 && clk == 129));
+property pr29 = Pmax(<> (nsLen ==4 && clk == 130));
+property pr30 = Pmax(<> (nsLen ==4 && clk == 131));
+property pr31 = Pmax(<> (nsLen == 4 && clk == 132));
+property pr32 = Pmax(<> (nsLen == 4 && clk == 133));
+property pr33 = Pmax(<> (nsLen == 4 && clk == 134));
+property pr34 = Pmax(<> (nsLen ==4 && clk == 135));
+property pr35 = Pmax(<> (nsLen ==4 && clk == 136));
+property pr36 = Pmax(<> (nsLen == 4 && clk == 137));
+property pr37 = Pmax(<> (nsLen ==4 && clk == 138));
+property pr38 = Pmax(<> (nsLen ==4 && clk == 139));
+property pr39 = Pmax(<> (nsLen == 4 && clk == 140));
+property pr40 = Pmax(<> (nsLen == 4 && clk == 141));
+property pr41 = Pmax(<> (nsLen == 4 && clk == 142));
+property pr42 = Pmax(<> (nsLen ==4 && clk == 143));
+property pr43 = Pmax(<> (nsLen ==4 && clk == 144));
+property pr44 = Pmax(<> (nsLen == 4 && clk == 145));
+property pr45 = Pmax(<> (nsLen ==4 && clk == 146));
+property pr46 = Pmax(<> (nsLen ==4 && clk == 147));
+property pr47 = Pmax(<> (nsLen == 4 && clk == 148));
+property pr48 = Pmax(<> (nsLen == 4 && clk == 149));
+property pr49 = Pmax(<> (nsLen == 4 && clk == 150));
+property pr50 = Pmax(<> (nsLen ==4 && clk == 151));
+property pr51 = Pmax(<> (nsLen ==4 && clk == 152));
+property pr52 = Pmax(<> (nsLen == 4 && clk == 153));
+property pr53 = Pmax(<> (nsLen ==4 && clk == 154));
+property pr54 = Pmax(<> (nsLen ==4 && clk == 155));
+property pr55 = Pmax(<> (nsLen == 4 && clk == 156));
+property pr56 = Pmax(<> (nsLen == 4 && clk == 157));
+property pr57 = Pmax(<> (nsLen == 4 && clk == 158));
+property pr58 = Pmax(<> (nsLen ==4 && clk == 159));
+property pr59 = Pmax(<> (nsLen ==4 && clk == 160));
+property pr60 = Pmax(<> (nsLen == 4 && clk == 161));
+property pr61 = Pmax(<> (nsLen ==4 && clk == 162));
+property pr62 = Pmax(<> (nsLen ==4 && clk == 163));
+property pr63 = Pmax(<> (nsLen ==4 && clk == 164));
+property pr64 = Pmax(<> (nsLen ==4 && clk == 165));
+property pr65 = Pmax(<> (nsLen == 4 && clk == 166));
+property pr66 = Pmax(<> (nsLen ==4 && clk == 167));
+property pr67 = Pmax(<> (nsLen ==4 && clk == 168));
+property pr68 = Pmax(<> (nsLen ==4 && clk == 169));
+property pr69 = Pmax(<> (nsLen == 4 && clk == 170));
+property pr70 = Pmax(<> (nsLen ==4 && clk == 171));
+property pr71 = Pmax(<> (nsLen ==4 && clk == 172));
+property pr11 = Pmax(<> (nsLen ==4 && clk == 173));
+property pr12 = Pmax(<> (nsLen == 4 && clk == 174));
+property pr13 = Pmax(<> (nsLen ==4 && clk == 175));
+property pr14 = Pmax(<> (nsLen ==4 && clk == 176));
+property pr15 = Pmax(<> (nsLen == 4 && clk == 177));
+property pr16 = Pmax(<> (nsLen == 4 && clk == 178));
+property pr17 = Pmax(<> (nsLen == 4 && clk == 179));
+property pr18 = Pmax(<> (nsLen ==4 && clk == 180));
+property pr19 = Pmax(<> (nsLen ==4 && clk == 181));
+property pr20 = Pmax(<> (nsLen == 4 && clk == 182));
+property pr21 = Pmax(<> (nsLen ==4 && clk == 183));
+property pr22 = Pmax(<> (nsLen ==4 && clk == 184));
+property pr23 = Pmax(<> (nsLen == 4 && clk == 185));
+property pr24 = Pmax(<> (nsLen == 4 && clk == 186));
+property pr25 = Pmax(<> (nsLen == 4 && clk == 187));
+property pr26 = Pmax(<> (nsLen ==4 && clk == 188));
+property pr27 = Pmax(<> (nsLen ==4 && clk == 189));
+property pr28 = Pmax(<> (nsLen == 4 && clk == 190));
+property pr29 = Pmax(<> (nsLen ==4 && clk == 191));
+property pr30 = Pmax(<> (nsLen ==4 && clk == 192));
+property pr31 = Pmax(<> (nsLen == 4 && clk == 193));
+property pr32 = Pmax(<> (nsLen == 4 && clk == 194));
+property pr33 = Pmax(<> (nsLen == 4 && clk == 195));
+property pr34 = Pmax(<> (nsLen ==4 && clk == 196));
+property pr35 = Pmax(<> (nsLen ==4 && clk == 197));
+property pr36 = Pmax(<> (nsLen == 4 && clk == 198));
+property pr37 = Pmax(<> (nsLen ==4 && clk == 199));
+property pr38 = Pmax(<> (nsLen ==4 && clk == 200));
+property pr39 = Pmax(<> (nsLen == 4 && clk == 201));
+property pr40 = Pmax(<> (nsLen == 4 && clk == 202));
+property pr41 = Pmax(<> (nsLen == 4 && clk == 203));
+property pr42 = Pmax(<> (nsLen ==4 && clk == 204));
+property pr43 = Pmax(<> (nsLen ==4 && clk == 205));
+property pr44 = Pmax(<> (nsLen == 4 && clk == 206));
+property pr45 = Pmax(<> (nsLen ==4 && clk == 207));
+property pr46 = Pmax(<> (nsLen ==4 && clk == 208));
+property pr47 = Pmax(<> (nsLen == 4 && clk == 209));
+property pr48 = Pmax(<> (nsLen == 4 && clk == 210));
+property pr49 = Pmax(<> (nsLen == 4 && clk == 211));/*
+property pr50 = Pmax(<> (nsLen ==4 && clk == 212));
+property pr51 = Pmax(<> (nsLen ==4 && clk == 213));
+property pr52 = Pmax(<> (nsLen == 4 && clk == 214));
+property pr53 = Pmax(<> (nsLen ==4 && clk == 215));
+property pr54 = Pmax(<> (nsLen ==4 && clk == 216));
+property pr55 = Pmax(<> (nsLen == 4 && clk == 217));
+property pr56 = Pmax(<> (nsLen == 4 && clk == 218));
+property pr57 = Pmax(<> (nsLen == 4 && clk == 219));
+property pr58 = Pmax(<> (nsLen ==4 && clk == 220));
+property pr59 = Pmax(<> (nsLen ==4 && clk == 221));
+property pr60 = Pmax(<> (nsLen == 4 && clk == 222));
+property pr61 = Pmax(<> (nsLen ==4 && clk == 223));
+property pr62 = Pmax(<> (nsLen ==4 && clk == 224));
+property pr63 = Pmax(<> (nsLen ==4 && clk == 225));
+property pr64 = Pmax(<> (nsLen ==4 && clk == 226));
+property pr65 = Pmax(<> (nsLen == 4 && clk == 227));
+property pr66 = Pmax(<> (nsLen ==4 && clk == 228));
+property pr67 = Pmax(<> (nsLen ==4 && clk == 229));
+property pr68 = Pmax(<> (nsLen ==4 && clk == 230));
+property pr69 = Pmax(<> (nsLen == 4 && clk == 231));
+property pr70 = Pmax(<> (nsLen ==4 && clk == 232));
+property pr71 = Pmax(<> (nsLen ==4 && clk == 233));*/
+/*
+property Pr15 = Pmax(<> (sentNs == 1&& clk == 100));
+property Pr16 = Pmax(<> (sentNs== 1 && clk == 101));
+property Pr17 = Pmax(<> (sentNs == 1&& clk == 102));
+property Pr18 = Pmax(<> (sentNs == 1&& clk == 103));
+property Pr19 = Pmax(<> (sentNs == 1&& clk == 104));
+property Pr20 = Pmax(<> (sentNs == 1&& clk == 105));
+property Pr21 = Pmax(<> (sentNs == 1&& clk == 106));
+property Pr22 = Pmax(<> (sentNs== 1 && clk == 107));
+property Pr23 = Pmax(<> (sentNs == 1&& clk == 108));
+property Pr24 = Pmax(<> (sentNs == 1&& clk == 109));
+property Pr25 = Pmax(<> (sentNs == 1&& clk == 110));
+property Pr26 = Pmax(<> (sentNs == 1&& clk == 111));
+property pr11 = Pmax(<> (sentNs == 1 && clk == 112));
+property pr12 = Pmax(<> (sentNs == 1 && clk == 113));
+property pr13 = Pmax(<> (sentNs == 1 && clk == 114));
+property pr14 = Pmax(<> (sentNs == 1 && clk == 115));
+property pr15 = Pmax(<> (sentNs == 1 && clk == 116));
+property pr16 = Pmax(<> (sentNs == 1 && clk == 117));
+property pr17 = Pmax(<> (sentNs == 1 && clk == 118));
+property pr18 = Pmax(<> (sentNs == 1 && clk == 119));
+property pr19 = Pmax(<> (sentNs == 1 && clk == 120));
+property pr20 = Pmax(<> (sentNs == 1 && clk == 121));
+property pr21 = Pmax(<> (sentNs == 1 && clk == 122));
+property pr22 = Pmax(<> (sentNs == 1 && clk == 123));
+property pr23 = Pmax(<> (sentNs == 1 && clk == 124));
+property pr24 = Pmax(<> (sentNs == 1 && clk == 125));
+property pr25 = Pmax(<> (sentNs == 1 && clk == 126));
+property pr26 = Pmax(<> (sentNs == 1 && clk == 127));
+property pr27 = Pmax(<> (sentNs == 1 && clk == 128));
+property pr28 = Pmax(<> (sentNs == 1 && clk == 129));
+property pr29 = Pmax(<> (sentNs == 1 && clk == 130));
+property pr30 = Pmax(<> (sentNs == 1 && clk == 131));
+property pr31 = Pmax(<> (sentNs == 1 && clk == 132));
+property pr32 = Pmax(<> (sentNs == 1 && clk == 133));
+property pr33 = Pmax(<> (sentNs == 1 && clk == 134));
+property pr34 = Pmax(<> (sentNs == 1 && clk == 135));
+property pr35 = Pmax(<> (sentNs == 1 && clk == 136));
+property pr36 = Pmax(<> (sentNs == 1 && clk == 137));
+property pr37 = Pmax(<> (sentNs == 1 && clk == 138));
+property pr38 = Pmax(<> (sentNs == 1 && clk == 139));
+property pr39 = Pmax(<> (sentNs == 1 && clk == 140));
+property pr40 = Pmax(<> (sentNs == 1 && clk == 141));
+property pr41 = Pmax(<> (sentNs == 1 && clk == 142));
+property pr42 = Pmax(<> (sentNs == 1 && clk == 143));
+property pr43 = Pmax(<> (sentNs == 1 && clk == 144));
+property pr44 = Pmax(<> (sentNs == 1 && clk == 145));
+property pr45 = Pmax(<> (sentNs == 1 && clk == 146));
+property pr46 = Pmax(<> (sentNs == 1 && clk == 147));
+property pr47 = Pmax(<> (sentNs == 1 && clk == 148));
+property pr48 = Pmax(<> (sentNs == 1 && clk == 149));
+property pr49 = Pmax(<> (sentNs == 1 && clk == 150));
+property pr50 = Pmax(<> (sentNs == 1 && clk == 151));
+property pr51 = Pmax(<> (sentNs == 1 && clk == 152));
+property pr52 = Pmax(<> (sentNs == 1 && clk == 153));
+property pr53 = Pmax(<> (sentNs == 1 && clk == 154));
+property pr54 = Pmax(<> (sentNs == 1 && clk == 155));
+property pr55 = Pmax(<> (sentNs == 1 && clk == 156));
+property pr56 = Pmax(<> (sentNs == 1 && clk == 157));
+property pr57 = Pmax(<> (sentNs == 1 && clk == 158));
+property pr58 = Pmax(<> (sentNs == 1 && clk == 159));
+property pr59 = Pmax(<> (sentNs == 1 && clk == 160));
+property pr60 = Pmax(<> (sentNs == 1 && clk == 161));
+property pr61 = Pmax(<> (sentNs == 1 && clk == 162));
+property pr62 = Pmax(<> (sentNs == 1 && clk == 163));
+property pr63 = Pmax(<> (sentNs == 1 && clk == 164));
+property pr64 = Pmax(<> (sentNs == 1 && clk == 165));
+property pr65 = Pmax(<> (sentNs == 1 && clk == 166));
+property pr66 = Pmax(<> (sentNs == 1 && clk == 167));
+property pr67 = Pmax(<> (sentNs == 1 && clk == 168));
+property pr68 = Pmax(<> (sentNs == 1 && clk == 169));
+property pr69 = Pmax(<> (sentNs == 1 && clk == 170));
+property pr70 = Pmax(<> (sentNs == 1 && clk == 171));
+property pr71 = Pmax(<> (sentNs == 1 && clk == 172));*/
+/*property pr11 = Pmax(<> (sentNs == 1 && clk == 173));
+property pr12 = Pmax(<> (sentNs == 1 && clk == 174));
+property pr13 = Pmax(<> (sentNs == 1 && clk == 175));
+property pr14 = Pmax(<> (sentNs == 1 && clk == 176));
+property pr15 = Pmax(<> (sentNs == 1 && clk == 177));
+property pr16 = Pmax(<> (sentNs == 1 && clk == 178));
+property pr17 = Pmax(<> (sentNs == 1 && clk == 179));
+property pr18 = Pmax(<> (sentNs == 1 && clk == 180));
+property pr19 = Pmax(<> (sentNs == 1 && clk == 181));
+property pr20 = Pmax(<> (sentNs == 1 && clk == 182));
+property pr21 = Pmax(<> (sentNs == 1 && clk == 183));
+property pr22 = Pmax(<> (sentNs == 1 && clk == 184));
+property pr23 = Pmax(<> (sentNs == 1 && clk == 185));
+property pr24 = Pmax(<> (sentNs == 1 && clk == 186));
+property pr25 = Pmax(<> (sentNs == 1 && clk == 187));
+property pr26 = Pmax(<> (sentNs == 1 && clk == 188));
+property pr27 = Pmax(<> (sentNs == 1 && clk == 189));
+property pr28 = Pmax(<> (sentNs == 1 && clk == 190));
+property pr29 = Pmax(<> (sentNs == 1 && clk == 191));
+property pr30 = Pmax(<> (sentNs == 1 && clk == 192));
+property pr31 = Pmax(<> (sentNs == 1 && clk == 193));
+property pr32 = Pmax(<> (sentNs == 1 && clk == 194));
+property pr33 = Pmax(<> (sentNs == 1 && clk == 195));
+property pr34 = Pmax(<> (sentNs == 1 && clk == 196));
+property pr35 = Pmax(<> (sentNs == 1 && clk == 197));
+property pr36 = Pmax(<> (sentNs == 1 && clk == 198));
+property pr37 = Pmax(<> (sentNs == 1 && clk == 199));
+property pr38 = Pmax(<> (sentNs == 1 && clk == 200));
+property pr39 = Pmax(<> (sentNs == 1 && clk == 201));
+property pr40 = Pmax(<> (sentNs == 1 && clk == 202));
+property pr41 = Pmax(<> (sentNs == 1 && clk == 203));
+property pr42 = Pmax(<> (sentNs == 1 && clk == 204));
+property pr43 = Pmax(<> (sentNs == 1 && clk == 205));
+property pr44 = Pmax(<> (sentNs == 1 && clk == 206));
+property pr45 = Pmax(<> (sentNs == 1 && clk == 207));
+property pr46 = Pmax(<> (sentNs == 1 && clk == 208));
+property pr47 = Pmax(<> (sentNs == 1 && clk == 209));
+property pr48 = Pmax(<> (sentNs == 1 && clk == 210));
+property pr49 = Pmax(<> (sentNs == 1 && clk == 211));
+property pr50 = Pmax(<> (sentNs == 1 && clk == 212));
+property pr51 = Pmax(<> (sentNs == 1 && clk == 213));
+property pr52 = Pmax(<> (sentNs == 1 && clk == 214));
+property pr53 = Pmax(<> (sentNs == 1 && clk == 215));
+property pr54 = Pmax(<> (sentNs == 1 && clk == 216));
+property pr55 = Pmax(<> (sentNs == 1 && clk == 217));
+property pr56 = Pmax(<> (sentNs == 1 && clk == 218));
+property pr57 = Pmax(<> (sentNs == 1 && clk == 219));
+property pr58 = Pmax(<> (sentNs == 1 && clk == 220));
+property pr59 = Pmax(<> (sentNs == 1 && clk == 221));
+property pr60 = Pmax(<> (sentNs == 1 && clk == 222));
+property pr61 = Pmax(<> (sentNs == 1 && clk == 223));
+property pr62 = Pmax(<> (sentNs == 1 && clk == 224));
+property pr63 = Pmax(<> (sentNs == 1 && clk == 225));
+property pr64 = Pmax(<> (sentNs == 1 && clk == 226));
+property pr65 = Pmax(<> (sentNs == 1 && clk == 227));
+property pr66 = Pmax(<> (sentNs == 1 && clk == 228));
+property pr67 = Pmax(<> (sentNs == 1 && clk == 229));
+property pr68 = Pmax(<> (sentNs == 1 && clk == 230));
+property pr69 = Pmax(<> (sentNs == 1 && clk == 231));
+property pr70 = Pmax(<> (sentNs == 1 && clk == 232));
+property pr71 = Pmax(<> (sentNs == 1 && clk == 233));
+//property pr14 = Pmax(<> ((optimalRuns>=1));
+property Pr15 = Pmax(<> (sentNs == 1&& clk == 100));
+property Pr16 = Pmax(<> (sentNs== 1 && clk == 101));
+property Pr17 = Pmax(<> (sentNs == 1&& clk == 102));
+property Pr18 = Pmax(<> (sentNs == 1&& clk == 103));
+property Pr19 = Pmax(<> (sentNs == 1&& clk == 104));
+property Pr20 = Pmax(<> (sentNs == 1&& clk == 105));
+*/
+property op = Pmax(<> (optimalRuns>=1));
+//propert Pr19 = Pmax(<> (nsLen >= 4));
 // ------ End: properties ---------
 
 process LocalBuffer() {
@@ -88,7 +350,7 @@ process LocalBuffer() {
 
 		localBuffer();
 
-		tack {= clk++, clk2 =1 =};
+		tack {= clk++ =};
 
 		if (clkUpper-clk <= 0) {
 		 stop
@@ -101,7 +363,7 @@ process LocalBuffer() {
 
 process EwBuffer() {
 
-		tick;
+		tick {= nsFull = 0 =};
 		ewBuffer();
 		receiveEw();
 
@@ -117,7 +379,7 @@ process EwBuffer() {
 process NsBuffer() {
 
 		tick;
-		tock;
+		nsFull();
 		receiveNs();
 
 		if (clkUpper-clk <= 0) {
@@ -141,7 +403,6 @@ process Send() {
 		Send()
 		}
 }
-
 
 
 process localBuffer() {
@@ -214,10 +475,20 @@ process send() {
 		}
 		else { //local tries ns
 			if(nsLen == 0) {
-				tack {= localLen-=1, localLockedns = false, sentNs = 1 =}
+				if (nsFull == 0) {
+					tack {= localLen-=1, localLockedns = false, sentNs = 1 =}
+				}
+				else {
+					tack {= localLockedns = true, localPriority = true, sentNs = 1 =}
+				}
 			}
 			else {
-				tack {= nsLen-=1, localLen-=1, localLockedns = false, sentNs = 1 =}
+				if (nsFull == 0) {
+					tack {= nsLen-=1, localLen-=1, localLockedns = false, sentNs = 1 =}
+				}
+				else {
+					tack {= nsLen-=1, localLockedns = true, localPriority = true, sentNs = 1 =}
+				}
 			}
 		}
 
@@ -251,96 +522,792 @@ process send() {
 		}
 		else {//local tries ns
 			if(nsLen == 0) {
-				tack {= ewLen-=1, localLen-=1, localLockedns=false, ewLockedlocal = false, sentNs = 1  =}
+				if (nsFull == 0) {
+					tack {= ewLen-=1, localLen-=1, localLockedns=false, ewLockedlocal = false, sentNs = 1  =}
+				}
+				else {
+					tack {= ewLen-=1, localLockedns = true, localPriority = true, sentNs = 1 =}
+				}
 			}
 			else {
 				if(nsPriority) {
-					tack {= nsLen-=1, localLen-=1, nsPriority = false, localPriority = false, localLockedns = false, ewLockedlocal = true, sentNs = 1 =}
+					if(nsFull == 0) {
+						tack {= nsLen-=1, localLen-=1, nsPriority = false, localPriority = false, localLockedns = false, ewLockedlocal = true, sentNs = 1 =}
+					}
+					else {
+						tack {= nsLen-=1, nsPriority = false, localLockedns = true, ewLockedlocal = true, sentNs = 1 =}
+					}
 				}
 				else {
-					tack {= ewLen-=1, localLen-=1, nsPriority = true, ewLockedlocal = false, localLockedns = false, sentNs = 1 =}
+					if (nsFull == 0) {
+						tack {= ewLen-=1, localLen-=1, nsPriority = true, ewLockedlocal = false, localLockedns = false, sentNs = 1 =}
+					}
+					else {
+						tack {= ewLen-=1, nsPriority = true, localPriority = true, ewLockedlocal = false, localLockedns = true, sentNs = 1 =}
+					}
 				}
 			}	
 		}		
 	}
 	else{ //ew tries ns
-		if(localLen == 0) {
-			if(nsLen == 0) {
-				tack {= ewLen-=1, ewLockedns = false, sentNs = 1 =}
-			}
-			else {
-				tack {= ewLen-=1, nsLen-=1, ewLockedns = false, sentNs = 1 =}
-			}
-		}
-		else if(localWillSend == 1) { //local tries ew
-			if(nsLen == 0) {
-				tack {= ewLen-=1, localLen-=1, ewLockedns = false, sentNs = 1, sentEw = 1=}
-			}
-			else {
-				tack {= nsLen-=1, ewLen-=1, localLen-=1, ewLockedns = false, sentNs = 1, sentEw = 1=}
-			}
-		}
-		else {//local tries ns
-			if(nsLen == 0) {
-				if(localPriority) {
-					tack {= localLen-=1, localPriority = false, nsPriority = false, ewLockedns = true, localLockedns = false, sentNs = 1 =}
+		if (nsFull == 0) {
+			if(localLen == 0) {
+
+				if(nsLen == 0) {
+					tack {= ewLen-=1, ewLockedns = false, sentNs = 1 =}
 				}
 				else {
-					tack {= ewLen-=1, localPriority = true, ewLockedns = false, localLockedns = true, sentNs = 1 =}
+					tack {= ewLen-=1, nsLen-=1, ewLockedns = false, sentNs = 1 =}
 				}
 			}
-			else {
-				if(localPriority) {
-					tack {= localLen-=1, nsLen-=1, localPriority = false, nsPriority = false, ewLockedns = true, localLockedns = false, sentNs = 1 =}
+			else if(localWillSend == 1) { //local tries ew
+				if(nsLen == 0) {
+					tack {= ewLen-=1, localLen-=1, ewLockedns = false, sentNs = 1, sentEw = 1=}
 				}
 				else {
-					tack {= ewLen-=1, nsLen-= 1, localPriority = true, ewLockedns = false, localLockedns = true, sentNs = 1 =}
+					tack {= nsLen-=1, ewLen-=1, localLen-=1, ewLockedns = false, sentNs = 1, sentEw = 1, optimalRuns += 1=}
 				}
-			}	
+			}
+			else {//local tries ns
+				if(nsLen == 0) {
+					if(localPriority) {
+						tack {= localLen-=1, localPriority = false, nsPriority = false, ewLockedns = true, localLockedns = false, sentNs = 1 =}
+					}
+					else {
+						tack {= ewLen-=1, localPriority = true, ewLockedns = false, localLockedns = true, sentNs = 1 =}
+					}
+				}
+				else {
+					if(localPriority) {
+						tack {= localLen-=1, nsLen-=1, localPriority = false, nsPriority = false, ewLockedns = true, localLockedns = false, sentNs = 1 =}
+					}
+					else {
+						tack {= ewLen-=1, nsLen-= 1, localPriority = true, ewLockedns = false, localLockedns = true, sentNs = 1 =}
+					}
+				}	
+			}
+		}
+		else {
+			if(localLen == 0) {
+				if(nsLen == 0) {
+					tack {= ewLockedns = true, nsPriority = false, localPriority = false, sentNs = 1 =}
+				}
+				else {
+					tack {= nsLen-=1, ewLockedns = true, nsPriority = false, localPriority = false, sentNs = 1 =}
+				}
+			}
+			else if(localWillSend == 1) { //local tries ew
+				if(nsLen == 0) {
+					tack {= localLen-=1, ewLockedns = true, localPriority = false, nsPriority = false, sentEw = 1, sentNs = 1=}
+				}
+				else {
+					tack {= nsLen-=1, localLen-=1, ewLockedns = true, nsPriority = false, localPriority = false, sentEw = 1, sentNs = 1=}
+				}
+			}
+			else {//local tries ns
+				if(nsLen == 0) {
+					if(localPriority) {
+						tack {= nsPriority = false, ewLockedns = true, localLockedns = true, sentNs = 1 =}
+					}
+					else {
+						tack {=nsPriority = false, ewLockedns = true, localLockedns = true, sentNs = 1 =}
+					}
+				}
+				else {
+					if(localPriority) {
+						tack {= nsLen-=1, nsPriority = false, ewLockedns = true, localLockedns = true, sentNs = 1 =}
+					}
+					else {
+						tack {= nsLen-= 1, nsPriority = false, ewLockedns = true, localLockedns = true, sentNs = 1 =}
+					}
+				}	
+			}
 		}	
 	}
+
+}
+
+process nsFull() {
+
+	
+
+if( clk > 211) {
+	if(clk%2 == 0) {
+		tock palt {
+		:(1.5024036403676989E-05): {= nsFull = 1 =}
+			:(1 -1.5024036403676989E-05): {= nsFull = 0 =}
+		}
+	}
+	else {
+		tock palt {
+		:(4.104643078960997E-05): {= nsFull = 1 =}
+		:(1 -4.104643078960997E-05): {= nsFull = 0 =}
+		}
+	}
+}
+else if (clk < 107) {
+	tock {= nsFull = 0 =}
+}
+
+	else if( clk == 107) {
+	tock palt {
+	:( 1.6935087808430282E-05): {= nsFull = 1 =}
+		:(1 - 1.6935087808430282E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 108) {
+	tock palt {
+	:(5.645029269476759E-06): {= nsFull = 1 =}
+		:(1 -5.645029269476759E-06): {= nsFull = 0 =}
+	}
+}
+else if( clk == 109) {
+	tock palt {
+	:(2.88523718217701E-05): {= nsFull = 1 =}
+		:(1 -2.88523718217701E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 110) {
+	tock palt {
+	:(1.0035607590180904E-05): {= nsFull = 1 =}
+		:(1 -1.0035607590180904E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 111) {
+	tock palt {
+	:(3.5217548858134836E-05): {= nsFull = 1 =}
+		:(1 -3.5217548858134836E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 112) {
+	tock palt {
+	:(1.2544509487726128E-05): {= nsFull = 1 =}
+		:(1 -1.2544509487726128E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 113) {
+	tock palt {
+	:(3.8325283307357523E-05): {= nsFull = 1 =}
+		:(1 -3.8325283307357523E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 114) {
+	tock palt {
+	:(1.3830508128397456E-05): {= nsFull = 1 =}
+		:(1 -1.3830508128397456E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 115) {
+	tock palt {
+	:(3.978858634977072E-05): {= nsFull = 1 =}
+		:(1 -3.978858634977072E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 116) {
+	tock palt {
+	:(1.4458657727091906E-05): {= nsFull = 1 =}
+		:(1 -1.4458657727091906E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 117) {
+	tock palt {
+	:(4.046700453407497E-05): {= nsFull = 1 =}
+		:(1 -4.046700453407497E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 118) {
+	tock palt {
+	:(1.4758343096598908E-05): {= nsFull = 1 =}
+		:(1 -1.4758343096598908E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 119) {
+	tock palt {
+	:(4.077959381048155E-05): {= nsFull = 1 =}
+		:(1 -4.077959381048155E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 120) {
+	tock palt {
+	:(1.4899635631658779E-05): {= nsFull = 1 =}
+		:(1 -1.4899635631658779E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 121) {
+	tock palt {
+	:(4.0923383665337416E-05): {= nsFull = 1 =}
+		:(1 -4.0923383665337416E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 122) {
+	tock palt {
+	:(1.4965864962962525E-05): {= nsFull = 1 =}
+		:(1 -1.4965864962962525E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 123) {
+	tock palt {
+	:(4.098956814685698E-05): {= nsFull = 1 =}
+		:(1 -4.098956814685698E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 124) {
+	tock palt {
+	:(1.499683201394874E-05): {= nsFull = 1 =}
+		:(1 -1.499683201394874E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 125) {
+	tock palt {
+	:(4.102008697318013E-05): {= nsFull = 1 =}
+		:(1 -4.102008697318013E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 126) {
+	tock palt {
+	:(1.5011302639590518E-05): {= nsFull = 1 =}
+		:(1 -1.5011302639590518E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 127) {
+	tock palt {
+	:(4.103419337100079E-05): {= nsFull = 1 =}
+		:(1 -4.103419337100079E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 128) {
+	tock palt {
+	:(1.5018067952831038E-05): {= nsFull = 1 =}
+		:(1 -1.5018067952831038E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 129) {
+	tock palt {
+	:(4.1040730895916706E-05): {= nsFull = 1 =}
+		:(1 -4.1040730895916706E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 130) {
+	tock palt {
+	:(1.5021234438616346E-05): {= nsFull = 1 =}
+		:(1 -1.5021234438616346E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 131) {
+	tock palt {
+	:(4.104376893518868E-05): {= nsFull = 1 =}
+		:(1 -4.104376893518868E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 132) {
+	tock palt {
+	:(1.502271870943713E-05): {= nsFull = 1 =}
+		:(1 -1.502271870943713E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 133) {
+	tock palt {
+	:(4.1045184553505844E-05): {= nsFull = 1 =}
+		:(1 -4.1045184553505844E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 134) {
+	tock palt {
+	:(1.5023415623201711E-05): {= nsFull = 1 =}
+		:(1 -1.5023415623201711E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 135) {
+	tock palt {
+	:(4.104584591286207E-05): {= nsFull = 1 =}
+		:(1 -4.104584591286207E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 136) {
+	tock palt {
+	:(1.5023743427404359E-05): {= nsFull = 1 =}
+		:(1 -1.5023743427404359E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 137) {
+	tock palt {
+	:(4.1046155669365066E-05): {= nsFull = 1 =}
+		:(1 -4.1046155669365066E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 138) {
+	tock palt {
+	:(1.5023897892647188E-05): {= nsFull = 1 =}
+		:(1 -1.5023897892647188E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 139) {
+	tock palt {
+	:(4.1046301095374205E-05): {= nsFull = 1 =}
+		:(1 -4.1046301095374205E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 140) {
+	tock palt {
+	:(1.5023970808420869E-05): {= nsFull = 1 =}
+		:(1 -1.5023970808420869E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 141) {
+	tock palt {
+	:(4.1046369525547544E-05): {= nsFull = 1 =}
+		:(1 -4.1046369525547544E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 142) {
+	tock palt {
+	:(1.5024005288604897E-05): {= nsFull = 1 =}
+		:(1 -1.5024005288604897E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 143) {
+	tock palt {
+	:(4.104640179433731E-05): {= nsFull = 1 =}
+		:(1 -4.104640179433731E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 144) {
+	tock palt {
+	:(1.5024021621061285E-05): {= nsFull = 1 =}
+		:(1 -1.5024021621061285E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 145) {
+	tock palt {
+	:(4.1046417041692954E-05): {= nsFull = 1 =}
+		:(1 -4.1046417041692954E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 146) {
+	tock palt {
+	:(1.502402936996296E-05): {= nsFull = 1 =}
+		:(1 -1.502402936996296E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 147) {
+	tock palt {
+	:(4.104642425996107E-05): {= nsFull = 1 =}
+		:(1 -4.104642425996107E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 148) {
+	tock palt {
+	:(1.502403305215641E-05): {= nsFull = 1 =}
+		:(1 -1.502403305215641E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 149) {
+	tock palt {
+	:(4.104642768330678E-05): {= nsFull = 1 =}
+		:(1 -4.104642768330678E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 150) {
+	tock palt {
+	:(1.5024034804508575E-05): {= nsFull = 1 =}
+		:(1 -1.5024034804508575E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 151) {
+	tock palt {
+	:(4.104642930961694E-05): {= nsFull = 1 =}
+		:(1 -4.104642930961694E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 152) {
+	tock palt {
+	:(1.5024035639640821E-05): {= nsFull = 1 =}
+		:(1 -1.5024035639640821E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 153) {
+	tock palt {
+	:(4.104643008345378E-05): {= nsFull = 1 =}
+		:(1 -4.104643008345378E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 154) {
+	tock palt {
+	:(1.502403603818789E-05): {= nsFull = 1 =}
+		:(1 -1.502403603818789E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 155) {
+	tock palt {
+	:(4.104643045221921E-05): {= nsFull = 1 =}
+		:(1 -4.104643045221921E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 156) {
+	tock palt {
+	:(1.5024036228631728E-05): {= nsFull = 1 =}
+		:(1 -1.5024036228631728E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 157) {
+	tock palt {
+	:(4.104643062820187E-05): {= nsFull = 1 =}
+		:(1 -4.104643062820187E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 158) {
+	tock palt {
+	:(1.5024036319746917E-05): {= nsFull = 1 =}
+		:(1 -1.5024036319746917E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 159) {
+	tock palt {
+	:(4.104643071229781E-05): {= nsFull = 1 =}
+		:(1 -4.104643071229781E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 160) {
+	tock palt {
+	:(1.5024036363391069E-05): {= nsFull = 1 =}
+		:(1 -1.5024036363391069E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 161) {
+	tock palt {
+	:(4.104643075253565E-05): {= nsFull = 1 =}
+		:(1 -4.104643075253565E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 162) {
+	tock palt {
+	:(1.502403638432009E-05): {= nsFull = 1 =}
+		:(1 -1.502403638432009E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 163) {
+	tock palt {
+	:(4.104643077181178E-05): {= nsFull = 1 =}
+		:(1 -4.104643077181178E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 164) {
+	tock palt {
+	:(1.50240363943671E-05): {= nsFull = 1 =}
+		:(1 -1.50240363943671E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 165) {
+	tock palt {
+	:(4.1046430781056713E-05): {= nsFull = 1 =}
+		:(1 -4.1046430781056713E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 166) {
+	tock palt {
+	:(1.502403639919511E-05): {= nsFull = 1 =}
+		:(1 -1.502403639919511E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 167) {
+	tock palt {
+	:(4.1046430785495464E-05): {= nsFull = 1 =}
+		:(1 -4.1046430785495464E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 168) {
+	tock palt {
+	:(1.5024036401517438E-05): {= nsFull = 1 =}
+		:(1 -1.5024036401517438E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 169) {
+	tock palt {
+	:(4.104643078762885E-05): {= nsFull = 1 =}
+		:(1 -4.104643078762885E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 170) {
+	tock palt {
+	:( 1.502403640263554E-05): {= nsFull = 1 =}
+		:(1 - 1.502403640263554E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 171) {
+	tock palt {
+	:(4.104643078865522E-05): {= nsFull = 1 =}
+		:(1 -4.104643078865522E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 172) {
+	tock palt {
+	:(1.5024036403174344E-05): {= nsFull = 1 =}
+		:(1 -1.5024036403174344E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 173) {
+	tock palt {
+	:(4.104643078914948E-05): {= nsFull = 1 =}
+		:(1 -4.104643078914948E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 174) {
+	tock palt {
+	:(1.5024036403434207E-05): {= nsFull = 1 =}
+		:(1 -1.5024036403434207E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 175) {
+	tock palt {
+	:(4.1046430789387696E-05): {= nsFull = 1 =}
+		:(1 -4.1046430789387696E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 176) {
+	tock palt {
+	:(1.5024036403559641E-05): {= nsFull = 1 =}
+		:(1 -1.5024036403559641E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 177) {
+	tock palt {
+	:(4.1046430789502614E-05): {= nsFull = 1 =}
+		:(1 -4.1046430789502614E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 178) {
+	tock palt {
+	:(1.5024036403620234E-05): {= nsFull = 1 =}
+		:(1 -1.5024036403620234E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 179) {
+	tock palt {
+	:(4.104643078955809E-05): {= nsFull = 1 =}
+		:(1 -4.104643078955809E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 180) {
+	tock palt {
+	:(1.5024036403649525E-05): {= nsFull = 1 =}
+		:(1 -1.5024036403649525E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 181) {
+	tock palt {
+	:(4.10464307895849E-05): {= nsFull = 1 =}
+		:(1 -4.10464307895849E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 182) {
+	tock palt {
+	:(1.5024036403663694E-05): {= nsFull = 1 =}
+		:(1 -1.5024036403663694E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 183) {
+	tock palt {
+	:(4.1046430789597855E-05): {= nsFull = 1 =}
+		:(1 -4.1046430789597855E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 184) {
+	tock palt {
+	:(1.5024036403670555E-05): {= nsFull = 1 =}
+		:(1 -1.5024036403670555E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 185) {
+	tock palt {
+	:(4.1046430789604116E-05): {= nsFull = 1 =}
+		:(1 -4.1046430789604116E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 186) {
+	tock palt {
+	:(1.5024036403673879E-05): {= nsFull = 1 =}
+		:(1 -1.5024036403673879E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 187) {
+	tock palt {
+	:(4.104643078960715E-05): {= nsFull = 1 =}
+		:(1 -4.104643078960715E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 188) {
+	tock palt {
+	:(1.502403640367549E-05): {= nsFull = 1 =}
+		:(1 -1.502403640367549E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 189) {
+	tock palt {
+	:(4.104643078960862E-05): {= nsFull = 1 =}
+		:(1 -4.104643078960862E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 190) {
+	tock palt {
+	:(1.502403640367627E-05): {= nsFull = 1 =}
+		:(1 -1.502403640367627E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 191) {
+	tock palt {
+	:(4.1046430789609334E-05): {= nsFull = 1 =}
+		:(1 -4.1046430789609334E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 192) {
+	tock palt {
+	:(1.5024036403676649E-05): {= nsFull = 1 =}
+		:(1 -1.5024036403676649E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 193) {
+	tock palt {
+	:(4.104643078960968E-05): {= nsFull = 1 =}
+		:(1 -4.104643078960968E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 194) {
+	tock palt {
+	:(1.5024036403676832E-05): {= nsFull = 1 =}
+		:(1 -1.5024036403676832E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 195) {
+	tock palt {
+	:(4.1046430789609835E-05): {= nsFull = 1 =}
+		:(1 -4.1046430789609835E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 196) {
+	tock palt {
+	:(1.5024036403676918E-05): {= nsFull = 1 =}
+		:(1 -1.5024036403676918E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 197) {
+	tock palt {
+	:(4.1046430789609917E-05): {= nsFull = 1 =}
+		:(1 -4.1046430789609917E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 198) {
+	tock palt {
+	:(1.5024036403676959E-05): {= nsFull = 1 =}
+		:(1 -1.5024036403676959E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 199) {
+	tock palt {
+	:(4.104643078960995E-05): {= nsFull = 1 =}
+		:(1 -4.104643078960995E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 200) {
+	tock palt {
+	:(1.5024036403676979E-05): {= nsFull = 1 =}
+		:(1 -1.5024036403676979E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 201) {
+	tock palt {
+	:(4.104643078960997E-05): {= nsFull = 1 =}
+		:(1 -4.104643078960997E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 202) {
+	tock palt {
+	:(1.5024036403676989E-05): {= nsFull = 1 =}
+		:(1 -1.5024036403676989E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 203) {
+	tock palt {
+	:(4.104643078960997E-05): {= nsFull = 1 =}
+		:(1 -4.104643078960997E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 204) {
+	tock palt {
+	:(1.5024036403676994E-05): {= nsFull = 1 =}
+		:(1 -1.5024036403676994E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 205) {
+	tock palt {
+	:(4.104643078960997E-05): {= nsFull = 1 =}
+		:(1 -4.104643078960997E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 206) {
+	tock palt {
+	:(1.5024036403676994E-05): {= nsFull = 1 =}
+		:(1 -1.5024036403676994E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 207) {
+	tock palt {
+	:(4.104643078960997E-05): {= nsFull = 1 =}
+		:(1 -4.104643078960997E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 208) {
+	tock palt {
+	:(1.5024036403676992E-05): {= nsFull = 1 =}
+		:(1 -1.5024036403676992E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 209) {
+	tock palt {
+	:(4.104643078960997E-05): {= nsFull = 1 =}
+		:(1 -4.104643078960997E-05): {= nsFull = 0 =}
+	}
+}
+else if( clk == 210) {
+	tock palt {
+	:(1.5024036403676989E-05): {= nsFull = 1 =}
+		:(1 -1.5024036403676989E-05): {= nsFull = 0 =}
+	}
+}
+else {
+	tock palt {
+	:(4.104643078960997E-05): {= nsFull = 1 =}
+		:(1 -4.104643078960997E-05): {= nsFull = 0 =}
+	}
+}
 
 }
 
 process receiveNs() {
 
 	if(nsLen < 4) {
-		if (clk == 100 || clk == 102 ) {
-			tack
-		}
-		else if (clk == 101) {
-			tack palt {
-				:(1/3): {= 1: nsLen +=1 =}
-			}
-		}
-		else {
-			if(clk%2 == 0) {
-				tack palt {
-					:(1/6): {= 1: nsLen+=1 =}
-				}
-			}
-			else {
-				tack palt {
-					:(2/3): {= 1: nsLen+= 1 =}
-				}
-			}
+
+		tack palt {
+			:(1/3): {= 1: nsLen+=1  =}
+			:(2/3): {= 1: nsLen = nsLen  =}
 		}
 	}
-	else { tack }
+	else {tack}
 
 }
 
 process receiveEw() {
 
-	if(ewLen < 4) {
-		if(clk%2 == 1) {
-			tack palt {
-				:(2/3): {= 1: ewLen+=1 =}
+		if(clk%2 == 0) {
+			if(ewLen < 4) {
+				tack palt {
+					:(2/3): {= 1: ewLen+= 1 =}
+					:(1/3): {= 1: ewLen = ewLen  =}
+				}
 			}
+			else {tack}
+
 		}
 		else {tack}
-	}
-	else { tack }
 
 }
 
