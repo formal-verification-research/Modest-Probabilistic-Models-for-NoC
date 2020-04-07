@@ -463,132 +463,132 @@
 	],
 	"automata": [
 		{
-			"name": "Clock",
+			"name": "Clock || Arbiter",
 			"locations": [
 				{
-					"name": "loc_1"
+					"name": "loc_1 || loc_1"
 				},
 				{
-					"name": "loc_5"
+					"name": "loc_1 || loc_8"
+				},
+				{
+					"name": "loc_1 || loc_11"
+				},
+				{
+					"name": "loc_1 || loc_14"
+				},
+				{
+					"name": "loc_1 || loc_17"
+				},
+				{
+					"name": "loc_1 || loc_18"
+				},
+				{
+					"name": "loc_1 || loc_22"
+				},
+				{
+					"name": "loc_1 || loc_29"
+				},
+				{
+					"name": "loc_1 || loc_36"
+				},
+				{
+					"name": "loc_1 || loc_43"
+				},
+				{
+					"name": "loc_1 || loc_46"
+				},
+				{
+					"name": "loc_1 || loc_54"
+				},
+				{
+					"name": "loc_1 || loc_62"
+				},
+				{
+					"name": "loc_1 || loc_70"
+				},
+				{
+					"name": "loc_1 || loc_78"
+				},
+				{
+					"name": "loc_1 || loc_93"
+				},
+				{
+					"name": "loc_1 || loc_108"
+				},
+				{
+					"name": "loc_1 || loc_123"
+				},
+				{
+					"name": "loc_1 || loc_138"
+				},
+				{
+					"name": "loc_1 || loc_141"
+				},
+				{
+					"name": "loc_1 || loc_160"
+				},
+				{
+					"name": "loc_5 || loc_160"
+				},
+				{
+					"name": "loc_1 || loc_166"
+				},
+				{
+					"name": "loc_5 || loc_166"
+				},
+				{
+					"name": "loc_5 || loc_18"
+				},
+				{
+					"name": "loc_5 || loc_22"
+				},
+				{
+					"name": "loc_5 || loc_29"
+				},
+				{
+					"name": "loc_5 || loc_36"
+				},
+				{
+					"name": "loc_5 || loc_43"
+				},
+				{
+					"name": "loc_5 || loc_46"
+				},
+				{
+					"name": "loc_5 || loc_54"
+				},
+				{
+					"name": "loc_5 || loc_62"
+				},
+				{
+					"name": "loc_5 || loc_70"
+				},
+				{
+					"name": "loc_5 || loc_78"
+				},
+				{
+					"name": "loc_5 || loc_93"
+				},
+				{
+					"name": "loc_5 || loc_108"
+				},
+				{
+					"name": "loc_5 || loc_123"
+				},
+				{
+					"name": "loc_5 || loc_138"
+				},
+				{
+					"name": "loc_5 || loc_141"
 				}
 			],
-			"initial-locations": [ "loc_1" ],
+			"initial-locations": [ "loc_1 || loc_1" ],
 			"edges": [
 				{
-					"location": "loc_1",
-					"action": "tick",
+					"location": "loc_1 || loc_1",
 					"destinations": [ {
-						"location": "loc_5",
-						"assignments": [ {
-							"ref": "clk",
-							"value": {
-								"op": "+",
-								"left": "clk",
-								"right": 1
-							}
-						} ]
-					} ]
-				},
-				{
-					"location": "loc_5",
-					"action": "tick",
-					"guard": {
-						"exp": {
-							"op": "≤",
-							"left": "clk",
-							"right": 101
-						}
-					},
-					"destinations": [ {
-						"location": "loc_5",
-						"assignments": [ {
-							"ref": "clk",
-							"value": {
-								"op": "+",
-								"left": "clk",
-								"right": 1
-							}
-						} ]
-					} ]
-				}
-			]
-		},
-		{
-			"name": "Arbiter",
-			"locations": [
-				{
-					"name": "loc_1"
-				},
-				{
-					"name": "loc_8"
-				},
-				{
-					"name": "loc_11"
-				},
-				{
-					"name": "loc_14"
-				},
-				{
-					"name": "loc_17"
-				},
-				{
-					"name": "loc_18"
-				},
-				{
-					"name": "loc_22"
-				},
-				{
-					"name": "loc_29"
-				},
-				{
-					"name": "loc_36"
-				},
-				{
-					"name": "loc_43"
-				},
-				{
-					"name": "loc_46"
-				},
-				{
-					"name": "loc_54"
-				},
-				{
-					"name": "loc_62"
-				},
-				{
-					"name": "loc_70"
-				},
-				{
-					"name": "loc_78"
-				},
-				{
-					"name": "loc_93"
-				},
-				{
-					"name": "loc_108"
-				},
-				{
-					"name": "loc_123"
-				},
-				{
-					"name": "loc_138"
-				},
-				{
-					"name": "loc_141"
-				},
-				{
-					"name": "loc_160"
-				},
-				{
-					"name": "loc_166"
-				}
-			],
-			"initial-locations": [ "loc_1" ],
-			"edges": [
-				{
-					"location": "loc_1",
-					"destinations": [ {
-						"location": "loc_8",
+						"location": "loc_1 || loc_8",
 						"assignments": [
 							{
 								"ref": "a0_id",
@@ -630,10 +630,10 @@
 					} ]
 				},
 				{
-					"location": "loc_8",
+					"location": "loc_1 || loc_8",
 					"destinations": [
 						{
-							"location": "loc_11",
+							"location": "loc_1 || loc_11",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -647,7 +647,7 @@
 							} ]
 						},
 						{
-							"location": "loc_11",
+							"location": "loc_1 || loc_11",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -661,7 +661,7 @@
 							} ]
 						},
 						{
-							"location": "loc_11",
+							"location": "loc_1 || loc_11",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -677,10 +677,10 @@
 					]
 				},
 				{
-					"location": "loc_11",
+					"location": "loc_1 || loc_11",
 					"destinations": [
 						{
-							"location": "loc_14",
+							"location": "loc_1 || loc_14",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -694,7 +694,7 @@
 							} ]
 						},
 						{
-							"location": "loc_14",
+							"location": "loc_1 || loc_14",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -708,7 +708,7 @@
 							} ]
 						},
 						{
-							"location": "loc_14",
+							"location": "loc_1 || loc_14",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -724,10 +724,10 @@
 					]
 				},
 				{
-					"location": "loc_14",
+					"location": "loc_1 || loc_14",
 					"destinations": [
 						{
-							"location": "loc_17",
+							"location": "loc_1 || loc_17",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -741,7 +741,7 @@
 							} ]
 						},
 						{
-							"location": "loc_17",
+							"location": "loc_1 || loc_17",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -755,7 +755,7 @@
 							} ]
 						},
 						{
-							"location": "loc_17",
+							"location": "loc_1 || loc_17",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -771,10 +771,10 @@
 					]
 				},
 				{
-					"location": "loc_17",
+					"location": "loc_1 || loc_17",
 					"destinations": [
 						{
-							"location": "loc_18",
+							"location": "loc_1 || loc_18",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -788,7 +788,7 @@
 							} ]
 						},
 						{
-							"location": "loc_18",
+							"location": "loc_1 || loc_18",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -802,7 +802,7 @@
 							} ]
 						},
 						{
-							"location": "loc_18",
+							"location": "loc_1 || loc_18",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -818,9 +818,9 @@
 					]
 				},
 				{
-					"location": "loc_18",
+					"location": "loc_1 || loc_18",
 					"destinations": [ {
-						"location": "loc_22",
+						"location": "loc_1 || loc_22",
 						"assignments": [
 							{
 								"ref": "a0_serviced",
@@ -834,7 +834,7 @@
 					} ]
 				},
 				{
-					"location": "loc_22",
+					"location": "loc_1 || loc_22",
 					"guard": {
 						"exp": {
 							"op": "=",
@@ -843,7 +843,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_29",
+						"location": "loc_1 || loc_29",
 						"assignments": [
 							{
 								"ref": "a1_serviced",
@@ -861,7 +861,7 @@
 					} ]
 				},
 				{
-					"location": "loc_22",
+					"location": "loc_1 || loc_22",
 					"guard": {
 						"exp": {
 							"op": "≠",
@@ -870,7 +870,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_29",
+						"location": "loc_1 || loc_29",
 						"assignments": [ {
 							"ref": "a1_serviced",
 							"value": true
@@ -878,7 +878,7 @@
 					} ]
 				},
 				{
-					"location": "loc_29",
+					"location": "loc_1 || loc_29",
 					"guard": {
 						"exp": {
 							"op": "∨",
@@ -895,7 +895,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_36",
+						"location": "loc_1 || loc_36",
 						"assignments": [
 							{
 								"ref": "a2_serviced",
@@ -913,7 +913,7 @@
 					} ]
 				},
 				{
-					"location": "loc_29",
+					"location": "loc_1 || loc_29",
 					"guard": {
 						"exp": {
 							"op": "¬",
@@ -933,7 +933,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_36",
+						"location": "loc_1 || loc_36",
 						"assignments": [ {
 							"ref": "a2_serviced",
 							"value": true
@@ -941,7 +941,7 @@
 					} ]
 				},
 				{
-					"location": "loc_36",
+					"location": "loc_1 || loc_36",
 					"guard": {
 						"exp": {
 							"op": "∨",
@@ -966,7 +966,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_43",
+						"location": "loc_1 || loc_43",
 						"assignments": [
 							{
 								"ref": "a3_serviced",
@@ -984,7 +984,7 @@
 					} ]
 				},
 				{
-					"location": "loc_36",
+					"location": "loc_1 || loc_36",
 					"guard": {
 						"exp": {
 							"op": "¬",
@@ -1012,7 +1012,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_43",
+						"location": "loc_1 || loc_43",
 						"assignments": [ {
 							"ref": "a3_serviced",
 							"value": true
@@ -1020,9 +1020,9 @@
 					} ]
 				},
 				{
-					"location": "loc_43",
+					"location": "loc_1 || loc_43",
 					"destinations": [ {
-						"location": "loc_46",
+						"location": "loc_1 || loc_46",
 						"assignments": [
 							{
 								"ref": "totalUnserviced",
@@ -1036,13 +1036,13 @@
 					} ]
 				},
 				{
-					"location": "loc_46",
+					"location": "loc_1 || loc_46",
 					"guard": {
 						"exp": "a0_serviced"
 					},
 					"destinations": [
 						{
-							"location": "loc_54",
+							"location": "loc_1 || loc_54",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -1074,7 +1074,7 @@
 							]
 						},
 						{
-							"location": "loc_54",
+							"location": "loc_1 || loc_54",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -1106,7 +1106,7 @@
 							]
 						},
 						{
-							"location": "loc_54",
+							"location": "loc_1 || loc_54",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -1140,7 +1140,7 @@
 					]
 				},
 				{
-					"location": "loc_46",
+					"location": "loc_1 || loc_46",
 					"guard": {
 						"exp": {
 							"op": "¬",
@@ -1148,7 +1148,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_54",
+						"location": "loc_1 || loc_54",
 						"assignments": [
 							{
 								"ref": "a0_priority",
@@ -1170,13 +1170,13 @@
 					} ]
 				},
 				{
-					"location": "loc_54",
+					"location": "loc_1 || loc_54",
 					"guard": {
 						"exp": "a1_serviced"
 					},
 					"destinations": [
 						{
-							"location": "loc_62",
+							"location": "loc_1 || loc_62",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -1208,7 +1208,7 @@
 							]
 						},
 						{
-							"location": "loc_62",
+							"location": "loc_1 || loc_62",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -1240,7 +1240,7 @@
 							]
 						},
 						{
-							"location": "loc_62",
+							"location": "loc_1 || loc_62",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -1274,7 +1274,7 @@
 					]
 				},
 				{
-					"location": "loc_54",
+					"location": "loc_1 || loc_54",
 					"guard": {
 						"exp": {
 							"op": "¬",
@@ -1282,7 +1282,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_62",
+						"location": "loc_1 || loc_62",
 						"assignments": [
 							{
 								"ref": "a1_priority",
@@ -1304,13 +1304,13 @@
 					} ]
 				},
 				{
-					"location": "loc_62",
+					"location": "loc_1 || loc_62",
 					"guard": {
 						"exp": "a2_serviced"
 					},
 					"destinations": [
 						{
-							"location": "loc_70",
+							"location": "loc_1 || loc_70",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -1342,7 +1342,7 @@
 							]
 						},
 						{
-							"location": "loc_70",
+							"location": "loc_1 || loc_70",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -1374,7 +1374,7 @@
 							]
 						},
 						{
-							"location": "loc_70",
+							"location": "loc_1 || loc_70",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -1408,7 +1408,7 @@
 					]
 				},
 				{
-					"location": "loc_62",
+					"location": "loc_1 || loc_62",
 					"guard": {
 						"exp": {
 							"op": "¬",
@@ -1416,7 +1416,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_70",
+						"location": "loc_1 || loc_70",
 						"assignments": [
 							{
 								"ref": "a2_priority",
@@ -1438,13 +1438,13 @@
 					} ]
 				},
 				{
-					"location": "loc_70",
+					"location": "loc_1 || loc_70",
 					"guard": {
 						"exp": "a3_serviced"
 					},
 					"destinations": [
 						{
-							"location": "loc_78",
+							"location": "loc_1 || loc_78",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -1476,7 +1476,7 @@
 							]
 						},
 						{
-							"location": "loc_78",
+							"location": "loc_1 || loc_78",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -1508,7 +1508,7 @@
 							]
 						},
 						{
-							"location": "loc_78",
+							"location": "loc_1 || loc_78",
 							"probability": {
 								"exp": {
 									"op": "/",
@@ -1542,7 +1542,7 @@
 					]
 				},
 				{
-					"location": "loc_70",
+					"location": "loc_1 || loc_70",
 					"guard": {
 						"exp": {
 							"op": "¬",
@@ -1550,7 +1550,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_78",
+						"location": "loc_1 || loc_78",
 						"assignments": [
 							{
 								"ref": "a3_priority",
@@ -1572,7 +1572,7 @@
 					} ]
 				},
 				{
-					"location": "loc_78",
+					"location": "loc_1 || loc_78",
 					"guard": {
 						"exp": {
 							"op": "=",
@@ -1581,7 +1581,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_93",
+						"location": "loc_1 || loc_93",
 						"assignments": [
 							{
 								"ref": "temp0_val",
@@ -1603,7 +1603,7 @@
 					} ]
 				},
 				{
-					"location": "loc_78",
+					"location": "loc_1 || loc_78",
 					"guard": {
 						"exp": {
 							"op": "∧",
@@ -1620,7 +1620,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_93",
+						"location": "loc_1 || loc_93",
 						"assignments": [
 							{
 								"ref": "temp1_val",
@@ -1642,7 +1642,7 @@
 					} ]
 				},
 				{
-					"location": "loc_78",
+					"location": "loc_1 || loc_78",
 					"guard": {
 						"exp": {
 							"op": "∧",
@@ -1667,7 +1667,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_93",
+						"location": "loc_1 || loc_93",
 						"assignments": [
 							{
 								"ref": "temp2_val",
@@ -1689,7 +1689,7 @@
 					} ]
 				},
 				{
-					"location": "loc_78",
+					"location": "loc_1 || loc_78",
 					"guard": {
 						"exp": {
 							"op": "∧",
@@ -1714,7 +1714,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_93",
+						"location": "loc_1 || loc_93",
 						"assignments": [
 							{
 								"ref": "temp3_val",
@@ -1736,7 +1736,7 @@
 					} ]
 				},
 				{
-					"location": "loc_93",
+					"location": "loc_1 || loc_93",
 					"guard": {
 						"exp": {
 							"op": "=",
@@ -1745,7 +1745,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_108",
+						"location": "loc_1 || loc_108",
 						"assignments": [
 							{
 								"ref": "temp0_val",
@@ -1767,7 +1767,7 @@
 					} ]
 				},
 				{
-					"location": "loc_93",
+					"location": "loc_1 || loc_93",
 					"guard": {
 						"exp": {
 							"op": "∧",
@@ -1784,7 +1784,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_108",
+						"location": "loc_1 || loc_108",
 						"assignments": [
 							{
 								"ref": "temp1_val",
@@ -1806,7 +1806,7 @@
 					} ]
 				},
 				{
-					"location": "loc_93",
+					"location": "loc_1 || loc_93",
 					"guard": {
 						"exp": {
 							"op": "∧",
@@ -1831,7 +1831,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_108",
+						"location": "loc_1 || loc_108",
 						"assignments": [
 							{
 								"ref": "temp2_val",
@@ -1853,7 +1853,7 @@
 					} ]
 				},
 				{
-					"location": "loc_93",
+					"location": "loc_1 || loc_93",
 					"guard": {
 						"exp": {
 							"op": "∧",
@@ -1878,7 +1878,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_108",
+						"location": "loc_1 || loc_108",
 						"assignments": [
 							{
 								"ref": "temp3_val",
@@ -1900,7 +1900,7 @@
 					} ]
 				},
 				{
-					"location": "loc_108",
+					"location": "loc_1 || loc_108",
 					"guard": {
 						"exp": {
 							"op": "=",
@@ -1909,7 +1909,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_123",
+						"location": "loc_1 || loc_123",
 						"assignments": [
 							{
 								"ref": "temp0_val",
@@ -1931,7 +1931,7 @@
 					} ]
 				},
 				{
-					"location": "loc_108",
+					"location": "loc_1 || loc_108",
 					"guard": {
 						"exp": {
 							"op": "∧",
@@ -1948,7 +1948,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_123",
+						"location": "loc_1 || loc_123",
 						"assignments": [
 							{
 								"ref": "temp1_val",
@@ -1970,7 +1970,7 @@
 					} ]
 				},
 				{
-					"location": "loc_108",
+					"location": "loc_1 || loc_108",
 					"guard": {
 						"exp": {
 							"op": "∧",
@@ -1995,7 +1995,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_123",
+						"location": "loc_1 || loc_123",
 						"assignments": [
 							{
 								"ref": "temp2_val",
@@ -2017,7 +2017,7 @@
 					} ]
 				},
 				{
-					"location": "loc_108",
+					"location": "loc_1 || loc_108",
 					"guard": {
 						"exp": {
 							"op": "∧",
@@ -2042,7 +2042,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_123",
+						"location": "loc_1 || loc_123",
 						"assignments": [
 							{
 								"ref": "temp3_val",
@@ -2064,7 +2064,7 @@
 					} ]
 				},
 				{
-					"location": "loc_123",
+					"location": "loc_1 || loc_123",
 					"guard": {
 						"exp": {
 							"op": "=",
@@ -2073,7 +2073,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_138",
+						"location": "loc_1 || loc_138",
 						"assignments": [
 							{
 								"ref": "temp0_val",
@@ -2095,7 +2095,7 @@
 					} ]
 				},
 				{
-					"location": "loc_123",
+					"location": "loc_1 || loc_123",
 					"guard": {
 						"exp": {
 							"op": "∧",
@@ -2112,7 +2112,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_138",
+						"location": "loc_1 || loc_138",
 						"assignments": [
 							{
 								"ref": "temp1_val",
@@ -2134,7 +2134,7 @@
 					} ]
 				},
 				{
-					"location": "loc_123",
+					"location": "loc_1 || loc_123",
 					"guard": {
 						"exp": {
 							"op": "∧",
@@ -2159,7 +2159,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_138",
+						"location": "loc_1 || loc_138",
 						"assignments": [
 							{
 								"ref": "temp2_val",
@@ -2181,7 +2181,7 @@
 					} ]
 				},
 				{
-					"location": "loc_123",
+					"location": "loc_1 || loc_123",
 					"guard": {
 						"exp": {
 							"op": "∧",
@@ -2206,7 +2206,7 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_138",
+						"location": "loc_1 || loc_138",
 						"assignments": [
 							{
 								"ref": "temp3_val",
@@ -2228,9 +2228,9 @@
 					} ]
 				},
 				{
-					"location": "loc_138",
+					"location": "loc_1 || loc_138",
 					"destinations": [ {
-						"location": "loc_141",
+						"location": "loc_1 || loc_141",
 						"assignments": [
 							{
 								"ref": "a0_val",
@@ -2300,7 +2300,66 @@
 					} ]
 				},
 				{
-					"location": "loc_141",
+					"location": "loc_1 || loc_141",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "∧",
+								"left": {
+									"op": "∧",
+									"left": {
+										"op": "¬",
+										"exp": {
+											"op": "∧",
+											"left": {
+												"op": "=",
+												"left": "totalUnserviced",
+												"right": 2
+											},
+											"right": {
+												"op": "=",
+												"left": "a0_val",
+												"right": "a1_val"
+											}
+										}
+									},
+									"right": {
+										"op": "¬",
+										"exp": {
+											"op": "∧",
+											"left": {
+												"op": "=",
+												"left": "totalUnserviced",
+												"right": 2
+											},
+											"right": {
+												"op": "≠",
+												"left": "a0_val",
+												"right": "a1_val"
+											}
+										}
+									}
+								},
+								"right": {
+									"op": "≠",
+									"left": "totalUnserviced",
+									"right": 1
+								}
+							},
+							"right": {
+								"op": "≠",
+								"left": "totalUnserviced",
+								"right": 0
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_1 || loc_160"
+					} ]
+				},
+				{
+					"location": "loc_1 || loc_141",
 					"action": "tick",
 					"guard": {
 						"exp": {
@@ -2310,15 +2369,25 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_160",
-						"assignments": [ {
-							"ref": "state",
-							"value": 0
-						} ]
+						"location": "loc_5 || loc_160",
+						"assignments": [
+							{
+								"ref": "clk",
+								"value": {
+									"op": "+",
+									"left": "clk",
+									"right": 1
+								}
+							},
+							{
+								"ref": "state",
+								"value": 0
+							}
+						]
 					} ]
 				},
 				{
-					"location": "loc_141",
+					"location": "loc_1 || loc_141",
 					"action": "tick",
 					"guard": {
 						"exp": {
@@ -2336,15 +2405,25 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_160",
-						"assignments": [ {
-							"ref": "state",
-							"value": 1
-						} ]
+						"location": "loc_5 || loc_160",
+						"assignments": [
+							{
+								"ref": "clk",
+								"value": {
+									"op": "+",
+									"left": "clk",
+									"right": 1
+								}
+							},
+							{
+								"ref": "state",
+								"value": 1
+							}
+						]
 					} ]
 				},
 				{
-					"location": "loc_141",
+					"location": "loc_1 || loc_141",
 					"action": "tick",
 					"guard": {
 						"exp": {
@@ -2378,15 +2457,77 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_160",
-						"assignments": [ {
-							"ref": "state",
-							"value": 2
-						} ]
+						"location": "loc_5 || loc_160",
+						"assignments": [
+							{
+								"ref": "clk",
+								"value": {
+									"op": "+",
+									"left": "clk",
+									"right": 1
+								}
+							},
+							{
+								"ref": "state",
+								"value": 2
+							}
+						]
 					} ]
 				},
 				{
-					"location": "loc_141",
+					"location": "loc_1 || loc_141",
+					"action": "tick",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "∧",
+								"left": {
+									"op": "∧",
+									"left": {
+										"op": "=",
+										"left": "totalUnserviced",
+										"right": 2
+									},
+									"right": {
+										"op": "≠",
+										"left": "a0_val",
+										"right": "a1_val"
+									}
+								},
+								"right": {
+									"op": "≠",
+									"left": "totalUnserviced",
+									"right": 1
+								}
+							},
+							"right": {
+								"op": "≠",
+								"left": "totalUnserviced",
+								"right": 0
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_160",
+						"assignments": [
+							{
+								"ref": "clk",
+								"value": {
+									"op": "+",
+									"left": "clk",
+									"right": 1
+								}
+							},
+							{
+								"ref": "state",
+								"value": 2
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_1 || loc_141",
 					"action": "tick",
 					"guard": {
 						"exp": {
@@ -2439,15 +2580,1870 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_160",
+						"location": "loc_5 || loc_160",
+						"assignments": [
+							{
+								"ref": "clk",
+								"value": {
+									"op": "+",
+									"left": "clk",
+									"right": 1
+								}
+							},
+							{
+								"ref": "state",
+								"value": 3
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_1 || loc_141",
+					"action": "tick",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "∧",
+								"left": {
+									"op": "∧",
+									"left": {
+										"op": "∧",
+										"left": {
+											"op": "=",
+											"left": "totalUnserviced",
+											"right": 2
+										},
+										"right": {
+											"op": "=",
+											"left": "a0_val",
+											"right": "a1_val"
+										}
+									},
+									"right": {
+										"op": "¬",
+										"exp": {
+											"op": "∧",
+											"left": {
+												"op": "=",
+												"left": "totalUnserviced",
+												"right": 2
+											},
+											"right": {
+												"op": "≠",
+												"left": "a0_val",
+												"right": "a1_val"
+											}
+										}
+									}
+								},
+								"right": {
+									"op": "≠",
+									"left": "totalUnserviced",
+									"right": 1
+								}
+							},
+							"right": {
+								"op": "≠",
+								"left": "totalUnserviced",
+								"right": 0
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_160",
+						"assignments": [
+							{
+								"ref": "clk",
+								"value": {
+									"op": "+",
+									"left": "clk",
+									"right": 1
+								}
+							},
+							{
+								"ref": "state",
+								"value": 3
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_1 || loc_141",
+					"action": "tick",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "∧",
+								"left": {
+									"op": "∧",
+									"left": {
+										"op": "∧",
+										"left": {
+											"op": "=",
+											"left": "totalUnserviced",
+											"right": 2
+										},
+										"right": {
+											"op": "=",
+											"left": "a0_val",
+											"right": "a1_val"
+										}
+									},
+									"right": {
+										"op": "¬",
+										"exp": {
+											"op": "∧",
+											"left": {
+												"op": "=",
+												"left": "totalUnserviced",
+												"right": 2
+											},
+											"right": {
+												"op": "≠",
+												"left": "a0_val",
+												"right": "a1_val"
+											}
+										}
+									}
+								},
+								"right": {
+									"op": "≠",
+									"left": "totalUnserviced",
+									"right": 1
+								}
+							},
+							"right": {
+								"op": "≠",
+								"left": "totalUnserviced",
+								"right": 0
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_160",
+						"assignments": [
+							{
+								"ref": "clk",
+								"value": {
+									"op": "+",
+									"left": "clk",
+									"right": 1
+								}
+							},
+							{
+								"ref": "state",
+								"value": 3
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_1 || loc_141",
+					"action": "tick",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "∧",
+								"left": {
+									"op": "∧",
+									"left": {
+										"op": "∧",
+										"left": {
+											"op": "=",
+											"left": "totalUnserviced",
+											"right": 2
+										},
+										"right": {
+											"op": "=",
+											"left": "a0_val",
+											"right": "a1_val"
+										}
+									},
+									"right": {
+										"op": "¬",
+										"exp": {
+											"op": "∧",
+											"left": {
+												"op": "=",
+												"left": "totalUnserviced",
+												"right": 2
+											},
+											"right": {
+												"op": "≠",
+												"left": "a0_val",
+												"right": "a1_val"
+											}
+										}
+									}
+								},
+								"right": {
+									"op": "≠",
+									"left": "totalUnserviced",
+									"right": 1
+								}
+							},
+							"right": {
+								"op": "≠",
+								"left": "totalUnserviced",
+								"right": 0
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_160",
+						"assignments": [
+							{
+								"ref": "clk",
+								"value": {
+									"op": "+",
+									"left": "clk",
+									"right": 1
+								}
+							},
+							{
+								"ref": "state",
+								"value": 3
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_1 || loc_160",
+					"guard": {
+						"exp": {
+							"op": "¬",
+							"exp": {
+								"op": "∨",
+								"left": {
+									"op": "∨",
+									"left": {
+										"op": "=",
+										"left": "a0_val",
+										"right": "a0_id"
+									},
+									"right": {
+										"op": "=",
+										"left": "a1_val",
+										"right": "a1_id"
+									}
+								},
+								"right": {
+									"op": "=",
+									"left": "a2_val",
+									"right": "a2_id"
+								}
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_1 || loc_166"
+					} ]
+				},
+				{
+					"location": "loc_1 || loc_160",
+					"action": "tock",
+					"guard": {
+						"exp": {
+							"op": "∨",
+							"left": {
+								"op": "∨",
+								"left": {
+									"op": "=",
+									"left": "a0_val",
+									"right": "a0_id"
+								},
+								"right": {
+									"op": "=",
+									"left": "a1_val",
+									"right": "a1_id"
+								}
+							},
+							"right": {
+								"op": "=",
+								"left": "a2_val",
+								"right": "a2_id"
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_1 || loc_166"
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_160",
+					"guard": {
+						"exp": {
+							"op": "¬",
+							"exp": {
+								"op": "∨",
+								"left": {
+									"op": "∨",
+									"left": {
+										"op": "=",
+										"left": "a0_val",
+										"right": "a0_id"
+									},
+									"right": {
+										"op": "=",
+										"left": "a1_val",
+										"right": "a1_id"
+									}
+								},
+								"right": {
+									"op": "=",
+									"left": "a2_val",
+									"right": "a2_id"
+								}
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_166"
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_160",
+					"action": "tock",
+					"guard": {
+						"exp": {
+							"op": "∨",
+							"left": {
+								"op": "∨",
+								"left": {
+									"op": "=",
+									"left": "a0_val",
+									"right": "a0_id"
+								},
+								"right": {
+									"op": "=",
+									"left": "a1_val",
+									"right": "a1_id"
+								}
+							},
+							"right": {
+								"op": "=",
+								"left": "a2_val",
+								"right": "a2_id"
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_166"
+					} ]
+				},
+				{
+					"location": "loc_1 || loc_166",
+					"guard": {
+						"exp": {
+							"op": "<",
+							"left": "clk",
+							"right": 101
+						}
+					},
+					"destinations": [ {
+						"location": "loc_1 || loc_18"
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_166",
+					"guard": {
+						"exp": {
+							"op": "<",
+							"left": "clk",
+							"right": 101
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_18"
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_18",
+					"destinations": [ {
+						"location": "loc_5 || loc_22",
+						"assignments": [
+							{
+								"ref": "a0_serviced",
+								"value": true
+							},
+							{
+								"ref": "unserviced",
+								"value": 0
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_22",
+					"guard": {
+						"exp": {
+							"op": "=",
+							"left": "a1_val",
+							"right": "a0_val"
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_29",
+						"assignments": [
+							{
+								"ref": "a1_serviced",
+								"value": false
+							},
+							{
+								"ref": "unserviced",
+								"value": {
+									"op": "+",
+									"left": "unserviced",
+									"right": 1
+								}
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_22",
+					"guard": {
+						"exp": {
+							"op": "≠",
+							"left": "a1_val",
+							"right": "a0_val"
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_29",
 						"assignments": [ {
-							"ref": "state",
-							"value": 3
+							"ref": "a1_serviced",
+							"value": true
 						} ]
 					} ]
 				},
 				{
-					"location": "loc_141",
+					"location": "loc_5 || loc_29",
+					"guard": {
+						"exp": {
+							"op": "∨",
+							"left": {
+								"op": "=",
+								"left": "a2_val",
+								"right": "a1_val"
+							},
+							"right": {
+								"op": "=",
+								"left": "a2_val",
+								"right": "a0_val"
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_36",
+						"assignments": [
+							{
+								"ref": "a2_serviced",
+								"value": false
+							},
+							{
+								"ref": "unserviced",
+								"value": {
+									"op": "+",
+									"left": "unserviced",
+									"right": 1
+								}
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_29",
+					"guard": {
+						"exp": {
+							"op": "¬",
+							"exp": {
+								"op": "∨",
+								"left": {
+									"op": "=",
+									"left": "a2_val",
+									"right": "a1_val"
+								},
+								"right": {
+									"op": "=",
+									"left": "a2_val",
+									"right": "a0_val"
+								}
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_36",
+						"assignments": [ {
+							"ref": "a2_serviced",
+							"value": true
+						} ]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_36",
+					"guard": {
+						"exp": {
+							"op": "∨",
+							"left": {
+								"op": "∨",
+								"left": {
+									"op": "=",
+									"left": "a3_val",
+									"right": "a2_val"
+								},
+								"right": {
+									"op": "=",
+									"left": "a3_val",
+									"right": "a1_val"
+								}
+							},
+							"right": {
+								"op": "=",
+								"left": "a3_val",
+								"right": "a0_val"
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_43",
+						"assignments": [
+							{
+								"ref": "a3_serviced",
+								"value": false
+							},
+							{
+								"ref": "unserviced",
+								"value": {
+									"op": "+",
+									"left": "unserviced",
+									"right": 1
+								}
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_36",
+					"guard": {
+						"exp": {
+							"op": "¬",
+							"exp": {
+								"op": "∨",
+								"left": {
+									"op": "∨",
+									"left": {
+										"op": "=",
+										"left": "a3_val",
+										"right": "a2_val"
+									},
+									"right": {
+										"op": "=",
+										"left": "a3_val",
+										"right": "a1_val"
+									}
+								},
+								"right": {
+									"op": "=",
+									"left": "a3_val",
+									"right": "a0_val"
+								}
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_43",
+						"assignments": [ {
+							"ref": "a3_serviced",
+							"value": true
+						} ]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_43",
+					"destinations": [ {
+						"location": "loc_5 || loc_46",
+						"assignments": [
+							{
+								"ref": "totalUnserviced",
+								"value": "unserviced"
+							},
+							{
+								"ref": "pstate",
+								"value": "state"
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_46",
+					"guard": {
+						"exp": "a0_serviced"
+					},
+					"destinations": [
+						{
+							"location": "loc_5 || loc_54",
+							"probability": {
+								"exp": {
+									"op": "/",
+									"left": 1,
+									"right": 3
+								}
+							},
+							"assignments": [
+								{
+									"ref": "a0_val",
+									"value": {
+										"op": "%",
+										"left": {
+											"op": "+",
+											"left": 1,
+											"right": "a0_id"
+										},
+										"right": 4
+									}
+								},
+								{
+									"ref": "a0_priority",
+									"value": {
+										"op": "+",
+										"left": "unserviced",
+										"right": "a0_priority"
+									}
+								}
+							]
+						},
+						{
+							"location": "loc_5 || loc_54",
+							"probability": {
+								"exp": {
+									"op": "/",
+									"left": 1,
+									"right": 3
+								}
+							},
+							"assignments": [
+								{
+									"ref": "a0_val",
+									"value": {
+										"op": "%",
+										"left": {
+											"op": "+",
+											"left": 2,
+											"right": "a0_id"
+										},
+										"right": 4
+									}
+								},
+								{
+									"ref": "a0_priority",
+									"value": {
+										"op": "+",
+										"left": "unserviced",
+										"right": "a0_priority"
+									}
+								}
+							]
+						},
+						{
+							"location": "loc_5 || loc_54",
+							"probability": {
+								"exp": {
+									"op": "/",
+									"left": 1,
+									"right": 3
+								}
+							},
+							"assignments": [
+								{
+									"ref": "a0_val",
+									"value": {
+										"op": "%",
+										"left": {
+											"op": "+",
+											"left": 3,
+											"right": "a0_id"
+										},
+										"right": 4
+									}
+								},
+								{
+									"ref": "a0_priority",
+									"value": {
+										"op": "+",
+										"left": "unserviced",
+										"right": "a0_priority"
+									}
+								}
+							]
+						}
+					]
+				},
+				{
+					"location": "loc_5 || loc_46",
+					"guard": {
+						"exp": {
+							"op": "¬",
+							"exp": "a0_serviced"
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_54",
+						"assignments": [
+							{
+								"ref": "a0_priority",
+								"value": {
+									"op": "-",
+									"left": "totalUnserviced",
+									"right": "unserviced"
+								}
+							},
+							{
+								"ref": "unserviced",
+								"value": {
+									"op": "-",
+									"left": "unserviced",
+									"right": 1
+								}
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_54",
+					"guard": {
+						"exp": "a1_serviced"
+					},
+					"destinations": [
+						{
+							"location": "loc_5 || loc_62",
+							"probability": {
+								"exp": {
+									"op": "/",
+									"left": 1,
+									"right": 3
+								}
+							},
+							"assignments": [
+								{
+									"ref": "a1_val",
+									"value": {
+										"op": "%",
+										"left": {
+											"op": "+",
+											"left": 1,
+											"right": "a1_id"
+										},
+										"right": 4
+									}
+								},
+								{
+									"ref": "a1_priority",
+									"value": {
+										"op": "+",
+										"left": "unserviced",
+										"right": "a1_priority"
+									}
+								}
+							]
+						},
+						{
+							"location": "loc_5 || loc_62",
+							"probability": {
+								"exp": {
+									"op": "/",
+									"left": 1,
+									"right": 3
+								}
+							},
+							"assignments": [
+								{
+									"ref": "a1_val",
+									"value": {
+										"op": "%",
+										"left": {
+											"op": "+",
+											"left": 2,
+											"right": "a1_id"
+										},
+										"right": 4
+									}
+								},
+								{
+									"ref": "a1_priority",
+									"value": {
+										"op": "+",
+										"left": "unserviced",
+										"right": "a1_priority"
+									}
+								}
+							]
+						},
+						{
+							"location": "loc_5 || loc_62",
+							"probability": {
+								"exp": {
+									"op": "/",
+									"left": 1,
+									"right": 3
+								}
+							},
+							"assignments": [
+								{
+									"ref": "a1_val",
+									"value": {
+										"op": "%",
+										"left": {
+											"op": "+",
+											"left": 3,
+											"right": "a1_id"
+										},
+										"right": 4
+									}
+								},
+								{
+									"ref": "a1_priority",
+									"value": {
+										"op": "+",
+										"left": "unserviced",
+										"right": "a1_priority"
+									}
+								}
+							]
+						}
+					]
+				},
+				{
+					"location": "loc_5 || loc_54",
+					"guard": {
+						"exp": {
+							"op": "¬",
+							"exp": "a1_serviced"
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_62",
+						"assignments": [
+							{
+								"ref": "a1_priority",
+								"value": {
+									"op": "-",
+									"left": "totalUnserviced",
+									"right": "unserviced"
+								}
+							},
+							{
+								"ref": "unserviced",
+								"value": {
+									"op": "-",
+									"left": "unserviced",
+									"right": 1
+								}
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_62",
+					"guard": {
+						"exp": "a2_serviced"
+					},
+					"destinations": [
+						{
+							"location": "loc_5 || loc_70",
+							"probability": {
+								"exp": {
+									"op": "/",
+									"left": 1,
+									"right": 3
+								}
+							},
+							"assignments": [
+								{
+									"ref": "a2_val",
+									"value": {
+										"op": "%",
+										"left": {
+											"op": "+",
+											"left": 1,
+											"right": "a2_id"
+										},
+										"right": 4
+									}
+								},
+								{
+									"ref": "a2_priority",
+									"value": {
+										"op": "+",
+										"left": "unserviced",
+										"right": "a2_priority"
+									}
+								}
+							]
+						},
+						{
+							"location": "loc_5 || loc_70",
+							"probability": {
+								"exp": {
+									"op": "/",
+									"left": 1,
+									"right": 3
+								}
+							},
+							"assignments": [
+								{
+									"ref": "a2_val",
+									"value": {
+										"op": "%",
+										"left": {
+											"op": "+",
+											"left": 2,
+											"right": "a2_id"
+										},
+										"right": 4
+									}
+								},
+								{
+									"ref": "a2_priority",
+									"value": {
+										"op": "+",
+										"left": "unserviced",
+										"right": "a2_priority"
+									}
+								}
+							]
+						},
+						{
+							"location": "loc_5 || loc_70",
+							"probability": {
+								"exp": {
+									"op": "/",
+									"left": 1,
+									"right": 3
+								}
+							},
+							"assignments": [
+								{
+									"ref": "a2_val",
+									"value": {
+										"op": "%",
+										"left": {
+											"op": "+",
+											"left": 3,
+											"right": "a2_id"
+										},
+										"right": 4
+									}
+								},
+								{
+									"ref": "a2_priority",
+									"value": {
+										"op": "+",
+										"left": "unserviced",
+										"right": "a2_priority"
+									}
+								}
+							]
+						}
+					]
+				},
+				{
+					"location": "loc_5 || loc_62",
+					"guard": {
+						"exp": {
+							"op": "¬",
+							"exp": "a2_serviced"
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_70",
+						"assignments": [
+							{
+								"ref": "a2_priority",
+								"value": {
+									"op": "-",
+									"left": "totalUnserviced",
+									"right": "unserviced"
+								}
+							},
+							{
+								"ref": "unserviced",
+								"value": {
+									"op": "-",
+									"left": "unserviced",
+									"right": 1
+								}
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_70",
+					"guard": {
+						"exp": "a3_serviced"
+					},
+					"destinations": [
+						{
+							"location": "loc_5 || loc_78",
+							"probability": {
+								"exp": {
+									"op": "/",
+									"left": 1,
+									"right": 3
+								}
+							},
+							"assignments": [
+								{
+									"ref": "a3_val",
+									"value": {
+										"op": "%",
+										"left": {
+											"op": "+",
+											"left": 1,
+											"right": "a3_id"
+										},
+										"right": 4
+									}
+								},
+								{
+									"ref": "a3_priority",
+									"value": {
+										"op": "+",
+										"left": "unserviced",
+										"right": "a3_priority"
+									}
+								}
+							]
+						},
+						{
+							"location": "loc_5 || loc_78",
+							"probability": {
+								"exp": {
+									"op": "/",
+									"left": 1,
+									"right": 3
+								}
+							},
+							"assignments": [
+								{
+									"ref": "a3_val",
+									"value": {
+										"op": "%",
+										"left": {
+											"op": "+",
+											"left": 2,
+											"right": "a3_id"
+										},
+										"right": 4
+									}
+								},
+								{
+									"ref": "a3_priority",
+									"value": {
+										"op": "+",
+										"left": "unserviced",
+										"right": "a3_priority"
+									}
+								}
+							]
+						},
+						{
+							"location": "loc_5 || loc_78",
+							"probability": {
+								"exp": {
+									"op": "/",
+									"left": 1,
+									"right": 3
+								}
+							},
+							"assignments": [
+								{
+									"ref": "a3_val",
+									"value": {
+										"op": "%",
+										"left": {
+											"op": "+",
+											"left": 3,
+											"right": "a3_id"
+										},
+										"right": 4
+									}
+								},
+								{
+									"ref": "a3_priority",
+									"value": {
+										"op": "+",
+										"left": "unserviced",
+										"right": "a3_priority"
+									}
+								}
+							]
+						}
+					]
+				},
+				{
+					"location": "loc_5 || loc_70",
+					"guard": {
+						"exp": {
+							"op": "¬",
+							"exp": "a3_serviced"
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_78",
+						"assignments": [
+							{
+								"ref": "a3_priority",
+								"value": {
+									"op": "-",
+									"left": "totalUnserviced",
+									"right": "unserviced"
+								}
+							},
+							{
+								"ref": "unserviced",
+								"value": {
+									"op": "-",
+									"left": "unserviced",
+									"right": 1
+								}
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_78",
+					"guard": {
+						"exp": {
+							"op": "=",
+							"left": "a0_priority",
+							"right": 0
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_93",
+						"assignments": [
+							{
+								"ref": "temp0_val",
+								"value": "a0_val"
+							},
+							{
+								"ref": "temp0_id",
+								"value": "a0_id"
+							},
+							{
+								"ref": "temp0_serviced",
+								"value": "a0_serviced"
+							},
+							{
+								"ref": "temp0_priority",
+								"value": "a0_priority"
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_78",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "=",
+								"left": "a0_priority",
+								"right": 1
+							},
+							"right": {
+								"op": "≠",
+								"left": "a0_priority",
+								"right": 0
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_93",
+						"assignments": [
+							{
+								"ref": "temp1_val",
+								"value": "a0_val"
+							},
+							{
+								"ref": "temp1_id",
+								"value": "a0_id"
+							},
+							{
+								"ref": "temp1_serviced",
+								"value": "a0_serviced"
+							},
+							{
+								"ref": "temp1_priority",
+								"value": "a0_priority"
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_78",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "∧",
+								"left": {
+									"op": "=",
+									"left": "a0_priority",
+									"right": 2
+								},
+								"right": {
+									"op": "≠",
+									"left": "a0_priority",
+									"right": 1
+								}
+							},
+							"right": {
+								"op": "≠",
+								"left": "a0_priority",
+								"right": 0
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_93",
+						"assignments": [
+							{
+								"ref": "temp2_val",
+								"value": "a0_val"
+							},
+							{
+								"ref": "temp2_id",
+								"value": "a0_id"
+							},
+							{
+								"ref": "temp2_serviced",
+								"value": "a0_serviced"
+							},
+							{
+								"ref": "temp2_priority",
+								"value": "a0_priority"
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_78",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "∧",
+								"left": {
+									"op": "≠",
+									"left": "a0_priority",
+									"right": 2
+								},
+								"right": {
+									"op": "≠",
+									"left": "a0_priority",
+									"right": 1
+								}
+							},
+							"right": {
+								"op": "≠",
+								"left": "a0_priority",
+								"right": 0
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_93",
+						"assignments": [
+							{
+								"ref": "temp3_val",
+								"value": "a0_val"
+							},
+							{
+								"ref": "temp3_id",
+								"value": "a0_id"
+							},
+							{
+								"ref": "temp3_serviced",
+								"value": "a0_serviced"
+							},
+							{
+								"ref": "temp3_priority",
+								"value": "a0_priority"
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_93",
+					"guard": {
+						"exp": {
+							"op": "=",
+							"left": "a1_priority",
+							"right": 0
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_108",
+						"assignments": [
+							{
+								"ref": "temp0_val",
+								"value": "a1_val"
+							},
+							{
+								"ref": "temp0_id",
+								"value": "a1_id"
+							},
+							{
+								"ref": "temp0_serviced",
+								"value": "a1_serviced"
+							},
+							{
+								"ref": "temp0_priority",
+								"value": "a1_priority"
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_93",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "=",
+								"left": "a1_priority",
+								"right": 1
+							},
+							"right": {
+								"op": "≠",
+								"left": "a1_priority",
+								"right": 0
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_108",
+						"assignments": [
+							{
+								"ref": "temp1_val",
+								"value": "a1_val"
+							},
+							{
+								"ref": "temp1_id",
+								"value": "a1_id"
+							},
+							{
+								"ref": "temp1_serviced",
+								"value": "a1_serviced"
+							},
+							{
+								"ref": "temp1_priority",
+								"value": "a1_priority"
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_93",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "∧",
+								"left": {
+									"op": "=",
+									"left": "a1_priority",
+									"right": 2
+								},
+								"right": {
+									"op": "≠",
+									"left": "a1_priority",
+									"right": 1
+								}
+							},
+							"right": {
+								"op": "≠",
+								"left": "a1_priority",
+								"right": 0
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_108",
+						"assignments": [
+							{
+								"ref": "temp2_val",
+								"value": "a1_val"
+							},
+							{
+								"ref": "temp2_id",
+								"value": "a1_id"
+							},
+							{
+								"ref": "temp2_serviced",
+								"value": "a1_serviced"
+							},
+							{
+								"ref": "temp2_priority",
+								"value": "a1_priority"
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_93",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "∧",
+								"left": {
+									"op": "≠",
+									"left": "a1_priority",
+									"right": 2
+								},
+								"right": {
+									"op": "≠",
+									"left": "a1_priority",
+									"right": 1
+								}
+							},
+							"right": {
+								"op": "≠",
+								"left": "a1_priority",
+								"right": 0
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_108",
+						"assignments": [
+							{
+								"ref": "temp3_val",
+								"value": "a1_val"
+							},
+							{
+								"ref": "temp3_id",
+								"value": "a1_id"
+							},
+							{
+								"ref": "temp3_serviced",
+								"value": "a1_serviced"
+							},
+							{
+								"ref": "temp3_priority",
+								"value": "a1_priority"
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_108",
+					"guard": {
+						"exp": {
+							"op": "=",
+							"left": "a2_priority",
+							"right": 0
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_123",
+						"assignments": [
+							{
+								"ref": "temp0_val",
+								"value": "a2_val"
+							},
+							{
+								"ref": "temp0_id",
+								"value": "a2_id"
+							},
+							{
+								"ref": "temp0_serviced",
+								"value": "a2_serviced"
+							},
+							{
+								"ref": "temp0_priority",
+								"value": "a2_priority"
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_108",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "=",
+								"left": "a2_priority",
+								"right": 1
+							},
+							"right": {
+								"op": "≠",
+								"left": "a2_priority",
+								"right": 0
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_123",
+						"assignments": [
+							{
+								"ref": "temp1_val",
+								"value": "a2_val"
+							},
+							{
+								"ref": "temp1_id",
+								"value": "a2_id"
+							},
+							{
+								"ref": "temp1_serviced",
+								"value": "a2_serviced"
+							},
+							{
+								"ref": "temp1_priority",
+								"value": "a2_priority"
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_108",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "∧",
+								"left": {
+									"op": "=",
+									"left": "a2_priority",
+									"right": 2
+								},
+								"right": {
+									"op": "≠",
+									"left": "a2_priority",
+									"right": 1
+								}
+							},
+							"right": {
+								"op": "≠",
+								"left": "a2_priority",
+								"right": 0
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_123",
+						"assignments": [
+							{
+								"ref": "temp2_val",
+								"value": "a2_val"
+							},
+							{
+								"ref": "temp2_id",
+								"value": "a2_id"
+							},
+							{
+								"ref": "temp2_serviced",
+								"value": "a2_serviced"
+							},
+							{
+								"ref": "temp2_priority",
+								"value": "a2_priority"
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_108",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "∧",
+								"left": {
+									"op": "≠",
+									"left": "a2_priority",
+									"right": 2
+								},
+								"right": {
+									"op": "≠",
+									"left": "a2_priority",
+									"right": 1
+								}
+							},
+							"right": {
+								"op": "≠",
+								"left": "a2_priority",
+								"right": 0
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_123",
+						"assignments": [
+							{
+								"ref": "temp3_val",
+								"value": "a2_val"
+							},
+							{
+								"ref": "temp3_id",
+								"value": "a2_id"
+							},
+							{
+								"ref": "temp3_serviced",
+								"value": "a2_serviced"
+							},
+							{
+								"ref": "temp3_priority",
+								"value": "a2_priority"
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_123",
+					"guard": {
+						"exp": {
+							"op": "=",
+							"left": "a3_priority",
+							"right": 0
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_138",
+						"assignments": [
+							{
+								"ref": "temp0_val",
+								"value": "a3_val"
+							},
+							{
+								"ref": "temp0_id",
+								"value": "a3_id"
+							},
+							{
+								"ref": "temp0_serviced",
+								"value": "a3_serviced"
+							},
+							{
+								"ref": "temp0_priority",
+								"value": "a3_priority"
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_123",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "=",
+								"left": "a3_priority",
+								"right": 1
+							},
+							"right": {
+								"op": "≠",
+								"left": "a3_priority",
+								"right": 0
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_138",
+						"assignments": [
+							{
+								"ref": "temp1_val",
+								"value": "a3_val"
+							},
+							{
+								"ref": "temp1_id",
+								"value": "a3_id"
+							},
+							{
+								"ref": "temp1_serviced",
+								"value": "a3_serviced"
+							},
+							{
+								"ref": "temp1_priority",
+								"value": "a3_priority"
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_123",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "∧",
+								"left": {
+									"op": "=",
+									"left": "a3_priority",
+									"right": 2
+								},
+								"right": {
+									"op": "≠",
+									"left": "a3_priority",
+									"right": 1
+								}
+							},
+							"right": {
+								"op": "≠",
+								"left": "a3_priority",
+								"right": 0
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_138",
+						"assignments": [
+							{
+								"ref": "temp2_val",
+								"value": "a3_val"
+							},
+							{
+								"ref": "temp2_id",
+								"value": "a3_id"
+							},
+							{
+								"ref": "temp2_serviced",
+								"value": "a3_serviced"
+							},
+							{
+								"ref": "temp2_priority",
+								"value": "a3_priority"
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_123",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "∧",
+								"left": {
+									"op": "≠",
+									"left": "a3_priority",
+									"right": 2
+								},
+								"right": {
+									"op": "≠",
+									"left": "a3_priority",
+									"right": 1
+								}
+							},
+							"right": {
+								"op": "≠",
+								"left": "a3_priority",
+								"right": 0
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_138",
+						"assignments": [
+							{
+								"ref": "temp3_val",
+								"value": "a3_val"
+							},
+							{
+								"ref": "temp3_id",
+								"value": "a3_id"
+							},
+							{
+								"ref": "temp3_serviced",
+								"value": "a3_serviced"
+							},
+							{
+								"ref": "temp3_priority",
+								"value": "a3_priority"
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_138",
+					"destinations": [ {
+						"location": "loc_5 || loc_141",
+						"assignments": [
+							{
+								"ref": "a0_val",
+								"value": "temp0_val"
+							},
+							{
+								"ref": "a0_id",
+								"value": "temp0_id"
+							},
+							{
+								"ref": "a0_serviced",
+								"value": "temp0_serviced"
+							},
+							{
+								"ref": "a0_priority",
+								"value": "temp0_priority"
+							},
+							{
+								"ref": "a1_val",
+								"value": "temp1_val"
+							},
+							{
+								"ref": "a1_id",
+								"value": "temp1_id"
+							},
+							{
+								"ref": "a1_serviced",
+								"value": "temp1_serviced"
+							},
+							{
+								"ref": "a1_priority",
+								"value": "temp1_priority"
+							},
+							{
+								"ref": "a2_val",
+								"value": "temp2_val"
+							},
+							{
+								"ref": "a2_id",
+								"value": "temp2_id"
+							},
+							{
+								"ref": "a2_serviced",
+								"value": "temp2_serviced"
+							},
+							{
+								"ref": "a2_priority",
+								"value": "temp2_priority"
+							},
+							{
+								"ref": "a3_val",
+								"value": "temp3_val"
+							},
+							{
+								"ref": "a3_id",
+								"value": "temp3_id"
+							},
+							{
+								"ref": "a3_serviced",
+								"value": "temp3_serviced"
+							},
+							{
+								"ref": "a3_priority",
+								"value": "temp3_priority"
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_141",
 					"guard": {
 						"exp": {
 							"op": "∧",
@@ -2502,110 +4498,540 @@
 						}
 					},
 					"destinations": [ {
-						"location": "loc_160"
+						"location": "loc_5 || loc_160"
 					} ]
 				},
 				{
-					"location": "loc_160",
-					"action": "tock",
+					"location": "loc_5 || loc_141",
+					"action": "tick",
 					"guard": {
 						"exp": {
-							"op": "∨",
+							"op": "∧",
 							"left": {
-								"op": "∨",
-								"left": {
-									"op": "=",
-									"left": "a0_val",
-									"right": "a0_id"
-								},
-								"right": {
-									"op": "=",
-									"left": "a1_val",
-									"right": "a1_id"
-								}
+								"op": "≤",
+								"left": "clk",
+								"right": 101
 							},
 							"right": {
 								"op": "=",
-								"left": "a2_val",
-								"right": "a2_id"
+								"left": "totalUnserviced",
+								"right": 0
 							}
 						}
 					},
 					"destinations": [ {
-						"location": "loc_166"
+						"location": "loc_5 || loc_160",
+						"assignments": [
+							{
+								"ref": "clk",
+								"value": {
+									"op": "+",
+									"left": "clk",
+									"right": 1
+								}
+							},
+							{
+								"ref": "state",
+								"value": 0
+							}
+						]
 					} ]
 				},
 				{
-					"location": "loc_160",
+					"location": "loc_5 || loc_141",
+					"action": "tick",
 					"guard": {
 						"exp": {
-							"op": "¬",
-							"exp": {
-								"op": "∨",
+							"op": "∧",
+							"left": {
+								"op": "≤",
+								"left": "clk",
+								"right": 101
+							},
+							"right": {
+								"op": "∧",
 								"left": {
-									"op": "∨",
-									"left": {
-										"op": "=",
-										"left": "a0_val",
-										"right": "a0_id"
-									},
-									"right": {
-										"op": "=",
-										"left": "a1_val",
-										"right": "a1_id"
-									}
+									"op": "=",
+									"left": "totalUnserviced",
+									"right": 1
 								},
 								"right": {
-									"op": "=",
-									"left": "a2_val",
-									"right": "a2_id"
+									"op": "≠",
+									"left": "totalUnserviced",
+									"right": 0
 								}
 							}
 						}
 					},
 					"destinations": [ {
-						"location": "loc_166"
+						"location": "loc_5 || loc_160",
+						"assignments": [
+							{
+								"ref": "clk",
+								"value": {
+									"op": "+",
+									"left": "clk",
+									"right": 1
+								}
+							},
+							{
+								"ref": "state",
+								"value": 1
+							}
+						]
 					} ]
 				},
 				{
-					"location": "loc_166",
+					"location": "loc_5 || loc_141",
+					"action": "tick",
 					"guard": {
 						"exp": {
-							"op": "<",
-							"left": "clk",
-							"right": 101
+							"op": "∧",
+							"left": {
+								"op": "≤",
+								"left": "clk",
+								"right": 101
+							},
+							"right": {
+								"op": "∧",
+								"left": {
+									"op": "∧",
+									"left": {
+										"op": "∧",
+										"left": {
+											"op": "=",
+											"left": "totalUnserviced",
+											"right": 2
+										},
+										"right": {
+											"op": "≠",
+											"left": "a0_val",
+											"right": "a1_val"
+										}
+									},
+									"right": {
+										"op": "≠",
+										"left": "totalUnserviced",
+										"right": 1
+									}
+								},
+								"right": {
+									"op": "≠",
+									"left": "totalUnserviced",
+									"right": 0
+								}
+							}
 						}
 					},
 					"destinations": [ {
-						"location": "loc_18"
+						"location": "loc_5 || loc_160",
+						"assignments": [
+							{
+								"ref": "clk",
+								"value": {
+									"op": "+",
+									"left": "clk",
+									"right": 1
+								}
+							},
+							{
+								"ref": "state",
+								"value": 2
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_141",
+					"action": "tick",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "≤",
+								"left": "clk",
+								"right": 101
+							},
+							"right": {
+								"op": "∧",
+								"left": {
+									"op": "∧",
+									"left": {
+										"op": "∧",
+										"left": {
+											"op": "=",
+											"left": "totalUnserviced",
+											"right": 2
+										},
+										"right": {
+											"op": "≠",
+											"left": "a0_val",
+											"right": "a1_val"
+										}
+									},
+									"right": {
+										"op": "≠",
+										"left": "totalUnserviced",
+										"right": 1
+									}
+								},
+								"right": {
+									"op": "≠",
+									"left": "totalUnserviced",
+									"right": 0
+								}
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_160",
+						"assignments": [
+							{
+								"ref": "clk",
+								"value": {
+									"op": "+",
+									"left": "clk",
+									"right": 1
+								}
+							},
+							{
+								"ref": "state",
+								"value": 2
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_141",
+					"action": "tick",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "≤",
+								"left": "clk",
+								"right": 101
+							},
+							"right": {
+								"op": "∧",
+								"left": {
+									"op": "∧",
+									"left": {
+										"op": "∧",
+										"left": {
+											"op": "∧",
+											"left": {
+												"op": "=",
+												"left": "totalUnserviced",
+												"right": 2
+											},
+											"right": {
+												"op": "=",
+												"left": "a0_val",
+												"right": "a1_val"
+											}
+										},
+										"right": {
+											"op": "¬",
+											"exp": {
+												"op": "∧",
+												"left": {
+													"op": "=",
+													"left": "totalUnserviced",
+													"right": 2
+												},
+												"right": {
+													"op": "≠",
+													"left": "a0_val",
+													"right": "a1_val"
+												}
+											}
+										}
+									},
+									"right": {
+										"op": "≠",
+										"left": "totalUnserviced",
+										"right": 1
+									}
+								},
+								"right": {
+									"op": "≠",
+									"left": "totalUnserviced",
+									"right": 0
+								}
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_160",
+						"assignments": [
+							{
+								"ref": "clk",
+								"value": {
+									"op": "+",
+									"left": "clk",
+									"right": 1
+								}
+							},
+							{
+								"ref": "state",
+								"value": 3
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_141",
+					"action": "tick",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "≤",
+								"left": "clk",
+								"right": 101
+							},
+							"right": {
+								"op": "∧",
+								"left": {
+									"op": "∧",
+									"left": {
+										"op": "∧",
+										"left": {
+											"op": "∧",
+											"left": {
+												"op": "=",
+												"left": "totalUnserviced",
+												"right": 2
+											},
+											"right": {
+												"op": "=",
+												"left": "a0_val",
+												"right": "a1_val"
+											}
+										},
+										"right": {
+											"op": "¬",
+											"exp": {
+												"op": "∧",
+												"left": {
+													"op": "=",
+													"left": "totalUnserviced",
+													"right": 2
+												},
+												"right": {
+													"op": "≠",
+													"left": "a0_val",
+													"right": "a1_val"
+												}
+											}
+										}
+									},
+									"right": {
+										"op": "≠",
+										"left": "totalUnserviced",
+										"right": 1
+									}
+								},
+								"right": {
+									"op": "≠",
+									"left": "totalUnserviced",
+									"right": 0
+								}
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_160",
+						"assignments": [
+							{
+								"ref": "clk",
+								"value": {
+									"op": "+",
+									"left": "clk",
+									"right": 1
+								}
+							},
+							{
+								"ref": "state",
+								"value": 3
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_141",
+					"action": "tick",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "≤",
+								"left": "clk",
+								"right": 101
+							},
+							"right": {
+								"op": "∧",
+								"left": {
+									"op": "∧",
+									"left": {
+										"op": "∧",
+										"left": {
+											"op": "∧",
+											"left": {
+												"op": "=",
+												"left": "totalUnserviced",
+												"right": 2
+											},
+											"right": {
+												"op": "=",
+												"left": "a0_val",
+												"right": "a1_val"
+											}
+										},
+										"right": {
+											"op": "¬",
+											"exp": {
+												"op": "∧",
+												"left": {
+													"op": "=",
+													"left": "totalUnserviced",
+													"right": 2
+												},
+												"right": {
+													"op": "≠",
+													"left": "a0_val",
+													"right": "a1_val"
+												}
+											}
+										}
+									},
+									"right": {
+										"op": "≠",
+										"left": "totalUnserviced",
+										"right": 1
+									}
+								},
+								"right": {
+									"op": "≠",
+									"left": "totalUnserviced",
+									"right": 0
+								}
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_160",
+						"assignments": [
+							{
+								"ref": "clk",
+								"value": {
+									"op": "+",
+									"left": "clk",
+									"right": 1
+								}
+							},
+							{
+								"ref": "state",
+								"value": 3
+							}
+						]
+					} ]
+				},
+				{
+					"location": "loc_5 || loc_141",
+					"action": "tick",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "≤",
+								"left": "clk",
+								"right": 101
+							},
+							"right": {
+								"op": "∧",
+								"left": {
+									"op": "∧",
+									"left": {
+										"op": "∧",
+										"left": {
+											"op": "∧",
+											"left": {
+												"op": "=",
+												"left": "totalUnserviced",
+												"right": 2
+											},
+											"right": {
+												"op": "=",
+												"left": "a0_val",
+												"right": "a1_val"
+											}
+										},
+										"right": {
+											"op": "¬",
+											"exp": {
+												"op": "∧",
+												"left": {
+													"op": "=",
+													"left": "totalUnserviced",
+													"right": 2
+												},
+												"right": {
+													"op": "≠",
+													"left": "a0_val",
+													"right": "a1_val"
+												}
+											}
+										}
+									},
+									"right": {
+										"op": "≠",
+										"left": "totalUnserviced",
+										"right": 1
+									}
+								},
+								"right": {
+									"op": "≠",
+									"left": "totalUnserviced",
+									"right": 0
+								}
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5 || loc_160",
+						"assignments": [
+							{
+								"ref": "clk",
+								"value": {
+									"op": "+",
+									"left": "clk",
+									"right": 1
+								}
+							},
+							{
+								"ref": "state",
+								"value": 3
+							}
+						]
 					} ]
 				}
 			]
 		}
 	],
 	"system": {
-		"elements": [
-			{
-				"automaton": "Clock"
-			},
-			{
-				"automaton": "Arbiter"
-			}
-		],
+		"elements": [ {
+			"automaton": "Clock || Arbiter"
+		} ],
 		"syncs": [
 			{
-				"synchronise": [
-					null,
-					"tock"
-				],
-				"result": "tock"
+				"synchronise": [ "tick" ],
+				"result": "tick"
 			},
 			{
-				"synchronise": [
-					"tick",
-					"tick"
-				],
-				"result": "tick"
+				"synchronise": [ "tock" ],
+				"result": "tock"
 			}
 		]
 	}
