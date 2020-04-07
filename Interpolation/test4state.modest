@@ -26,7 +26,7 @@ action tick;
 // ------ Begin: properties ---------
 //property Pr1 = Pmax(<> (clk >= clkUpper));
 
-//property TotalServiced = Pmax(<> (totalServiced >= ((clkUpper-clkLower)*3)));		//Probablility that the arbiter servieces at least 15 buffers out of a possible 20. probablity the arbiter is at least 75% efficient
+property TotalServiced = Pmax(<> (totalServiced >= ((clkUpper-clkLower)*20)));		//Probablility that the arbiter servieces at least 15 buffers out of a possible 20. probablity the arbiter is at least 75% efficient
 
 //property conflict1 = Pmax(<> (totalUnserviced == 1 && clk >= clkUpper));
 
@@ -36,11 +36,19 @@ action tick;
 
 //1 clock cycle
 
+<<<<<<< HEAD
+//property State0 = Pmax(<> ((clk >= clkUpper) && (state == 0)));
+/*property State1 = Pmax(<> ((clk >= clkUpper) && (state == 1)));
+property State3 = Pmax(<> ((clk >= clkUpper) && (state == 2)));
+property State2 = Pmax(<> ((clk >= clkUpper) && (state == 3)));
+*/
+=======
 property State0 = Pmax(<> ((clk >= clkUpper) && (state == 0)));
 property State1 = Pmax(<> ((clk >= clkUpper) && (state == 1)));
 property State2 = Pmax(<> ((clk >= clkUpper) && (state == 2)));
 property State3 = Pmax(<> ((clk >= clkUpper) && (state == 3)));
 
+>>>>>>> ab3a3c76a9d9b69e35d5f0dd7400ba885f738e0e
 
 //2 clock cycles
 /*
