@@ -7,8 +7,13 @@ const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
 const int DUR;
+const int Mvar;
+const int Nvar;
+const int Startvar;
 const int clkLower = 0; 
 const int clkUpper = clkLower + DUR;
+int (clkLower..clkUpper) clk;
+int 
 transient int clk2;
 //transient int(0..1) clk;
 
@@ -152,12 +157,7 @@ process Top(){
 
 process Arbiter0() {
 	//begin;
-		//do{
-
-		palt {
-			:(1/10): {= noc[0].localLen += localNotFull1(0) =}
-			:(9/10): {= noc[0].localLen = noc[0].localLen =}
-		};
+	//do{
 
 		arbiter0();
 
@@ -177,10 +177,6 @@ process Arbiter0() {
 process Arbiter1() {
 	//begin;
 	//do{
-		palt {
-			:(1/10): {= noc[1].localLen += localNotFull1(1) =}
-			:(9/10): {= noc[1].localLen = noc[1].localLen =}
-		};
 
 		arbiter1();
 
@@ -200,10 +196,6 @@ process Arbiter1() {
 process Arbiter2() {
 	//begin;
 	//do{
-		palt {
-			:(1/10): {= noc[2].localLen += localNotFull1(2) =}
-			:(9/10): {= noc[2].localLen = noc[2].localLen =}
-		};
 
 		arbiter2();
 		if (false) {
@@ -222,10 +214,6 @@ process Arbiter2() {
 process Arbiter3() {
 	//begin;
 	//do{
-		palt {
-			:(1/10): {= noc[3].localLen += localNotFull1(3) =}
-			:(9/10): {= noc[3].localLen = noc[3].localLen =}
-		};
 
 		arbiter3();
 		if (false) {
@@ -249,9 +237,15 @@ process Arbiter3() {
 
 process populate() {
 
-	
+	if( (clk%(Mvar+Nvar) <= Startvar+Mvar-1) && (clk%(Mvar+Nvar) >= Startvar) ) {
 
-	tick {=
+		 tick {= 
+
+
+		-1: noc[0].localLen += localNotFull1(0),		//Adds a flit to the local buffer of each NoC, if they are not already full
+		-1: noc[1].localLen += localNotFull1(1),
+		-1: noc[2].localLen += localNotFull1(2),
+		-1: noc[3].localLen += localNotFull1(3),
 
 		1: noc[0].nsLen += (nsShouldInc0 - nsShouldDec0),
 		1: noc[1].nsLen += (nsShouldInc1 - nsShouldDec1),
@@ -265,9 +259,34 @@ process populate() {
 
 		1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
 
+		1: clk += (clk == Mvar+Nvar - 1)? (-(Mvar+Nvar-1)): 1,
 		1: clk2 = 1
 
 		=}
+
+	}
+	else {
+
+			tick {=
+
+		1: noc[0].nsLen += (nsShouldInc0 - nsShouldDec0),
+		1: noc[1].nsLen += (nsShouldInc1 - nsShouldDec1),
+		1: noc[2].nsLen += (nsShouldInc2 - nsShouldDec2),
+		1: noc[3].nsLen += (nsShouldInc3 - nsShouldDec3),
+
+		1: noc[0].ewLen += (ewShouldInc0 - ewShouldDec0),
+		1: noc[1].ewLen += (ewShouldInc1 - ewShouldDec1),
+		1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
+		1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
+
+		1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+
+		1: clk += (clk == Mvar+Nvar - 1)? (-(Mvar+Nvar-1)): 1,
+		1: clk2 = 1
+
+		=}
+
+	}
 
 
 
