@@ -13,7 +13,7 @@ const int Startvar;
 const int clkLower = 0; 
 const int clkUpper = clkLower + DUR;
 int (clkLower..clkUpper) clk;
-int 
+int (0..3) sendCounter;
 transient int clk2;
 //transient int(0..1) clk;
 
@@ -237,35 +237,392 @@ process Arbiter3() {
 
 process populate() {
 
-	if( (clk%(Mvar+Nvar) <= Startvar+Mvar-1) && (clk%(Mvar+Nvar) >= Startvar) ) {
+	if(sendCounter == 0) {
 
-		 tick {= 
+		 if(clk == 0) {
+
+		 	tick palt {
+
+		 		:(1/8): {= 
 
 
-		-1: noc[0].localLen += localNotFull1(0),		//Adds a flit to the local buffer of each NoC, if they are not already full
-		-1: noc[1].localLen += localNotFull1(1),
-		-1: noc[2].localLen += localNotFull1(2),
-		-1: noc[3].localLen += localNotFull1(3),
+				-1: noc[0].localLen += localNotFull1(0),		//Adds a flit to the local buffer of each NoC, if they are not already full
+				-1: noc[1].localLen += localNotFull1(1),
+				-1: noc[2].localLen += localNotFull1(2),
+				-1: noc[3].localLen += localNotFull1(3),
 
-		1: noc[0].nsLen += (nsShouldInc0 - nsShouldDec0),
-		1: noc[1].nsLen += (nsShouldInc1 - nsShouldDec1),
-		1: noc[2].nsLen += (nsShouldInc2 - nsShouldDec2),
-		1: noc[3].nsLen += (nsShouldInc3 - nsShouldDec3),
+				1: noc[0].nsLen += (nsShouldInc0 - nsShouldDec0),
+				1: noc[1].nsLen += (nsShouldInc1 - nsShouldDec1),
+				1: noc[2].nsLen += (nsShouldInc2 - nsShouldDec2),
+				1: noc[3].nsLen += (nsShouldInc3 - nsShouldDec3),
 
-		1: noc[0].ewLen += (ewShouldInc0 - ewShouldDec0),
-		1: noc[1].ewLen += (ewShouldInc1 - ewShouldDec1),
-		1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
-		1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
+				1: noc[0].ewLen += (ewShouldInc0 - ewShouldDec0),
+				1: noc[1].ewLen += (ewShouldInc1 - ewShouldDec1),
+				1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
+				1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
 
-		1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+				1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
 
-		1: clk += (clk == Mvar+Nvar - 1)? (-(Mvar+Nvar-1)): 1,
-		1: clk2 = 1
+				1: clk += 1,
+				1: sendCounter += 1,
+				1: clk2 = 1
 
-		=}
+				=}
+
+				:(7/8): {= 
+
+				1: noc[0].nsLen += (nsShouldInc0 - nsShouldDec0),
+				1: noc[1].nsLen += (nsShouldInc1 - nsShouldDec1),
+				1: noc[2].nsLen += (nsShouldInc2 - nsShouldDec2),
+				1: noc[3].nsLen += (nsShouldInc3 - nsShouldDec3),
+
+				1: noc[0].ewLen += (ewShouldInc0 - ewShouldDec0),
+				1: noc[1].ewLen += (ewShouldInc1 - ewShouldDec1),
+				1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
+				1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
+
+				1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+
+				1: clk += 1,
+				1: clk2 = 1
+
+				=}
+
+		 	}
+
+		 }
+		 else if (clk == 1) {
+			tick palt {
+
+		 		:(1/7): {= 
+
+
+				-1: noc[0].localLen += localNotFull1(0),		//Adds a flit to the local buffer of each NoC, if they are not already full
+				-1: noc[1].localLen += localNotFull1(1),
+				-1: noc[2].localLen += localNotFull1(2),
+				-1: noc[3].localLen += localNotFull1(3),
+
+				1: noc[0].nsLen += (nsShouldInc0 - nsShouldDec0),
+				1: noc[1].nsLen += (nsShouldInc1 - nsShouldDec1),
+				1: noc[2].nsLen += (nsShouldInc2 - nsShouldDec2),
+				1: noc[3].nsLen += (nsShouldInc3 - nsShouldDec3),
+
+				1: noc[0].ewLen += (ewShouldInc0 - ewShouldDec0),
+				1: noc[1].ewLen += (ewShouldInc1 - ewShouldDec1),
+				1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
+				1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
+
+				1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+
+				1: clk += 1,
+				1: sendCounter += 1,
+				1: clk2 = 1
+
+				=}
+
+				:(6/7): {= 
+
+				1: noc[0].nsLen += (nsShouldInc0 - nsShouldDec0),
+				1: noc[1].nsLen += (nsShouldInc1 - nsShouldDec1),
+				1: noc[2].nsLen += (nsShouldInc2 - nsShouldDec2),
+				1: noc[3].nsLen += (nsShouldInc3 - nsShouldDec3),
+
+				1: noc[0].ewLen += (ewShouldInc0 - ewShouldDec0),
+				1: noc[1].ewLen += (ewShouldInc1 - ewShouldDec1),
+				1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
+				1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
+
+				1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+
+				1: clk += 1,
+				1: clk2 = 1
+
+				=}
+
+		 	}
+		 }
+		 else if (clk == 2) {
+		 	tick palt {
+
+		 		:(1/6): {= 
+
+
+				-1: noc[0].localLen += localNotFull1(0),		//Adds a flit to the local buffer of each NoC, if they are not already full
+				-1: noc[1].localLen += localNotFull1(1),
+				-1: noc[2].localLen += localNotFull1(2),
+				-1: noc[3].localLen += localNotFull1(3),
+
+				1: noc[0].nsLen += (nsShouldInc0 - nsShouldDec0),
+				1: noc[1].nsLen += (nsShouldInc1 - nsShouldDec1),
+				1: noc[2].nsLen += (nsShouldInc2 - nsShouldDec2),
+				1: noc[3].nsLen += (nsShouldInc3 - nsShouldDec3),
+
+				1: noc[0].ewLen += (ewShouldInc0 - ewShouldDec0),
+				1: noc[1].ewLen += (ewShouldInc1 - ewShouldDec1),
+				1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
+				1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
+
+				1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+
+				1: clk += 1,
+				1: sendCounter += 1,
+				1: clk2 = 1
+
+				=}
+
+				:(5/6): {= 
+
+				1: noc[0].nsLen += (nsShouldInc0 - nsShouldDec0),
+				1: noc[1].nsLen += (nsShouldInc1 - nsShouldDec1),
+				1: noc[2].nsLen += (nsShouldInc2 - nsShouldDec2),
+				1: noc[3].nsLen += (nsShouldInc3 - nsShouldDec3),
+
+				1: noc[0].ewLen += (ewShouldInc0 - ewShouldDec0),
+				1: noc[1].ewLen += (ewShouldInc1 - ewShouldDec1),
+				1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
+				1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
+
+				1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+
+				1: clk += 1,
+				1: clk2 = 1
+
+				=}
+
+		 	}
+		 }
+		 else if (clk == 3) {
+
+		 	tick palt {
+
+		 		:(1/5): {= 
+
+
+				-1: noc[0].localLen += localNotFull1(0),		//Adds a flit to the local buffer of each NoC, if they are not already full
+				-1: noc[1].localLen += localNotFull1(1),
+				-1: noc[2].localLen += localNotFull1(2),
+				-1: noc[3].localLen += localNotFull1(3),
+
+				1: noc[0].nsLen += (nsShouldInc0 - nsShouldDec0),
+				1: noc[1].nsLen += (nsShouldInc1 - nsShouldDec1),
+				1: noc[2].nsLen += (nsShouldInc2 - nsShouldDec2),
+				1: noc[3].nsLen += (nsShouldInc3 - nsShouldDec3),
+
+				1: noc[0].ewLen += (ewShouldInc0 - ewShouldDec0),
+				1: noc[1].ewLen += (ewShouldInc1 - ewShouldDec1),
+				1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
+				1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
+
+				1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+
+				1: clk += 1,
+				1: sendCounter += 1,
+				1: clk2 = 1
+
+				=}
+
+				:(4/5): {= 
+
+				1: noc[0].nsLen += (nsShouldInc0 - nsShouldDec0),
+				1: noc[1].nsLen += (nsShouldInc1 - nsShouldDec1),
+				1: noc[2].nsLen += (nsShouldInc2 - nsShouldDec2),
+				1: noc[3].nsLen += (nsShouldInc3 - nsShouldDec3),
+
+				1: noc[0].ewLen += (ewShouldInc0 - ewShouldDec0),
+				1: noc[1].ewLen += (ewShouldInc1 - ewShouldDec1),
+				1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
+				1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
+
+				1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+
+				1: clk += 1,
+				1: clk2 = 1
+
+				=}
+
+		 	}
+		 	
+		 }
+		 else if (clk == 4) {
+		 	tick palt {
+
+		 		:(1/4): {= 
+
+
+				-1: noc[0].localLen += localNotFull1(0),		//Adds a flit to the local buffer of each NoC, if they are not already full
+				-1: noc[1].localLen += localNotFull1(1),
+				-1: noc[2].localLen += localNotFull1(2),
+				-1: noc[3].localLen += localNotFull1(3),
+
+				1: noc[0].nsLen += (nsShouldInc0 - nsShouldDec0),
+				1: noc[1].nsLen += (nsShouldInc1 - nsShouldDec1),
+				1: noc[2].nsLen += (nsShouldInc2 - nsShouldDec2),
+				1: noc[3].nsLen += (nsShouldInc3 - nsShouldDec3),
+
+				1: noc[0].ewLen += (ewShouldInc0 - ewShouldDec0),
+				1: noc[1].ewLen += (ewShouldInc1 - ewShouldDec1),
+				1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
+				1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
+
+				1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+
+				1: clk += 1,
+				1: sendCounter += 1,
+				1: clk2 = 1
+
+				=}
+
+				:(3/4): {= 
+
+				1: noc[0].nsLen += (nsShouldInc0 - nsShouldDec0),
+				1: noc[1].nsLen += (nsShouldInc1 - nsShouldDec1),
+				1: noc[2].nsLen += (nsShouldInc2 - nsShouldDec2),
+				1: noc[3].nsLen += (nsShouldInc3 - nsShouldDec3),
+
+				1: noc[0].ewLen += (ewShouldInc0 - ewShouldDec0),
+				1: noc[1].ewLen += (ewShouldInc1 - ewShouldDec1),
+				1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
+				1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
+
+				1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+
+				1: clk += 1,
+				1: clk2 = 1
+
+				=}
+
+		 	}
+		 }
+		 else if (clk == 5) {
+		 	tick palt {
+
+		 		:(1/3): {= 
+
+
+				-1: noc[0].localLen += localNotFull1(0),		//Adds a flit to the local buffer of each NoC, if they are not already full
+				-1: noc[1].localLen += localNotFull1(1),
+				-1: noc[2].localLen += localNotFull1(2),
+				-1: noc[3].localLen += localNotFull1(3),
+
+				1: noc[0].nsLen += (nsShouldInc0 - nsShouldDec0),
+				1: noc[1].nsLen += (nsShouldInc1 - nsShouldDec1),
+				1: noc[2].nsLen += (nsShouldInc2 - nsShouldDec2),
+				1: noc[3].nsLen += (nsShouldInc3 - nsShouldDec3),
+
+				1: noc[0].ewLen += (ewShouldInc0 - ewShouldDec0),
+				1: noc[1].ewLen += (ewShouldInc1 - ewShouldDec1),
+				1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
+				1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
+
+				1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+
+				1: clk += 1,
+				1: sendCounter += 1,
+				1: clk2 = 1
+
+				=}
+
+				:(2/3): {= 
+
+				1: noc[0].nsLen += (nsShouldInc0 - nsShouldDec0),
+				1: noc[1].nsLen += (nsShouldInc1 - nsShouldDec1),
+				1: noc[2].nsLen += (nsShouldInc2 - nsShouldDec2),
+				1: noc[3].nsLen += (nsShouldInc3 - nsShouldDec3),
+
+				1: noc[0].ewLen += (ewShouldInc0 - ewShouldDec0),
+				1: noc[1].ewLen += (ewShouldInc1 - ewShouldDec1),
+				1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
+				1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
+
+				1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+
+				1: clk += 1,
+				1: clk2 = 1
+
+				=}
+
+		 	}
+		 }
+		 else if (clk == 6) {
+		 	tick palt {
+
+		 		:(1/2): {= 
+
+
+				-1: noc[0].localLen += localNotFull1(0),		//Adds a flit to the local buffer of each NoC, if they are not already full
+				-1: noc[1].localLen += localNotFull1(1),
+				-1: noc[2].localLen += localNotFull1(2),
+				-1: noc[3].localLen += localNotFull1(3),
+
+				1: noc[0].nsLen += (nsShouldInc0 - nsShouldDec0),
+				1: noc[1].nsLen += (nsShouldInc1 - nsShouldDec1),
+				1: noc[2].nsLen += (nsShouldInc2 - nsShouldDec2),
+				1: noc[3].nsLen += (nsShouldInc3 - nsShouldDec3),
+
+				1: noc[0].ewLen += (ewShouldInc0 - ewShouldDec0),
+				1: noc[1].ewLen += (ewShouldInc1 - ewShouldDec1),
+				1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
+				1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
+
+				1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+
+				1: clk += 1,
+				1: sendCounter += 1,
+				1: clk2 = 1
+
+				=}
+
+				:(1/2): {= 
+
+				1: noc[0].nsLen += (nsShouldInc0 - nsShouldDec0),
+				1: noc[1].nsLen += (nsShouldInc1 - nsShouldDec1),
+				1: noc[2].nsLen += (nsShouldInc2 - nsShouldDec2),
+				1: noc[3].nsLen += (nsShouldInc3 - nsShouldDec3),
+
+				1: noc[0].ewLen += (ewShouldInc0 - ewShouldDec0),
+				1: noc[1].ewLen += (ewShouldInc1 - ewShouldDec1),
+				1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
+				1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
+
+				1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+
+				1: clk += 1,
+				1: clk2 = 1
+
+				=}
+
+		 	}
+		 }
+		 else {
+		 	tick {= 
+
+
+				-1: noc[0].localLen += localNotFull1(0),		//Adds a flit to the local buffer of each NoC, if they are not already full
+				-1: noc[1].localLen += localNotFull1(1),
+				-1: noc[2].localLen += localNotFull1(2),
+				-1: noc[3].localLen += localNotFull1(3),
+
+				1: noc[0].nsLen += (nsShouldInc0 - nsShouldDec0),
+				1: noc[1].nsLen += (nsShouldInc1 - nsShouldDec1),
+				1: noc[2].nsLen += (nsShouldInc2 - nsShouldDec2),
+				1: noc[3].nsLen += (nsShouldInc3 - nsShouldDec3),
+
+				1: noc[0].ewLen += (ewShouldInc0 - ewShouldDec0),
+				1: noc[1].ewLen += (ewShouldInc1 - ewShouldDec1),
+				1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
+				1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
+
+				1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+
+				1: clk += 1,
+				1: sendCounter += 1,
+				1: clk2 = 1
+
+				=}
+		 }
 
 	}
-	else {
+	else if(sendCounter == 3) {
 
 			tick {=
 
@@ -282,9 +639,38 @@ process populate() {
 		1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
 
 		1: clk += (clk == Mvar+Nvar - 1)? (-(Mvar+Nvar-1)): 1,
+		1: sendCounter = (clk == Mvar+Nvar - 1)? 0: sendCounter,
 		1: clk2 = 1
 
 		=}
+
+	}
+	else {
+		{= 
+
+
+				-1: noc[0].localLen += localNotFull1(0),		//Adds a flit to the local buffer of each NoC, if they are not already full
+				-1: noc[1].localLen += localNotFull1(1),
+				-1: noc[2].localLen += localNotFull1(2),
+				-1: noc[3].localLen += localNotFull1(3),
+
+				1: noc[0].nsLen += (nsShouldInc0 - nsShouldDec0),
+				1: noc[1].nsLen += (nsShouldInc1 - nsShouldDec1),
+				1: noc[2].nsLen += (nsShouldInc2 - nsShouldDec2),
+				1: noc[3].nsLen += (nsShouldInc3 - nsShouldDec3),
+
+				1: noc[0].ewLen += (ewShouldInc0 - ewShouldDec0),
+				1: noc[1].ewLen += (ewShouldInc1 - ewShouldDec1),
+				1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
+				1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
+
+				1: optimalRuns += (optimalRuns >= 1)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+
+				1: clk += (clk == Mvar+Nvar - 1)? (-(Mvar+Nvar-1)): 1,
+				1: sendCounter += (clk == Mvar+Nvar - 1)? -sendCounter: 1,
+				1: clk2 = 1
+
+				=}
 
 	}
 
