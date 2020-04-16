@@ -34,7 +34,7 @@ transient int (0..1) optimalRuns0 = 0;
 transient int (0..1) optimalRuns1 = 0;
 transient int (0..1) optimalRuns2 = 0;
 transient int (0..1) optimalRuns3 = 0;
-int (0..12) optimalRuns = 0;
+int (0..16) optimalRuns = 0;
 
 
 transient int(0..1) nsShouldDec0 = 0; 
@@ -95,7 +95,11 @@ property p4 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 4));
 property p5 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 5));
 property p6 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 6));
 property p7 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 7));
-property p8 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 8)); /*
+property p8 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 8));
+property p9 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 9));
+property p10 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 10));
+property p11 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 11));
+property p12 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 12));  /*
 property p1 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 6));
 property p1 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 7));
 property p1 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 8));
@@ -239,7 +243,7 @@ process populate() {
 		1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
 		1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
 
-		1: optimalRuns += (optimalRuns >= 8)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+		1: optimalRuns += (optimalRuns >= 12)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
 
 		1: clk += (clk == Mvar+Nvar - 1)? (-(Mvar+Nvar-1)): 1,
 		1: clk2 = 1
@@ -261,7 +265,7 @@ process populate() {
 		1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
 		1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
 
-		1: optimalRuns += (optimalRuns >= 8)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+		1: optimalRuns += (optimalRuns >= 12)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
 
 		1: clk += (clk == Mvar+Nvar - 1)? (-(Mvar+Nvar-1)): 1,
 		1: clk2 = 1
