@@ -40,7 +40,7 @@ int (0..1) noneSent1 = 0;
 int (0..1) noneSent2 = 0;
 int (0..1) noneSent3 = 0;
 
-int (0..12) noiseRuns = 0;
+int (0..4) noiseRuns = 0;
 
 
 
@@ -101,14 +101,14 @@ function int(0..1) nsNotEmpty0(int(0..4) n) =    (noc[n].nsLen > 0)? 0 : 1;
 
 // ------ Begin: properties ---------
 //property Pr1 = Pmax(<> (clk >= clkUpper) );
-property p1 = Pmax(<>[S(clk2) <= DUR] ((noiseRuns) >= 1));
+property p1 = Pmax(<>[S(clk2) <= DUR] ((noiseRuns) >= 1));/*
 property p2 = Pmax(<>[S(clk2) <= DUR] ((noiseRuns) >= 2));
 property p3 = Pmax(<>[S(clk2) <= DUR] ((noiseRuns) >= 3));
 property p4 = Pmax(<>[S(clk2) <= DUR] ((noiseRuns) >= 4));
 property p5 = Pmax(<>[S(clk2) <= DUR] ((noiseRuns) >= 5));
 property p6 = Pmax(<>[S(clk2) <= DUR] ((noiseRuns) >= 6));
 property p7 = Pmax(<>[S(clk2) <= DUR] ((noiseRuns) >= 7));
-property p8 = Pmax(<>[S(clk2) <= DUR] ((noiseRuns) >= 8));
+property p8 = Pmax(<>[S(clk2) <= DUR] ((noiseRuns) >= 8));*/
 /*property p9 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 9));
 property p10 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 10));
 property p11 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 11));
@@ -269,7 +269,7 @@ process populate() {
 		1: noc[2].localLen -= localShouldDec2,
 		1: noc[3].localLen -= localShouldDec3,
 
-		1: noiseRuns +=( (noiseRuns >= 8)? 0 : ((optimalRuns0*( (localShouldDec0+ewShouldDec0+nsShouldDec0 == 0)? 1:0) ) + (optimalRuns1*( (localShouldDec1+ewShouldDec1+nsShouldDec1 == 0)? 1:0) )  + (optimalRuns2*( (localShouldDec2+ewShouldDec2+nsShouldDec2 == 0)? 1:0) ) + (optimalRuns3*( (localShouldDec3+ewShouldDec3+nsShouldDec3 == 0)? 1:0) ) ) + ((noneSent0*(localShouldDec0*ewShouldDec0*nsShouldDec0)) + (noneSent1*(localShouldDec1*ewShouldDec1*nsShouldDec1))  + (noneSent2*(localShouldDec2*ewShouldDec2*nsShouldDec2)) + (noneSent3*(localShouldDec3*ewShouldDec3*nsShouldDec3)))),
+		1: noiseRuns +=( (noiseRuns >= 1)? 0 : ((optimalRuns0*( (localShouldDec0+ewShouldDec0+nsShouldDec0 == 0)? 1:0) ) + (optimalRuns1*( (localShouldDec1+ewShouldDec1+nsShouldDec1 == 0)? 1:0) )  + (optimalRuns2*( (localShouldDec2+ewShouldDec2+nsShouldDec2 == 0)? 1:0) ) + (optimalRuns3*( (localShouldDec3+ewShouldDec3+nsShouldDec3 == 0)? 1:0) ) ) + ((noneSent0*(localShouldDec0*ewShouldDec0*nsShouldDec0)) + (noneSent1*(localShouldDec1*ewShouldDec1*nsShouldDec1))  + (noneSent2*(localShouldDec2*ewShouldDec2*nsShouldDec2)) + (noneSent3*(localShouldDec3*ewShouldDec3*nsShouldDec3)))),
 
 		1: noneSent0 = ( (1 - localShouldDec0)*(1- ewShouldDec0)*(1- nsShouldDec0)),
 		1: noneSent1 = ( (1 - localShouldDec0)*(1- ewShouldDec0)*(1- nsShouldDec0)),
@@ -306,7 +306,7 @@ process populate() {
 		1: noc[2].localLen -= localShouldDec2,
 		1: noc[3].localLen -= localShouldDec3,
 
-		1: noiseRuns +=( (noiseRuns >= 8)? 0 : ( (optimalRuns0*( (localShouldDec0+ewShouldDec0+nsShouldDec0 == 0)? 1:0) ) + (optimalRuns1*( (localShouldDec1+ewShouldDec1+nsShouldDec1 == 0)? 1:0) )  + (optimalRuns2*( (localShouldDec2+ewShouldDec2+nsShouldDec2 == 0)? 1:0) ) + (optimalRuns3*( (localShouldDec3+ewShouldDec3+nsShouldDec3 == 0)? 1:0) ) ) + ((noneSent0*(localShouldDec0*ewShouldDec0*nsShouldDec0)) + (noneSent1*(localShouldDec1*ewShouldDec1*nsShouldDec1))  + (noneSent2*(localShouldDec2*ewShouldDec2*nsShouldDec2)) + (noneSent3*(localShouldDec3*ewShouldDec3*nsShouldDec3)))),
+		1: noiseRuns +=( (noiseRuns >= 1)? 0 : ( (optimalRuns0*( (localShouldDec0+ewShouldDec0+nsShouldDec0 == 0)? 1:0) ) + (optimalRuns1*( (localShouldDec1+ewShouldDec1+nsShouldDec1 == 0)? 1:0) )  + (optimalRuns2*( (localShouldDec2+ewShouldDec2+nsShouldDec2 == 0)? 1:0) ) + (optimalRuns3*( (localShouldDec3+ewShouldDec3+nsShouldDec3 == 0)? 1:0) ) ) + ((noneSent0*(localShouldDec0*ewShouldDec0*nsShouldDec0)) + (noneSent1*(localShouldDec1*ewShouldDec1*nsShouldDec1))  + (noneSent2*(localShouldDec2*ewShouldDec2*nsShouldDec2)) + (noneSent3*(localShouldDec3*ewShouldDec3*nsShouldDec3)))),
 
 		1: noneSent0 = ( (1 - localShouldDec0)*(1- ewShouldDec0)*(1- nsShouldDec0)),
 		1: noneSent1 = ( (1 - localShouldDec0)*(1- ewShouldDec0)*(1- nsShouldDec0)),
