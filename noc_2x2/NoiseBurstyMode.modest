@@ -276,6 +276,11 @@ process populate() {
 		1: noneSent2 = ( (1 - localShouldDec0)*(1- ewShouldDec0)*(1- nsShouldDec0)),
 		1: noneSent3 = ( (1 - localShouldDec0)*(1- ewShouldDec0)*(1- nsShouldDec0)), 
 
+		1: optimalRuns0 = (localShouldDec0*ewShouldDec0*nsShouldDec0),
+		1: optimalRuns1 = (localShouldDec1*ewShouldDec1*nsShouldDec1),
+		1: optimalRuns2 = (localShouldDec2*ewShouldDec2*nsShouldDec2),
+		1: optimalRuns3 = (localShouldDec3*ewShouldDec3*nsShouldDec3),
+
 		1: clk += (clk == Mvar+Nvar - 1)? (-(Mvar+Nvar-1)): 1,
 		1: clk2 = 1
 
@@ -307,6 +312,11 @@ process populate() {
 		1: noneSent1 = ( (1 - localShouldDec0)*(1- ewShouldDec0)*(1- nsShouldDec0)),
 		1: noneSent2 = ( (1 - localShouldDec0)*(1- ewShouldDec0)*(1- nsShouldDec0)),
 		1: noneSent3 = ( (1 - localShouldDec0)*(1- ewShouldDec0)*(1- nsShouldDec0)), 
+
+		1: optimalRuns0 = (localShouldDec0*ewShouldDec0*nsShouldDec0),
+		1: optimalRuns1 = (localShouldDec1*ewShouldDec1*nsShouldDec1),
+		1: optimalRuns2 = (localShouldDec2*ewShouldDec2*nsShouldDec2),
+		1: optimalRuns3 = (localShouldDec3*ewShouldDec3*nsShouldDec3),
 
 		1: clk += (clk == Mvar+Nvar - 1)? (-(Mvar+Nvar-1)): 1,
 		1: clk2 = 1
@@ -436,9 +446,9 @@ process arbiter0(){
 							noc[0].ewLockedns = !nsNotFull(2), // Ew is locked to ns if it is unable to send
 							nsShouldInc2 = (nsNotFull1(2)), //The ns direction receives if it is not full
 							noc[0].nsPriority = nsNotFull(2),  //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec0 = (nsNotEmpty1(0)), // Ns sends if it is not empty
+							nsShouldDec0 = (nsNotEmpty1(0)) // Ns sends if it is not empty
 							//totalFlitsDelivered0 += nsNotEmpty1(0),
-							optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+							//optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 
 				=} 
 
@@ -470,9 +480,9 @@ process arbiter0(){
 							noc[0].ewLockedns = !nsNotFull(2), // Ew is locked to ns if it is unable to send
 							nsShouldInc2 = (nsNotFull1(2)), //The ns direction receives if it is not full
 							noc[0].nsPriority = nsNotFull(2),  //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec0 = (nsNotEmpty1(0)), // Ns sends if it is not empty
+							nsShouldDec0 = (nsNotEmpty1(0)) // Ns sends if it is not empty
 							//totalFlitsDelivered0 += nsNotEmpty1(0),
-							optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+							//optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 				=} 
 
 
@@ -509,9 +519,9 @@ process arbiter0(){
 							noc[0].ewLockedns = !nsNotFull(2), // Ew is locked to ns if it is unable to send
 							nsShouldInc2 = (nsNotFull1(2)), //The ns direction receives if it is not full
 							noc[0].nsPriority = nsNotFull(2),  //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec0 = (nsNotEmpty1(0)), // Ns sends if it is not empty
+							nsShouldDec0 = (nsNotEmpty1(0)) // Ns sends if it is not empty
 							//totalFlitsDelivered0 += nsNotEmpty1(0),
-							optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+							//optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 				=} 
 
 
@@ -569,9 +579,9 @@ process arbiter0(){
 							noc[0].ewLockedns = !nsNotFull(2), // Ew is locked to ns if it is unable to send
 							nsShouldInc2 = (nsNotFull1(2)), //The ns direction receives if it is not full
 							noc[0].nsPriority = nsNotFull(2),  //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec0 = (nsNotEmpty1(0)), // Ns sends if it is not empty
+							nsShouldDec0 = (nsNotEmpty1(0)) // Ns sends if it is not empty
 							//totalFlitsDelivered0 += nsNotEmpty1(0),
-							optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+							//optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 				=} 
 
 
@@ -671,9 +681,9 @@ process arbiter0(){
 										ewShouldDec0 = nsNotFull1(2), 
 										noc[0].ewLockedns = !nsNotFull(2),
 										nsShouldInc2 = nsNotFull1(2), 
-										nsShouldDec0 = (nsNotEmpty1(0)), 
+										nsShouldDec0 = (nsNotEmpty1(0)) 
 										//totalFlitsDelivered0 += nsNotEmpty1(0),
-										optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+										//optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 									=} 
 	
 
@@ -703,9 +713,9 @@ process arbiter0(){
 										ewShouldDec0 = nsNotFull1(2), 
 										noc[0].ewLockedns = !nsNotFull(2),
 										nsShouldInc2 = nsNotFull1(2), 
-										nsShouldDec0 = (nsNotEmpty1(0)), 
+										nsShouldDec0 = (nsNotEmpty1(0)) 
 										//totalFlitsDelivered0 += nsNotEmpty1(0),
-										optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+										//optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 						=} 
 
 					}
@@ -767,9 +777,9 @@ process arbiter0(){
 									ewShouldDec0 = nsNotFull1(2), 
 									noc[0].ewLockedns = !nsNotFull(2),
 									nsShouldInc2 = nsNotFull1(2), 
-									nsShouldDec0 = (nsNotEmpty1(0)),
+									nsShouldDec0 = (nsNotEmpty1(0))
 									//totalFlitsDelivered0 += nsNotEmpty1(0),
-									optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+									//optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 								=} 
 
 
@@ -818,9 +828,9 @@ process arbiter0(){
 									ewShouldDec0 = nsNotFull1(2), 
 									noc[0].ewLockedns = !nsNotFull(2),
 									nsShouldInc2 = nsNotFull1(2), 
-									nsShouldDec0 = (nsNotEmpty1(0)), 
+									nsShouldDec0 = (nsNotEmpty1(0))
 									//totalFlitsDelivered0 += nsNotEmpty1(0),
-									optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+									//optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 					=} 
 
 				}
@@ -893,8 +903,8 @@ process arbiter0(){
 									nsShouldInc2 = nsNotFull1(2), 
 									nsShouldDec0 = (nsNotEmpty1(0)), 
 									//totalFlitsDelivered0 += nsNotEmpty1(0),
-									noc[0].nsPriority = nsNotFull(2),
-									optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+									noc[0].nsPriority = nsNotFull(2)
+									//optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 								=} 
 
 
@@ -928,8 +938,8 @@ process arbiter0(){
 									nsShouldInc2 = nsNotFull1(2), 
 									nsShouldDec0 = (nsNotEmpty1(0)), 
 									//totalFlitsDelivered0 += nsNotEmpty1(0),
-									noc[0].nsPriority = nsNotFull(2),
-									optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+									noc[0].nsPriority = nsNotFull(2)
+									//optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 								=}  
 
 
@@ -964,8 +974,8 @@ process arbiter0(){
 									nsShouldInc2 = nsNotFull1(2), 
 									nsShouldDec0 = (nsNotEmpty1(0)), 
 									//totalFlitsDelivered0 += nsNotEmpty1(0),
-									noc[0].nsPriority = nsNotFull(2),
-									optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+									noc[0].nsPriority = nsNotFull(2)
+									//optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 								=} 
 
 
@@ -1020,8 +1030,8 @@ process arbiter0(){
 									nsShouldInc2 = nsNotFull1(2), 
 									nsShouldDec0 = (nsNotEmpty1(0)), 
 									//totalFlitsDelivered0 += nsNotEmpty1(0),
-									noc[0].nsPriority = nsNotFull(2),
-									optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+									noc[0].nsPriority = nsNotFull(2)
+									//optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 								=}  
 
 
@@ -1129,9 +1139,9 @@ process arbiter0(){
 									noc[0].ewLockedns = !nsNotFull(2),
 									nsShouldInc2 = (nsNotFull1(2)), 
 									nsShouldDec0 = (nsNotEmpty1(0)), 
-									noc[0].nsPriority = false,
+									noc[0].nsPriority = false
 									//totalFlitsDelivered0 += nsNotEmpty1(0),
-									optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+									//optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 								=}  
 
 
@@ -1163,9 +1173,9 @@ process arbiter0(){
 									noc[0].ewLockedns = !nsNotFull(2),
 									nsShouldInc2 = (nsNotFull1(2)), 
 									nsShouldDec0 = (nsNotEmpty1(0)), 
-									noc[0].nsPriority = false,
+									noc[0].nsPriority = false
 									//totalFlitsDelivered0 += nsNotEmpty1(0),
-									optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+									//optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 								=}  
 
 
@@ -1229,9 +1239,9 @@ process arbiter0(){
 									noc[0].ewLockedns = !nsNotFull(2),
 									nsShouldInc2 = (nsNotFull1(2)), 
 									nsShouldDec0 = (nsNotEmpty1(0)), 
-									noc[0].nsPriority = false,
+									noc[0].nsPriority = false
 									//totalFlitsDelivered0 += nsNotEmpty1(0),
-									optimalRuns0 += ewNotFull1(1)*localNotEmpty1(0)*nsNotFull1(2)*nsNotEmpty1(0)
+									//optimalRuns0 += ewNotFull1(1)*localNotEmpty1(0)*nsNotFull1(2)*nsNotEmpty1(0)
 								=}  
 						}
 
@@ -1285,9 +1295,9 @@ process arbiter0(){
 									noc[0].ewLockedns = !nsNotFull(2),
 									nsShouldInc2 = (nsNotFull1(2)), 
 									nsShouldDec0 = (nsNotEmpty1(0)), 
-									noc[0].nsPriority = false,
+									noc[0].nsPriority = false
 									//totalFlitsDelivered0 += nsNotEmpty1(0),
-									optimalRuns0 += ewNotFull1(1)*localNotEmpty1(0)*nsNotFull1(2)*nsNotEmpty1(0)
+									//optimalRuns0 += ewNotFull1(1)*localNotEmpty1(0)*nsNotFull1(2)*nsNotEmpty1(0)
 								=}  
 
 
@@ -1420,9 +1430,9 @@ process arbiter1(){
 							noc[1].ewLockedns = !nsNotFull(3),  // Ew is locked to ns if it is unable to send
 							nsShouldInc3 = (nsNotFull1(3)),  //The ns direction receives if it is not full
 							noc[1].nsPriority = nsNotFull(3),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec1 = (nsNotEmpty1(1)),  // Ns sends if it is not empty
+							nsShouldDec1 = (nsNotEmpty1(1))  // Ns sends if it is not empty
 							//totalFlitsDelivered1 += nsNotEmpty1(1), 
-							optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+							//optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 
 				=} 
 
@@ -1454,9 +1464,9 @@ process arbiter1(){
 							noc[1].ewLockedns = !nsNotFull(3),  // Ew is locked to ns if it is unable to send
 							nsShouldInc3 = (nsNotFull1(3)),  //The ns direction receives if it is not full
 							noc[1].nsPriority = nsNotFull(3),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec1 = (nsNotEmpty1(1)),  // Ns sends if it is not empty
+							nsShouldDec1 = (nsNotEmpty1(1))  // Ns sends if it is not empty
 							//totalFlitsDelivered1 += nsNotEmpty1(1), 
-							optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+							//optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 				=} 
 
 
@@ -1493,9 +1503,9 @@ process arbiter1(){
 							noc[1].ewLockedns = !nsNotFull(3),  // Ew is locked to ns if it is unable to send
 							nsShouldInc3 = (nsNotFull1(3)),  //The ns direction receives if it is not full
 							noc[1].nsPriority = nsNotFull(3),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec1 = (nsNotEmpty1(1)),  // Ns sends if it is not empty
+							nsShouldDec1 = (nsNotEmpty1(1))  // Ns sends if it is not empty
 							//totalFlitsDelivered1 += nsNotEmpty1(1), 
-							optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+							//optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 				=} 
 
 
@@ -1553,9 +1563,9 @@ process arbiter1(){
 							noc[1].ewLockedns = !nsNotFull(3),  // Ew is locked to ns if it is unable to send
 							nsShouldInc3 = (nsNotFull1(3)),  //The ns direction receives if it is not full
 							noc[1].nsPriority = nsNotFull(3),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec1 = (nsNotEmpty1(1)),  // Ns sends if it is not empty
+							nsShouldDec1 = (nsNotEmpty1(1))  // Ns sends if it is not empty
 							//totalFlitsDelivered1 += nsNotEmpty1(1), 
-							optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+							//optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 				=} 
 
 
@@ -1655,9 +1665,9 @@ process arbiter1(){
 										ewShouldDec1 = nsNotFull1(3),  
 										noc[1].ewLockedns = !nsNotFull(3), 
 										nsShouldInc3 = nsNotFull1(3),  
-										nsShouldDec1 = (nsNotEmpty1(1)),  
+										nsShouldDec1 = (nsNotEmpty1(1))  
 										//totalFlitsDelivered1 += nsNotEmpty1(1), 
-										optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+										//optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 									=} 
 	
 
@@ -1687,9 +1697,9 @@ process arbiter1(){
 										ewShouldDec1 = nsNotFull1(3),  
 										noc[1].ewLockedns = !nsNotFull(3), 
 										nsShouldInc3 = nsNotFull1(3),  
-										nsShouldDec1 = (nsNotEmpty1(1)),  
+										nsShouldDec1 = (nsNotEmpty1(1))  
 										//totalFlitsDelivered1 += nsNotEmpty1(1), 
-										optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+										//optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 						=} 
 
 					}
@@ -1751,9 +1761,9 @@ process arbiter1(){
 									ewShouldDec1 = nsNotFull1(3),  
 									noc[1].ewLockedns = !nsNotFull(3), 
 									nsShouldInc3 = nsNotFull1(3),  
-									nsShouldDec1 = (nsNotEmpty1(1)),  
+									nsShouldDec1 = (nsNotEmpty1(1))  
 									//totalFlitsDelivered1 += nsNotEmpty1(1), 
-									optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+									//optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 								=} 
 
 
@@ -1802,9 +1812,9 @@ process arbiter1(){
 									ewShouldDec1 = nsNotFull1(3),  
 									noc[1].ewLockedns = !nsNotFull(3), 
 									nsShouldInc3 = nsNotFull1(3),  
-									nsShouldDec1 = (nsNotEmpty1(1)),  
+									nsShouldDec1 = (nsNotEmpty1(1))  
 									//totalFlitsDelivered1 += nsNotEmpty1(1), 
-									optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+									//optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 					=} 
 
 				}
@@ -1877,8 +1887,8 @@ process arbiter1(){
 									nsShouldInc3 = nsNotFull1(3),  
 									nsShouldDec1 = (nsNotEmpty1(1)),  
 									//totalFlitsDelivered1 += nsNotEmpty1(1), 
-									noc[1].nsPriority = nsNotFull(3), 
-									optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+									noc[1].nsPriority = nsNotFull(3) 
+									//optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 								=} 
 
 
@@ -1912,8 +1922,8 @@ process arbiter1(){
 									nsShouldInc3 = nsNotFull1(3),  
 									nsShouldDec1 = (nsNotEmpty1(1)),  
 									//totalFlitsDelivered1 += nsNotEmpty1(1), 
-									noc[1].nsPriority = nsNotFull(3), 
-									optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+									noc[1].nsPriority = nsNotFull(3) 
+									//optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 								=}  
 
 
@@ -1948,8 +1958,8 @@ process arbiter1(){
 									nsShouldInc3 = nsNotFull1(3),  
 									nsShouldDec1 = (nsNotEmpty1(1)),  
 									//totalFlitsDelivered1 += nsNotEmpty1(1), 
-									noc[1].nsPriority = nsNotFull(3), 
-									optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+									noc[1].nsPriority = nsNotFull(3)
+									//optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 								=} 
 
 
@@ -2004,8 +2014,8 @@ process arbiter1(){
 									nsShouldInc3 = nsNotFull1(3),  
 									nsShouldDec1 = (nsNotEmpty1(1)),  
 									//totalFlitsDelivered1 += nsNotEmpty1(1), 
-									noc[1].nsPriority = nsNotFull(3), 
-									optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+									noc[1].nsPriority = nsNotFull(3) 
+									//optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 								=}  
 
 
@@ -2113,9 +2123,9 @@ process arbiter1(){
 									noc[1].ewLockedns = !nsNotFull(3), 
 									nsShouldInc3 = (nsNotFull1(3)),  
 									nsShouldDec1 = (nsNotEmpty1(1)),  
-									noc[1].nsPriority = false, 
+									noc[1].nsPriority = false 
 									//totalFlitsDelivered1 += nsNotEmpty1(1), 
-									optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+									//optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 								=}  
 
 
@@ -2147,9 +2157,9 @@ process arbiter1(){
 									noc[1].ewLockedns = !nsNotFull(3), 
 									nsShouldInc3 = (nsNotFull1(3)),  
 									nsShouldDec1 = (nsNotEmpty1(1)),  
-									noc[1].nsPriority = false, 
+									noc[1].nsPriority = false 
 									//totalFlitsDelivered1 += nsNotEmpty1(1), 
-									optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+									//optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 								=}  
 
 
@@ -2213,9 +2223,9 @@ process arbiter1(){
 									noc[1].ewLockedns = !nsNotFull(3), 
 									nsShouldInc3 = (nsNotFull1(3)),  
 									nsShouldDec1 = (nsNotEmpty1(1)),  
-									noc[1].nsPriority = false, 
+									noc[1].nsPriority = false 
 									//totalFlitsDelivered1 += nsNotEmpty1(1), 
-									optimalRuns1 += ewNotFull1(0)*localNotEmpty1(1)*nsNotFull1(3)*nsNotEmpty1(1)
+									//optimalRuns1 += ewNotFull1(0)*localNotEmpty1(1)*nsNotFull1(3)*nsNotEmpty1(1)
 								=}  
 						}
 
@@ -2269,9 +2279,9 @@ process arbiter1(){
 									noc[1].ewLockedns = !nsNotFull(3), 
 									nsShouldInc3 = (nsNotFull1(3)),  
 									nsShouldDec1 = (nsNotEmpty1(1)),  
-									noc[1].nsPriority = false, 
+									noc[1].nsPriority = false 
 									//totalFlitsDelivered1 += nsNotEmpty1(1), 
-									optimalRuns1 += ewNotFull1(0)*localNotEmpty1(1)*nsNotFull1(3)*nsNotEmpty1(1)
+									//optimalRuns1 += ewNotFull1(0)*localNotEmpty1(1)*nsNotFull1(3)*nsNotEmpty1(1)
 								=}  
 
 
@@ -2404,9 +2414,9 @@ process arbiter2(){
 							noc[2].ewLockedns = !nsNotFull(0),  // Ew is locked to ns if it is unable to send
 							nsShouldInc0 = (nsNotFull1(0)),  //The ns direction receives if it is not full
 							noc[2].nsPriority = nsNotFull(0),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec2 = (nsNotEmpty1(2)),  // Ns sends if it is not empty
+							nsShouldDec2 = (nsNotEmpty1(2))  // Ns sends if it is not empty
 							//totalFlitsDelivered2 += nsNotEmpty1(2), 
-							optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+							//optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 
 				=} 
 
@@ -2438,9 +2448,9 @@ process arbiter2(){
 							noc[2].ewLockedns = !nsNotFull(0),  // Ew is locked to ns if it is unable to send
 							nsShouldInc0 = (nsNotFull1(0)),  //The ns direction receives if it is not full
 							noc[2].nsPriority = nsNotFull(0),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec2 = (nsNotEmpty1(2)),  // Ns sends if it is not empty
+							nsShouldDec2 = (nsNotEmpty1(2))  // Ns sends if it is not empty
 							//totalFlitsDelivered2 += nsNotEmpty1(2), 
-							optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+							//optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 				=} 
 
 
@@ -2477,9 +2487,9 @@ process arbiter2(){
 							noc[2].ewLockedns = !nsNotFull(0),  // Ew is locked to ns if it is unable to send
 							nsShouldInc0 = (nsNotFull1(0)),  //The ns direction receives if it is not full
 							noc[2].nsPriority = nsNotFull(0),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec2 = (nsNotEmpty1(2)),  // Ns sends if it is not empty
+							nsShouldDec2 = (nsNotEmpty1(2))  // Ns sends if it is not empty
 							//totalFlitsDelivered2 += nsNotEmpty1(2), 
-							optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+							//optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 				=} 
 
 
@@ -2537,9 +2547,9 @@ process arbiter2(){
 							noc[2].ewLockedns = !nsNotFull(0),  // Ew is locked to ns if it is unable to send
 							nsShouldInc0 = (nsNotFull1(0)),  //The ns direction receives if it is not full
 							noc[2].nsPriority = nsNotFull(0),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec2 = (nsNotEmpty1(2)),  // Ns sends if it is not empty
+							nsShouldDec2 = (nsNotEmpty1(2))  // Ns sends if it is not empty
 							//totalFlitsDelivered2 += nsNotEmpty1(2), 
-							optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+							//optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 				=} 
 
 
@@ -2639,9 +2649,9 @@ process arbiter2(){
 										ewShouldDec2 = nsNotFull1(0),  
 										noc[2].ewLockedns = !nsNotFull(0), 
 										nsShouldInc0 = nsNotFull1(0),  
-										nsShouldDec2 = (nsNotEmpty1(2)),  
+										nsShouldDec2 = (nsNotEmpty1(2))  
 										//totalFlitsDelivered2 += nsNotEmpty1(2), 
-										optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+										//optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 									=} 
 	
 
@@ -2671,9 +2681,9 @@ process arbiter2(){
 										ewShouldDec2 = nsNotFull1(0),  
 										noc[2].ewLockedns = !nsNotFull(0), 
 										nsShouldInc0 = nsNotFull1(0),  
-										nsShouldDec2 = (nsNotEmpty1(2)),  
+										nsShouldDec2 = (nsNotEmpty1(2))  
 										//totalFlitsDelivered2 += nsNotEmpty1(2), 
-										optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+										//optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 						=} 
 
 					}
@@ -2735,9 +2745,9 @@ process arbiter2(){
 									ewShouldDec2 = nsNotFull1(0),  
 									noc[2].ewLockedns = !nsNotFull(0), 
 									nsShouldInc0 = nsNotFull1(0),  
-									nsShouldDec2 = (nsNotEmpty1(2)),  
+									nsShouldDec2 = (nsNotEmpty1(2))  
 									//totalFlitsDelivered2 += nsNotEmpty1(2), 
-									optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+									//optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 								=} 
 
 
@@ -2786,9 +2796,9 @@ process arbiter2(){
 									ewShouldDec2 = nsNotFull1(0),  
 									noc[2].ewLockedns = !nsNotFull(0), 
 									nsShouldInc0 = nsNotFull1(0),  
-									nsShouldDec2 = (nsNotEmpty1(2)),  
+									nsShouldDec2 = (nsNotEmpty1(2))  
 									//totalFlitsDelivered2 += nsNotEmpty1(2), 
-									optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+									//optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 					=} 
 
 				}
@@ -2861,8 +2871,8 @@ process arbiter2(){
 									nsShouldInc0 = nsNotFull1(0),  
 									nsShouldDec2 = (nsNotEmpty1(2)),  
 									//totalFlitsDelivered2 += nsNotEmpty1(2), 
-									noc[2].nsPriority = nsNotFull(0), 
-									optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+									noc[2].nsPriority = nsNotFull(0) 
+									//optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 								=} 
 
 
@@ -2896,8 +2906,8 @@ process arbiter2(){
 									nsShouldInc0 = nsNotFull1(0),  
 									nsShouldDec2 = (nsNotEmpty1(2)),  
 									//totalFlitsDelivered2 += nsNotEmpty1(2), 
-									noc[2].nsPriority = nsNotFull(0), 
-									optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+									noc[2].nsPriority = nsNotFull(0) 
+									//optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 								=}  
 
 
@@ -2932,8 +2942,8 @@ process arbiter2(){
 									nsShouldInc0 = nsNotFull1(0),  
 									nsShouldDec2 = (nsNotEmpty1(2)),  
 									//totalFlitsDelivered2 += nsNotEmpty1(2), 
-									noc[2].nsPriority = nsNotFull(0), 
-									optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+									noc[2].nsPriority = nsNotFull(0) 
+									//optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 								=} 
 
 
@@ -2988,8 +2998,8 @@ process arbiter2(){
 									nsShouldInc0 = nsNotFull1(0),  
 									nsShouldDec2 = (nsNotEmpty1(2)),  
 									//totalFlitsDelivered2 += nsNotEmpty1(2), 
-									noc[2].nsPriority = nsNotFull(0), 
-									optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+									noc[2].nsPriority = nsNotFull(0) 
+									//optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 								=}  
 
 
@@ -3097,9 +3107,9 @@ process arbiter2(){
 									noc[2].ewLockedns = !nsNotFull(0), 
 									nsShouldInc0 = (nsNotFull1(0)),  
 									nsShouldDec2 = (nsNotEmpty1(2)),  
-									noc[2].nsPriority = false, 
+									noc[2].nsPriority = false 
 									//totalFlitsDelivered2 += nsNotEmpty1(2), 
-									optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+									//optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 								=}  
 
 
@@ -3131,9 +3141,9 @@ process arbiter2(){
 									noc[2].ewLockedns = !nsNotFull(0), 
 									nsShouldInc0 = (nsNotFull1(0)),  
 									nsShouldDec2 = (nsNotEmpty1(2)),  
-									noc[2].nsPriority = false, 
+									noc[2].nsPriority = false 
 									//totalFlitsDelivered2 += nsNotEmpty1(2), 
-									optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+									//optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 								=}  
 
 
@@ -3197,9 +3207,9 @@ process arbiter2(){
 									noc[2].ewLockedns = !nsNotFull(0), 
 									nsShouldInc0 = (nsNotFull1(0)),  
 									nsShouldDec2 = (nsNotEmpty1(2)),  
-									noc[2].nsPriority = false, 
+									noc[2].nsPriority = false 
 									//totalFlitsDelivered2 += nsNotEmpty1(2), 
-									optimalRuns2 += ewNotFull1(3)*localNotEmpty1(2)*nsNotFull1(0)*nsNotEmpty1(2)
+									//optimalRuns2 += ewNotFull1(3)*localNotEmpty1(2)*nsNotFull1(0)*nsNotEmpty1(2)
 								=}  
 						}
 
@@ -3253,9 +3263,9 @@ process arbiter2(){
 									noc[2].ewLockedns = !nsNotFull(0), 
 									nsShouldInc0 = (nsNotFull1(0)),  
 									nsShouldDec2 = (nsNotEmpty1(2)),  
-									noc[2].nsPriority = false, 
+									noc[2].nsPriority = false 
 									//totalFlitsDelivered2 += nsNotEmpty1(2), 
-									optimalRuns2 += ewNotFull1(3)*localNotEmpty1(2)*nsNotFull1(0)*nsNotEmpty1(2)
+									//optimalRuns2 += ewNotFull1(3)*localNotEmpty1(2)*nsNotFull1(0)*nsNotEmpty1(2)
 								=}  
 
 
@@ -3388,9 +3398,9 @@ process arbiter3(){
 							noc[3].ewLockedns = !nsNotFull(1),  // Ew is locked to ns if it is unable to send
 							nsShouldInc1 = (nsNotFull1(1)),  //The ns direction receives if it is not full
 							noc[3].nsPriority = nsNotFull(1),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec3 = (nsNotEmpty1(3)),  // Ns sends if it is not empty
+							nsShouldDec3 = (nsNotEmpty1(3))  // Ns sends if it is not empty
 							//totalFlitsDelivered3 += nsNotEmpty1(3), 
-							optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+							//optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 
 				=} 
 
@@ -3422,9 +3432,9 @@ process arbiter3(){
 							noc[3].ewLockedns = !nsNotFull(1),  // Ew is locked to ns if it is unable to send
 							nsShouldInc1 = (nsNotFull1(1)),  //The ns direction receives if it is not full
 							noc[3].nsPriority = nsNotFull(1),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec3 = (nsNotEmpty1(3)),  // Ns sends if it is not empty
+							nsShouldDec3 = (nsNotEmpty1(3))  // Ns sends if it is not empty
 							//totalFlitsDelivered3 += nsNotEmpty1(3), 
-							optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+							//optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 				=} 
 
 
@@ -3461,9 +3471,9 @@ process arbiter3(){
 							noc[3].ewLockedns = !nsNotFull(1),  // Ew is locked to ns if it is unable to send
 							nsShouldInc1 = (nsNotFull1(1)),  //The ns direction receives if it is not full
 							noc[3].nsPriority = nsNotFull(1),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec3 = (nsNotEmpty1(3)),  // Ns sends if it is not empty
+							nsShouldDec3 = (nsNotEmpty1(3))  // Ns sends if it is not empty
 							//totalFlitsDelivered3 += nsNotEmpty1(3), 
-							optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+							//optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 				=} 
 
 
@@ -3521,9 +3531,9 @@ process arbiter3(){
 							noc[3].ewLockedns = !nsNotFull(1),  // Ew is locked to ns if it is unable to send
 							nsShouldInc1 = (nsNotFull1(1)),  //The ns direction receives if it is not full
 							noc[3].nsPriority = nsNotFull(1),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec3 = (nsNotEmpty1(3)),  // Ns sends if it is not empty
+							nsShouldDec3 = (nsNotEmpty1(3))  // Ns sends if it is not empty
 							//totalFlitsDelivered3 += nsNotEmpty1(3), 
-							optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+							//optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 				=} 
 
 
@@ -3623,9 +3633,9 @@ process arbiter3(){
 										ewShouldDec3 = nsNotFull1(1),  
 										noc[3].ewLockedns = !nsNotFull(1), 
 										nsShouldInc1 = nsNotFull1(1),  
-										nsShouldDec3 = (nsNotEmpty1(3)),  
+										nsShouldDec3 = (nsNotEmpty1(3))  
 										//totalFlitsDelivered3 += nsNotEmpty1(3), 
-										optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+										//optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 									=} 
 	
 
@@ -3655,9 +3665,9 @@ process arbiter3(){
 										ewShouldDec3 = nsNotFull1(1),  
 										noc[3].ewLockedns = !nsNotFull(1), 
 										nsShouldInc1 = nsNotFull1(1),  
-										nsShouldDec3 = (nsNotEmpty1(3)),  
+										nsShouldDec3 = (nsNotEmpty1(3))  
 										//totalFlitsDelivered3 += nsNotEmpty1(3), 
-										optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+										//optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 						=} 
 
 					}
@@ -3719,9 +3729,9 @@ process arbiter3(){
 									ewShouldDec3 = nsNotFull1(1),  
 									noc[3].ewLockedns = !nsNotFull(1), 
 									nsShouldInc1 = nsNotFull1(1),  
-									nsShouldDec3 = (nsNotEmpty1(3)),  
+									nsShouldDec3 = (nsNotEmpty1(3)) 
 									//totalFlitsDelivered3 += nsNotEmpty1(3), 
-									optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+									//optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 								=} 
 
 
@@ -3770,9 +3780,9 @@ process arbiter3(){
 									ewShouldDec3 = nsNotFull1(1),  
 									noc[3].ewLockedns = !nsNotFull(1), 
 									nsShouldInc1 = nsNotFull1(1),  
-									nsShouldDec3 = (nsNotEmpty1(3)),  
+									nsShouldDec3 = (nsNotEmpty1(3))  
 									//totalFlitsDelivered3 += nsNotEmpty1(3), 
-									optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+									//optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 					=} 
 
 				}
@@ -3845,8 +3855,8 @@ process arbiter3(){
 									nsShouldInc1 = nsNotFull1(1),  
 									nsShouldDec3 = (nsNotEmpty1(3)),  
 									//totalFlitsDelivered3 += nsNotEmpty1(3), 
-									noc[3].nsPriority = nsNotFull(1), 
-									optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+									noc[3].nsPriority = nsNotFull(1) 
+									//optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 								=} 
 
 
@@ -3880,8 +3890,8 @@ process arbiter3(){
 									nsShouldInc1 = nsNotFull1(1),  
 									nsShouldDec3 = (nsNotEmpty1(3)),  
 									//totalFlitsDelivered3 += nsNotEmpty1(3), 
-									noc[3].nsPriority = nsNotFull(1), 
-									optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+									noc[3].nsPriority = nsNotFull(1) 
+									//optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 								=}  
 
 
@@ -3916,8 +3926,8 @@ process arbiter3(){
 									nsShouldInc1 = nsNotFull1(1),  
 									nsShouldDec3 = (nsNotEmpty1(3)),  
 									//totalFlitsDelivered3 += nsNotEmpty1(3), 
-									noc[3].nsPriority = nsNotFull(1), 
-									optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+									noc[3].nsPriority = nsNotFull(1) 
+									//optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 								=} 
 
 
@@ -3972,8 +3982,8 @@ process arbiter3(){
 									nsShouldInc1 = nsNotFull1(1),  
 									nsShouldDec3 = (nsNotEmpty1(3)),  
 									//totalFlitsDelivered3 += nsNotEmpty1(3), 
-									noc[3].nsPriority = nsNotFull(1), 
-									optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+									noc[3].nsPriority = nsNotFull(1) 
+									//optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 								=}  
 
 
@@ -4081,9 +4091,9 @@ process arbiter3(){
 									noc[3].ewLockedns = !nsNotFull(1), 
 									nsShouldInc1 = (nsNotFull1(1)),  
 									nsShouldDec3 = (nsNotEmpty1(3)),  
-									noc[3].nsPriority = false, 
+									noc[3].nsPriority = false 
 									//totalFlitsDelivered3 += nsNotEmpty1(3), 
-									optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+									//optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 								=}  
 
 
@@ -4115,9 +4125,9 @@ process arbiter3(){
 									noc[3].ewLockedns = !nsNotFull(1), 
 									nsShouldInc1 = (nsNotFull1(1)),  
 									nsShouldDec3 = (nsNotEmpty1(3)),  
-									noc[3].nsPriority = false, 
+									noc[3].nsPriority = false 
 									//totalFlitsDelivered3 += nsNotEmpty1(3), 
-									optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+									//optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 								=}  
 
 
@@ -4181,9 +4191,9 @@ process arbiter3(){
 									noc[3].ewLockedns = !nsNotFull(1), 
 									nsShouldInc1 = (nsNotFull1(1)),  
 									nsShouldDec3 = (nsNotEmpty1(3)),  
-									noc[3].nsPriority = false, 
+									noc[3].nsPriority = false 
 									//totalFlitsDelivered3 += nsNotEmpty1(3), 
-									optimalRuns3 += ewNotFull1(2)*localNotEmpty1(3)*nsNotFull1(1)*nsNotEmpty1(3)
+									//optimalRuns3 += ewNotFull1(2)*localNotEmpty1(3)*nsNotFull1(1)*nsNotEmpty1(3)
 								=}  
 						}
 
@@ -4237,9 +4247,9 @@ process arbiter3(){
 									noc[3].ewLockedns = !nsNotFull(1), 
 									nsShouldInc1 = (nsNotFull1(1)),  
 									nsShouldDec3 = (nsNotEmpty1(3)),  
-									noc[3].nsPriority = false, 
+									noc[3].nsPriority = false 
 									//totalFlitsDelivered3 += nsNotEmpty1(3), 
-									optimalRuns3 += ewNotFull1(2)*localNotEmpty1(3)*nsNotFull1(1)*nsNotEmpty1(3)
+									//optimalRuns3 += ewNotFull1(2)*localNotEmpty1(3)*nsNotFull1(1)*nsNotEmpty1(3)
 								=}  
 
 
