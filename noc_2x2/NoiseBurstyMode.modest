@@ -30,11 +30,19 @@ int //totalFlitsDelivered;*/
 
 datatype node = {int(0..4) localLen, int(0..4) ewLen, int(0..4) nsLen, bool localPriority, bool nsPriority, bool ewLockedns, bool ewLockedlocal, bool localLockedns, bool localLockedew};
 
-transient int (0..1) optimalRuns0 = 0;
-transient int (0..1) optimalRuns1 = 0;
-transient int (0..1) optimalRuns2 = 0;
-transient int (0..1) optimalRuns3 = 0;
-int (0..24) optimalRuns = 0;
+int (0..1) optimalRuns0 = 0;
+int (0..1) optimalRuns1 = 0;
+int (0..1) optimalRuns2 = 0;
+int (0..1) optimalRuns3 = 0;
+
+int (0..1) noneSent0 = 0;
+int (0..1) noneSent1 = 0;
+int (0..1) noneSent2 = 0;
+int (0..1) noneSent3 = 0;
+
+int (0..4) noiseRuns = 0;
+
+
 
 
 transient int(0..1) nsShouldDec0 = 0; 
@@ -56,6 +64,11 @@ transient int (0..1) ewShouldInc0 = 0;
 transient int (0..1) ewShouldInc1 = 0;
 transient int (0..1) ewShouldInc2 = 0;
 transient int (0..1) ewShouldInc3 = 0;
+
+transient int(0..1) localShouldDec0 = 0; 
+transient int(0..1) localShouldDec1 = 0; 
+transient int(0..1) localShouldDec2 = 0; 
+transient int(0..1) localShouldDec3 = 0; 
 
 //node r0, r1, r2, r3;
 
@@ -88,15 +101,15 @@ function int(0..1) nsNotEmpty0(int(0..4) n) =    (noc[n].nsLen > 0)? 0 : 1;
 
 // ------ Begin: properties ---------
 //property Pr1 = Pmax(<> (clk >= clkUpper) );
-property p1 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 1));
-property p2 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 2));
-property p3 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 3));
-property p4 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 4));
-property p5 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 5));
-property p6 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 6));
-property p7 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 7));
-property p8 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 8));
-property p9 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 9));
+property p1 = Pmax(<>[S(clk2) <= DUR] ((noiseRuns) >= 1));/*
+property p2 = Pmax(<>[S(clk2) <= DUR] ((noiseRuns) >= 2));
+property p3 = Pmax(<>[S(clk2) <= DUR] ((noiseRuns) >= 3));
+property p4 = Pmax(<>[S(clk2) <= DUR] ((noiseRuns) >= 4));
+property p5 = Pmax(<>[S(clk2) <= DUR] ((noiseRuns) >= 5));
+property p6 = Pmax(<>[S(clk2) <= DUR] ((noiseRuns) >= 6));
+property p7 = Pmax(<>[S(clk2) <= DUR] ((noiseRuns) >= 7));
+property p8 = Pmax(<>[S(clk2) <= DUR] ((noiseRuns) >= 8));*/
+/*property p9 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 9));
 property p10 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 10));
 property p11 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 11));
 property p12 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 12));
@@ -107,7 +120,7 @@ property p16 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 16));
 property p17 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 17));
 property p18 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 18));
 property p19 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 19));
-property p20 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 20));  /*
+property p20 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 20)); */ /*
 property p1 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 6));
 property p1 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 7));
 property p1 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 8));
@@ -250,8 +263,23 @@ process populate() {
 		1: noc[1].ewLen += (ewShouldInc1 - ewShouldDec1),
 		1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
 		1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
+		
+		1: noc[0].localLen -= localShouldDec0,
+		1: noc[1].localLen -= localShouldDec1,
+		1: noc[2].localLen -= localShouldDec2,
+		1: noc[3].localLen -= localShouldDec3,
 
-		1: optimalRuns += (optimalRuns >= 20)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+		1: noiseRuns +=( (noiseRuns >= 1)? 0 : ((optimalRuns0*( (localShouldDec0+ewShouldDec0+nsShouldDec0 == 0)? 1:0) ) + (optimalRuns1*( (localShouldDec1+ewShouldDec1+nsShouldDec1 == 0)? 1:0) )  + (optimalRuns2*( (localShouldDec2+ewShouldDec2+nsShouldDec2 == 0)? 1:0) ) + (optimalRuns3*( (localShouldDec3+ewShouldDec3+nsShouldDec3 == 0)? 1:0) ) ) + ((noneSent0*(localShouldDec0*ewShouldDec0*nsShouldDec0)) + (noneSent1*(localShouldDec1*ewShouldDec1*nsShouldDec1))  + (noneSent2*(localShouldDec2*ewShouldDec2*nsShouldDec2)) + (noneSent3*(localShouldDec3*ewShouldDec3*nsShouldDec3)))),
+
+		1: noneSent0 = ( (1 - localShouldDec0)*(1- ewShouldDec0)*(1- nsShouldDec0)),
+		1: noneSent1 = ( (1 - localShouldDec0)*(1- ewShouldDec0)*(1- nsShouldDec0)),
+		1: noneSent2 = ( (1 - localShouldDec0)*(1- ewShouldDec0)*(1- nsShouldDec0)),
+		1: noneSent3 = ( (1 - localShouldDec0)*(1- ewShouldDec0)*(1- nsShouldDec0)), 
+
+		1: optimalRuns0 = (localShouldDec0*ewShouldDec0*nsShouldDec0),
+		1: optimalRuns1 = (localShouldDec1*ewShouldDec1*nsShouldDec1),
+		1: optimalRuns2 = (localShouldDec2*ewShouldDec2*nsShouldDec2),
+		1: optimalRuns3 = (localShouldDec3*ewShouldDec3*nsShouldDec3),
 
 		1: clk += (clk == Mvar+Nvar - 1)? (-(Mvar+Nvar-1)): 1,
 		1: clk2 = 1
@@ -273,7 +301,22 @@ process populate() {
 		1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
 		1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
 
-		1: optimalRuns += (optimalRuns >= 12)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+		1: noc[0].localLen -= localShouldDec0,
+		1: noc[1].localLen -= localShouldDec1,
+		1: noc[2].localLen -= localShouldDec2,
+		1: noc[3].localLen -= localShouldDec3,
+
+		1: noiseRuns +=( (noiseRuns >= 1)? 0 : ( (optimalRuns0*( (localShouldDec0+ewShouldDec0+nsShouldDec0 == 0)? 1:0) ) + (optimalRuns1*( (localShouldDec1+ewShouldDec1+nsShouldDec1 == 0)? 1:0) )  + (optimalRuns2*( (localShouldDec2+ewShouldDec2+nsShouldDec2 == 0)? 1:0) ) + (optimalRuns3*( (localShouldDec3+ewShouldDec3+nsShouldDec3 == 0)? 1:0) ) ) + ((noneSent0*(localShouldDec0*ewShouldDec0*nsShouldDec0)) + (noneSent1*(localShouldDec1*ewShouldDec1*nsShouldDec1))  + (noneSent2*(localShouldDec2*ewShouldDec2*nsShouldDec2)) + (noneSent3*(localShouldDec3*ewShouldDec3*nsShouldDec3)))),
+
+		1: noneSent0 = ( (1 - localShouldDec0)*(1- ewShouldDec0)*(1- nsShouldDec0)),
+		1: noneSent1 = ( (1 - localShouldDec0)*(1- ewShouldDec0)*(1- nsShouldDec0)),
+		1: noneSent2 = ( (1 - localShouldDec0)*(1- ewShouldDec0)*(1- nsShouldDec0)),
+		1: noneSent3 = ( (1 - localShouldDec0)*(1- ewShouldDec0)*(1- nsShouldDec0)), 
+
+		1: optimalRuns0 = (localShouldDec0*ewShouldDec0*nsShouldDec0),
+		1: optimalRuns1 = (localShouldDec1*ewShouldDec1*nsShouldDec1),
+		1: optimalRuns2 = (localShouldDec2*ewShouldDec2*nsShouldDec2),
+		1: optimalRuns3 = (localShouldDec3*ewShouldDec3*nsShouldDec3),
 
 		1: clk += (clk == Mvar+Nvar - 1)? (-(Mvar+Nvar-1)): 1,
 		1: clk2 = 1
@@ -297,7 +340,7 @@ process arbiter0(){
 
 			tick {= noc[0].localLockedns = !nsNotFull(2),  //Sets the priority to false if it was able to send to the ns buffer of the NoC in the y direction
 				noc[0].localPriority = !nsNotFull(2) || noc[0].localPriority,		//Local gets priority if it is unable to send
-				noc[0].localLen -= nsNotFull1(2),     //Local sends a flit ns if the receiving buffer is not full
+				localShouldDec0 = nsNotFull1(2),     //Local sends a flit ns if the receiving buffer is not full
 				nsShouldInc2 = (nsNotFull1(2)),  //The ns direction receives the flit if it is not already full
 				nsShouldDec0 = (nsNotEmpty1(0))						//The ns buffer sends a flit to local if it is not empty
 				//totalFlitsDelivered0 += nsNotEmpty1(0)
@@ -309,7 +352,7 @@ process arbiter0(){
 
 			tick {=  		noc[0].localLockedew = !ewNotFull(1), // Local is locked it if has a flit and is unable to send it
 							noc[0].localPriority = !ewNotFull(1) || noc[0].localPriority,  // Local gets priority under the same conditions		
-							noc[0].localLen -= (ewNotFull1(1)),  //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
+							localShouldDec0 = (ewNotFull1(1)),  //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
 							ewShouldInc1 = (ewNotFull1(1)), //The ew direction receives it under the same conditions
 							nsShouldDec0 = (nsNotEmpty1(0)) //The ns buffer sends a flit to local if it is not empty
 							//totalFlitsDelivered0 += nsNotEmpty1(0)	
@@ -324,7 +367,7 @@ process arbiter0(){
 				//Local sends in the NS direction
 				:(1/3):  {=  noc[0].localLockedns = localNotEmpty(0) && !nsNotFull(2), // Local is locked it if has a flit and is unable to send it
 							noc[0].localPriority = (localNotEmpty(0) && !nsNotFull(2)) || noc[0].localPriority,  // Local gets priority under the same conditions
-							noc[0].localLen -= (localNotEmpty1(0))*(nsNotFull1(2)),  //Local sends a flit to the ns direction if it is not empty and the receiving buffer is not full
+							localShouldDec0 = (localNotEmpty1(0))*(nsNotFull1(2)),  //Local sends a flit to the ns direction if it is not empty and the receiving buffer is not full
 					   		nsShouldInc2 = (nsNotFull1(2))*(localNotEmpty1(0)), //The ns direction receives the flit under the same conditions
 							nsShouldDec0 = (nsNotEmpty1(0))   //The ns buffer sends a flit to local if it is not empty	
 							//totalFlitsDelivered0 += nsNotEmpty1(0)
@@ -332,7 +375,7 @@ process arbiter0(){
 				//Local sends to the ew direction
 				:(2/3): {=  noc[0].localLockedew = localNotEmpty(0) && !ewNotFull(1), // Local is locked it if has a flit and is unable to send it
 							noc[0].localPriority = (localNotEmpty(0) && !ewNotFull(1)) || noc[0].localPriority,  // Local gets priority under the same conditions
-							noc[0].localLen -= (localNotEmpty1(0))*(ewNotFull1(1)),  //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
+							localShouldDec0 = (localNotEmpty1(0))*(ewNotFull1(1)),  //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
 							ewShouldInc1 = (ewNotFull1(1))*(localNotEmpty1(0)), //The ew direction receives it under the same conditions
 							nsShouldDec0 = (nsNotEmpty1(0)) //The ns buffer sends a flit to local if it is not empty
 							//totalFlitsDelivered0 += nsNotEmpty1(0)
@@ -350,7 +393,7 @@ process arbiter0(){
 
 				tick {= noc[0].localLockedns = !nsNotFull(2), 	//Local stays locked if it is unable to send
 					noc[0].localPriority = !nsNotFull(2),
-						noc[0].localLen -= nsNotFull1(2),  //Local sends if the ns direction is not already full
+						localShouldDec0 = nsNotFull1(2),  //Local sends if the ns direction is not already full
 						nsShouldInc2 = nsNotFull1(2), //The ns direction receives under the same conditions
 						noc[0].nsPriority = false,
 						noc[0].ewLockedns = true, 
@@ -365,7 +408,7 @@ process arbiter0(){
 			tick palt {
 			// Local and EW both send ns	
 			:(1/2):  {= noc[0].localLockedns = !nsNotFull(2), 	//Local stays locked if it is unable to send
-						noc[0].localLen -= nsNotFull1(2),  //Local sends if the ns direction is not already full
+						localShouldDec0 = nsNotFull1(2),  //Local sends if the ns direction is not already full
 						nsShouldInc2 = nsNotFull1(2), //The ns direction receives under the same conditions
 						nsShouldDec0 = (nsNotEmpty1(0)),   //The ns buffer sends a flit to local if it is not empty
 						noc[0].nsPriority = false,
@@ -377,7 +420,7 @@ process arbiter0(){
 			 //Local sends ns, and EW sends to to local
 			:(1/2):  {= noc[0].localLockedns =  !nsNotFull(2),  //Local stays locked if it is unable to send
 						noc[0].localPriority = !(nsNotFull(2) && nsNotEmpty(0)), //Local only loses priority if it sends and ew doesn't
-						noc[0].localLen -= (nsNotFull1(2)),  //Local sends ns if it isn't empty and ns isn't full
+						localShouldDec0 = (nsNotFull1(2)),  //Local sends ns if it isn't empty and ns isn't full
 						nsShouldInc2 = (nsNotFull1(2)), //Ns receives under the same conditions
 						ewShouldDec0 = nsNotEmpty0(0), 	//Ew sends if the ns buffer is empty
 						noc[0].ewLockedlocal = nsNotEmpty(0), 	//Local is locked if the ns buffer is not empty
@@ -397,15 +440,15 @@ process arbiter0(){
 				//Local has a 1 or 3 and EW has a 2
 				tick {= noc[0].localLockedew = !ewNotFull(1), //Local is locked in the ew direction if it is unable to send
 							noc[0].localPriority = !(ewNotFull(1) && !nsNotFull(2)), //Local remains in priority under the same conditions
-							noc[0].localLen -= (ewNotFull1(1)),  //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec0 = (ewNotFull1(1)),  //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc1 = (ewNotFull1(1)), //The ew direction recieves under the same conditions
 							ewShouldDec0 = (nsNotFull1(2)),  // Ew sends if the ns direction is not full
 							noc[0].ewLockedns = !nsNotFull(2), // Ew is locked to ns if it is unable to send
 							nsShouldInc2 = (nsNotFull1(2)), //The ns direction receives if it is not full
 							noc[0].nsPriority = nsNotFull(2),  //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec0 = (nsNotEmpty1(0)), // Ns sends if it is not empty
+							nsShouldDec0 = (nsNotEmpty1(0)) // Ns sends if it is not empty
 							//totalFlitsDelivered0 += nsNotEmpty1(0),
-							optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+							//optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 
 				=} 
 
@@ -419,7 +462,7 @@ process arbiter0(){
 				//Local has a 1 or 3 and EW has a 0	
 				:(1/2):  {= noc[0].localLockedew = !ewNotFull(1), //Local is locked in the ew direction if it is unable to send
 							noc[0].localPriority = !(ewNotFull(1) && nsNotEmpty(0)), //Local remains in priority under the same conditions
-							noc[0].localLen -= (ewNotFull1(1)),  //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec0 = (ewNotFull1(1)),  //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc1 = (ewNotFull1(1)), //The ew direction receives under the same conditions
 							noc[0].ewLockedlocal = nsNotEmpty(0), //The ew buffer is locked into the local direction if the ns buffer is not empty
 							noc[0].nsPriority = !nsNotEmpty(0),  //The ns buffer remains in priority if it is empty
@@ -431,15 +474,15 @@ process arbiter0(){
 				//Local has a 1 or 3 and EW has a 2
 				:(1/2):  {= noc[0].localLockedew = !ewNotFull(1), //Local is locked in the ew direction if it is unable to send
 							noc[0].localPriority = !(ewNotFull(1) && !nsNotFull(2)), //Local remains in priority under the same conditions
-							noc[0].localLen -= (ewNotFull1(1)),  //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec0 = (ewNotFull1(1)),  //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc1 = (ewNotFull1(1)), //The ew direction recieves under the same conditions
 							ewShouldDec0 = (nsNotFull1(2)),  // Ew sends if the ns direction is not full
 							noc[0].ewLockedns = !nsNotFull(2), // Ew is locked to ns if it is unable to send
 							nsShouldInc2 = (nsNotFull1(2)), //The ns direction receives if it is not full
 							noc[0].nsPriority = nsNotFull(2),  //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec0 = (nsNotEmpty1(0)), // Ns sends if it is not empty
+							nsShouldDec0 = (nsNotEmpty1(0)) // Ns sends if it is not empty
 							//totalFlitsDelivered0 += nsNotEmpty1(0),
-							optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+							//optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 				=} 
 
 
@@ -459,7 +502,7 @@ process arbiter0(){
 				:(1/3): {=	noc[0].ewLockedns = (localNotEmpty(0)) || (!localNotEmpty(0) && nsNotFull(2)),                //The ew buffer gets locked in the ns direction if local is not empty 
 							noc[0].localPriority = (localNotEmpty(0) && !nsNotFull(2)) || (!localNotEmpty(0) && nsNotFull(2)),   //Local remains in priority if it is non-empty and is unable to send
 							noc[0].localLockedns = (localNotEmpty(0) && !nsNotFull(2)), // Local gets locked to ns under the same conditions
-							noc[0].localLen -= (localNotEmpty1(0))*(nsNotFull1(2)),  	//Local sends the ns direction if it is not empty, and the receiving buffer is not full
+							localShouldDec0 = (localNotEmpty1(0))*(nsNotFull1(2)),  	//Local sends the ns direction if it is not empty, and the receiving buffer is not full
 							nsShouldInc2 = (nsNotFull1(2)),   //The ns direction receives if it is not full (either from ew or local)
 							ewShouldDec0 = localNotEmpty0(0)*(nsNotFull1(2)),		//Ew sends if local is empty and the ns direction is not full
 							nsShouldDec0 = (nsNotEmpty1(0)), 		//Ns sends local if it is not empty
@@ -470,15 +513,15 @@ process arbiter0(){
 				//Local has a 1 or 3 and EW has a 2
 				:(2/3):  {= noc[0].localLockedew = localNotEmpty(0) && !ewNotFull(1), //Local is locked in the ew direction if it is unable to send
 							noc[0].localPriority = (localNotEmpty(0) && !ewNotFull(1)) || (!localNotEmpty(0) && nsNotFull(2)) || ( (localNotEmpty(0) && ewNotFull(1) && (nsNotFull(2)))), //Local remains in priority under the same conditions
-							noc[0].localLen -= (localNotEmpty1(0))*(ewNotFull1(1)),  //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec0 = (localNotEmpty1(0))*(ewNotFull1(1)),  //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc1 = (ewNotFull1(1))*(localNotEmpty1(0)), //The ew direction recieves under the same conditions
 							ewShouldDec0 = (nsNotFull1(2)),  // Ew sends if the ns direction is not full
 							noc[0].ewLockedns = !nsNotFull(2), // Ew is locked to ns if it is unable to send
 							nsShouldInc2 = (nsNotFull1(2)), //The ns direction receives if it is not full
 							noc[0].nsPriority = nsNotFull(2),  //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec0 = (nsNotEmpty1(0)), // Ns sends if it is not empty
+							nsShouldDec0 = (nsNotEmpty1(0)) // Ns sends if it is not empty
 							//totalFlitsDelivered0 += nsNotEmpty1(0),
-							optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+							//optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 				=} 
 
 
@@ -494,7 +537,7 @@ process arbiter0(){
 				:(1/6):  {= noc[0].ewLockedns = (localNotEmpty(0)) || (!localNotEmpty(0) && nsNotFull(2)),                //The ew buffer gets locked in the ns direction if local is not empty 
 							noc[0].localPriority = (localNotEmpty(0) && !nsNotFull(2)) || (!localNotEmpty(0) && nsNotFull(2)),   //Local remains in priority if it is non-empty and is unable to send
 							noc[0].localLockedns = (localNotEmpty(0) && !nsNotFull(2)), // Local gets locked to ns under the same conditions
-							noc[0].localLen -= (localNotEmpty1(0))*(nsNotFull1(2)),  	//Local sends the ns direction if it is not empty, and the receiving buffer is not full
+							localShouldDec0 = (localNotEmpty1(0))*(nsNotFull1(2)),  	//Local sends the ns direction if it is not empty, and the receiving buffer is not full
 							nsShouldInc2 = (nsNotFull1(2)),   //The ns direction receives if it is not full (either from ew or local)
 							ewShouldDec0 = localNotEmpty0(0)*(nsNotFull1(2)),		//Ew sends if local is empty and the ns direction is not full
 							nsShouldDec0 = (nsNotEmpty1(0)), 		//Ns sends local if it is not empty
@@ -505,7 +548,7 @@ process arbiter0(){
 				//Local Sends to 2, EW to 0
 				:(1/6):  {= noc[0].localLockedns = localNotEmpty(0) && !nsNotFull(2), //Local is locked in the ns direction if it is unable to send
 							noc[0].localPriority = (localNotEmpty(0) && !nsNotFull(2)) || (localNotEmpty(0) && !nsNotEmpty(0)) || ( ( (localNotEmpty(0)) && (nsNotFull(2)) ) && !nsNotEmpty(0)), //Local remains in priority under the same conditions
-							noc[0].localLen -= (localNotEmpty1(0))*(nsNotFull1(2)),  //Local sends the ns direction if it is not empty, and the receiving buffer is not full
+							localShouldDec0 = (localNotEmpty1(0))*(nsNotFull1(2)),  //Local sends the ns direction if it is not empty, and the receiving buffer is not full
 							nsShouldInc2 = (nsNotFull1(2))*(localNotEmpty1(0)), //The ns direction receives if it is not full and local is not empty
 							ewShouldDec0 = nsNotEmpty0(0), //Ew sends local if the ns buffer is empty
 							noc[0].ewLockedlocal = nsNotEmpty(0), //Ew gets locked to local if the ns buffer is not empty
@@ -518,7 +561,7 @@ process arbiter0(){
 				//Local has a 1 or 3 and EW has a 0	
 				:(1/3):  {= noc[0].localLockedew = localNotEmpty(0) && !ewNotFull(1), //Local is locked in the ew direction if it is unable to send
 							noc[0].localPriority = (localNotEmpty(0) && !ewNotFull(1)) || (localNotEmpty(0) && !nsNotEmpty(0)) || ( ( (localNotEmpty(0)) && (ewNotFull(1)) ) && !nsNotEmpty(0)), //Local remains in priority under the same conditions
-							noc[0].localLen -= (localNotEmpty1(0))*(ewNotFull1(1)),  //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec0 = (localNotEmpty1(0))*(ewNotFull1(1)),  //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc1 = (ewNotFull1(1))*(localNotEmpty1(0)), //The ew direction receives under the same conditions
 							noc[0].ewLockedlocal = nsNotEmpty(0), //The ew buffer is locked into the local direction if the ns buffer is not empty
 							noc[0].nsPriority = !nsNotEmpty(0),  //The ns buffer remains in priority if it is empty
@@ -530,15 +573,15 @@ process arbiter0(){
 				//Local has a 1 or 3 and EW has a 2
 				:(1/3):  {= noc[0].localLockedew = localNotEmpty(0) && !ewNotFull(1), //Local is locked in the ew direction if it is unable to send
 							noc[0].localPriority = (localNotEmpty(0) && !ewNotFull(1)) || (!localNotEmpty(0) && nsNotFull(2)) || ( (localNotEmpty(0) && ewNotFull(1) && (nsNotFull(2)))), //Local remains in priority under the same conditions
-							noc[0].localLen -= (localNotEmpty1(0))*(ewNotFull1(1)),  //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec0 = (localNotEmpty1(0))*(ewNotFull1(1)),  //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc1 = (ewNotFull1(1))*(localNotEmpty1(0)), //The ew direction recieves under the same conditions
 							ewShouldDec0 = (nsNotFull1(2)),  // Ew sends if the ns direction is not full
 							noc[0].ewLockedns = !nsNotFull(2), // Ew is locked to ns if it is unable to send
 							nsShouldInc2 = (nsNotFull1(2)), //The ns direction receives if it is not full
 							noc[0].nsPriority = nsNotFull(2),  //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec0 = (nsNotEmpty1(0)), // Ns sends if it is not empty
+							nsShouldDec0 = (nsNotEmpty1(0)) // Ns sends if it is not empty
 							//totalFlitsDelivered0 += nsNotEmpty1(0),
-							optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+							//optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 				=} 
 
 
@@ -557,7 +600,7 @@ process arbiter0(){
 							if (noc[0].ewLockedlocal) {
 								tick {= noc[0].localLockedns = !nsNotFull(2),
 									noc[0].localPriority = !nsNotFull(2),
-									noc[0].localLen -= (nsNotFull1(2)),  
+									localShouldDec0 = (nsNotFull1(2)),  
 									nsShouldInc2 = (nsNotFull1(2)), 
 									ewShouldDec0 = 1, 
 									noc[0].ewLockedlocal = false,
@@ -596,7 +639,7 @@ process arbiter0(){
 								//Local Sends to 2, EW to 0
 								:(1/2):  {= noc[0].localLockedns = !nsNotFull(2),
 											noc[0].localPriority = !nsNotFull(2),
-											noc[0].localLen -= (nsNotFull1(2)),  
+											localShouldDec0 = (nsNotFull1(2)),  
 											nsShouldInc2 = (nsNotFull1(2)), 
 											ewShouldDec0 = 1, 
 											//totalFlitsDelivered0 += 1,
@@ -617,7 +660,7 @@ process arbiter0(){
 							// Local Sens EW and EW sends local 
 							tick {=  noc[0].localLockedew = !ewNotFull(1),
 										noc[0].localPriority = !ewNotFull(1),
-										noc[0].localLen -= (ewNotFull1(1)),  
+										localShouldDec0 = (ewNotFull1(1)),  
 										ewShouldInc1 = (ewNotFull1(1)), 
 										noc[0].ewLockedlocal = false,
 										ewShouldDec0 = 1, 
@@ -633,14 +676,14 @@ process arbiter0(){
 							//Local sends EW and EW sends NS
 							tick {=  noc[0].localLockedew = !ewNotFull(1),
 										noc[0].localPriority = !ewNotFull(1) && nsNotFull(2),
-										noc[0].localLen -= (ewNotFull1(1)),  
+										localShouldDec0 = (ewNotFull1(1)),  
 										ewShouldInc1 = (ewNotFull1(1)), 
 										ewShouldDec0 = nsNotFull1(2), 
 										noc[0].ewLockedns = !nsNotFull(2),
 										nsShouldInc2 = nsNotFull1(2), 
-										nsShouldDec0 = (nsNotEmpty1(0)), 
+										nsShouldDec0 = (nsNotEmpty1(0)) 
 										//totalFlitsDelivered0 += nsNotEmpty1(0),
-										optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+										//optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 									=} 
 	
 
@@ -654,7 +697,7 @@ process arbiter0(){
 						//Local has a 1 or 3 and EW has a 0
 						:(1/2):  {= 		noc[0].localLockedew = !ewNotFull(1),
 										noc[0].localPriority = !ewNotFull(1),
-										noc[0].localLen -= (ewNotFull1(1)),  
+										localShouldDec0 = (ewNotFull1(1)),  
 										ewShouldInc1 = (ewNotFull1(1)), 
 										noc[0].ewLockedlocal = false,
 										ewShouldDec0 = 1, 
@@ -665,14 +708,14 @@ process arbiter0(){
 						//Local has a 1 or 3 and EW has a 2
 						:(1/2):  {= 		noc[0].localLockedew = !ewNotFull(1),
 										noc[0].localPriority = !ewNotFull(1) && nsNotFull(2),
-										noc[0].localLen -= (ewNotFull1(1)),  
+										localShouldDec0 = (ewNotFull1(1)),  
 										ewShouldInc1 = (ewNotFull1(1)), 
 										ewShouldDec0 = nsNotFull1(2), 
 										noc[0].ewLockedns = !nsNotFull(2),
 										nsShouldInc2 = nsNotFull1(2), 
-										nsShouldDec0 = (nsNotEmpty1(0)), 
+										nsShouldDec0 = (nsNotEmpty1(0)) 
 										//totalFlitsDelivered0 += nsNotEmpty1(0),
-										optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+										//optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 						=} 
 
 					}
@@ -692,7 +735,7 @@ process arbiter0(){
 						//Local sends NS and EW sends local
 						:(1/3):  {= noc[0].localLockedns = localNotEmpty(0) && !nsNotFull(2),
 									noc[0].localPriority = localNotEmpty(0) && !nsNotFull(2),
-									noc[0].localLen -= (localNotEmpty1(0))*(nsNotFull1(2)),  
+									localShouldDec0 = (localNotEmpty1(0))*(nsNotFull1(2)),  
 									nsShouldInc2 = (nsNotFull1(2))*(localNotEmpty1(0)), 
 									noc[0].ewLockedlocal = false,
 									ewShouldDec0 = 1, 
@@ -703,7 +746,7 @@ process arbiter0(){
 						// Local Sens EW and EW sends local 
 						:(2/3):  {=  noc[0].localLockedew = localNotEmpty(0) && !ewNotFull(1),
 									noc[0].localPriority = localNotEmpty(0) && !ewNotFull(1),
-									noc[0].localLen -= (localNotEmpty1(0))*(ewNotFull1(1)),  
+									localShouldDec0 = (localNotEmpty1(0))*(ewNotFull1(1)),  
 									ewShouldInc1 = (ewNotFull1(1))*(localNotEmpty1(0)), 
 									noc[0].ewLockedlocal = false,
 									ewShouldDec0 = 1, 
@@ -729,14 +772,14 @@ process arbiter0(){
 						//Local sends EW and EW sends NS
 						:(2/3):  {=  noc[0].localLockedew = localNotEmpty(0) && !ewNotFull(1),
 									noc[0].localPriority = localNotEmpty(0) && !ewNotFull(1) && nsNotFull(2),
-									noc[0].localLen -= (localNotEmpty1(0))*(ewNotFull1(1)),  
+									localShouldDec0 = (localNotEmpty1(0))*(ewNotFull1(1)),  
 									ewShouldInc1 = (ewNotFull1(1))*(localNotEmpty1(0)), 
 									ewShouldDec0 = nsNotFull1(2), 
 									noc[0].ewLockedns = !nsNotFull(2),
 									nsShouldInc2 = nsNotFull1(2), 
-									nsShouldDec0 = (nsNotEmpty1(0)),
+									nsShouldDec0 = (nsNotEmpty1(0))
 									//totalFlitsDelivered0 += nsNotEmpty1(0),
-									optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+									//optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 								=} 
 
 
@@ -759,7 +802,7 @@ process arbiter0(){
 					//Local Sends to 2, EW to 0
 					:(1/6):  {= 		noc[0].localLockedns = localNotEmpty(0) && !nsNotFull(2),
 									noc[0].localPriority = localNotEmpty(0) && !nsNotFull(2),
-									noc[0].localLen -= (localNotEmpty1(0))*(nsNotFull1(2)),  
+									localShouldDec0 = (localNotEmpty1(0))*(nsNotFull1(2)),  
 									nsShouldInc2 = (nsNotFull1(2))*(localNotEmpty1(0)), 
 									ewShouldDec0 = 1, 
 									//totalFlitsDelivered0 += 1,
@@ -770,7 +813,7 @@ process arbiter0(){
 					//Local has a 1 or 3 and EW has a 0
 					:(1/3):  {= 		noc[0].localLockedew = localNotEmpty(0) && !ewNotFull(1),
 									noc[0].localPriority = localNotEmpty(0) && !ewNotFull(1),
-									noc[0].localLen -= (localNotEmpty1(0))*(ewNotFull1(1)),  
+									localShouldDec0 = (localNotEmpty1(0))*(ewNotFull1(1)),  
 									ewShouldInc1 = (ewNotFull1(1))*(localNotEmpty1(0)), 
 									ewShouldDec0 = 1, 
 									//totalFlitsDelivered0 += 1,
@@ -780,14 +823,14 @@ process arbiter0(){
 					//Local has a 1 or 3 and EW has a 2
 					:(1/3):  {= 		noc[0].localLockedew = localNotEmpty(0) && !ewNotFull(1),
 									noc[0].localPriority = localNotEmpty(0) && !ewNotFull(1) && nsNotFull(2),
-									noc[0].localLen -= (localNotEmpty1(0))*(ewNotFull1(1)),  
+									localShouldDec0 = (localNotEmpty1(0))*(ewNotFull1(1)),  
 									ewShouldInc1 = (ewNotFull1(1))*(localNotEmpty1(0)), 
 									ewShouldDec0 = nsNotFull1(2), 
 									noc[0].ewLockedns = !nsNotFull(2),
 									nsShouldInc2 = nsNotFull1(2), 
-									nsShouldDec0 = (nsNotEmpty1(0)), 
+									nsShouldDec0 = (nsNotEmpty1(0))
 									//totalFlitsDelivered0 += nsNotEmpty1(0),
-									optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+									//optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 					=} 
 
 				}
@@ -830,7 +873,7 @@ process arbiter0(){
 					//Local Sends to 2, EW to 0
 			:(1/2):  {= noc[0].localPriority = !nsNotFull(2) && !nsNotEmpty(0),
 						noc[0].localLockedns = !nsNotFull(2),
-						noc[0].localLen -= nsNotFull1(2),  
+						localShouldDec0 = nsNotFull1(2),  
 						nsShouldInc2 = (nsNotFull1(2)), 
 						ewShouldDec0 = nsNotEmpty0(0),
 						noc[0].ewLockedns = nsNotEmpty(0),
@@ -853,15 +896,15 @@ process arbiter0(){
 						//Local sends EW and EW sends NS
 						tick {=  noc[0].localPriority = !ewNotFull(1) && nsNotFull(2),
 									noc[0].localLockedew = !ewNotFull(1),
-									noc[0].localLen -= (ewNotFull1(1)),  
+									localShouldDec0 = (ewNotFull1(1)),  
 									ewShouldInc1 = (ewNotFull1(1)), 
 									noc[0].ewLockedns = !nsNotFull(2),
 									ewShouldDec0 = nsNotFull1(2), 
 									nsShouldInc2 = nsNotFull1(2), 
 									nsShouldDec0 = (nsNotEmpty1(0)), 
 									//totalFlitsDelivered0 += nsNotEmpty1(0),
-									noc[0].nsPriority = nsNotFull(2),
-									optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+									noc[0].nsPriority = nsNotFull(2)
+									//optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 								=} 
 
 
@@ -876,7 +919,7 @@ process arbiter0(){
 						//Local has a 1 or 3 and EW has a 0
 						:(1/2):  {=  noc[0].localPriority = !ewNotFull(1) && !nsNotEmpty(0), 
 									noc[0].localLockedew = !ewNotFull(1),
-									noc[0].localLen -= (ewNotFull1(1)),  
+									localShouldDec0 = (ewNotFull1(1)),  
 									ewShouldInc1 = (ewNotFull1(1)), 
 									nsShouldDec0 = nsNotEmpty1(0),
 									noc[0].nsPriority = !nsNotEmpty(0), 
@@ -888,15 +931,15 @@ process arbiter0(){
 						//Local has a 1 or 3 and EW has a 2
 						:(1/2):  {= noc[0].localPriority = !ewNotFull(1) && nsNotFull(2),
 									noc[0].localLockedew = !ewNotFull(1),
-									noc[0].localLen -= (ewNotFull1(1)),  
+									localShouldDec0 = (ewNotFull1(1)),  
 									ewShouldInc1 = (ewNotFull1(1)), 
 									noc[0].ewLockedns = !nsNotFull(2),
 									ewShouldDec0 = nsNotFull1(2), 
 									nsShouldInc2 = nsNotFull1(2), 
 									nsShouldDec0 = (nsNotEmpty1(0)), 
 									//totalFlitsDelivered0 += nsNotEmpty1(0),
-									noc[0].nsPriority = nsNotFull(2),
-									optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+									noc[0].nsPriority = nsNotFull(2)
+									//optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 								=}  
 
 
@@ -924,15 +967,15 @@ process arbiter0(){
 						//Local sends EW and EW sends NS
 						:(2/3):  {=  noc[0].localPriority = localNotEmpty(0) && !ewNotFull(1) && nsNotFull(2),
 									noc[0].localLockedew = localNotEmpty(0) && !ewNotFull(1),
-									noc[0].localLen -= (localNotEmpty1(0))*(ewNotFull1(1)),  
+									localShouldDec0 = (localNotEmpty1(0))*(ewNotFull1(1)),  
 									ewShouldInc1 = (ewNotFull1(1))*(localNotEmpty1(0)), 
 									noc[0].ewLockedns = !nsNotFull(2),
 									ewShouldDec0 = nsNotFull1(2), 
 									nsShouldInc2 = nsNotFull1(2), 
 									nsShouldDec0 = (nsNotEmpty1(0)), 
 									//totalFlitsDelivered0 += nsNotEmpty1(0),
-									noc[0].nsPriority = nsNotFull(2),
-									optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+									noc[0].nsPriority = nsNotFull(2)
+									//optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 								=} 
 
 
@@ -955,7 +998,7 @@ process arbiter0(){
 						//Local Sends to 2, EW to 0
 						:(1/6):  {= noc[0].localPriority = !nsNotFull(2) && localNotEmpty(0) && !nsNotEmpty(0), 
 									noc[0].localLockedns = localNotEmpty(0) && !nsNotFull(2),
-									noc[0].localLen -= (localNotEmpty1(0))*(nsNotFull1(2)),  
+									localShouldDec0 = (localNotEmpty1(0))*(nsNotFull1(2)),  
 									nsShouldInc2 = (nsNotFull1(2))*(localNotEmpty1(0)), 
 									ewShouldDec0 = nsNotEmpty0(0),
 									noc[0].ewLockedlocal = nsNotEmpty(0),
@@ -968,7 +1011,7 @@ process arbiter0(){
 						//Local has a 1 or 3 and EW has a 0
 						:(1/3):  {=  noc[0].localPriority = !ewNotFull(1) && localNotEmpty(0) && !nsNotEmpty(0), 
 									noc[0].localLockedew = localNotEmpty(0) && !ewNotFull(1),
-									noc[0].localLen -= (localNotEmpty1(0))*(ewNotFull1(1)),  
+									localShouldDec0 = (localNotEmpty1(0))*(ewNotFull1(1)),  
 									ewShouldInc1 = (ewNotFull1(1))*(localNotEmpty1(0)), 
 									nsShouldDec0 = nsNotEmpty1(0),
 									noc[0].nsPriority = !nsNotEmpty(0), 
@@ -980,15 +1023,15 @@ process arbiter0(){
 						//Local has a 1 or 3 and EW has a 2
 						:(1/3):  {= noc[0].localPriority = localNotEmpty(0) && !ewNotFull(1) && nsNotFull(2),
 									noc[0].localLockedew = localNotEmpty(0) && !ewNotFull(1),
-									noc[0].localLen -= (localNotEmpty1(0))*(ewNotFull1(1)),  
+									localShouldDec0 = (localNotEmpty1(0))*(ewNotFull1(1)),  
 									ewShouldInc1 = (ewNotFull1(1))*(localNotEmpty1(0)), 
 									noc[0].ewLockedns = !nsNotFull(2),
 									ewShouldDec0 = nsNotFull1(2), 
 									nsShouldInc2 = nsNotFull1(2), 
 									nsShouldDec0 = (nsNotEmpty1(0)), 
 									//totalFlitsDelivered0 += nsNotEmpty1(0),
-									noc[0].nsPriority = nsNotFull(2),
-									optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+									noc[0].nsPriority = nsNotFull(2)
+									//optimalRuns0 += localNotEmpty1(0)*ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 								=}  
 
 
@@ -1008,7 +1051,7 @@ process arbiter0(){
 						 //Local sends NS and EW sends local
 								tick {= noc[0].localPriority = true, 
 									noc[0].localLockedns = !nsNotFull(2), 
-									noc[0].localLen -= (nsNotFull1(2)),
+									localShouldDec0 = (nsNotFull1(2)),
 									nsShouldInc2 = (nsNotFull1(2)), 
 									ewShouldDec0 = 1, 
 									noc[0].ewLockedlocal = false,
@@ -1022,7 +1065,7 @@ process arbiter0(){
 
 							tick {= noc[0].localPriority = !nsNotFull(2), 
 									noc[0].localLockedns = !nsNotFull(2), 
-									noc[0].localLen -= (nsNotFull1(2)),  
+									localShouldDec0 = (nsNotFull1(2)),  
 									nsShouldInc2 = (nsNotFull1(2)), 
 									noc[0].ewLockedns = true,
 									nsShouldDec0 = (nsNotEmpty1(0)), 
@@ -1041,7 +1084,7 @@ process arbiter0(){
 						//Local and EW both send to 2
 						:(1/2):  {= 	noc[0].localPriority = !nsNotFull(2), 
 									noc[0].localLockedns = !nsNotFull(2), 
-									noc[0].localLen -= (nsNotFull1(2)),  
+									localShouldDec0 = (nsNotFull1(2)),  
 									nsShouldInc2 = (nsNotFull1(2)), 
 									noc[0].ewLockedns = true,
 									nsShouldDec0 = (nsNotEmpty1(0)), 
@@ -1051,7 +1094,7 @@ process arbiter0(){
 						//Local Sends to 2, EW to 0
 						:(1/2):  {= noc[0].localPriority = true, 
 									noc[0].localLockedns = !nsNotFull(2), 
-									noc[0].localLen -= (nsNotFull1(2)),
+									localShouldDec0 = (nsNotFull1(2)),
 									nsShouldInc2 = (nsNotFull1(2)), 
 									ewShouldDec0 = 1, 
 									noc[0].ewLockedlocal = false,
@@ -1072,7 +1115,7 @@ process arbiter0(){
 						// Local Sends EW and EW sends local
 					tick {= 	noc[0].localPriority = true, 
 						noc[0].localLockedew = !ewNotFull(1),
-						noc[0].localLen -= (ewNotFull1(1)),  
+						localShouldDec0 = (ewNotFull1(1)),  
 						ewShouldInc1 = (ewNotFull1(1)), 
 						ewShouldDec0 = 1, 
 						noc[0].ewLockedlocal = false,
@@ -1090,15 +1133,15 @@ process arbiter0(){
 								//Local has a 1 or 3 and EW has a 2
 						tick {=  		noc[0].localPriority = !(ewNotFull(1) && !nsNotFull(2)), 
 									noc[0].localLockedew = !ewNotFull(1),
-									noc[0].localLen -= (ewNotFull1(1)),  
+									localShouldDec0 = (ewNotFull1(1)),  
 									ewShouldInc1 = (ewNotFull1(1)), 
 									ewShouldDec0 = (nsNotFull1(2)), 
 									noc[0].ewLockedns = !nsNotFull(2),
 									nsShouldInc2 = (nsNotFull1(2)), 
 									nsShouldDec0 = (nsNotEmpty1(0)), 
-									noc[0].nsPriority = false,
+									noc[0].nsPriority = false
 									//totalFlitsDelivered0 += nsNotEmpty1(0),
-									optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+									//optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 								=}  
 
 
@@ -1114,7 +1157,7 @@ process arbiter0(){
 						//Local has a 1 or 3 and EW has a 0
 						:(1/2):  {= 	noc[0].localPriority = true, 
 									noc[0].localLockedew = !ewNotFull(1),
-									noc[0].localLen -= (ewNotFull1(1)),  
+									localShouldDec0 = (ewNotFull1(1)),  
 									ewShouldInc1 = (ewNotFull1(1)), 
 									ewShouldDec0 = 1, 
 									noc[0].ewLockedlocal = false,
@@ -1124,15 +1167,15 @@ process arbiter0(){
 						//Local has a 1 or 3 and EW has a 2
 						:(1/2):  {=  noc[0].localPriority = !(ewNotFull(1) && !nsNotFull(2)), 
 									noc[0].localLockedew = !ewNotFull(1),
-									noc[0].localLen -= (ewNotFull1(1)),  
+									localShouldDec0 = (ewNotFull1(1)),  
 									ewShouldInc1 = (ewNotFull1(1)), 
 									ewShouldDec0 = (nsNotFull1(2)), 
 									noc[0].ewLockedns = !nsNotFull(2),
 									nsShouldInc2 = (nsNotFull1(2)), 
 									nsShouldDec0 = (nsNotEmpty1(0)), 
-									noc[0].nsPriority = false,
+									noc[0].nsPriority = false
 									//totalFlitsDelivered0 += nsNotEmpty1(0),
-									optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
+									//optimalRuns0 += ewNotFull1(1)*nsNotFull1(2)*nsNotEmpty1(0)
 								=}  
 
 
@@ -1150,7 +1193,7 @@ process arbiter0(){
 						 //Local sends NS and EW sends local
 						:(1/3):  tick {= noc[0].localPriority = true, 
 									noc[0].localLockedns = localNotEmpty(0) && !nsNotFull(2), 
-									noc[0].localLen -= (nsNotFull1(2))*(localNotEmpty1(0)),
+									localShouldDec0 = (nsNotFull1(2))*(localNotEmpty1(0)),
 									nsShouldInc2 = (nsNotFull1(2))*(localNotEmpty1(0)), 
 									ewShouldDec0 = 1,
 									noc[0].ewLockedlocal = false, 
@@ -1160,7 +1203,7 @@ process arbiter0(){
 						// Local Sends EW and EW sends local
 						:(2/3):  tick {= noc[0].localPriority = true, 
 									noc[0].localLockedew = localNotEmpty(0) && !ewNotFull(1),
-									noc[0].localLen -= (localNotEmpty1(0))*(ewNotFull1(1)),  
+									localShouldDec0 = (localNotEmpty1(0))*(ewNotFull1(1)),  
 									ewShouldInc1 = (ewNotFull1(1))*(localNotEmpty1(0)), 
 									ewShouldDec0 = 1, 
 									noc[0].ewLockedlocal = false,
@@ -1179,7 +1222,7 @@ process arbiter0(){
 						//Local and EW both send to 2
 						:(1/3):  {= noc[0].localPriority = (localNotEmpty(0) && !nsNotFull(2)) || (!localNotEmpty(0) && nsNotFull(2)), 
 									noc[0].localLockedns = localNotEmpty(0) && !nsNotFull(2), 
-									noc[0].localLen -= (localNotEmpty1(0))*(nsNotFull1(2)),  
+									localShouldDec0 = (localNotEmpty1(0))*(nsNotFull1(2)),  
 									nsShouldInc2 = (nsNotFull1(2)), 
 									noc[0].ewLockedns = localNotEmpty(0) || (!localNotEmpty(0) && !nsNotFull(2)),
 									ewShouldDec0 = localNotEmpty0(0)*nsNotFull1(2),
@@ -1190,15 +1233,15 @@ process arbiter0(){
 								//Local has a 1 or 3 and EW has a 2
 						:(2/3):  {=  noc[0].localPriority = (!ewNotFull(1) && localNotEmpty(0)) || (!localNotEmpty(0) && nsNotFull(2)) || (ewNotFull(1) && localNotEmpty(0) && nsNotFull(2)), 
 									noc[0].localLockedew = localNotEmpty(0) && !ewNotFull(1),
-									noc[0].localLen -= (localNotEmpty1(0))*(ewNotFull1(1)),  
+									localShouldDec0 = (localNotEmpty1(0))*(ewNotFull1(1)),  
 									ewShouldInc1 = (ewNotFull1(1))*(localNotEmpty1(0)), 
 									ewShouldDec0 = (nsNotFull1(2)), 
 									noc[0].ewLockedns = !nsNotFull(2),
 									nsShouldInc2 = (nsNotFull1(2)), 
 									nsShouldDec0 = (nsNotEmpty1(0)), 
-									noc[0].nsPriority = false,
+									noc[0].nsPriority = false
 									//totalFlitsDelivered0 += nsNotEmpty1(0),
-									optimalRuns0 += ewNotFull1(1)*localNotEmpty1(0)*nsNotFull1(2)*nsNotEmpty1(0)
+									//optimalRuns0 += ewNotFull1(1)*localNotEmpty1(0)*nsNotFull1(2)*nsNotEmpty1(0)
 								=}  
 						}
 
@@ -1213,7 +1256,7 @@ process arbiter0(){
 						//Local and EW both send to 2
 						:(1/6):  {= noc[0].localPriority = (localNotEmpty(0) && !nsNotFull(2)) || (!localNotEmpty(0) && nsNotFull(2)), 
 									noc[0].localLockedns = localNotEmpty(0) && !nsNotFull(2), 
-									noc[0].localLen -= (localNotEmpty1(0))*(nsNotFull1(2)),  
+									localShouldDec0 = (localNotEmpty1(0))*(nsNotFull1(2)),  
 									nsShouldInc2 = (nsNotFull1(2)), 
 									noc[0].ewLockedns = localNotEmpty(0) || (!localNotEmpty(0) && !nsNotFull(2)),
 									ewShouldDec0 = localNotEmpty0(0)*nsNotFull1(2),
@@ -1224,7 +1267,7 @@ process arbiter0(){
 						//Local Sends to 2, EW to 0
 						:(1/6):  {= noc[0].localPriority = true, 
 									noc[0].localLockedns = localNotEmpty(0) && !nsNotFull(2), 
-									noc[0].localLen -= (nsNotFull1(2))*(localNotEmpty1(0)),
+									localShouldDec0 = (nsNotFull1(2))*(localNotEmpty1(0)),
 									nsShouldInc2 = (nsNotFull1(2))*(localNotEmpty1(0)), 
 									ewShouldDec0 = 1,
 									noc[0].ewLockedlocal = false, 
@@ -1236,7 +1279,7 @@ process arbiter0(){
 						//Local has a 1 or 3 and EW has a 0
 						:(1/3):  {= noc[0].localPriority = true, 
 									noc[0].localLockedew = localNotEmpty(0) && !ewNotFull(1),
-									noc[0].localLen -= (localNotEmpty1(0))*(ewNotFull1(1)),  
+									localShouldDec0 = (localNotEmpty1(0))*(ewNotFull1(1)),  
 									ewShouldInc1 = (ewNotFull1(1))*(localNotEmpty1(0)), 
 									ewShouldDec0 = 1, 
 									noc[0].ewLockedlocal = false,
@@ -1246,15 +1289,15 @@ process arbiter0(){
 						//Local has a 1 or 3 and EW has a 2
 						:(1/3):  {=  noc[0].localPriority = (!ewNotFull(1) && localNotEmpty(0)) || (!localNotEmpty(0) && nsNotFull(2)) || (ewNotFull(1) && localNotEmpty(0) && nsNotFull(2)), 
 									noc[0].localLockedew = localNotEmpty(0) && !ewNotFull(1),
-									noc[0].localLen -= (localNotEmpty1(0))*(ewNotFull1(1)),  
+									localShouldDec0 = (localNotEmpty1(0))*(ewNotFull1(1)),  
 									ewShouldInc1 = (ewNotFull1(1))*(localNotEmpty1(0)), 
 									ewShouldDec0 = (nsNotFull1(2)), 
 									noc[0].ewLockedns = !nsNotFull(2),
 									nsShouldInc2 = (nsNotFull1(2)), 
 									nsShouldDec0 = (nsNotEmpty1(0)), 
-									noc[0].nsPriority = false,
+									noc[0].nsPriority = false
 									//totalFlitsDelivered0 += nsNotEmpty1(0),
-									optimalRuns0 += ewNotFull1(1)*localNotEmpty1(0)*nsNotFull1(2)*nsNotEmpty1(0)
+									//optimalRuns0 += ewNotFull1(1)*localNotEmpty1(0)*nsNotFull1(2)*nsNotEmpty1(0)
 								=}  
 
 
@@ -1281,7 +1324,7 @@ process arbiter1(){
 
 			tick {= noc[1].localLockedns = !nsNotFull(3),   //Sets the priority to false if it was able to send to the ns buffer of the NoC in the y direction
 				noc[1].localPriority = !nsNotFull(3) || noc[1].localPriority, 		//Local gets priority if it is unable to send
-				noc[1].localLen -= nsNotFull1(3),      //Local sends a flit ns if the receiving buffer is not full
+				localShouldDec1 = nsNotFull1(3),      //Local sends a flit ns if the receiving buffer is not full
 				nsShouldInc3 = (nsNotFull1(3)),   //The ns direction receives the flit if it is not already full
 				nsShouldDec1 = (nsNotEmpty1(1)) 						//The ns buffer sends a flit to local if it is not empty
 				//totalFlitsDelivered1 += nsNotEmpty1(1)
@@ -1293,7 +1336,7 @@ process arbiter1(){
 
 			tick {=  			noc[1].localLockedew = !ewNotFull(0),  // Local is locked it if has a flit and is unable to send it
 							noc[1].localPriority = !ewNotFull(0) || noc[1].localPriority,   // Local gets priority under the same conditions		
-							noc[1].localLen -= (ewNotFull1(0)),   //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
+							localShouldDec1 = (ewNotFull1(0)),   //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
 							ewShouldInc0 = (ewNotFull1(0)),  //The ew direction receives it under the same conditions
 							nsShouldDec1 = (nsNotEmpty1(1))  //The ns buffer sends a flit to local if it is not empty
 							//totalFlitsDelivered1 += nsNotEmpty1(1)	
@@ -1308,7 +1351,7 @@ process arbiter1(){
 				//Local sends in the NS direction
 				:(1/3): {=  noc[1].localLockedns = localNotEmpty(1) && !nsNotFull(3),  // Local is locked it if has a flit and is unable to send it
 							noc[1].localPriority = (localNotEmpty(1) && !nsNotFull(3)) || noc[1].localPriority,   // Local gets priority under the same conditions
-							noc[1].localLen -= (localNotEmpty1(1))*(nsNotFull1(3)),   //Local sends a flit to the ns direction if it is not empty and the receiving buffer is not full
+							localShouldDec1 = (localNotEmpty1(1))*(nsNotFull1(3)),   //Local sends a flit to the ns direction if it is not empty and the receiving buffer is not full
 					   		nsShouldInc3 = (nsNotFull1(3))*(localNotEmpty1(1)),  //The ns direction receives the flit under the same conditions
 							nsShouldDec1 = (nsNotEmpty1(1))    //The ns buffer sends a flit to local if it is not empty	
 							//totalFlitsDelivered1 += nsNotEmpty1(1)
@@ -1316,7 +1359,7 @@ process arbiter1(){
 				//Local sends to the ew direction
 				:(2/3): {=  noc[1].localLockedew = localNotEmpty(1) && !ewNotFull(0),  // Local is locked it if has a flit and is unable to send it
 							noc[1].localPriority = (localNotEmpty(1) && !ewNotFull(0)) || noc[1].localPriority,   // Local gets priority under the same conditions
-							noc[1].localLen -= (localNotEmpty1(1))*(ewNotFull1(0)),   //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
+							localShouldDec1 = (localNotEmpty1(1))*(ewNotFull1(0)),   //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
 							ewShouldInc0 = (ewNotFull1(0))*(localNotEmpty1(1)),  //The ew direction receives it under the same conditions
 							nsShouldDec1 = (nsNotEmpty1(1))  //The ns buffer sends a flit to local if it is not empty
 							//totalFlitsDelivered1 += nsNotEmpty1(1)
@@ -1334,7 +1377,7 @@ process arbiter1(){
 
 				tick {= noc[1].localLockedns = !nsNotFull(3),  	//Local stays locked if it is unable to send
 					noc[1].localPriority = !nsNotFull(3), 
-						noc[1].localLen -= nsNotFull1(3),   //Local sends if the ns direction is not already full
+						localShouldDec1 = nsNotFull1(3),   //Local sends if the ns direction is not already full
 						nsShouldInc3 = nsNotFull1(3),  //The ns direction receives under the same conditions
 						noc[1].nsPriority = false, 
 						noc[1].ewLockedns = true,  
@@ -1348,7 +1391,7 @@ process arbiter1(){
 			tick palt {
 			// Local and EW both send ns	
 			:(1/2):  {= noc[1].localLockedns = !nsNotFull(3),  	//Local stays locked if it is unable to send
-						noc[1].localLen -= nsNotFull1(3),   //Local sends if the ns direction is not already full
+						localShouldDec1 = nsNotFull1(3),   //Local sends if the ns direction is not already full
 						nsShouldInc3 = nsNotFull1(3),  //The ns direction receives under the same conditions
 						nsShouldDec1 = (nsNotEmpty1(1)),    //The ns buffer sends a flit to local if it is not empty
 						noc[1].nsPriority = false, 
@@ -1360,7 +1403,7 @@ process arbiter1(){
 			 //Local sends ns,  and EW sends to to local
 			:(1/2):  {= noc[1].localLockedns =  !nsNotFull(3),   //Local stays locked if it is unable to send
 						noc[1].localPriority = !(nsNotFull(3) && nsNotEmpty(1)),  //Local only loses priority if it sends and ew doesn't
-						noc[1].localLen -= (nsNotFull1(3)),   //Local sends ns if it isn't empty and ns isn't full
+						localShouldDec1 = (nsNotFull1(3)),   //Local sends ns if it isn't empty and ns isn't full
 						nsShouldInc3 = (nsNotFull1(3)),  //Ns receives under the same conditions
 						ewShouldDec1 = nsNotEmpty0(1),  	//Ew sends if the ns buffer is empty
 				
@@ -1381,15 +1424,15 @@ process arbiter1(){
 				//Local has a 1 or 3 and EW has a 2
 				tick {= noc[1].localLockedew = !ewNotFull(0),  //Local is locked in the ew direction if it is unable to send
 							noc[1].localPriority = !(ewNotFull(0) && !nsNotFull(3)),  //Local remains in priority under the same conditions
-							noc[1].localLen -= (ewNotFull1(0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec1 = (ewNotFull1(0)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc0 = (ewNotFull1(0)),  //The ew direction recieves under the same conditions
 							ewShouldDec1 = (nsNotFull1(3)),   // Ew sends if the ns direction is not full
 							noc[1].ewLockedns = !nsNotFull(3),  // Ew is locked to ns if it is unable to send
 							nsShouldInc3 = (nsNotFull1(3)),  //The ns direction receives if it is not full
 							noc[1].nsPriority = nsNotFull(3),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec1 = (nsNotEmpty1(1)),  // Ns sends if it is not empty
+							nsShouldDec1 = (nsNotEmpty1(1))  // Ns sends if it is not empty
 							//totalFlitsDelivered1 += nsNotEmpty1(1), 
-							optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+							//optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 
 				=} 
 
@@ -1403,7 +1446,7 @@ process arbiter1(){
 				//Local has a 1 or 3 and EW has a 0	
 				:(1/2):  {= noc[1].localLockedew = !ewNotFull(0),  //Local is locked in the ew direction if it is unable to send
 							noc[1].localPriority = !(ewNotFull(0) && nsNotEmpty(1)),  //Local remains in priority under the same conditions
-							noc[1].localLen -= (ewNotFull1(0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec1 = (ewNotFull1(0)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc0 = (ewNotFull1(0)),  //The ew direction receives under the same conditions
 							noc[1].ewLockedlocal = nsNotEmpty(1),  //The ew buffer is locked into the local direction if the ns buffer is not empty
 							noc[1].nsPriority = !nsNotEmpty(1),   //The ns buffer remains in priority if it is empty
@@ -1415,15 +1458,15 @@ process arbiter1(){
 				//Local has a 1 or 3 and EW has a 2
 				:(1/2):  {= noc[1].localLockedew = !ewNotFull(0),  //Local is locked in the ew direction if it is unable to send
 							noc[1].localPriority = !(ewNotFull(0) && !nsNotFull(3)),  //Local remains in priority under the same conditions
-							noc[1].localLen -= (ewNotFull1(0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec1 = (ewNotFull1(0)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc0 = (ewNotFull1(0)),  //The ew direction recieves under the same conditions
 							ewShouldDec1 = (nsNotFull1(3)),   // Ew sends if the ns direction is not full
 							noc[1].ewLockedns = !nsNotFull(3),  // Ew is locked to ns if it is unable to send
 							nsShouldInc3 = (nsNotFull1(3)),  //The ns direction receives if it is not full
 							noc[1].nsPriority = nsNotFull(3),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec1 = (nsNotEmpty1(1)),  // Ns sends if it is not empty
+							nsShouldDec1 = (nsNotEmpty1(1))  // Ns sends if it is not empty
 							//totalFlitsDelivered1 += nsNotEmpty1(1), 
-							optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+							//optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 				=} 
 
 
@@ -1443,7 +1486,7 @@ process arbiter1(){
 				:(1/3): {=	noc[1].ewLockedns = (localNotEmpty(1)) || (!localNotEmpty(1) && nsNotFull(3)),                 //The ew buffer gets locked in the ns direction if local is not empty 
 							noc[1].localPriority = (localNotEmpty(1) && !nsNotFull(3)) || (!localNotEmpty(1) && nsNotFull(3)),    //Local remains in priority if it is non-empty and is unable to send
 							noc[1].localLockedns = (localNotEmpty(1) && !nsNotFull(3)),  // Local gets locked to ns under the same conditions
-							noc[1].localLen -= (localNotEmpty1(1))*(nsNotFull1(3)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
+							localShouldDec1 = (localNotEmpty1(1))*(nsNotFull1(3)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
 							nsShouldInc3 = (nsNotFull1(3)),    //The ns direction receives if it is not full (either from ew or local)
 							ewShouldDec1 = localNotEmpty0(1)*(nsNotFull1(3)), 		//Ew sends if local is empty and the ns direction is not full
 							nsShouldDec1 = (nsNotEmpty1(1)),  		//Ns sends local if it is not empty
@@ -1454,15 +1497,15 @@ process arbiter1(){
 				//Local has a 1 or 3 and EW has a 2
 				:(2/3):  {= noc[1].localLockedew = localNotEmpty(1) && !ewNotFull(0),  //Local is locked in the ew direction if it is unable to send
 							noc[1].localPriority = (localNotEmpty(1) && !ewNotFull(0)) || (!localNotEmpty(1) && nsNotFull(3)) || ( (localNotEmpty(1) && ewNotFull(0) && (nsNotFull(3)))),  //Local remains in priority under the same conditions
-							noc[1].localLen -= (localNotEmpty1(1))*(ewNotFull1(0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec1 = (localNotEmpty1(1))*(ewNotFull1(0)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc0 = (ewNotFull1(0))*(localNotEmpty1(1)),  //The ew direction recieves under the same conditions
 							ewShouldDec1 = (nsNotFull1(3)),   // Ew sends if the ns direction is not full
 							noc[1].ewLockedns = !nsNotFull(3),  // Ew is locked to ns if it is unable to send
 							nsShouldInc3 = (nsNotFull1(3)),  //The ns direction receives if it is not full
 							noc[1].nsPriority = nsNotFull(3),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec1 = (nsNotEmpty1(1)),  // Ns sends if it is not empty
+							nsShouldDec1 = (nsNotEmpty1(1))  // Ns sends if it is not empty
 							//totalFlitsDelivered1 += nsNotEmpty1(1), 
-							optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+							//optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 				=} 
 
 
@@ -1478,7 +1521,7 @@ process arbiter1(){
 				:(1/6):  {= noc[1].ewLockedns = (localNotEmpty(1)) || (!localNotEmpty(1) && nsNotFull(3)),                 //The ew buffer gets locked in the ns direction if local is not empty 
 							noc[1].localPriority = (localNotEmpty(1) && !nsNotFull(3)) || (!localNotEmpty(1) && nsNotFull(3)),    //Local remains in priority if it is non-empty and is unable to send
 							noc[1].localLockedns = (localNotEmpty(1) && !nsNotFull(3)),  // Local gets locked to ns under the same conditions
-							noc[1].localLen -= (localNotEmpty1(1))*(nsNotFull1(3)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
+							localShouldDec1 = (localNotEmpty1(1))*(nsNotFull1(3)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
 							nsShouldInc3 = (nsNotFull1(3)),    //The ns direction receives if it is not full (either from ew or local)
 							ewShouldDec1 = localNotEmpty0(1)*(nsNotFull1(3)), 		//Ew sends if local is empty and the ns direction is not full
 							nsShouldDec1 = (nsNotEmpty1(1)),  		//Ns sends local if it is not empty
@@ -1489,7 +1532,7 @@ process arbiter1(){
 				//Local Sends to 2,  EW to 0
 				:(1/6):  {= noc[1].localLockedns = localNotEmpty(1) && !nsNotFull(3),  //Local is locked in the ns direction if it is unable to send
 							noc[1].localPriority = (localNotEmpty(1) && !nsNotFull(3)) || (localNotEmpty(1) && !nsNotEmpty(1)) || ( ( (localNotEmpty(1)) && (nsNotFull(3)) ) && !nsNotEmpty(1)),  //Local remains in priority under the same conditions
-							noc[1].localLen -= (localNotEmpty1(1))*(nsNotFull1(3)),   //Local sends the ns direction if it is not empty,  and the receiving buffer is not full
+							localShouldDec1 = (localNotEmpty1(1))*(nsNotFull1(3)),   //Local sends the ns direction if it is not empty,  and the receiving buffer is not full
 							nsShouldInc3 = (nsNotFull1(3))*(localNotEmpty1(1)),  //The ns direction receives if it is not full and local is not empty
 							ewShouldDec1 = nsNotEmpty0(1),  //Ew sends local if the ns buffer is empty
 							noc[1].ewLockedlocal = nsNotEmpty(1),  //Ew gets locked to local if the ns buffer is not empty
@@ -1502,7 +1545,7 @@ process arbiter1(){
 				//Local has a 1 or 3 and EW has a 0	
 				:(1/3):  {= noc[1].localLockedew = localNotEmpty(1) && !ewNotFull(0),  //Local is locked in the ew direction if it is unable to send
 							noc[1].localPriority = (localNotEmpty(1) && !ewNotFull(0)) || (localNotEmpty(1) && !nsNotEmpty(1)) || ( ( (localNotEmpty(1)) && (ewNotFull(0)) ) && !nsNotEmpty(1)),  //Local remains in priority under the same conditions
-							noc[1].localLen -= (localNotEmpty1(1))*(ewNotFull1(0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec1 = (localNotEmpty1(1))*(ewNotFull1(0)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc0 = (ewNotFull1(0))*(localNotEmpty1(1)),  //The ew direction receives under the same conditions
 							noc[1].ewLockedlocal = nsNotEmpty(1),  //The ew buffer is locked into the local direction if the ns buffer is not empty
 							noc[1].nsPriority = !nsNotEmpty(1),   //The ns buffer remains in priority if it is empty
@@ -1514,15 +1557,15 @@ process arbiter1(){
 				//Local has a 1 or 3 and EW has a 2
 				:(1/3):  {= noc[1].localLockedew = localNotEmpty(1) && !ewNotFull(0),  //Local is locked in the ew direction if it is unable to send
 							noc[1].localPriority = (localNotEmpty(1) && !ewNotFull(0)) || (!localNotEmpty(1) && nsNotFull(3)) || ( (localNotEmpty(1) && ewNotFull(0) && (nsNotFull(3)))),  //Local remains in priority under the same conditions
-							noc[1].localLen -= (localNotEmpty1(1))*(ewNotFull1(0)),   //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec1 = (localNotEmpty1(1))*(ewNotFull1(0)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc0 = (ewNotFull1(0))*(localNotEmpty1(1)),  //The ew direction recieves under the same conditions
 							ewShouldDec1 = (nsNotFull1(3)),   // Ew sends if the ns direction is not full
 							noc[1].ewLockedns = !nsNotFull(3),  // Ew is locked to ns if it is unable to send
 							nsShouldInc3 = (nsNotFull1(3)),  //The ns direction receives if it is not full
 							noc[1].nsPriority = nsNotFull(3),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec1 = (nsNotEmpty1(1)),  // Ns sends if it is not empty
+							nsShouldDec1 = (nsNotEmpty1(1))  // Ns sends if it is not empty
 							//totalFlitsDelivered1 += nsNotEmpty1(1), 
-							optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+							//optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 				=} 
 
 
@@ -1541,7 +1584,7 @@ process arbiter1(){
 							if (noc[1].ewLockedlocal) {
 								tick {= noc[1].localLockedns = !nsNotFull(3), 
 									noc[1].localPriority = !nsNotFull(3), 
-									noc[1].localLen -= (nsNotFull1(3)),   
+									localShouldDec1 = (nsNotFull1(3)),   
 									nsShouldInc3 = (nsNotFull1(3)),  
 									ewShouldDec1 = 1,  
 									noc[1].ewLockedlocal = false, 
@@ -1580,7 +1623,7 @@ process arbiter1(){
 								//Local Sends to 2,  EW to 0
 								:(1/2):  {= noc[1].localLockedns = !nsNotFull(3), 
 											noc[1].localPriority = !nsNotFull(3), 
-											noc[1].localLen -= (nsNotFull1(3)),   
+											localShouldDec1 = (nsNotFull1(3)),   
 											nsShouldInc3 = (nsNotFull1(3)),  
 											ewShouldDec1 = 1,  
 											//totalFlitsDelivered1 += 1, 
@@ -1601,7 +1644,7 @@ process arbiter1(){
 							// Local Sens EW and EW sends local 
 							tick {=  noc[1].localLockedew = !ewNotFull(0), 
 										noc[1].localPriority = !ewNotFull(0), 
-										noc[1].localLen -= (ewNotFull1(0)),   
+										localShouldDec1 = (ewNotFull1(0)),   
 										ewShouldInc0 = (ewNotFull1(0)),  
 										noc[1].ewLockedlocal = false, 
 										ewShouldDec1 = 1,  
@@ -1617,14 +1660,14 @@ process arbiter1(){
 							//Local sends EW and EW sends NS
 							tick {=  noc[1].localLockedew = !ewNotFull(0), 
 										noc[1].localPriority = !ewNotFull(0) && nsNotFull(3), 
-										noc[1].localLen -= (ewNotFull1(0)),   
+										localShouldDec1 = (ewNotFull1(0)),   
 										ewShouldInc0 = (ewNotFull1(0)),  
 										ewShouldDec1 = nsNotFull1(3),  
 										noc[1].ewLockedns = !nsNotFull(3), 
 										nsShouldInc3 = nsNotFull1(3),  
-										nsShouldDec1 = (nsNotEmpty1(1)),  
+										nsShouldDec1 = (nsNotEmpty1(1))  
 										//totalFlitsDelivered1 += nsNotEmpty1(1), 
-										optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+										//optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 									=} 
 	
 
@@ -1638,7 +1681,7 @@ process arbiter1(){
 						//Local has a 1 or 3 and EW has a 0
 						:(1/2):  {= 		noc[1].localLockedew = !ewNotFull(0), 
 										noc[1].localPriority = !ewNotFull(0), 
-										noc[1].localLen -= (ewNotFull1(0)),   
+										localShouldDec1 = (ewNotFull1(0)),   
 										ewShouldInc0 = (ewNotFull1(0)),  
 										noc[1].ewLockedlocal = false, 
 										ewShouldDec1 = 1,  
@@ -1649,14 +1692,14 @@ process arbiter1(){
 						//Local has a 1 or 3 and EW has a 2
 						:(1/2):  {= 		noc[1].localLockedew = !ewNotFull(0), 
 										noc[1].localPriority = !ewNotFull(0) && nsNotFull(3), 
-										noc[1].localLen -= (ewNotFull1(0)),   
+										localShouldDec1 = (ewNotFull1(0)),   
 										ewShouldInc0 = (ewNotFull1(0)),  
 										ewShouldDec1 = nsNotFull1(3),  
 										noc[1].ewLockedns = !nsNotFull(3), 
 										nsShouldInc3 = nsNotFull1(3),  
-										nsShouldDec1 = (nsNotEmpty1(1)),  
+										nsShouldDec1 = (nsNotEmpty1(1))  
 										//totalFlitsDelivered1 += nsNotEmpty1(1), 
-										optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+										//optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 						=} 
 
 					}
@@ -1676,7 +1719,7 @@ process arbiter1(){
 						//Local sends NS and EW sends local
 						:(1/3):  {= noc[1].localLockedns = localNotEmpty(1) && !nsNotFull(3), 
 									noc[1].localPriority = localNotEmpty(1) && !nsNotFull(3), 
-									noc[1].localLen -= (localNotEmpty1(1))*(nsNotFull1(3)),   
+									localShouldDec1 = (localNotEmpty1(1))*(nsNotFull1(3)),   
 									nsShouldInc3 = (nsNotFull1(3))*(localNotEmpty1(1)), 
 									noc[1].ewLockedlocal = false, 
 									ewShouldDec1 = 1,  
@@ -1687,7 +1730,7 @@ process arbiter1(){
 						// Local Sens EW and EW sends local 
 						:(2/3):  {=  noc[1].localLockedew = localNotEmpty(1) && !ewNotFull(0), 
 									noc[1].localPriority = localNotEmpty(1) && !ewNotFull(0), 
-									noc[1].localLen -= (localNotEmpty1(1))*(ewNotFull1(0)),   
+									localShouldDec1 = (localNotEmpty1(1))*(ewNotFull1(0)),   
 									ewShouldInc0 = (ewNotFull1(0))*(localNotEmpty1(1)),  
 									noc[1].ewLockedlocal = false,
 									ewShouldDec1 = 1,  
@@ -1713,14 +1756,14 @@ process arbiter1(){
 						//Local sends EW and EW sends NS
 						:(2/3):  {=  noc[1].localLockedew = localNotEmpty(1) && !ewNotFull(0), 
 									noc[1].localPriority = localNotEmpty(1) && !ewNotFull(0) && nsNotFull(3), 
-									noc[1].localLen -= (localNotEmpty1(1))*(ewNotFull1(0)),   
+									localShouldDec1 = (localNotEmpty1(1))*(ewNotFull1(0)),   
 									ewShouldInc0 = (ewNotFull1(0))*(localNotEmpty1(1)),  
 									ewShouldDec1 = nsNotFull1(3),  
 									noc[1].ewLockedns = !nsNotFull(3), 
 									nsShouldInc3 = nsNotFull1(3),  
-									nsShouldDec1 = (nsNotEmpty1(1)),  
+									nsShouldDec1 = (nsNotEmpty1(1))  
 									//totalFlitsDelivered1 += nsNotEmpty1(1), 
-									optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+									//optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 								=} 
 
 
@@ -1743,7 +1786,7 @@ process arbiter1(){
 					//Local Sends to 2,  EW to 0
 					:(1/6):  {= 		noc[1].localLockedns = localNotEmpty(1) && !nsNotFull(3), 
 									noc[1].localPriority = localNotEmpty(1) && !nsNotFull(3), 
-									noc[1].localLen -= (localNotEmpty1(1))*(nsNotFull1(3)),   
+									localShouldDec1 = (localNotEmpty1(1))*(nsNotFull1(3)),   
 									nsShouldInc3 = (nsNotFull1(3))*(localNotEmpty1(1)),  
 									ewShouldDec1 = 1,  
 									//totalFlitsDelivered1 += 1, 
@@ -1754,7 +1797,7 @@ process arbiter1(){
 					//Local has a 1 or 3 and EW has a 0
 					:(1/3):  {= 		noc[1].localLockedew = localNotEmpty(1) && !ewNotFull(0), 
 									noc[1].localPriority = localNotEmpty(1) && !ewNotFull(0), 
-									noc[1].localLen -= (localNotEmpty1(1))*(ewNotFull1(0)),   
+									localShouldDec1 = (localNotEmpty1(1))*(ewNotFull1(0)),   
 									ewShouldInc0 = (ewNotFull1(0))*(localNotEmpty1(1)),  
 									ewShouldDec1 = 1,  
 									//totalFlitsDelivered1 += 1, 
@@ -1764,14 +1807,14 @@ process arbiter1(){
 					//Local has a 1 or 3 and EW has a 2
 					:(1/3):  {= 		noc[1].localLockedew = localNotEmpty(1) && !ewNotFull(0), 
 									noc[1].localPriority = localNotEmpty(1) && !ewNotFull(0) && nsNotFull(3), 
-									noc[1].localLen -= (localNotEmpty1(1))*(ewNotFull1(0)),   
+									localShouldDec1 = (localNotEmpty1(1))*(ewNotFull1(0)),   
 									ewShouldInc0 = (ewNotFull1(0))*(localNotEmpty1(1)),  
 									ewShouldDec1 = nsNotFull1(3),  
 									noc[1].ewLockedns = !nsNotFull(3), 
 									nsShouldInc3 = nsNotFull1(3),  
-									nsShouldDec1 = (nsNotEmpty1(1)),  
+									nsShouldDec1 = (nsNotEmpty1(1))  
 									//totalFlitsDelivered1 += nsNotEmpty1(1), 
-									optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+									//optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 					=} 
 
 				}
@@ -1814,7 +1857,7 @@ process arbiter1(){
 					//Local Sends to 2,  EW to 0
 			:(1/2):  {= noc[1].localPriority = !nsNotFull(3) && !nsNotEmpty(1), 
 						noc[1].localLockedns = !nsNotFull(3), 
-						noc[1].localLen -= nsNotFull1(3),   
+						localShouldDec1 = nsNotFull1(3),   
 						nsShouldInc3 = (nsNotFull1(3)),  
 						ewShouldDec1 = nsNotEmpty0(1), 
 						noc[1].ewLockedns = nsNotEmpty(1), 
@@ -1837,15 +1880,15 @@ process arbiter1(){
 						//Local sends EW and EW sends NS
 						tick {=  noc[1].localPriority = !ewNotFull(0) && nsNotFull(3), 
 									noc[1].localLockedew = !ewNotFull(0), 
-									noc[1].localLen -= (ewNotFull1(0)),   
+									localShouldDec1 = (ewNotFull1(0)),   
 									ewShouldInc0 = (ewNotFull1(0)),  
 									noc[1].ewLockedns = !nsNotFull(3), 
 									ewShouldDec1 = nsNotFull1(3),  
 									nsShouldInc3 = nsNotFull1(3),  
 									nsShouldDec1 = (nsNotEmpty1(1)),  
 									//totalFlitsDelivered1 += nsNotEmpty1(1), 
-									noc[1].nsPriority = nsNotFull(3), 
-									optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+									noc[1].nsPriority = nsNotFull(3) 
+									//optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 								=} 
 
 
@@ -1860,7 +1903,7 @@ process arbiter1(){
 						//Local has a 1 or 3 and EW has a 0
 						:(1/2):  {=  noc[1].localPriority = !ewNotFull(0) && !nsNotEmpty(1),  
 									noc[1].localLockedew = !ewNotFull(0), 
-									noc[1].localLen -= (ewNotFull1(0)),   
+									localShouldDec1 = (ewNotFull1(0)),   
 									ewShouldInc0 = (ewNotFull1(0)),  
 									nsShouldDec1 = nsNotEmpty1(1), 
 									noc[1].nsPriority = !nsNotEmpty(1),  
@@ -1872,15 +1915,15 @@ process arbiter1(){
 						//Local has a 1 or 3 and EW has a 2
 						:(1/2):  {= noc[1].localPriority = !ewNotFull(0) && nsNotFull(3), 
 									noc[1].localLockedew = !ewNotFull(0), 
-									noc[1].localLen -= (ewNotFull1(0)),   
+									localShouldDec1 = (ewNotFull1(0)),   
 									ewShouldInc0 = (ewNotFull1(0)),  
 									noc[1].ewLockedns = !nsNotFull(3), 
 									ewShouldDec1 = nsNotFull1(3),  
 									nsShouldInc3 = nsNotFull1(3),  
 									nsShouldDec1 = (nsNotEmpty1(1)),  
 									//totalFlitsDelivered1 += nsNotEmpty1(1), 
-									noc[1].nsPriority = nsNotFull(3), 
-									optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+									noc[1].nsPriority = nsNotFull(3) 
+									//optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 								=}  
 
 
@@ -1908,15 +1951,15 @@ process arbiter1(){
 						//Local sends EW and EW sends NS
 						:(2/3):  {=  noc[1].localPriority = localNotEmpty(1) && !ewNotFull(0) && nsNotFull(3), 
 									noc[1].localLockedew = localNotEmpty(1) && !ewNotFull(0), 
-									noc[1].localLen -= (localNotEmpty1(1))*(ewNotFull1(0)),   
+									localShouldDec1 = (localNotEmpty1(1))*(ewNotFull1(0)),   
 									ewShouldInc0 = (ewNotFull1(0))*(localNotEmpty1(1)),  
 									noc[1].ewLockedns = !nsNotFull(3), 
 									ewShouldDec1 = nsNotFull1(3),  
 									nsShouldInc3 = nsNotFull1(3),  
 									nsShouldDec1 = (nsNotEmpty1(1)),  
 									//totalFlitsDelivered1 += nsNotEmpty1(1), 
-									noc[1].nsPriority = nsNotFull(3), 
-									optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+									noc[1].nsPriority = nsNotFull(3)
+									//optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 								=} 
 
 
@@ -1939,7 +1982,7 @@ process arbiter1(){
 						//Local Sends to 2,  EW to 0
 						:(1/6):  {= noc[1].localPriority = !nsNotFull(3) && localNotEmpty(1) && !nsNotEmpty(1),  
 									noc[1].localLockedns = localNotEmpty(1) && !nsNotFull(3), 
-									noc[1].localLen -= (localNotEmpty1(1))*(nsNotFull1(3)),   
+									localShouldDec1 = (localNotEmpty1(1))*(nsNotFull1(3)),   
 									nsShouldInc3 = (nsNotFull1(3))*(localNotEmpty1(1)),  
 									ewShouldDec1 = nsNotEmpty0(1), 
 									noc[1].ewLockedlocal = nsNotEmpty(1), 
@@ -1952,7 +1995,7 @@ process arbiter1(){
 						//Local has a 1 or 3 and EW has a 0
 						:(1/3):  {=  noc[1].localPriority = !ewNotFull(0) && localNotEmpty(1) && !nsNotEmpty(1),  
 									noc[1].localLockedew = localNotEmpty(1) && !ewNotFull(0), 
-									noc[1].localLen -= (localNotEmpty1(1))*(ewNotFull1(0)),   
+									localShouldDec1 = (localNotEmpty1(1))*(ewNotFull1(0)),   
 									ewShouldInc0 = (ewNotFull1(0))*(localNotEmpty1(1)),  
 									nsShouldDec1 = nsNotEmpty1(1), 
 									noc[1].nsPriority = !nsNotEmpty(1),  
@@ -1964,15 +2007,15 @@ process arbiter1(){
 						//Local has a 1 or 3 and EW has a 2
 						:(1/3):  {= noc[1].localPriority = localNotEmpty(1) && !ewNotFull(0) && nsNotFull(3), 
 									noc[1].localLockedew = localNotEmpty(1) && !ewNotFull(0), 
-									noc[1].localLen -= (localNotEmpty1(1))*(ewNotFull1(0)),   
+									localShouldDec1 = (localNotEmpty1(1))*(ewNotFull1(0)),   
 									ewShouldInc0 = (ewNotFull1(0))*(localNotEmpty1(1)),  
 									noc[1].ewLockedns = !nsNotFull(3), 
 									ewShouldDec1 = nsNotFull1(3),  
 									nsShouldInc3 = nsNotFull1(3),  
 									nsShouldDec1 = (nsNotEmpty1(1)),  
 									//totalFlitsDelivered1 += nsNotEmpty1(1), 
-									noc[1].nsPriority = nsNotFull(3), 
-									optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+									noc[1].nsPriority = nsNotFull(3) 
+									//optimalRuns1 += localNotEmpty1(1)*ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 								=}  
 
 
@@ -1992,7 +2035,7 @@ process arbiter1(){
 						 //Local sends NS and EW sends local
 								tick {= noc[1].localPriority = true,  
 									noc[1].localLockedns = !nsNotFull(3),  
-									noc[1].localLen -= (nsNotFull1(3)), 
+									localShouldDec1 = (nsNotFull1(3)), 
 									nsShouldInc3 = (nsNotFull1(3)),  
 									ewShouldDec1 = 1,  
 									noc[1].ewLockedlocal = false, 
@@ -2006,7 +2049,7 @@ process arbiter1(){
 
 							tick {= noc[1].localPriority = !nsNotFull(3),  
 									noc[1].localLockedns = !nsNotFull(3),  
-									noc[1].localLen -= (nsNotFull1(3)),   
+									localShouldDec1 = (nsNotFull1(3)),   
 									nsShouldInc3 = (nsNotFull1(3)),  
 									noc[1].ewLockedns = true, 
 									nsShouldDec1 = (nsNotEmpty1(1)),  
@@ -2025,7 +2068,7 @@ process arbiter1(){
 						//Local and EW both send to 2
 						:(1/2):  {= 	noc[1].localPriority = !nsNotFull(3),  
 									noc[1].localLockedns = !nsNotFull(3),  
-									noc[1].localLen -= (nsNotFull1(3)),   
+									localShouldDec1 = (nsNotFull1(3)),   
 									nsShouldInc3 = (nsNotFull1(3)),  
 									noc[1].ewLockedns = true, 
 									nsShouldDec1 = (nsNotEmpty1(1)),  
@@ -2035,7 +2078,7 @@ process arbiter1(){
 						//Local Sends to 2,  EW to 0
 						:(1/2):  {= noc[1].localPriority = true,  
 									noc[1].localLockedns = !nsNotFull(3),  
-									noc[1].localLen -= (nsNotFull1(3)), 
+									localShouldDec1 = (nsNotFull1(3)), 
 									nsShouldInc3 = (nsNotFull1(3)),  
 									ewShouldDec1 = 1,  
 									noc[1].ewLockedlocal = false, 
@@ -2056,7 +2099,7 @@ process arbiter1(){
 						// Local Sends EW and EW sends local
 					tick {= 	noc[1].localPriority = true,  
 						noc[1].localLockedew = !ewNotFull(0), 
-						noc[1].localLen -= (ewNotFull1(0)),   
+						localShouldDec1 = (ewNotFull1(0)),   
 						ewShouldInc0 = (ewNotFull1(0)),  
 						ewShouldDec1 = 1,  
 						noc[1].ewLockedlocal = false, 
@@ -2074,15 +2117,15 @@ process arbiter1(){
 								//Local has a 1 or 3 and EW has a 2
 						tick {=  		noc[1].localPriority = !(ewNotFull(0) && !nsNotFull(3)),  
 									noc[1].localLockedew = !ewNotFull(0), 
-									noc[1].localLen -= (ewNotFull1(0)),   
+									localShouldDec1 = (ewNotFull1(0)),   
 									ewShouldInc0 = (ewNotFull1(0)),  
 									ewShouldDec1 = (nsNotFull1(3)),  
 									noc[1].ewLockedns = !nsNotFull(3), 
 									nsShouldInc3 = (nsNotFull1(3)),  
 									nsShouldDec1 = (nsNotEmpty1(1)),  
-									noc[1].nsPriority = false, 
+									noc[1].nsPriority = false 
 									//totalFlitsDelivered1 += nsNotEmpty1(1), 
-									optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+									//optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 								=}  
 
 
@@ -2098,7 +2141,7 @@ process arbiter1(){
 						//Local has a 1 or 3 and EW has a 0
 						:(1/2):  {= 	noc[1].localPriority = true,  
 									noc[1].localLockedew = !ewNotFull(0), 
-									noc[1].localLen -= (ewNotFull1(0)),   
+									localShouldDec1 = (ewNotFull1(0)),   
 									ewShouldInc0 = (ewNotFull1(0)),  
 									ewShouldDec1 = 1,  
 									noc[1].ewLockedlocal = false, 
@@ -2108,15 +2151,15 @@ process arbiter1(){
 						//Local has a 1 or 3 and EW has a 2
 						:(1/2):  {=  noc[1].localPriority = !(ewNotFull(0) && !nsNotFull(3)),  
 									noc[1].localLockedew = !ewNotFull(0), 
-									noc[1].localLen -= (ewNotFull1(0)),   
+									localShouldDec1 = (ewNotFull1(0)),   
 									ewShouldInc0 = (ewNotFull1(0)),  
 									ewShouldDec1 = (nsNotFull1(3)),  
 									noc[1].ewLockedns = !nsNotFull(3), 
 									nsShouldInc3 = (nsNotFull1(3)),  
 									nsShouldDec1 = (nsNotEmpty1(1)),  
-									noc[1].nsPriority = false, 
+									noc[1].nsPriority = false 
 									//totalFlitsDelivered1 += nsNotEmpty1(1), 
-									optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
+									//optimalRuns1 += ewNotFull1(0)*nsNotFull1(3)*nsNotEmpty1(1)
 								=}  
 
 
@@ -2134,7 +2177,7 @@ process arbiter1(){
 						 //Local sends NS and EW sends local
 						:(1/3):  tick {= noc[1].localPriority = true,  
 									noc[1].localLockedns = localNotEmpty(1) && !nsNotFull(3),  
-									noc[1].localLen -= (nsNotFull1(3))*(localNotEmpty1(1)), 
+									localShouldDec1 = (nsNotFull1(3))*(localNotEmpty1(1)), 
 									nsShouldInc3 = (nsNotFull1(3))*(localNotEmpty1(1)),  
 									ewShouldDec1 = 1, 
 									noc[1].ewLockedlocal = false,  
@@ -2144,7 +2187,7 @@ process arbiter1(){
 						// Local Sends EW and EW sends local
 						:(2/3):  tick {= noc[1].localPriority = true,  
 									noc[1].localLockedew = localNotEmpty(1) && !ewNotFull(0), 
-									noc[1].localLen -= (localNotEmpty1(1))*(ewNotFull1(0)),   
+									localShouldDec1 = (localNotEmpty1(1))*(ewNotFull1(0)),   
 									ewShouldInc0 = (ewNotFull1(0))*(localNotEmpty1(1)),  
 									ewShouldDec1 = 1,  
 									noc[1].ewLockedlocal = false, 
@@ -2163,7 +2206,7 @@ process arbiter1(){
 						//Local and EW both send to 2
 						:(1/3):  {= noc[1].localPriority = (localNotEmpty(1) && !nsNotFull(3)) || (!localNotEmpty(1) && nsNotFull(3)),  
 									noc[1].localLockedns = localNotEmpty(1) && !nsNotFull(3),  
-									noc[1].localLen -= (localNotEmpty1(1))*(nsNotFull1(3)),   
+									localShouldDec1 = (localNotEmpty1(1))*(nsNotFull1(3)),   
 									nsShouldInc3 = (nsNotFull1(3)),  
 									noc[1].ewLockedns = localNotEmpty(1) || (!localNotEmpty(1) && !nsNotFull(3)), 
 									ewShouldDec1 = localNotEmpty0(1)*nsNotFull1(3), 
@@ -2174,15 +2217,15 @@ process arbiter1(){
 								//Local has a 1 or 3 and EW has a 2
 						:(2/3):  {=  noc[1].localPriority = (!ewNotFull(0) && localNotEmpty(1)) || (!localNotEmpty(1) && nsNotFull(3)) || (ewNotFull(0) && localNotEmpty(1) && nsNotFull(3)),  
 									noc[1].localLockedew = localNotEmpty(1) && !ewNotFull(0), 
-									noc[1].localLen -= (localNotEmpty1(1))*(ewNotFull1(0)),   
+									localShouldDec1 = (localNotEmpty1(1))*(ewNotFull1(0)),   
 									ewShouldInc0 = (ewNotFull1(0))*(localNotEmpty1(1)),  
 									ewShouldDec1 = (nsNotFull1(3)),  
 									noc[1].ewLockedns = !nsNotFull(3), 
 									nsShouldInc3 = (nsNotFull1(3)),  
 									nsShouldDec1 = (nsNotEmpty1(1)),  
-									noc[1].nsPriority = false, 
+									noc[1].nsPriority = false 
 									//totalFlitsDelivered1 += nsNotEmpty1(1), 
-									optimalRuns1 += ewNotFull1(0)*localNotEmpty1(1)*nsNotFull1(3)*nsNotEmpty1(1)
+									//optimalRuns1 += ewNotFull1(0)*localNotEmpty1(1)*nsNotFull1(3)*nsNotEmpty1(1)
 								=}  
 						}
 
@@ -2197,7 +2240,7 @@ process arbiter1(){
 						//Local and EW both send to 2
 						:(1/6):  {= noc[1].localPriority = (localNotEmpty(1) && !nsNotFull(3)) || (!localNotEmpty(1) && nsNotFull(3)),  
 									noc[1].localLockedns = localNotEmpty(1) && !nsNotFull(3),  
-									noc[1].localLen -= (localNotEmpty1(1))*(nsNotFull1(3)),   
+									localShouldDec1 = (localNotEmpty1(1))*(nsNotFull1(3)),   
 									nsShouldInc3 = (nsNotFull1(3)),  
 									noc[1].ewLockedns = localNotEmpty(1) || (!localNotEmpty(1) && !nsNotFull(3)), 
 									ewShouldDec1 = localNotEmpty0(1)*nsNotFull1(3), 
@@ -2208,7 +2251,7 @@ process arbiter1(){
 						//Local Sends to 2,  EW to 0
 						:(1/6):  {= noc[1].localPriority = true,  
 									noc[1].localLockedns = localNotEmpty(1) && !nsNotFull(3),  
-									noc[1].localLen -= (nsNotFull1(3))*(localNotEmpty1(1)), 
+									localShouldDec1 = (nsNotFull1(3))*(localNotEmpty1(1)), 
 									nsShouldInc3 = (nsNotFull1(3))*(localNotEmpty1(1)),  
 									ewShouldDec1 = 1, 
 									noc[1].ewLockedlocal = false,  
@@ -2220,7 +2263,7 @@ process arbiter1(){
 						//Local has a 1 or 3 and EW has a 0
 						:(1/3):  {= noc[1].localPriority = true,  
 									noc[1].localLockedew = localNotEmpty(1) && !ewNotFull(0), 
-									noc[1].localLen -= (localNotEmpty1(1))*(ewNotFull1(0)),   
+									localShouldDec1 = (localNotEmpty1(1))*(ewNotFull1(0)),   
 									ewShouldInc0 = (ewNotFull1(0))*(localNotEmpty1(1)),  
 									ewShouldDec1 = 1,  
 									noc[1].ewLockedlocal = false, 
@@ -2230,15 +2273,15 @@ process arbiter1(){
 						//Local has a 1 or 3 and EW has a 2
 						:(1/3):  {=  noc[1].localPriority = (!ewNotFull(0) && localNotEmpty(1)) || (!localNotEmpty(1) && nsNotFull(3)) || (ewNotFull(0) && localNotEmpty(1) && nsNotFull(3)),  
 									noc[1].localLockedew = localNotEmpty(1) && !ewNotFull(0), 
-									noc[1].localLen -= (localNotEmpty1(1))*(ewNotFull1(0)),   
+									localShouldDec1 = (localNotEmpty1(1))*(ewNotFull1(0)),   
 									ewShouldInc0 = (ewNotFull1(0))*(localNotEmpty1(1)),  
 									ewShouldDec1 = (nsNotFull1(3)),  
 									noc[1].ewLockedns = !nsNotFull(3), 
 									nsShouldInc3 = (nsNotFull1(3)),  
 									nsShouldDec1 = (nsNotEmpty1(1)),  
-									noc[1].nsPriority = false, 
+									noc[1].nsPriority = false 
 									//totalFlitsDelivered1 += nsNotEmpty1(1), 
-									optimalRuns1 += ewNotFull1(0)*localNotEmpty1(1)*nsNotFull1(3)*nsNotEmpty1(1)
+									//optimalRuns1 += ewNotFull1(0)*localNotEmpty1(1)*nsNotFull1(3)*nsNotEmpty1(1)
 								=}  
 
 
@@ -2265,7 +2308,7 @@ process arbiter2(){
 
 			tick {=  noc[2].localLockedns = !nsNotFull(0),   //Sets the priority to false if it was able to send to the ns buffer of the NoC in the y direction
 				noc[2].localPriority = !nsNotFull(0) || noc[2].localPriority, 		//Local gets priority if it is unable to send
-				noc[2].localLen -= nsNotFull1(0),      //Local sends a flit ns if the receiving buffer is not full
+				localShouldDec2 = nsNotFull1(0),      //Local sends a flit ns if the receiving buffer is not full
 				nsShouldInc0 = (nsNotFull1(0)),   //The ns direction receives the flit if it is not already full
 				nsShouldDec2 = (nsNotEmpty1(2)) 						//The ns buffer sends a flit to local if it is not empty
 				//totalFlitsDelivered2 += nsNotEmpty1(2)
@@ -2277,7 +2320,7 @@ process arbiter2(){
 
 			tick {=   			noc[2].localLockedew = !ewNotFull(3),  // Local is locked it if has a flit and is unable to send it
 							noc[2].localPriority = !ewNotFull(3) || noc[2].localPriority,   // Local gets priority under the same conditions		
-							noc[2].localLen -= (ewNotFull1(3)),   //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
+							localShouldDec2 = (ewNotFull1(3)),   //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
 							ewShouldInc3 = (ewNotFull1(3)),  //The ew direction receives it under the same conditions
 							nsShouldDec2 = (nsNotEmpty1(2))  //The ns buffer sends a flit to local if it is not empty
 							//totalFlitsDelivered2 += nsNotEmpty1(2)	
@@ -2292,7 +2335,7 @@ process arbiter2(){
 				//Local sends in the NS direction
 				:(1/3): {=   noc[2].localLockedns = localNotEmpty(2) && !nsNotFull(0),  // Local is locked it if has a flit and is unable to send it
 							noc[2].localPriority = (localNotEmpty(2) && !nsNotFull(0)) || noc[2].localPriority,   // Local gets priority under the same conditions
-							noc[2].localLen -= (localNotEmpty1(2))*(nsNotFull1(0)),   //Local sends a flit to the ns direction if it is not empty and the receiving buffer is not full
+							localShouldDec2 = (localNotEmpty1(2))*(nsNotFull1(0)),   //Local sends a flit to the ns direction if it is not empty and the receiving buffer is not full
 					   		nsShouldInc0 = (nsNotFull1(0))*(localNotEmpty1(2)),  //The ns direction receives the flit under the same conditions
 							nsShouldDec2 = (nsNotEmpty1(2))    //The ns buffer sends a flit to local if it is not empty	
 							//totalFlitsDelivered2 += nsNotEmpty1(2)
@@ -2300,7 +2343,7 @@ process arbiter2(){
 				//Local sends to the ew direction
 				:(2/3): {=   noc[2].localLockedew = localNotEmpty(2) && !ewNotFull(3),  // Local is locked it if has a flit and is unable to send it
 							noc[2].localPriority = (localNotEmpty(2) && !ewNotFull(3)) || noc[2].localPriority,   // Local gets priority under the same conditions
-							noc[2].localLen -= (localNotEmpty1(2))*(ewNotFull1(3)),   //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
+							localShouldDec2 = (localNotEmpty1(2))*(ewNotFull1(3)),   //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
 							ewShouldInc3 = (ewNotFull1(3))*(localNotEmpty1(2)),  //The ew direction receives it under the same conditions
 							nsShouldDec2 = (nsNotEmpty1(2))  //The ns buffer sends a flit to local if it is not empty
 							//totalFlitsDelivered2 += nsNotEmpty1(2)
@@ -2318,7 +2361,7 @@ process arbiter2(){
 
 				tick {=  noc[2].localLockedns = !nsNotFull(0),  	//Local stays locked if it is unable to send
 					noc[2].localPriority = !nsNotFull(0), 
-						noc[2].localLen -= nsNotFull1(0),   //Local sends if the ns direction is not already full
+						localShouldDec2 = nsNotFull1(0),   //Local sends if the ns direction is not already full
 						nsShouldInc0 = nsNotFull1(0),  //The ns direction receives under the same conditions
 						noc[2].nsPriority = false, 
 						noc[2].ewLockedns = true,  
@@ -2332,7 +2375,7 @@ process arbiter2(){
 			tick palt {
 			// Local and EW both send ns	
 			:(1/2):  {=  noc[2].localLockedns = !nsNotFull(0),  	//Local stays locked if it is unable to send
-						noc[2].localLen -= nsNotFull1(0),   //Local sends if the ns direction is not already full
+						localShouldDec2 = nsNotFull1(0),   //Local sends if the ns direction is not already full
 						nsShouldInc0 = nsNotFull1(0),  //The ns direction receives under the same conditions
 						nsShouldDec2 = (nsNotEmpty1(2)),    //The ns buffer sends a flit to local if it is not empty
 						noc[2].nsPriority = false, 
@@ -2344,7 +2387,7 @@ process arbiter2(){
 			 //Local sends ns,  and EW sends to to local
 			:(1/2):  {=  noc[2].localLockedns =  !nsNotFull(0),   //Local stays locked if it is unable to send
 						noc[2].localPriority = !(nsNotFull(0) && nsNotEmpty(2)),  //Local only loses priority if it sends and ew doesn't
-						noc[2].localLen -= (nsNotFull1(0)),   //Local sends ns if it isn't empty and ns isn't full
+						localShouldDec2 = (nsNotFull1(0)),   //Local sends ns if it isn't empty and ns isn't full
 						nsShouldInc0 = (nsNotFull1(0)),  //Ns receives under the same conditions
 						ewShouldDec2 = nsNotEmpty0(2),  	//Ew sends if the ns buffer is empty
 				
@@ -2365,15 +2408,15 @@ process arbiter2(){
 				//Local has a 1 or 3 and EW has a 2
 				tick {=  noc[2].localLockedew = !ewNotFull(3),  //Local is locked in the ew direction if it is unable to send
 							noc[2].localPriority = !(ewNotFull(3) && !nsNotFull(0)),  //Local remains in priority under the same conditions
-							noc[2].localLen -= (ewNotFull1(3)),   //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec2 = (ewNotFull1(3)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc3 = (ewNotFull1(3)),  //The ew direction recieves under the same conditions
 							ewShouldDec2 = (nsNotFull1(0)),   // Ew sends if the ns direction is not full
 							noc[2].ewLockedns = !nsNotFull(0),  // Ew is locked to ns if it is unable to send
 							nsShouldInc0 = (nsNotFull1(0)),  //The ns direction receives if it is not full
 							noc[2].nsPriority = nsNotFull(0),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec2 = (nsNotEmpty1(2)),  // Ns sends if it is not empty
+							nsShouldDec2 = (nsNotEmpty1(2))  // Ns sends if it is not empty
 							//totalFlitsDelivered2 += nsNotEmpty1(2), 
-							optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+							//optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 
 				=} 
 
@@ -2387,7 +2430,7 @@ process arbiter2(){
 				//Local has a 1 or 3 and EW has a 0	
 				:(1/2):  {=  noc[2].localLockedew = !ewNotFull(3),  //Local is locked in the ew direction if it is unable to send
 							noc[2].localPriority = !(ewNotFull(3) && nsNotEmpty(2)),  //Local remains in priority under the same conditions
-							noc[2].localLen -= (ewNotFull1(3)),   //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec2 = (ewNotFull1(3)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc3 = (ewNotFull1(3)),  //The ew direction receives under the same conditions
 							noc[2].ewLockedlocal = nsNotEmpty(2),  //The ew buffer is locked into the local direction if the ns buffer is not empty
 							noc[2].nsPriority = !nsNotEmpty(2),   //The ns buffer remains in priority if it is empty
@@ -2399,15 +2442,15 @@ process arbiter2(){
 				//Local has a 1 or 3 and EW has a 2
 				:(1/2):  {=  noc[2].localLockedew = !ewNotFull(3),  //Local is locked in the ew direction if it is unable to send
 							noc[2].localPriority = !(ewNotFull(3) && !nsNotFull(0)),  //Local remains in priority under the same conditions
-							noc[2].localLen -= (ewNotFull1(3)),   //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec2 = (ewNotFull1(3)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc3 = (ewNotFull1(3)),  //The ew direction recieves under the same conditions
 							ewShouldDec2 = (nsNotFull1(0)),   // Ew sends if the ns direction is not full
 							noc[2].ewLockedns = !nsNotFull(0),  // Ew is locked to ns if it is unable to send
 							nsShouldInc0 = (nsNotFull1(0)),  //The ns direction receives if it is not full
 							noc[2].nsPriority = nsNotFull(0),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec2 = (nsNotEmpty1(2)),  // Ns sends if it is not empty
+							nsShouldDec2 = (nsNotEmpty1(2))  // Ns sends if it is not empty
 							//totalFlitsDelivered2 += nsNotEmpty1(2), 
-							optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+							//optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 				=} 
 
 
@@ -2427,7 +2470,7 @@ process arbiter2(){
 				:(1/3): {= 	noc[2].ewLockedns = (localNotEmpty(2)) || (!localNotEmpty(2) && nsNotFull(0)),                 //The ew buffer gets locked in the ns direction if local is not empty 
 							noc[2].localPriority = (localNotEmpty(2) && !nsNotFull(0)) || (!localNotEmpty(2) && nsNotFull(0)),    //Local remains in priority if it is non-empty and is unable to send
 							noc[2].localLockedns = (localNotEmpty(2) && !nsNotFull(0)),  // Local gets locked to ns under the same conditions
-							noc[2].localLen -= (localNotEmpty1(2))*(nsNotFull1(0)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
+							localShouldDec2 = (localNotEmpty1(2))*(nsNotFull1(0)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
 							nsShouldInc0 = (nsNotFull1(0)),    //The ns direction receives if it is not full (either from ew or local)
 							ewShouldDec2 = localNotEmpty0(2)*(nsNotFull1(0)), 		//Ew sends if local is empty and the ns direction is not full
 							nsShouldDec2 = (nsNotEmpty1(2)),  		//Ns sends local if it is not empty
@@ -2438,15 +2481,15 @@ process arbiter2(){
 				//Local has a 1 or 3 and EW has a 2
 				:(2/3):  {=  noc[2].localLockedew = localNotEmpty(2) && !ewNotFull(3),  //Local is locked in the ew direction if it is unable to send
 							noc[2].localPriority = (localNotEmpty(2) && !ewNotFull(3)) || (!localNotEmpty(2) && nsNotFull(0)) || ( (localNotEmpty(2) && ewNotFull(3) && (nsNotFull(0)))),  //Local remains in priority under the same conditions
-							noc[2].localLen -= (localNotEmpty1(2))*(ewNotFull1(3)),   //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec2 = (localNotEmpty1(2))*(ewNotFull1(3)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc3 = (ewNotFull1(3))*(localNotEmpty1(2)),  //The ew direction recieves under the same conditions
 							ewShouldDec2 = (nsNotFull1(0)),   // Ew sends if the ns direction is not full
 							noc[2].ewLockedns = !nsNotFull(0),  // Ew is locked to ns if it is unable to send
 							nsShouldInc0 = (nsNotFull1(0)),  //The ns direction receives if it is not full
 							noc[2].nsPriority = nsNotFull(0),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec2 = (nsNotEmpty1(2)),  // Ns sends if it is not empty
+							nsShouldDec2 = (nsNotEmpty1(2))  // Ns sends if it is not empty
 							//totalFlitsDelivered2 += nsNotEmpty1(2), 
-							optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+							//optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 				=} 
 
 
@@ -2462,7 +2505,7 @@ process arbiter2(){
 				:(1/6):  {=  noc[2].ewLockedns = (localNotEmpty(2)) || (!localNotEmpty(2) && nsNotFull(0)),                 //The ew buffer gets locked in the ns direction if local is not empty 
 							noc[2].localPriority = (localNotEmpty(2) && !nsNotFull(0)) || (!localNotEmpty(2) && nsNotFull(0)),    //Local remains in priority if it is non-empty and is unable to send
 							noc[2].localLockedns = (localNotEmpty(2) && !nsNotFull(0)),  // Local gets locked to ns under the same conditions
-							noc[2].localLen -= (localNotEmpty1(2))*(nsNotFull1(0)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
+							localShouldDec2 = (localNotEmpty1(2))*(nsNotFull1(0)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
 							nsShouldInc0 = (nsNotFull1(0)),    //The ns direction receives if it is not full (either from ew or local)
 							ewShouldDec2 = localNotEmpty0(2)*(nsNotFull1(0)), 		//Ew sends if local is empty and the ns direction is not full
 							nsShouldDec2 = (nsNotEmpty1(2)),  		//Ns sends local if it is not empty
@@ -2473,7 +2516,7 @@ process arbiter2(){
 				//Local Sends to 2,  EW to 0
 				:(1/6):  {=  noc[2].localLockedns = localNotEmpty(2) && !nsNotFull(0),  //Local is locked in the ns direction if it is unable to send
 							noc[2].localPriority = (localNotEmpty(2) && !nsNotFull(0)) || (localNotEmpty(2) && !nsNotEmpty(2)) || ( ( (localNotEmpty(2)) && (nsNotFull(0)) ) && !nsNotEmpty(2)),  //Local remains in priority under the same conditions
-							noc[2].localLen -= (localNotEmpty1(2))*(nsNotFull1(0)),   //Local sends the ns direction if it is not empty,  and the receiving buffer is not full
+							localShouldDec2 = (localNotEmpty1(2))*(nsNotFull1(0)),   //Local sends the ns direction if it is not empty,  and the receiving buffer is not full
 							nsShouldInc0 = (nsNotFull1(0))*(localNotEmpty1(2)),  //The ns direction receives if it is not full and local is not empty
 							ewShouldDec2 = nsNotEmpty0(2),  //Ew sends local if the ns buffer is empty
 							noc[2].ewLockedlocal = nsNotEmpty(2),  //Ew gets locked to local if the ns buffer is not empty
@@ -2486,7 +2529,7 @@ process arbiter2(){
 				//Local has a 1 or 3 and EW has a 0	
 				:(1/3):  {=  noc[2].localLockedew = localNotEmpty(2) && !ewNotFull(3),  //Local is locked in the ew direction if it is unable to send
 							noc[2].localPriority = (localNotEmpty(2) && !ewNotFull(3)) || (localNotEmpty(2) && !nsNotEmpty(2)) || ( ( (localNotEmpty(2)) && (ewNotFull(3)) ) && !nsNotEmpty(2)),  //Local remains in priority under the same conditions
-							noc[2].localLen -= (localNotEmpty1(2))*(ewNotFull1(3)),   //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec2 = (localNotEmpty1(2))*(ewNotFull1(3)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc3 = (ewNotFull1(3))*(localNotEmpty1(2)),  //The ew direction receives under the same conditions
 							noc[2].ewLockedlocal = nsNotEmpty(2),  //The ew buffer is locked into the local direction if the ns buffer is not empty
 							noc[2].nsPriority = !nsNotEmpty(2),   //The ns buffer remains in priority if it is empty
@@ -2498,15 +2541,15 @@ process arbiter2(){
 				//Local has a 1 or 3 and EW has a 2
 				:(1/3):  {=  noc[2].localLockedew = localNotEmpty(2) && !ewNotFull(3),  //Local is locked in the ew direction if it is unable to send
 							noc[2].localPriority = (localNotEmpty(2) && !ewNotFull(3)) || (!localNotEmpty(2) && nsNotFull(0)) || ( (localNotEmpty(2) && ewNotFull(3) && (nsNotFull(0)))),  //Local remains in priority under the same conditions
-							noc[2].localLen -= (localNotEmpty1(2))*(ewNotFull1(3)),   //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec2 = (localNotEmpty1(2))*(ewNotFull1(3)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc3 = (ewNotFull1(3))*(localNotEmpty1(2)),  //The ew direction recieves under the same conditions
 							ewShouldDec2 = (nsNotFull1(0)),   // Ew sends if the ns direction is not full
 							noc[2].ewLockedns = !nsNotFull(0),  // Ew is locked to ns if it is unable to send
 							nsShouldInc0 = (nsNotFull1(0)),  //The ns direction receives if it is not full
 							noc[2].nsPriority = nsNotFull(0),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec2 = (nsNotEmpty1(2)),  // Ns sends if it is not empty
+							nsShouldDec2 = (nsNotEmpty1(2))  // Ns sends if it is not empty
 							//totalFlitsDelivered2 += nsNotEmpty1(2), 
-							optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+							//optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 				=} 
 
 
@@ -2525,7 +2568,7 @@ process arbiter2(){
 							if (noc[2].ewLockedlocal) {
 								tick {=  noc[2].localLockedns = !nsNotFull(0), 
 									noc[2].localPriority = !nsNotFull(0), 
-									noc[2].localLen -= (nsNotFull1(0)),   
+									localShouldDec2 = (nsNotFull1(0)),   
 									nsShouldInc0 = (nsNotFull1(0)),  
 									ewShouldDec2 = 1,  
 									noc[2].ewLockedlocal = false, 
@@ -2564,7 +2607,7 @@ process arbiter2(){
 								//Local Sends to 2,  EW to 0
 								:(1/2):  {=  noc[2].localLockedns = !nsNotFull(0), 
 											noc[2].localPriority = !nsNotFull(0), 
-											noc[2].localLen -= (nsNotFull1(0)),   
+											localShouldDec2 = (nsNotFull1(0)),   
 											nsShouldInc0 = (nsNotFull1(0)),  
 											ewShouldDec2 = 1,  
 											//totalFlitsDelivered2 += 1, 
@@ -2585,7 +2628,7 @@ process arbiter2(){
 							// Local Sens EW and EW sends local 
 							tick {=   noc[2].localLockedew = !ewNotFull(3), 
 										noc[2].localPriority = !ewNotFull(3), 
-										noc[2].localLen -= (ewNotFull1(3)),   
+										localShouldDec2 = (ewNotFull1(3)),   
 										ewShouldInc3 = (ewNotFull1(3)),  
 										noc[2].ewLockedlocal = false, 
 										ewShouldDec2 = 1,  
@@ -2601,14 +2644,14 @@ process arbiter2(){
 							//Local sends EW and EW sends NS
 							tick {=   noc[2].localLockedew = !ewNotFull(3), 
 										noc[2].localPriority = !ewNotFull(3) && nsNotFull(0), 
-										noc[2].localLen -= (ewNotFull1(3)),   
+										localShouldDec2 = (ewNotFull1(3)),   
 										ewShouldInc3 = (ewNotFull1(3)),  
 										ewShouldDec2 = nsNotFull1(0),  
 										noc[2].ewLockedns = !nsNotFull(0), 
 										nsShouldInc0 = nsNotFull1(0),  
-										nsShouldDec2 = (nsNotEmpty1(2)),  
+										nsShouldDec2 = (nsNotEmpty1(2))  
 										//totalFlitsDelivered2 += nsNotEmpty1(2), 
-										optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+										//optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 									=} 
 	
 
@@ -2622,7 +2665,7 @@ process arbiter2(){
 						//Local has a 1 or 3 and EW has a 0
 						:(1/2):  {=  		noc[2].localLockedew = !ewNotFull(3), 
 										noc[2].localPriority = !ewNotFull(3), 
-										noc[2].localLen -= (ewNotFull1(3)),   
+										localShouldDec2 = (ewNotFull1(3)),   
 										ewShouldInc3 = (ewNotFull1(3)),  
 										noc[2].ewLockedlocal = false, 
 										ewShouldDec2 = 1,  
@@ -2633,14 +2676,14 @@ process arbiter2(){
 						//Local has a 1 or 3 and EW has a 2
 						:(1/2):  {=  		noc[2].localLockedew = !ewNotFull(3), 
 										noc[2].localPriority = !ewNotFull(3) && nsNotFull(0), 
-										noc[2].localLen -= (ewNotFull1(3)),   
+										localShouldDec2 = (ewNotFull1(3)),   
 										ewShouldInc3 = (ewNotFull1(3)),  
 										ewShouldDec2 = nsNotFull1(0),  
 										noc[2].ewLockedns = !nsNotFull(0), 
 										nsShouldInc0 = nsNotFull1(0),  
-										nsShouldDec2 = (nsNotEmpty1(2)),  
+										nsShouldDec2 = (nsNotEmpty1(2))  
 										//totalFlitsDelivered2 += nsNotEmpty1(2), 
-										optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+										//optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 						=} 
 
 					}
@@ -2660,7 +2703,7 @@ process arbiter2(){
 						//Local sends NS and EW sends local
 						:(1/3):  {=  noc[2].localLockedns = localNotEmpty(2) && !nsNotFull(0), 
 									noc[2].localPriority = localNotEmpty(2) && !nsNotFull(0), 
-									noc[2].localLen -= (localNotEmpty1(2))*(nsNotFull1(0)),   
+									localShouldDec2 = (localNotEmpty1(2))*(nsNotFull1(0)),   
 									nsShouldInc0 = (nsNotFull1(0))*(localNotEmpty1(2)), 
 									noc[2].ewLockedlocal = false, 
 									ewShouldDec2 = 1,  
@@ -2671,7 +2714,7 @@ process arbiter2(){
 						// Local Sens EW and EW sends local 
 						:(2/3):  {=   noc[2].localLockedew = localNotEmpty(2) && !ewNotFull(3), 
 									noc[2].localPriority = localNotEmpty(2) && !ewNotFull(3), 
-									noc[2].localLen -= (localNotEmpty1(2))*(ewNotFull1(3)),   
+									localShouldDec2 = (localNotEmpty1(2))*(ewNotFull1(3)),   
 									ewShouldInc3 = (ewNotFull1(3))*(localNotEmpty1(2)), 
 									noc[2].ewLockedlocal = false, 
 									ewShouldDec2 = 1,  
@@ -2697,14 +2740,14 @@ process arbiter2(){
 						//Local sends EW and EW sends NS
 						:(2/3):  {=   noc[2].localLockedew = localNotEmpty(2) && !ewNotFull(3), 
 									noc[2].localPriority = localNotEmpty(2) && !ewNotFull(3) && nsNotFull(0), 
-									noc[2].localLen -= (localNotEmpty1(2))*(ewNotFull1(3)),   
+									localShouldDec2 = (localNotEmpty1(2))*(ewNotFull1(3)),   
 									ewShouldInc3 = (ewNotFull1(3))*(localNotEmpty1(2)),  
 									ewShouldDec2 = nsNotFull1(0),  
 									noc[2].ewLockedns = !nsNotFull(0), 
 									nsShouldInc0 = nsNotFull1(0),  
-									nsShouldDec2 = (nsNotEmpty1(2)),  
+									nsShouldDec2 = (nsNotEmpty1(2))  
 									//totalFlitsDelivered2 += nsNotEmpty1(2), 
-									optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+									//optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 								=} 
 
 
@@ -2727,7 +2770,7 @@ process arbiter2(){
 					//Local Sends to 2,  EW to 0
 					:(1/6):  {=  		noc[2].localLockedns = localNotEmpty(2) && !nsNotFull(0), 
 									noc[2].localPriority = localNotEmpty(2) && !nsNotFull(0), 
-									noc[2].localLen -= (localNotEmpty1(2))*(nsNotFull1(0)),   
+									localShouldDec2 = (localNotEmpty1(2))*(nsNotFull1(0)),   
 									nsShouldInc0 = (nsNotFull1(0))*(localNotEmpty1(2)),  
 									ewShouldDec2 = 1,  
 									//totalFlitsDelivered2 += 1, 
@@ -2738,7 +2781,7 @@ process arbiter2(){
 					//Local has a 1 or 3 and EW has a 0
 					:(1/3):  {=  		noc[2].localLockedew = localNotEmpty(2) && !ewNotFull(3), 
 									noc[2].localPriority = localNotEmpty(2) && !ewNotFull(3), 
-									noc[2].localLen -= (localNotEmpty1(2))*(ewNotFull1(3)),   
+									localShouldDec2 = (localNotEmpty1(2))*(ewNotFull1(3)),   
 									ewShouldInc3 = (ewNotFull1(3))*(localNotEmpty1(2)),  
 									ewShouldDec2 = 1,  
 									//totalFlitsDelivered2 += 1, 
@@ -2748,14 +2791,14 @@ process arbiter2(){
 					//Local has a 1 or 3 and EW has a 2
 					:(1/3):  {=  		noc[2].localLockedew = localNotEmpty(2) && !ewNotFull(3), 
 									noc[2].localPriority = localNotEmpty(2) && !ewNotFull(3) && nsNotFull(0), 
-									noc[2].localLen -= (localNotEmpty1(2))*(ewNotFull1(3)),   
+									localShouldDec2 = (localNotEmpty1(2))*(ewNotFull1(3)),   
 									ewShouldInc3 = (ewNotFull1(3))*(localNotEmpty1(2)),  
 									ewShouldDec2 = nsNotFull1(0),  
 									noc[2].ewLockedns = !nsNotFull(0), 
 									nsShouldInc0 = nsNotFull1(0),  
-									nsShouldDec2 = (nsNotEmpty1(2)),  
+									nsShouldDec2 = (nsNotEmpty1(2))  
 									//totalFlitsDelivered2 += nsNotEmpty1(2), 
-									optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+									//optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 					=} 
 
 				}
@@ -2798,7 +2841,7 @@ process arbiter2(){
 					//Local Sends to 2,  EW to 0
 			:(1/2):  {=  noc[2].localPriority = !nsNotFull(0) && !nsNotEmpty(2), 
 						noc[2].localLockedns = !nsNotFull(0), 
-						noc[2].localLen -= nsNotFull1(0),   
+						localShouldDec2 = nsNotFull1(0),   
 						nsShouldInc0 = (nsNotFull1(0)),  
 						ewShouldDec2 = nsNotEmpty0(2), 
 						noc[2].ewLockedns = nsNotEmpty(2), 
@@ -2821,15 +2864,15 @@ process arbiter2(){
 						//Local sends EW and EW sends NS
 						tick {=   noc[2].localPriority = !ewNotFull(3) && nsNotFull(0), 
 									noc[2].localLockedew = !ewNotFull(3), 
-									noc[2].localLen -= (ewNotFull1(3)),   
+									localShouldDec2 = (ewNotFull1(3)),   
 									ewShouldInc3 = (ewNotFull1(3)),  
 									noc[2].ewLockedns = !nsNotFull(0), 
 									ewShouldDec2 = nsNotFull1(0),  
 									nsShouldInc0 = nsNotFull1(0),  
 									nsShouldDec2 = (nsNotEmpty1(2)),  
 									//totalFlitsDelivered2 += nsNotEmpty1(2), 
-									noc[2].nsPriority = nsNotFull(0), 
-									optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+									noc[2].nsPriority = nsNotFull(0) 
+									//optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 								=} 
 
 
@@ -2844,7 +2887,7 @@ process arbiter2(){
 						//Local has a 1 or 3 and EW has a 0
 						:(1/2):  {=   noc[2].localPriority = !ewNotFull(3) && !nsNotEmpty(2),  
 									noc[2].localLockedew = !ewNotFull(3), 
-									noc[2].localLen -= (ewNotFull1(3)),   
+									localShouldDec2 = (ewNotFull1(3)),   
 									ewShouldInc3 = (ewNotFull1(3)),  
 									nsShouldDec2 = nsNotEmpty1(2), 
 									noc[2].nsPriority = !nsNotEmpty(2),  
@@ -2856,15 +2899,15 @@ process arbiter2(){
 						//Local has a 1 or 3 and EW has a 2
 						:(1/2):  {=  noc[2].localPriority = !ewNotFull(3) && nsNotFull(0), 
 									noc[2].localLockedew = !ewNotFull(3), 
-									noc[2].localLen -= (ewNotFull1(3)),   
+									localShouldDec2 = (ewNotFull1(3)),   
 									ewShouldInc3 = (ewNotFull1(3)),  
 									noc[2].ewLockedns = !nsNotFull(0), 
 									ewShouldDec2 = nsNotFull1(0),  
 									nsShouldInc0 = nsNotFull1(0),  
 									nsShouldDec2 = (nsNotEmpty1(2)),  
 									//totalFlitsDelivered2 += nsNotEmpty1(2), 
-									noc[2].nsPriority = nsNotFull(0), 
-									optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+									noc[2].nsPriority = nsNotFull(0) 
+									//optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 								=}  
 
 
@@ -2892,15 +2935,15 @@ process arbiter2(){
 						//Local sends EW and EW sends NS
 						:(2/3):  {=   noc[2].localPriority = localNotEmpty(2) && !ewNotFull(3) && nsNotFull(0), 
 									noc[2].localLockedew = localNotEmpty(2) && !ewNotFull(3), 
-									noc[2].localLen -= (localNotEmpty1(2))*(ewNotFull1(3)),   
+									localShouldDec2 = (localNotEmpty1(2))*(ewNotFull1(3)),   
 									ewShouldInc3 = (ewNotFull1(3))*(localNotEmpty1(2)),  
 									noc[2].ewLockedns = !nsNotFull(0), 
 									ewShouldDec2 = nsNotFull1(0),  
 									nsShouldInc0 = nsNotFull1(0),  
 									nsShouldDec2 = (nsNotEmpty1(2)),  
 									//totalFlitsDelivered2 += nsNotEmpty1(2), 
-									noc[2].nsPriority = nsNotFull(0), 
-									optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+									noc[2].nsPriority = nsNotFull(0) 
+									//optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 								=} 
 
 
@@ -2923,7 +2966,7 @@ process arbiter2(){
 						//Local Sends to 2,  EW to 0
 						:(1/6):  {=  noc[2].localPriority = !nsNotFull(0) && localNotEmpty(2) && !nsNotEmpty(2),  
 									noc[2].localLockedns = localNotEmpty(2) && !nsNotFull(0), 
-									noc[2].localLen -= (localNotEmpty1(2))*(nsNotFull1(0)),   
+									localShouldDec2 = (localNotEmpty1(2))*(nsNotFull1(0)),   
 									nsShouldInc0 = (nsNotFull1(0))*(localNotEmpty1(2)),  
 									ewShouldDec2 = nsNotEmpty0(2), 
 									noc[2].ewLockedlocal = nsNotEmpty(2), 
@@ -2936,7 +2979,7 @@ process arbiter2(){
 						//Local has a 1 or 3 and EW has a 0
 						:(1/3):  {=   noc[2].localPriority = !ewNotFull(3) && localNotEmpty(2) && !nsNotEmpty(2),  
 									noc[2].localLockedew = localNotEmpty(2) && !ewNotFull(3), 
-									noc[2].localLen -= (localNotEmpty1(2))*(ewNotFull1(3)),   
+									localShouldDec2 = (localNotEmpty1(2))*(ewNotFull1(3)),   
 									ewShouldInc3 = (ewNotFull1(3))*(localNotEmpty1(2)),  
 									nsShouldDec2 = nsNotEmpty1(2), 
 									noc[2].nsPriority = !nsNotEmpty(2),  
@@ -2948,15 +2991,15 @@ process arbiter2(){
 						//Local has a 1 or 3 and EW has a 2
 						:(1/3):  {=  noc[2].localPriority = localNotEmpty(2) && !ewNotFull(3) && nsNotFull(0), 
 									noc[2].localLockedew = localNotEmpty(2) && !ewNotFull(3), 
-									noc[2].localLen -= (localNotEmpty1(2))*(ewNotFull1(3)),   
+									localShouldDec2 = (localNotEmpty1(2))*(ewNotFull1(3)),   
 									ewShouldInc3 = (ewNotFull1(3))*(localNotEmpty1(2)),  
 									noc[2].ewLockedns = !nsNotFull(0), 
 									ewShouldDec2 = nsNotFull1(0),  
 									nsShouldInc0 = nsNotFull1(0),  
 									nsShouldDec2 = (nsNotEmpty1(2)),  
 									//totalFlitsDelivered2 += nsNotEmpty1(2), 
-									noc[2].nsPriority = nsNotFull(0), 
-									optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+									noc[2].nsPriority = nsNotFull(0) 
+									//optimalRuns2 += localNotEmpty1(2)*ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 								=}  
 
 
@@ -2976,7 +3019,7 @@ process arbiter2(){
 						 //Local sends NS and EW sends local
 								tick {=  noc[2].localPriority = true,  
 									noc[2].localLockedns = !nsNotFull(0),  
-									noc[2].localLen -= (nsNotFull1(0)), 
+									localShouldDec2 = (nsNotFull1(0)), 
 									nsShouldInc0 = (nsNotFull1(0)),  
 									ewShouldDec2 = 1,  
 									noc[2].ewLockedlocal = false, 
@@ -2990,7 +3033,7 @@ process arbiter2(){
 
 							tick {=  noc[2].localPriority = !nsNotFull(0),  
 									noc[2].localLockedns = !nsNotFull(0),  
-									noc[2].localLen -= (nsNotFull1(0)),   
+									localShouldDec2 = (nsNotFull1(0)),   
 									nsShouldInc0 = (nsNotFull1(0)),  
 									noc[2].ewLockedns = true, 
 									nsShouldDec2 = (nsNotEmpty1(2)),  
@@ -3009,7 +3052,7 @@ process arbiter2(){
 						//Local and EW both send to 2
 						:(1/2):  {=  	noc[2].localPriority = !nsNotFull(0),  
 									noc[2].localLockedns = !nsNotFull(0),  
-									noc[2].localLen -= (nsNotFull1(0)),   
+									localShouldDec2 = (nsNotFull1(0)),   
 									nsShouldInc0 = (nsNotFull1(0)),  
 									noc[2].ewLockedns = true, 
 									nsShouldDec2 = (nsNotEmpty1(2)),  
@@ -3019,7 +3062,7 @@ process arbiter2(){
 						//Local Sends to 2,  EW to 0
 						:(1/2):  {=  noc[2].localPriority = true,  
 									noc[2].localLockedns = !nsNotFull(0),  
-									noc[2].localLen -= (nsNotFull1(0)), 
+									localShouldDec2 = (nsNotFull1(0)), 
 									nsShouldInc0 = (nsNotFull1(0)),  
 									ewShouldDec2 = 1,  
 									noc[2].ewLockedlocal = false, 
@@ -3040,7 +3083,7 @@ process arbiter2(){
 						// Local Sends EW and EW sends local
 					tick {=  	noc[2].localPriority = true,  
 						noc[2].localLockedew = !ewNotFull(3), 
-						noc[2].localLen -= (ewNotFull1(3)),   
+						localShouldDec2 = (ewNotFull1(3)),   
 						ewShouldInc3 = (ewNotFull1(3)),  
 						ewShouldDec2 = 1,  
 						noc[2].ewLockedlocal = false, 
@@ -3058,15 +3101,15 @@ process arbiter2(){
 								//Local has a 1 or 3 and EW has a 2
 						tick {=   		noc[2].localPriority = !(ewNotFull(3) && !nsNotFull(0)),  
 									noc[2].localLockedew = !ewNotFull(3), 
-									noc[2].localLen -= (ewNotFull1(3)),   
+									localShouldDec2 = (ewNotFull1(3)),   
 									ewShouldInc3 = (ewNotFull1(3)),  
 									ewShouldDec2 = (nsNotFull1(0)),  
 									noc[2].ewLockedns = !nsNotFull(0), 
 									nsShouldInc0 = (nsNotFull1(0)),  
 									nsShouldDec2 = (nsNotEmpty1(2)),  
-									noc[2].nsPriority = false, 
+									noc[2].nsPriority = false 
 									//totalFlitsDelivered2 += nsNotEmpty1(2), 
-									optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+									//optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 								=}  
 
 
@@ -3082,7 +3125,7 @@ process arbiter2(){
 						//Local has a 1 or 3 and EW has a 0
 						:(1/2):  {=  	noc[2].localPriority = true,  
 									noc[2].localLockedew = !ewNotFull(3), 
-									noc[2].localLen -= (ewNotFull1(3)),   
+									localShouldDec2 = (ewNotFull1(3)),   
 									ewShouldInc3 = (ewNotFull1(3)),  
 									ewShouldDec2 = 1,  
 									noc[2].ewLockedlocal = false, 
@@ -3092,15 +3135,15 @@ process arbiter2(){
 						//Local has a 1 or 3 and EW has a 2
 						:(1/2):  {=   noc[2].localPriority = !(ewNotFull(3) && !nsNotFull(0)),  
 									noc[2].localLockedew = !ewNotFull(3), 
-									noc[2].localLen -= (ewNotFull1(3)),   
+									localShouldDec2 = (ewNotFull1(3)),   
 									ewShouldInc3 = (ewNotFull1(3)),  
 									ewShouldDec2 = (nsNotFull1(0)),  
 									noc[2].ewLockedns = !nsNotFull(0), 
 									nsShouldInc0 = (nsNotFull1(0)),  
 									nsShouldDec2 = (nsNotEmpty1(2)),  
-									noc[2].nsPriority = false, 
+									noc[2].nsPriority = false 
 									//totalFlitsDelivered2 += nsNotEmpty1(2), 
-									optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
+									//optimalRuns2 += ewNotFull1(3)*nsNotFull1(0)*nsNotEmpty1(2)
 								=}  
 
 
@@ -3118,7 +3161,7 @@ process arbiter2(){
 						 //Local sends NS and EW sends local
 						:(1/3):  tick {=  noc[2].localPriority = true,  
 									noc[2].localLockedns = localNotEmpty(2) && !nsNotFull(0),  
-									noc[2].localLen -= (nsNotFull1(0))*(localNotEmpty1(2)), 
+									localShouldDec2 = (nsNotFull1(0))*(localNotEmpty1(2)), 
 									nsShouldInc0 = (nsNotFull1(0))*(localNotEmpty1(2)),  
 									ewShouldDec2 = 1, 
 									noc[2].ewLockedlocal = false,  
@@ -3128,7 +3171,7 @@ process arbiter2(){
 						// Local Sends EW and EW sends local
 						:(2/3):  tick {=  noc[2].localPriority = true,  
 									noc[2].localLockedew = localNotEmpty(2) && !ewNotFull(3), 
-									noc[2].localLen -= (localNotEmpty1(2))*(ewNotFull1(3)),   
+									localShouldDec2 = (localNotEmpty1(2))*(ewNotFull1(3)),   
 									ewShouldInc3 = (ewNotFull1(3))*(localNotEmpty1(2)),  
 									ewShouldDec2 = 1,  
 									noc[2].ewLockedlocal = false, 
@@ -3147,7 +3190,7 @@ process arbiter2(){
 						//Local and EW both send to 2
 						:(1/3):  {=  noc[2].localPriority = (localNotEmpty(2) && !nsNotFull(0)) || (!localNotEmpty(2) && nsNotFull(0)),  
 									noc[2].localLockedns = localNotEmpty(2) && !nsNotFull(0),  
-									noc[2].localLen -= (localNotEmpty1(2))*(nsNotFull1(0)),   
+									localShouldDec2 = (localNotEmpty1(2))*(nsNotFull1(0)),   
 									nsShouldInc0 = (nsNotFull1(0)),  
 									noc[2].ewLockedns = localNotEmpty(2) || (!localNotEmpty(2) && !nsNotFull(0)), 
 									ewShouldDec2 = localNotEmpty0(2)*nsNotFull1(0), 
@@ -3158,15 +3201,15 @@ process arbiter2(){
 								//Local has a 1 or 3 and EW has a 2
 						:(2/3):  {=   noc[2].localPriority = (!ewNotFull(3) && localNotEmpty(2)) || (!localNotEmpty(2) && nsNotFull(0)) || (ewNotFull(3) && localNotEmpty(2) && nsNotFull(0)),  
 									noc[2].localLockedew = localNotEmpty(2) && !ewNotFull(3), 
-									noc[2].localLen -= (localNotEmpty1(2))*(ewNotFull1(3)),   
+									localShouldDec2 = (localNotEmpty1(2))*(ewNotFull1(3)),   
 									ewShouldInc3 = (ewNotFull1(3))*(localNotEmpty1(2)),  
 									ewShouldDec2 = (nsNotFull1(0)),  
 									noc[2].ewLockedns = !nsNotFull(0), 
 									nsShouldInc0 = (nsNotFull1(0)),  
 									nsShouldDec2 = (nsNotEmpty1(2)),  
-									noc[2].nsPriority = false, 
+									noc[2].nsPriority = false 
 									//totalFlitsDelivered2 += nsNotEmpty1(2), 
-									optimalRuns2 += ewNotFull1(3)*localNotEmpty1(2)*nsNotFull1(0)*nsNotEmpty1(2)
+									//optimalRuns2 += ewNotFull1(3)*localNotEmpty1(2)*nsNotFull1(0)*nsNotEmpty1(2)
 								=}  
 						}
 
@@ -3181,7 +3224,7 @@ process arbiter2(){
 						//Local and EW both send to 2
 						:(1/6):  {=  noc[2].localPriority = (localNotEmpty(2) && !nsNotFull(0)) || (!localNotEmpty(2) && nsNotFull(0)),  
 									noc[2].localLockedns = localNotEmpty(2) && !nsNotFull(0),  
-									noc[2].localLen -= (localNotEmpty1(2))*(nsNotFull1(0)),   
+									localShouldDec2 = (localNotEmpty1(2))*(nsNotFull1(0)),   
 									nsShouldInc0 = (nsNotFull1(0)),  
 									noc[2].ewLockedns = localNotEmpty(2) || (!localNotEmpty(2) && !nsNotFull(0)), 
 									ewShouldDec2 = localNotEmpty0(2)*nsNotFull1(0), 
@@ -3192,7 +3235,7 @@ process arbiter2(){
 						//Local Sends to 2,  EW to 0
 						:(1/6):  {=  noc[2].localPriority = true,  
 									noc[2].localLockedns = localNotEmpty(2) && !nsNotFull(0),  
-									noc[2].localLen -= (nsNotFull1(0))*(localNotEmpty1(2)), 
+									localShouldDec2 = (nsNotFull1(0))*(localNotEmpty1(2)), 
 									nsShouldInc0 = (nsNotFull1(0))*(localNotEmpty1(2)),  
 									ewShouldDec2 = 1, 
 									noc[2].ewLockedlocal = false,  
@@ -3204,7 +3247,7 @@ process arbiter2(){
 						//Local has a 1 or 3 and EW has a 0
 						:(1/3):  {=  noc[2].localPriority = true,  
 									noc[2].localLockedew = localNotEmpty(2) && !ewNotFull(3), 
-									noc[2].localLen -= (localNotEmpty1(2))*(ewNotFull1(3)),   
+									localShouldDec2 = (localNotEmpty1(2))*(ewNotFull1(3)),   
 									ewShouldInc3 = (ewNotFull1(3))*(localNotEmpty1(2)),  
 									ewShouldDec2 = 1,  
 									noc[2].ewLockedlocal = false, 
@@ -3214,15 +3257,15 @@ process arbiter2(){
 						//Local has a 1 or 3 and EW has a 2
 						:(1/3):  {=   noc[2].localPriority = (!ewNotFull(3) && localNotEmpty(2)) || (!localNotEmpty(2) && nsNotFull(0)) || (ewNotFull(3) && localNotEmpty(2) && nsNotFull(0)),  
 									noc[2].localLockedew = localNotEmpty(2) && !ewNotFull(3), 
-									noc[2].localLen -= (localNotEmpty1(2))*(ewNotFull1(3)),   
+									localShouldDec2 = (localNotEmpty1(2))*(ewNotFull1(3)),   
 									ewShouldInc3 = (ewNotFull1(3))*(localNotEmpty1(2)),  
 									ewShouldDec2 = (nsNotFull1(0)),  
 									noc[2].ewLockedns = !nsNotFull(0), 
 									nsShouldInc0 = (nsNotFull1(0)),  
 									nsShouldDec2 = (nsNotEmpty1(2)),  
-									noc[2].nsPriority = false, 
+									noc[2].nsPriority = false 
 									//totalFlitsDelivered2 += nsNotEmpty1(2), 
-									optimalRuns2 += ewNotFull1(3)*localNotEmpty1(2)*nsNotFull1(0)*nsNotEmpty1(2)
+									//optimalRuns2 += ewNotFull1(3)*localNotEmpty1(2)*nsNotFull1(0)*nsNotEmpty1(2)
 								=}  
 
 
@@ -3249,7 +3292,7 @@ process arbiter3(){
 
 			tick {=  noc[3].localLockedns = !nsNotFull(1),   //Sets the priority to false if it was able to send to the ns buffer of the NoC in the y direction
 				noc[3].localPriority = !nsNotFull(1) || noc[3].localPriority, 		//Local gets priority if it is unable to send
-				noc[3].localLen -= nsNotFull1(1),      //Local sends a flit ns if the receiving buffer is not full
+				localShouldDec3 = nsNotFull1(1),      //Local sends a flit ns if the receiving buffer is not full
 				nsShouldInc1 = (nsNotFull1(1)),   //The ns direction receives the flit if it is not already full
 				nsShouldDec3 = (nsNotEmpty1(3)) 						//The ns buffer sends a flit to local if it is not empty
 				//totalFlitsDelivered3 += nsNotEmpty1(3)
@@ -3261,7 +3304,7 @@ process arbiter3(){
 
 			tick {=   			noc[3].localLockedew = !ewNotFull(2),  // Local is locked it if has a flit and is unable to send it
 							noc[3].localPriority = !ewNotFull(2) || noc[3].localPriority,   // Local gets priority under the same conditions		
-							noc[3].localLen -= (ewNotFull1(2)),   //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
+							localShouldDec3 = (ewNotFull1(2)),   //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
 							ewShouldInc2 = (ewNotFull1(2)),  //The ew direction receives it under the same conditions
 							nsShouldDec3 = (nsNotEmpty1(3))  //The ns buffer sends a flit to local if it is not empty
 							//totalFlitsDelivered3 += nsNotEmpty1(3)	
@@ -3276,7 +3319,7 @@ process arbiter3(){
 				//Local sends in the NS direction
 				:(1/3): {=   noc[3].localLockedns = localNotEmpty(3) && !nsNotFull(1),  // Local is locked it if has a flit and is unable to send it
 							noc[3].localPriority = (localNotEmpty(3) && !nsNotFull(1)) || noc[3].localPriority,   // Local gets priority under the same conditions
-							noc[3].localLen -= (localNotEmpty1(3))*(nsNotFull1(1)),   //Local sends a flit to the ns direction if it is not empty and the receiving buffer is not full
+							localShouldDec3 = (localNotEmpty1(3))*(nsNotFull1(1)),   //Local sends a flit to the ns direction if it is not empty and the receiving buffer is not full
 					   		nsShouldInc1 = (nsNotFull1(1))*(localNotEmpty1(3)),  //The ns direction receives the flit under the same conditions
 							nsShouldDec3 = (nsNotEmpty1(3))    //The ns buffer sends a flit to local if it is not empty	
 							//totalFlitsDelivered3 += nsNotEmpty1(3)
@@ -3284,7 +3327,7 @@ process arbiter3(){
 				//Local sends to the ew direction
 				:(2/3): {=   noc[3].localLockedew = localNotEmpty(3) && !ewNotFull(2),  // Local is locked it if has a flit and is unable to send it
 							noc[3].localPriority = (localNotEmpty(3) && !ewNotFull(2)) || noc[3].localPriority,   // Local gets priority under the same conditions
-							noc[3].localLen -= (localNotEmpty1(3))*(ewNotFull1(2)),   //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
+							localShouldDec3 = (localNotEmpty1(3))*(ewNotFull1(2)),   //Local sends a flit to the ew direction if it is not empty and the receiving buffer is not full
 							ewShouldInc2 = (ewNotFull1(2))*(localNotEmpty1(3)),  //The ew direction receives it under the same conditions
 							nsShouldDec3 = (nsNotEmpty1(3))  //The ns buffer sends a flit to local if it is not empty
 							//totalFlitsDelivered3 += nsNotEmpty1(3)
@@ -3302,7 +3345,7 @@ process arbiter3(){
 
 				tick {=  noc[3].localLockedns = !nsNotFull(1),  	//Local stays locked if it is unable to send
 					noc[3].localPriority = !nsNotFull(1), 
-						noc[3].localLen -= nsNotFull1(1),   //Local sends if the ns direction is not already full
+						localShouldDec3 = nsNotFull1(1),   //Local sends if the ns direction is not already full
 						nsShouldInc1 = nsNotFull1(1),  //The ns direction receives under the same conditions
 						noc[3].nsPriority = false, 
 						noc[3].ewLockedns = true,  
@@ -3316,7 +3359,7 @@ process arbiter3(){
 			tick palt {
 			// Local and EW both send ns	
 			:(1/2):  {=  noc[3].localLockedns = !nsNotFull(1),  	//Local stays locked if it is unable to send
-						noc[3].localLen -= nsNotFull1(1),   //Local sends if the ns direction is not already full
+						localShouldDec3 = nsNotFull1(1),   //Local sends if the ns direction is not already full
 						nsShouldInc1 = nsNotFull1(1),  //The ns direction receives under the same conditions
 						nsShouldDec3 = (nsNotEmpty1(3)),    //The ns buffer sends a flit to local if it is not empty
 						noc[3].nsPriority = false, 
@@ -3328,7 +3371,7 @@ process arbiter3(){
 			 //Local sends ns,  and EW sends to to local
 			:(1/2):  {=  noc[3].localLockedns =  !nsNotFull(1),   //Local stays locked if it is unable to send
 						noc[3].localPriority = !(nsNotFull(1) && nsNotEmpty(3)),  //Local only loses priority if it sends and ew doesn't
-						noc[3].localLen -= (nsNotFull1(1)),   //Local sends ns if it isn't empty and ns isn't full
+						localShouldDec3 = (nsNotFull1(1)),   //Local sends ns if it isn't empty and ns isn't full
 						nsShouldInc1 = (nsNotFull1(1)),  //Ns receives under the same conditions
 						ewShouldDec3 = nsNotEmpty0(3),  	//Ew sends if the ns buffer is empty
 				
@@ -3349,15 +3392,15 @@ process arbiter3(){
 				//Local has a 1 or 3 and EW has a 2
 				tick {=  noc[3].localLockedew = !ewNotFull(2),  //Local is locked in the ew direction if it is unable to send
 							noc[3].localPriority = !(ewNotFull(2) && !nsNotFull(1)),  //Local remains in priority under the same conditions
-							noc[3].localLen -= (ewNotFull1(2)),   //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec3 = (ewNotFull1(2)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc2 = (ewNotFull1(2)),  //The ew direction recieves under the same conditions
 							ewShouldDec3 = (nsNotFull1(1)),   // Ew sends if the ns direction is not full
 							noc[3].ewLockedns = !nsNotFull(1),  // Ew is locked to ns if it is unable to send
 							nsShouldInc1 = (nsNotFull1(1)),  //The ns direction receives if it is not full
 							noc[3].nsPriority = nsNotFull(1),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec3 = (nsNotEmpty1(3)),  // Ns sends if it is not empty
+							nsShouldDec3 = (nsNotEmpty1(3))  // Ns sends if it is not empty
 							//totalFlitsDelivered3 += nsNotEmpty1(3), 
-							optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+							//optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 
 				=} 
 
@@ -3371,7 +3414,7 @@ process arbiter3(){
 				//Local has a 1 or 3 and EW has a 0	
 				:(1/2):  {=  noc[3].localLockedew = !ewNotFull(2),  //Local is locked in the ew direction if it is unable to send
 							noc[3].localPriority = !(ewNotFull(2) && nsNotEmpty(3)),  //Local remains in priority under the same conditions
-							noc[3].localLen -= (ewNotFull1(2)),   //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec3 = (ewNotFull1(2)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc2 = (ewNotFull1(2)),  //The ew direction receives under the same conditions
 							noc[3].ewLockedlocal = nsNotEmpty(3),  //The ew buffer is locked into the local direction if the ns buffer is not empty
 							noc[3].nsPriority = !nsNotEmpty(3),   //The ns buffer remains in priority if it is empty
@@ -3383,15 +3426,15 @@ process arbiter3(){
 				//Local has a 1 or 3 and EW has a 2
 				:(1/2):  {=  noc[3].localLockedew = !ewNotFull(2),  //Local is locked in the ew direction if it is unable to send
 							noc[3].localPriority = !(ewNotFull(2) && !nsNotFull(1)),  //Local remains in priority under the same conditions
-							noc[3].localLen -= (ewNotFull1(2)),   //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec3 = (ewNotFull1(2)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc2 = (ewNotFull1(2)),  //The ew direction recieves under the same conditions
 							ewShouldDec3 = (nsNotFull1(1)),   // Ew sends if the ns direction is not full
 							noc[3].ewLockedns = !nsNotFull(1),  // Ew is locked to ns if it is unable to send
 							nsShouldInc1 = (nsNotFull1(1)),  //The ns direction receives if it is not full
 							noc[3].nsPriority = nsNotFull(1),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec3 = (nsNotEmpty1(3)),  // Ns sends if it is not empty
+							nsShouldDec3 = (nsNotEmpty1(3))  // Ns sends if it is not empty
 							//totalFlitsDelivered3 += nsNotEmpty1(3), 
-							optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+							//optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 				=} 
 
 
@@ -3411,7 +3454,7 @@ process arbiter3(){
 				:(1/3): {= 	noc[3].ewLockedns = (localNotEmpty(3)) || (!localNotEmpty(3) && nsNotFull(1)),                 //The ew buffer gets locked in the ns direction if local is not empty 
 							noc[3].localPriority = (localNotEmpty(3) && !nsNotFull(1)) || (!localNotEmpty(3) && nsNotFull(1)),    //Local remains in priority if it is non-empty and is unable to send
 							noc[3].localLockedns = (localNotEmpty(3) && !nsNotFull(1)),  // Local gets locked to ns under the same conditions
-							noc[3].localLen -= (localNotEmpty1(3))*(nsNotFull1(1)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
+							localShouldDec3 = (localNotEmpty1(3))*(nsNotFull1(1)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
 							nsShouldInc1 = (nsNotFull1(1)),    //The ns direction receives if it is not full (either from ew or local)
 							ewShouldDec3 = localNotEmpty0(3)*(nsNotFull1(1)), 		//Ew sends if local is empty and the ns direction is not full
 							nsShouldDec3 = (nsNotEmpty1(3)),  		//Ns sends local if it is not empty
@@ -3422,15 +3465,15 @@ process arbiter3(){
 				//Local has a 1 or 3 and EW has a 2
 				:(2/3):  {=  noc[3].localLockedew = localNotEmpty(3) && !ewNotFull(2),  //Local is locked in the ew direction if it is unable to send
 							noc[3].localPriority = (localNotEmpty(3) && !ewNotFull(2)) || (!localNotEmpty(3) && nsNotFull(1)) || ( (localNotEmpty(3) && ewNotFull(2) && (nsNotFull(1)))),  //Local remains in priority under the same conditions
-							noc[3].localLen -= (localNotEmpty1(3))*(ewNotFull1(2)),   //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec3 = (localNotEmpty1(3))*(ewNotFull1(2)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc2 = (ewNotFull1(2))*(localNotEmpty1(3)),  //The ew direction recieves under the same conditions
 							ewShouldDec3 = (nsNotFull1(1)),   // Ew sends if the ns direction is not full
 							noc[3].ewLockedns = !nsNotFull(1),  // Ew is locked to ns if it is unable to send
 							nsShouldInc1 = (nsNotFull1(1)),  //The ns direction receives if it is not full
 							noc[3].nsPriority = nsNotFull(1),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec3 = (nsNotEmpty1(3)),  // Ns sends if it is not empty
+							nsShouldDec3 = (nsNotEmpty1(3))  // Ns sends if it is not empty
 							//totalFlitsDelivered3 += nsNotEmpty1(3), 
-							optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+							//optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 				=} 
 
 
@@ -3446,7 +3489,7 @@ process arbiter3(){
 				:(1/6):  {=  noc[3].ewLockedns = (localNotEmpty(3)) || (!localNotEmpty(3) && nsNotFull(1)),                 //The ew buffer gets locked in the ns direction if local is not empty 
 							noc[3].localPriority = (localNotEmpty(3) && !nsNotFull(1)) || (!localNotEmpty(3) && nsNotFull(1)),    //Local remains in priority if it is non-empty and is unable to send
 							noc[3].localLockedns = (localNotEmpty(3) && !nsNotFull(1)),  // Local gets locked to ns under the same conditions
-							noc[3].localLen -= (localNotEmpty1(3))*(nsNotFull1(1)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
+							localShouldDec3 = (localNotEmpty1(3))*(nsNotFull1(1)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
 							nsShouldInc1 = (nsNotFull1(1)),    //The ns direction receives if it is not full (either from ew or local)
 							ewShouldDec3 = localNotEmpty0(3)*(nsNotFull1(1)), 		//Ew sends if local is empty and the ns direction is not full
 							nsShouldDec3 = (nsNotEmpty1(3)),  		//Ns sends local if it is not empty
@@ -3457,7 +3500,7 @@ process arbiter3(){
 				//Local Sends to 2,  EW to 0
 				:(1/6):  {=  noc[3].localLockedns = localNotEmpty(3) && !nsNotFull(1),  //Local is locked in the ns direction if it is unable to send
 							noc[3].localPriority = (localNotEmpty(3) && !nsNotFull(1)) || (localNotEmpty(3) && !nsNotEmpty(3)) || ( ( (localNotEmpty(3)) && (nsNotFull(1)) ) && !nsNotEmpty(3)),  //Local remains in priority under the same conditions
-							noc[3].localLen -= (localNotEmpty1(3))*(nsNotFull1(1)),   //Local sends the ns direction if it is not empty,  and the receiving buffer is not full
+							localShouldDec3 = (localNotEmpty1(3))*(nsNotFull1(1)),   //Local sends the ns direction if it is not empty,  and the receiving buffer is not full
 							nsShouldInc1 = (nsNotFull1(1))*(localNotEmpty1(3)),  //The ns direction receives if it is not full and local is not empty
 							ewShouldDec3 = nsNotEmpty0(3),  //Ew sends local if the ns buffer is empty
 							noc[3].ewLockedlocal = nsNotEmpty(3),  //Ew gets locked to local if the ns buffer is not empty
@@ -3470,7 +3513,7 @@ process arbiter3(){
 				//Local has a 1 or 3 and EW has a 0	
 				:(1/3):  {=  noc[3].localLockedew = localNotEmpty(3) && !ewNotFull(2),  //Local is locked in the ew direction if it is unable to send
 							noc[3].localPriority = (localNotEmpty(3) && !ewNotFull(2)) || (localNotEmpty(3) && !nsNotEmpty(3)) || ( ( (localNotEmpty(3)) && (ewNotFull(2)) ) && !nsNotEmpty(3)),  //Local remains in priority under the same conditions
-							noc[3].localLen -= (localNotEmpty1(3))*(ewNotFull1(2)),   //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec3 = (localNotEmpty1(3))*(ewNotFull1(2)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc2 = (ewNotFull1(2))*(localNotEmpty1(3)),  //The ew direction receives under the same conditions
 							noc[3].ewLockedlocal = nsNotEmpty(3),  //The ew buffer is locked into the local direction if the ns buffer is not empty
 							noc[3].nsPriority = !nsNotEmpty(3),   //The ns buffer remains in priority if it is empty
@@ -3482,15 +3525,15 @@ process arbiter3(){
 				//Local has a 1 or 3 and EW has a 2
 				:(1/3):  {=  noc[3].localLockedew = localNotEmpty(3) && !ewNotFull(2),  //Local is locked in the ew direction if it is unable to send
 							noc[3].localPriority = (localNotEmpty(3) && !ewNotFull(2)) || (!localNotEmpty(3) && nsNotFull(1)) || ( (localNotEmpty(3) && ewNotFull(2) && (nsNotFull(1)))),  //Local remains in priority under the same conditions
-							noc[3].localLen -= (localNotEmpty1(3))*(ewNotFull1(2)),   //Local sends ew if it is not empty and the ew direciton is not full
+							localShouldDec3 = (localNotEmpty1(3))*(ewNotFull1(2)),   //Local sends ew if it is not empty and the ew direciton is not full
 							ewShouldInc2 = (ewNotFull1(2))*(localNotEmpty1(3)),  //The ew direction recieves under the same conditions
 							ewShouldDec3 = (nsNotFull1(1)),   // Ew sends if the ns direction is not full
 							noc[3].ewLockedns = !nsNotFull(1),  // Ew is locked to ns if it is unable to send
 							nsShouldInc1 = (nsNotFull1(1)),  //The ns direction receives if it is not full
 							noc[3].nsPriority = nsNotFull(1),   //The ns buffer stays in priority if it is empty or ew is able to send
-							nsShouldDec3 = (nsNotEmpty1(3)),  // Ns sends if it is not empty
+							nsShouldDec3 = (nsNotEmpty1(3))  // Ns sends if it is not empty
 							//totalFlitsDelivered3 += nsNotEmpty1(3), 
-							optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+							//optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 				=} 
 
 
@@ -3509,7 +3552,7 @@ process arbiter3(){
 							if (noc[3].ewLockedlocal) {
 								tick {=  noc[3].localLockedns = !nsNotFull(1), 
 									noc[3].localPriority = !nsNotFull(1), 
-									noc[3].localLen -= (nsNotFull1(1)),   
+									localShouldDec3 = (nsNotFull1(1)),   
 									nsShouldInc1 = (nsNotFull1(1)),  
 									ewShouldDec3 = 1,  
 									noc[3].ewLockedlocal = false, 
@@ -3548,7 +3591,7 @@ process arbiter3(){
 								//Local Sends to 2,  EW to 0
 								:(1/2):  {=  noc[3].localLockedns = !nsNotFull(1), 
 											noc[3].localPriority = !nsNotFull(1), 
-											noc[3].localLen -= (nsNotFull1(1)),   
+											localShouldDec3 = (nsNotFull1(1)),   
 											nsShouldInc1 = (nsNotFull1(1)),  
 											ewShouldDec3 = 1,  
 											//totalFlitsDelivered3 += 1, 
@@ -3569,7 +3612,7 @@ process arbiter3(){
 							// Local Sens EW and EW sends local 
 							tick {=   noc[3].localLockedew = !ewNotFull(2), 
 										noc[3].localPriority = !ewNotFull(2), 
-										noc[3].localLen -= (ewNotFull1(2)),   
+										localShouldDec3 = (ewNotFull1(2)),   
 										ewShouldInc2 = (ewNotFull1(2)),  
 										noc[3].ewLockedlocal = false, 
 										ewShouldDec3 = 1,  
@@ -3585,14 +3628,14 @@ process arbiter3(){
 							//Local sends EW and EW sends NS
 							tick {=   noc[3].localLockedew = !ewNotFull(2), 
 										noc[3].localPriority = !ewNotFull(2) && nsNotFull(1), 
-										noc[3].localLen -= (ewNotFull1(2)),   
+										localShouldDec3 = (ewNotFull1(2)),   
 										ewShouldInc2 = (ewNotFull1(2)),  
 										ewShouldDec3 = nsNotFull1(1),  
 										noc[3].ewLockedns = !nsNotFull(1), 
 										nsShouldInc1 = nsNotFull1(1),  
-										nsShouldDec3 = (nsNotEmpty1(3)),  
+										nsShouldDec3 = (nsNotEmpty1(3))  
 										//totalFlitsDelivered3 += nsNotEmpty1(3), 
-										optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+										//optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 									=} 
 	
 
@@ -3606,7 +3649,7 @@ process arbiter3(){
 						//Local has a 1 or 3 and EW has a 0
 						:(1/2):  {=  		noc[3].localLockedew = !ewNotFull(2), 
 										noc[3].localPriority = !ewNotFull(2), 
-										noc[3].localLen -= (ewNotFull1(2)),   
+										localShouldDec3 = (ewNotFull1(2)),   
 										ewShouldInc2 = (ewNotFull1(2)),  
 										noc[3].ewLockedlocal = false, 
 										ewShouldDec3 = 1,  
@@ -3617,14 +3660,14 @@ process arbiter3(){
 						//Local has a 1 or 3 and EW has a 2
 						:(1/2):  {=  		noc[3].localLockedew = !ewNotFull(2), 
 										noc[3].localPriority = !ewNotFull(2) && nsNotFull(1), 
-										noc[3].localLen -= (ewNotFull1(2)),   
+										localShouldDec3 = (ewNotFull1(2)),   
 										ewShouldInc2 = (ewNotFull1(2)),  
 										ewShouldDec3 = nsNotFull1(1),  
 										noc[3].ewLockedns = !nsNotFull(1), 
 										nsShouldInc1 = nsNotFull1(1),  
-										nsShouldDec3 = (nsNotEmpty1(3)),  
+										nsShouldDec3 = (nsNotEmpty1(3))  
 										//totalFlitsDelivered3 += nsNotEmpty1(3), 
-										optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+										//optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 						=} 
 
 					}
@@ -3644,7 +3687,7 @@ process arbiter3(){
 						//Local sends NS and EW sends local
 						:(1/3):  {=  noc[3].localLockedns = localNotEmpty(3) && !nsNotFull(1), 
 									noc[3].localPriority = localNotEmpty(3) && !nsNotFull(1), 
-									noc[3].localLen -= (localNotEmpty1(3))*(nsNotFull1(1)),   
+									localShouldDec3 = (localNotEmpty1(3))*(nsNotFull1(1)),   
 									nsShouldInc1 = (nsNotFull1(1))*(localNotEmpty1(3)),
 									noc[3].ewLockedlocal = false,  
 									ewShouldDec3 = 1,  
@@ -3655,7 +3698,7 @@ process arbiter3(){
 						// Local Sens EW and EW sends local 
 						:(2/3):  {=   noc[3].localLockedew = localNotEmpty(3) && !ewNotFull(2), 
 									noc[3].localPriority = localNotEmpty(3) && !ewNotFull(2), 
-									noc[3].localLen -= (localNotEmpty1(3))*(ewNotFull1(2)),   
+									localShouldDec3 = (localNotEmpty1(3))*(ewNotFull1(2)),   
 									ewShouldInc2 = (ewNotFull1(2))*(localNotEmpty1(3)), 
 									noc[3].ewLockedlocal = false, 
 									ewShouldDec3 = 1,  
@@ -3681,14 +3724,14 @@ process arbiter3(){
 						//Local sends EW and EW sends NS
 						:(2/3):  {=   noc[3].localLockedew = localNotEmpty(3) && !ewNotFull(2), 
 									noc[3].localPriority = localNotEmpty(3) && !ewNotFull(2) && nsNotFull(1), 
-									noc[3].localLen -= (localNotEmpty1(3))*(ewNotFull1(2)),   
+									localShouldDec3 = (localNotEmpty1(3))*(ewNotFull1(2)),   
 									ewShouldInc2 = (ewNotFull1(2))*(localNotEmpty1(3)),  
 									ewShouldDec3 = nsNotFull1(1),  
 									noc[3].ewLockedns = !nsNotFull(1), 
 									nsShouldInc1 = nsNotFull1(1),  
-									nsShouldDec3 = (nsNotEmpty1(3)),  
+									nsShouldDec3 = (nsNotEmpty1(3)) 
 									//totalFlitsDelivered3 += nsNotEmpty1(3), 
-									optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+									//optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 								=} 
 
 
@@ -3711,7 +3754,7 @@ process arbiter3(){
 					//Local Sends to 2,  EW to 0
 					:(1/6):  {=  		noc[3].localLockedns = localNotEmpty(3) && !nsNotFull(1), 
 									noc[3].localPriority = localNotEmpty(3) && !nsNotFull(1), 
-									noc[3].localLen -= (localNotEmpty1(3))*(nsNotFull1(1)),   
+									localShouldDec3 = (localNotEmpty1(3))*(nsNotFull1(1)),   
 									nsShouldInc1 = (nsNotFull1(1))*(localNotEmpty1(3)),  
 									ewShouldDec3 = 1,  
 									//totalFlitsDelivered3 += 1, 
@@ -3722,7 +3765,7 @@ process arbiter3(){
 					//Local has a 1 or 3 and EW has a 0
 					:(1/3):  {=  		noc[3].localLockedew = localNotEmpty(3) && !ewNotFull(2), 
 									noc[3].localPriority = localNotEmpty(3) && !ewNotFull(2), 
-									noc[3].localLen -= (localNotEmpty1(3))*(ewNotFull1(2)),   
+									localShouldDec3 = (localNotEmpty1(3))*(ewNotFull1(2)),   
 									ewShouldInc2 = (ewNotFull1(2))*(localNotEmpty1(3)),  
 									ewShouldDec3 = 1,  
 									//totalFlitsDelivered3 += 1, 
@@ -3732,14 +3775,14 @@ process arbiter3(){
 					//Local has a 1 or 3 and EW has a 2
 					:(1/3):  {=  		noc[3].localLockedew = localNotEmpty(3) && !ewNotFull(2), 
 									noc[3].localPriority = localNotEmpty(3) && !ewNotFull(2) && nsNotFull(1), 
-									noc[3].localLen -= (localNotEmpty1(3))*(ewNotFull1(2)),   
+									localShouldDec3 = (localNotEmpty1(3))*(ewNotFull1(2)),   
 									ewShouldInc2 = (ewNotFull1(2))*(localNotEmpty1(3)),  
 									ewShouldDec3 = nsNotFull1(1),  
 									noc[3].ewLockedns = !nsNotFull(1), 
 									nsShouldInc1 = nsNotFull1(1),  
-									nsShouldDec3 = (nsNotEmpty1(3)),  
+									nsShouldDec3 = (nsNotEmpty1(3))  
 									//totalFlitsDelivered3 += nsNotEmpty1(3), 
-									optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+									//optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 					=} 
 
 				}
@@ -3782,7 +3825,7 @@ process arbiter3(){
 					//Local Sends to 2,  EW to 0
 			:(1/2):  {=  noc[3].localPriority = !nsNotFull(1) && !nsNotEmpty(3), 
 						noc[3].localLockedns = !nsNotFull(1), 
-						noc[3].localLen -= nsNotFull1(1),   
+						localShouldDec3 = nsNotFull1(1),   
 						nsShouldInc1 = (nsNotFull1(1)),  
 						ewShouldDec3 = nsNotEmpty0(3), 
 						noc[3].ewLockedns = nsNotEmpty(3), 
@@ -3805,15 +3848,15 @@ process arbiter3(){
 						//Local sends EW and EW sends NS
 						tick {=   noc[3].localPriority = !ewNotFull(2) && nsNotFull(1), 
 									noc[3].localLockedew = !ewNotFull(2), 
-									noc[3].localLen -= (ewNotFull1(2)),   
+									localShouldDec3 = (ewNotFull1(2)),   
 									ewShouldInc2 = (ewNotFull1(2)),  
 									noc[3].ewLockedns = !nsNotFull(1), 
 									ewShouldDec3 = nsNotFull1(1),  
 									nsShouldInc1 = nsNotFull1(1),  
 									nsShouldDec3 = (nsNotEmpty1(3)),  
 									//totalFlitsDelivered3 += nsNotEmpty1(3), 
-									noc[3].nsPriority = nsNotFull(1), 
-									optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+									noc[3].nsPriority = nsNotFull(1) 
+									//optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 								=} 
 
 
@@ -3828,7 +3871,7 @@ process arbiter3(){
 						//Local has a 1 or 3 and EW has a 0
 						:(1/2):  {=   noc[3].localPriority = !ewNotFull(2) && !nsNotEmpty(3),  
 									noc[3].localLockedew = !ewNotFull(2), 
-									noc[3].localLen -= (ewNotFull1(2)),   
+									localShouldDec3 = (ewNotFull1(2)),   
 									ewShouldInc2 = (ewNotFull1(2)),  
 									nsShouldDec3 = nsNotEmpty1(3), 
 									noc[3].nsPriority = !nsNotEmpty(3),  
@@ -3840,15 +3883,15 @@ process arbiter3(){
 						//Local has a 1 or 3 and EW has a 2
 						:(1/2):  {=  noc[3].localPriority = !ewNotFull(2) && nsNotFull(1), 
 									noc[3].localLockedew = !ewNotFull(2), 
-									noc[3].localLen -= (ewNotFull1(2)),   
+									localShouldDec3 = (ewNotFull1(2)),   
 									ewShouldInc2 = (ewNotFull1(2)),  
 									noc[3].ewLockedns = !nsNotFull(1), 
 									ewShouldDec3 = nsNotFull1(1),  
 									nsShouldInc1 = nsNotFull1(1),  
 									nsShouldDec3 = (nsNotEmpty1(3)),  
 									//totalFlitsDelivered3 += nsNotEmpty1(3), 
-									noc[3].nsPriority = nsNotFull(1), 
-									optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+									noc[3].nsPriority = nsNotFull(1) 
+									//optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 								=}  
 
 
@@ -3876,15 +3919,15 @@ process arbiter3(){
 						//Local sends EW and EW sends NS
 						:(2/3):  {=   noc[3].localPriority = localNotEmpty(3) && !ewNotFull(2) && nsNotFull(1), 
 									noc[3].localLockedew = localNotEmpty(3) && !ewNotFull(2), 
-									noc[3].localLen -= (localNotEmpty1(3))*(ewNotFull1(2)),   
+									localShouldDec3 = (localNotEmpty1(3))*(ewNotFull1(2)),   
 									ewShouldInc2 = (ewNotFull1(2))*(localNotEmpty1(3)),  
 									noc[3].ewLockedns = !nsNotFull(1), 
 									ewShouldDec3 = nsNotFull1(1),  
 									nsShouldInc1 = nsNotFull1(1),  
 									nsShouldDec3 = (nsNotEmpty1(3)),  
 									//totalFlitsDelivered3 += nsNotEmpty1(3), 
-									noc[3].nsPriority = nsNotFull(1), 
-									optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+									noc[3].nsPriority = nsNotFull(1) 
+									//optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 								=} 
 
 
@@ -3907,7 +3950,7 @@ process arbiter3(){
 						//Local Sends to 2,  EW to 0
 						:(1/6):  {=  noc[3].localPriority = !nsNotFull(1) && localNotEmpty(3) && !nsNotEmpty(3),  
 									noc[3].localLockedns = localNotEmpty(3) && !nsNotFull(1), 
-									noc[3].localLen -= (localNotEmpty1(3))*(nsNotFull1(1)),   
+									localShouldDec3 = (localNotEmpty1(3))*(nsNotFull1(1)),   
 									nsShouldInc1 = (nsNotFull1(1))*(localNotEmpty1(3)),  
 									ewShouldDec3 = nsNotEmpty0(3), 
 									noc[3].ewLockedlocal = nsNotEmpty(3), 
@@ -3920,7 +3963,7 @@ process arbiter3(){
 						//Local has a 1 or 3 and EW has a 0
 						:(1/3):  {=   noc[3].localPriority = !ewNotFull(2) && localNotEmpty(3) && !nsNotEmpty(3),  
 									noc[3].localLockedew = localNotEmpty(3) && !ewNotFull(2), 
-									noc[3].localLen -= (localNotEmpty1(3))*(ewNotFull1(2)),   
+									localShouldDec3 = (localNotEmpty1(3))*(ewNotFull1(2)),   
 									ewShouldInc2 = (ewNotFull1(2))*(localNotEmpty1(3)),  
 									nsShouldDec3 = nsNotEmpty1(3), 
 									noc[3].nsPriority = !nsNotEmpty(3),  
@@ -3932,15 +3975,15 @@ process arbiter3(){
 						//Local has a 1 or 3 and EW has a 2
 						:(1/3):  {=  noc[3].localPriority = localNotEmpty(3) && !ewNotFull(2) && nsNotFull(1), 
 									noc[3].localLockedew = localNotEmpty(3) && !ewNotFull(2), 
-									noc[3].localLen -= (localNotEmpty1(3))*(ewNotFull1(2)),   
+									localShouldDec3 = (localNotEmpty1(3))*(ewNotFull1(2)),   
 									ewShouldInc2 = (ewNotFull1(2))*(localNotEmpty1(3)),  
 									noc[3].ewLockedns = !nsNotFull(1), 
 									ewShouldDec3 = nsNotFull1(1),  
 									nsShouldInc1 = nsNotFull1(1),  
 									nsShouldDec3 = (nsNotEmpty1(3)),  
 									//totalFlitsDelivered3 += nsNotEmpty1(3), 
-									noc[3].nsPriority = nsNotFull(1), 
-									optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+									noc[3].nsPriority = nsNotFull(1) 
+									//optimalRuns3 += localNotEmpty1(3)*ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 								=}  
 
 
@@ -3960,7 +4003,7 @@ process arbiter3(){
 						 //Local sends NS and EW sends local
 								tick {=  noc[3].localPriority = true,  
 									noc[3].localLockedns = !nsNotFull(1),  
-									noc[3].localLen -= (nsNotFull1(1)), 
+									localShouldDec3 = (nsNotFull1(1)), 
 									nsShouldInc1 = (nsNotFull1(1)),  
 									ewShouldDec3 = 1,  
 									noc[3].ewLockedlocal = false, 
@@ -3974,7 +4017,7 @@ process arbiter3(){
 
 							tick {=  noc[3].localPriority = !nsNotFull(1),  
 									noc[3].localLockedns = !nsNotFull(1),  
-									noc[3].localLen -= (nsNotFull1(1)),   
+									localShouldDec3 = (nsNotFull1(1)),   
 									nsShouldInc1 = (nsNotFull1(1)),  
 									noc[3].ewLockedns = true, 
 									nsShouldDec3 = (nsNotEmpty1(3)),  
@@ -3993,7 +4036,7 @@ process arbiter3(){
 						//Local and EW both send to 2
 						:(1/2):  {=  	noc[3].localPriority = !nsNotFull(1),  
 									noc[3].localLockedns = !nsNotFull(1),  
-									noc[3].localLen -= (nsNotFull1(1)),   
+									localShouldDec3 = (nsNotFull1(1)),   
 									nsShouldInc1 = (nsNotFull1(1)),  
 									noc[3].ewLockedns = true, 
 									nsShouldDec3 = (nsNotEmpty1(3)),  
@@ -4003,7 +4046,7 @@ process arbiter3(){
 						//Local Sends to 2,  EW to 0
 						:(1/2):  {=  noc[3].localPriority = true,  
 									noc[3].localLockedns = !nsNotFull(1),  
-									noc[3].localLen -= (nsNotFull1(1)), 
+									localShouldDec3 = (nsNotFull1(1)), 
 									nsShouldInc1 = (nsNotFull1(1)),  
 									ewShouldDec3 = 1,  
 									noc[3].ewLockedlocal = false, 
@@ -4024,7 +4067,7 @@ process arbiter3(){
 						// Local Sends EW and EW sends local
 					tick {=  	noc[3].localPriority = true,  
 						noc[3].localLockedew = !ewNotFull(2), 
-						noc[3].localLen -= (ewNotFull1(2)),   
+						localShouldDec3 = (ewNotFull1(2)),   
 						ewShouldInc2 = (ewNotFull1(2)),  
 						ewShouldDec3 = 1,  
 						noc[3].ewLockedlocal = false, 
@@ -4042,15 +4085,15 @@ process arbiter3(){
 								//Local has a 1 or 3 and EW has a 2
 						tick {=   		noc[3].localPriority = !(ewNotFull(2) && !nsNotFull(1)),  
 									noc[3].localLockedew = !ewNotFull(2), 
-									noc[3].localLen -= (ewNotFull1(2)),   
+									localShouldDec3 = (ewNotFull1(2)),   
 									ewShouldInc2 = (ewNotFull1(2)),  
 									ewShouldDec3 = (nsNotFull1(1)),  
 									noc[3].ewLockedns = !nsNotFull(1), 
 									nsShouldInc1 = (nsNotFull1(1)),  
 									nsShouldDec3 = (nsNotEmpty1(3)),  
-									noc[3].nsPriority = false, 
+									noc[3].nsPriority = false 
 									//totalFlitsDelivered3 += nsNotEmpty1(3), 
-									optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+									//optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 								=}  
 
 
@@ -4066,7 +4109,7 @@ process arbiter3(){
 						//Local has a 1 or 3 and EW has a 0
 						:(1/2):  {=  	noc[3].localPriority = true,  
 									noc[3].localLockedew = !ewNotFull(2), 
-									noc[3].localLen -= (ewNotFull1(2)),   
+									localShouldDec3 = (ewNotFull1(2)),   
 									ewShouldInc2 = (ewNotFull1(2)),  
 									ewShouldDec3 = 1,  
 									noc[3].ewLockedlocal = false, 
@@ -4076,15 +4119,15 @@ process arbiter3(){
 						//Local has a 1 or 3 and EW has a 2
 						:(1/2):  {=   noc[3].localPriority = !(ewNotFull(2) && !nsNotFull(1)),  
 									noc[3].localLockedew = !ewNotFull(2), 
-									noc[3].localLen -= (ewNotFull1(2)),   
+									localShouldDec3 = (ewNotFull1(2)),   
 									ewShouldInc2 = (ewNotFull1(2)),  
 									ewShouldDec3 = (nsNotFull1(1)),  
 									noc[3].ewLockedns = !nsNotFull(1), 
 									nsShouldInc1 = (nsNotFull1(1)),  
 									nsShouldDec3 = (nsNotEmpty1(3)),  
-									noc[3].nsPriority = false, 
+									noc[3].nsPriority = false 
 									//totalFlitsDelivered3 += nsNotEmpty1(3), 
-									optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
+									//optimalRuns3 += ewNotFull1(2)*nsNotFull1(1)*nsNotEmpty1(3)
 								=}  
 
 
@@ -4102,7 +4145,7 @@ process arbiter3(){
 						 //Local sends NS and EW sends local
 						:(1/3):  tick {=  noc[3].localPriority = true,  
 									noc[3].localLockedns = localNotEmpty(3) && !nsNotFull(1),  
-									noc[3].localLen -= (nsNotFull1(1))*(localNotEmpty1(3)), 
+									localShouldDec3 = (nsNotFull1(1))*(localNotEmpty1(3)), 
 									nsShouldInc1 = (nsNotFull1(1))*(localNotEmpty1(3)),  
 									ewShouldDec3 = 1, 
 									noc[3].ewLockedlocal = false,  
@@ -4112,7 +4155,7 @@ process arbiter3(){
 						// Local Sends EW and EW sends local
 						:(2/3):  tick {=  noc[3].localPriority = true,  
 									noc[3].localLockedew = localNotEmpty(3) && !ewNotFull(2), 
-									noc[3].localLen -= (localNotEmpty1(3))*(ewNotFull1(2)),   
+									localShouldDec3 = (localNotEmpty1(3))*(ewNotFull1(2)),   
 									ewShouldInc2 = (ewNotFull1(2))*(localNotEmpty1(3)),  
 									ewShouldDec3 = 1,  
 									noc[3].ewLockedlocal = false, 
@@ -4131,7 +4174,7 @@ process arbiter3(){
 						//Local and EW both send to 2
 						:(1/3):  {=  noc[3].localPriority = (localNotEmpty(3) && !nsNotFull(1)) || (!localNotEmpty(3) && nsNotFull(1)),  
 									noc[3].localLockedns = localNotEmpty(3) && !nsNotFull(1),  
-									noc[3].localLen -= (localNotEmpty1(3))*(nsNotFull1(1)),   
+									localShouldDec3 = (localNotEmpty1(3))*(nsNotFull1(1)),   
 									nsShouldInc1 = (nsNotFull1(1)),  
 									noc[3].ewLockedns = localNotEmpty(3) || (!localNotEmpty(3) && !nsNotFull(1)), 
 									ewShouldDec3 = localNotEmpty0(3)*nsNotFull1(1), 
@@ -4142,15 +4185,15 @@ process arbiter3(){
 								//Local has a 1 or 3 and EW has a 2
 						:(2/3):  {=   noc[3].localPriority = (!ewNotFull(2) && localNotEmpty(3)) || (!localNotEmpty(3) && nsNotFull(1)) || (ewNotFull(2) && localNotEmpty(3) && nsNotFull(1)),  
 									noc[3].localLockedew = localNotEmpty(3) && !ewNotFull(2), 
-									noc[3].localLen -= (localNotEmpty1(3))*(ewNotFull1(2)),   
+									localShouldDec3 = (localNotEmpty1(3))*(ewNotFull1(2)),   
 									ewShouldInc2 = (ewNotFull1(2))*(localNotEmpty1(3)),  
 									ewShouldDec3 = (nsNotFull1(1)),  
 									noc[3].ewLockedns = !nsNotFull(1), 
 									nsShouldInc1 = (nsNotFull1(1)),  
 									nsShouldDec3 = (nsNotEmpty1(3)),  
-									noc[3].nsPriority = false, 
+									noc[3].nsPriority = false 
 									//totalFlitsDelivered3 += nsNotEmpty1(3), 
-									optimalRuns3 += ewNotFull1(2)*localNotEmpty1(3)*nsNotFull1(1)*nsNotEmpty1(3)
+									//optimalRuns3 += ewNotFull1(2)*localNotEmpty1(3)*nsNotFull1(1)*nsNotEmpty1(3)
 								=}  
 						}
 
@@ -4165,7 +4208,7 @@ process arbiter3(){
 						//Local and EW both send to 2
 						:(1/6):  {=  noc[3].localPriority = (localNotEmpty(3) && !nsNotFull(1)) || (!localNotEmpty(3) && nsNotFull(1)),  
 									noc[3].localLockedns = localNotEmpty(3) && !nsNotFull(1),  
-									noc[3].localLen -= (localNotEmpty1(3))*(nsNotFull1(1)),   
+									localShouldDec3 = (localNotEmpty1(3))*(nsNotFull1(1)),   
 									nsShouldInc1 = (nsNotFull1(1)),  
 									noc[3].ewLockedns = localNotEmpty(3) || (!localNotEmpty(3) && !nsNotFull(1)), 
 									ewShouldDec3 = localNotEmpty0(3)*nsNotFull1(1), 
@@ -4176,7 +4219,7 @@ process arbiter3(){
 						//Local Sends to 2,  EW to 0
 						:(1/6):  {=  noc[3].localPriority = true,  
 									noc[3].localLockedns = localNotEmpty(3) && !nsNotFull(1),  
-									noc[3].localLen -= (nsNotFull1(1))*(localNotEmpty1(3)), 
+									localShouldDec3 = (nsNotFull1(1))*(localNotEmpty1(3)), 
 									nsShouldInc1 = (nsNotFull1(1))*(localNotEmpty1(3)),  
 									ewShouldDec3 = 1, 
 									noc[3].ewLockedlocal = false,  
@@ -4188,7 +4231,7 @@ process arbiter3(){
 						//Local has a 1 or 3 and EW has a 0
 						:(1/3):  {=  noc[3].localPriority = true,  
 									noc[3].localLockedew = localNotEmpty(3) && !ewNotFull(2), 
-									noc[3].localLen -= (localNotEmpty1(3))*(ewNotFull1(2)),   
+									localShouldDec3 = (localNotEmpty1(3))*(ewNotFull1(2)),   
 									ewShouldInc2 = (ewNotFull1(2))*(localNotEmpty1(3)),  
 									ewShouldDec3 = 1,  
 									noc[3].ewLockedlocal = false, 
@@ -4198,15 +4241,15 @@ process arbiter3(){
 						//Local has a 1 or 3 and EW has a 2
 						:(1/3):  {=   noc[3].localPriority = (!ewNotFull(2) && localNotEmpty(3)) || (!localNotEmpty(3) && nsNotFull(1)) || (ewNotFull(2) && localNotEmpty(3) && nsNotFull(1)),  
 									noc[3].localLockedew = localNotEmpty(3) && !ewNotFull(2), 
-									noc[3].localLen -= (localNotEmpty1(3))*(ewNotFull1(2)),   
+									localShouldDec3 = (localNotEmpty1(3))*(ewNotFull1(2)),   
 									ewShouldInc2 = (ewNotFull1(2))*(localNotEmpty1(3)),  
 									ewShouldDec3 = (nsNotFull1(1)),  
 									noc[3].ewLockedns = !nsNotFull(1), 
 									nsShouldInc1 = (nsNotFull1(1)),  
 									nsShouldDec3 = (nsNotEmpty1(3)),  
-									noc[3].nsPriority = false, 
+									noc[3].nsPriority = false 
 									//totalFlitsDelivered3 += nsNotEmpty1(3), 
-									optimalRuns3 += ewNotFull1(2)*localNotEmpty1(3)*nsNotFull1(1)*nsNotEmpty1(3)
+									//optimalRuns3 += ewNotFull1(2)*localNotEmpty1(3)*nsNotFull1(1)*nsNotEmpty1(3)
 								=}  
 
 
