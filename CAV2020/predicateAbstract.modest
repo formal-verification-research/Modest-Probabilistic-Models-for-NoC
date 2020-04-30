@@ -7,8 +7,9 @@ NoC router IDs
 option "dtmc";
 
 // ---- Begin Varialbes ----
+const int DUR;
 const int clkLower = 100; 
-const int clkUpper = 112;
+const int clkUpper = clkLower + DUR;
 int(clkLower..clkUpper) clk;
 //transient int(0..1) clk;
 

@@ -267,7 +267,6 @@ process arbiter(int n){
 		}
 	}
 	
-	
 	else if(noc[n].localB1 == true && noc[n].ewB1 == false && noc[n].nsB1 == true){ //local and ns buffers have flits
 		if(noc[n].localLockedns == true){
 			no_conflict_localns_ns(n)

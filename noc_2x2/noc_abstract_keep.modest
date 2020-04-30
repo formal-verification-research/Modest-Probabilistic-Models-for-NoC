@@ -602,7 +602,7 @@ process Arbiter_corner0(){
 				r0l2 = false
 				=}
 				}
-				else {tau};
+			else {tau};
 				
 			if(r0e0){		//east.dest = 0
 				{= 
@@ -1435,7 +1435,7 @@ process Arbiter_corner3(){
 	}
 }
 
-
+//dest is a bit if a misnomer. should be more like source
 process enque_r0eb(bool dest){
 	if(r0eb3 == true){
 		tau
