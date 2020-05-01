@@ -235,6 +235,7 @@ process Arbiter_corner(int routerID){
 		
 		//need to update the bufferID array
 		//test update for router 0
+		
 		if(routerID == 0){
 			{=
 				noc[routerID].bufferID[1] = noc[routerID].bufferArray[noc[routerID].bufferID[1]].priority,
@@ -244,26 +245,27 @@ process Arbiter_corner(int routerID){
 		}
 		else if(routerID == 1){
 			{=
-				noc[routerID].bufferID[2] = noc[routerID].bufferArray[noc[routerID].bufferID[1]].priority,
-				noc[routerID].bufferID[3] = noc[routerID].bufferArray[noc[routerID].bufferID[2]].priority,
+				noc[routerID].bufferID[2] = noc[routerID].bufferArray[noc[routerID].bufferID[2]].priority,
+				noc[routerID].bufferID[3] = noc[routerID].bufferArray[noc[routerID].bufferID[3]].priority,
 				noc[routerID].bufferID[4] = noc[routerID].bufferArray[noc[routerID].bufferID[4]].priority
 			=}
 		}
 		else if(routerID == 2){
 			{=
-				noc[routerID].bufferID[0] = noc[routerID].bufferArray[noc[routerID].bufferID[1]].priority,
-				noc[routerID].bufferID[1] = noc[routerID].bufferArray[noc[routerID].bufferID[2]].priority,
+				noc[routerID].bufferID[0] = noc[routerID].bufferArray[noc[routerID].bufferID[0]].priority,
+				noc[routerID].bufferID[1] = noc[routerID].bufferArray[noc[routerID].bufferID[1]].priority,
 				noc[routerID].bufferID[4] = noc[routerID].bufferArray[noc[routerID].bufferID[4]].priority
 			=}
 		}
 		else if(routerID == 3){
 			{=
-				noc[routerID].bufferID[0] = noc[routerID].bufferArray[noc[routerID].bufferID[1]].priority,
-				noc[routerID].bufferID[3] = noc[routerID].bufferArray[noc[routerID].bufferID[2]].priority,
+				noc[routerID].bufferID[0] = noc[routerID].bufferArray[noc[routerID].bufferID[0]].priority,
+				noc[routerID].bufferID[3] = noc[routerID].bufferArray[noc[routerID].bufferID[3]].priority,
 				noc[routerID].bufferID[4] = noc[routerID].bufferArray[noc[routerID].bufferID[4]].priority
 			=}
 		}
 		else{tau};
+		
 		
 		//Rewrite buffer array with new priority values-------------------------------------------------------------------------
 		{= 
