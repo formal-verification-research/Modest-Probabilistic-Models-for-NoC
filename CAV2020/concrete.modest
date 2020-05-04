@@ -301,10 +301,6 @@ process initialize_node_nw(int routerID){
 	noc[routerID].bufferArray[1].id = 2, 
 	noc[routerID].bufferArray[2].id = 4,
 	
-	noc[routerID].bufferArray[0].dest = -1,
-	noc[routerID].bufferArray[1].dest = -1,
-	noc[routerID].bufferArray[2].dest = -1,
-	
 	noc[routerID].unserviced = 0
 	
 	=}
@@ -322,10 +318,6 @@ process initialize_node_ne(int routerID){
 	noc[routerID].bufferArray[1].id = 3, 
 	noc[routerID].bufferArray[2].id = 4,
 	
-	noc[routerID].bufferArray[0].dest = -1,
-	noc[routerID].bufferArray[1].dest = -1,
-	noc[routerID].bufferArray[2].dest = -1,
-	
 	noc[routerID].unserviced = 0
 	=}
 }
@@ -341,10 +333,6 @@ process initialize_node_sw(int routerID){
 	noc[routerID].bufferArray[0].id = 0, 
 	noc[routerID].bufferArray[1].id = 1, 
 	noc[routerID].bufferArray[2].id = 4,
-	
-	noc[routerID].bufferArray[0].dest = -1,
-	noc[routerID].bufferArray[1].dest = -1,
-	noc[routerID].bufferArray[2].dest = -1,
 	
 	noc[routerID].unserviced = 0
 	=}
@@ -362,10 +350,6 @@ process initialize_node_se(int routerID){
 	noc[routerID].bufferArray[1].id = 3, 
 	noc[routerID].bufferArray[2].id = 4,
 	
-	noc[routerID].bufferArray[0].dest = -1,
-	noc[routerID].bufferArray[1].dest = -1,
-	noc[routerID].bufferArray[2].dest = -1,
-	
 	noc[routerID].unserviced = 0
 	=}
 	
@@ -375,9 +359,9 @@ process initialize_node_se(int routerID){
 process initialRoute(int routerID){
 	
 	{=
-	noc[routerID].bufferArray[0].val = route(noc[routerID].bufferArray[0].dest, routerID),
-	noc[routerID].bufferArray[1].val = route(noc[routerID].bufferArray[1].dest, routerID),
-	noc[routerID].bufferArray[2].val = route(noc[routerID].bufferArray[2].dest, routerID)
+	noc[routerID].bufferArray[0].val = route(peekFront(noc[routerID].bufferArray[0].buff), routerID),
+	noc[routerID].bufferArray[1].val = route(peekFront(noc[routerID].bufferArray[1].buff), routerID),
+	noc[routerID].bufferArray[2].val = route(peekFront(noc[routerID].bufferArray[2].buff), routerID)
 	=}
 }
 
@@ -388,34 +372,37 @@ process setPriority(int i, int routerID){
 		if(noc[routerID].bufferArray[i].val == -1){ tau }
 		else if(noc[routerID].bufferArray[i].val == 4){			//Send in the local direction
 			
-			{= noc[routerID].bufferArray[i].val = -1 =}			//flit delivered
+			{= 
+			noc[routerID].bufferArray[i].val = -1,
+			noc[routerID].bufferArray[i].buff = dequeue(noc[routerID].bufferArray[i].buff)			
+			=}			//flit delivered
 		}
 		else if(noc[routerID].bufferArray[i].val == 0){			//Send in the north direction
 			{=
-			noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff),
+			noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff = enqueue(peekFront(noc[routerID].bufferArray[i].buff), noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff),
 			noc[routerID].bufferArray[i].val = -1,
-			noc[routerID].bufferArray[i].dest = -1
+			noc[routerID].bufferArray[i].buff = dequeue(noc[routerID].bufferArray[i].buff)
 			=}
 		}
 		else if(noc[routerID].bufferArray[i].val == 1){			//Send in the east direction
 			{=
-			noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff),
+			noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff = enqueue(peekFront(noc[routerID].bufferArray[i].buff), noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff),
 			noc[routerID].bufferArray[i].val = -1,
-			noc[routerID].bufferArray[i].dest = -1
+			noc[routerID].bufferArray[i].buff = dequeue(noc[routerID].bufferArray[i].buff)
 			=}
 		}
 		else if(noc[routerID].bufferArray[i].val == 2){			//Send in the south direction
 			{=
-			noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff),
+			noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff = enqueue(peekFront(noc[routerID].bufferArray[i].buff), noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff),
 			noc[routerID].bufferArray[i].val = -1,
-			noc[routerID].bufferArray[i].dest = -1
+			noc[routerID].bufferArray[i].buff = dequeue(noc[routerID].bufferArray[i].buff)
 			=}
 		}
 		else if(noc[routerID].bufferArray[i].val == 3){			//Send in the west direction
 			{=
-			noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff = enqueue(noc[routerID].bufferArray[i].dest, noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff),
+			noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff = enqueue(peekFront(noc[routerID].bufferArray[i].buff), noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff),
 			noc[routerID].bufferArray[i].val = -1,
-			noc[routerID].bufferArray[i].dest = -1
+			noc[routerID].bufferArray[i].buff = dequeue(noc[routerID].bufferArray[i].buff)
 			=}
 		}
 		else {tau};
@@ -435,12 +422,12 @@ process setPriority(int i, int routerID){
 //Updates the destination from the buffer if the buffer was serviced
 process updateDestination(int i , int routerID){
 	if(noc[routerID].bufferArray[i].serviced == true){
-		{= 
-		noc[routerID].bufferArray[i].dest = peekFront(noc[routerID].bufferArray[i].buff)
-		=};
+		//{= 
+		//noc[routerID].bufferArray[i].dest = peekFront(noc[routerID].bufferArray[i].buff)
+		//=};
 		{=
-		noc[routerID].bufferArray[i].val = route(noc[routerID].bufferArray[i].dest, routerID),		//Update value from buffer
-		noc[routerID].bufferArray[i].buff = dequeue(noc[routerID].bufferArray[i].buff)
+		noc[routerID].bufferArray[i].val = route(peekFront(noc[routerID].bufferArray[i].buff), routerID)		//Update value from buffer
+		//noc[routerID].bufferArray[i].buff = dequeue(noc[routerID].bufferArray[i].buff)
 		=}
 	}
 	else {tau}
