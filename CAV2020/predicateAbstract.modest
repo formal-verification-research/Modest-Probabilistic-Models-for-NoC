@@ -7,8 +7,9 @@ NoC router IDs
 option "dtmc";
 
 // ---- Begin Varialbes ----
+const int DUR;
 const int clkLower = 100; 
-const int clkUpper = 112;
+const int clkUpper = clkLower + DUR;
 int(clkLower..clkUpper) clk;
 //transient int(0..1) clk;
 
@@ -28,18 +29,18 @@ action tick;
 bool r0l1;	//noc[0].bufferArray[local].dest == 1
 bool r0l2;	//noc[0].bufferArray[local].dest == 2
 bool r0l3;	//noc[0].bufferArray[local].dest == 3
-bool r0lb1, r0lb2, r0lb3/*, r0lb4*/ = false; //Length of the local buffer
-bool r0lbv11, r0lbv12, r0lbv13/*, r0lbv14*/ = false; //Value of the local buffer at each position, true if dest = 1
-bool r0lbv21, r0lbv22, r0lbv23/*, r0lbv24*/ = false; //Value of the local buffer at each position, true if dest = 2
+bool r0lb1, r0lb2, r0lb3, r0lb4 = false; //Length of the local buffer
+bool r0lbv11, r0lbv12, r0lbv13, r0lbv14 = false; //Value of the local buffer at each position, true if dest = 1
+bool r0lbv21, r0lbv22, r0lbv23, r0lbv24 = false; //Value of the local buffer at each position, true if dest = 2
 											//If both are true, dest = 3
 
 bool r0e0;	//noc[0].bufferArray[east].dest == 0
 bool r0e2;	//noc[0].bufferArray[east].dest == 2
-bool r0eb1, r0eb2, r0eb3/*, r0eb4*/ = false; //Length of the east buffer
-bool r0ebv1, r0ebv2, r0ebv3/*, r0ebv4*/ = false; //Value of the east buffer at each position, true if dest = 2, false if dest = 0
+bool r0eb1, r0eb2, r0eb3, r0eb4 = false; //Length of the east buffer
+bool r0ebv1, r0ebv2, r0ebv3, r0ebv4 = false; //Value of the east buffer at each position, true if dest = 2, false if dest = 0
 
 bool r0s0;	//noc[0].bufferArray[south].dest == 0
-bool r0sb1, r0sb2, r0sb3/*, r0sb4*/ = false; //Length of the south buffer
+bool r0sb1, r0sb2, r0sb3, r0sb4 = false; //Length of the south buffer
 
 bool r0a1, r0a2, r0a3 = false; //priority positions of the arbiter  noc[0].bufferArray[0] == local, noc[0].bufferArray[1] == local, noc[0].bufferArray[0] == south || (noc[0].bufferArray[1] == south && r0a1)
 
@@ -47,17 +48,17 @@ bool r0a1, r0a2, r0a3 = false; //priority positions of the arbiter  noc[0].buffe
 bool r1l0;	//noc[1].bufferArray[local].dest == 0
 bool r1l2;	//noc[1].bufferArray[local].dest == 2
 bool r1l3;	//noc[1].bufferArray[local].dest == 3
-bool r1lb1, r1lb2, r1lb3/*, r1lb4*/ = false; //Length of the local buffer
-bool r1lbv11, r1lbv12, r1lbv13/*, r1lbv14*/ = false; //Value of the local buffer at each position, true if dest = 0
-bool r1lbv21, r1lbv22, r1lbv23/*, r1lbv24*/ = false; //Value of the local buffer at each position, true if dest = 2
+bool r1lb1, r1lb2, r1lb3, r1lb4 = false; //Length of the local buffer
+bool r1lbv11, r1lbv12, r1lbv13, r1lbv14 = false; //Value of the local buffer at each position, true if dest = 0
+bool r1lbv21, r1lbv22, r1lbv23, r1lbv24 = false; //Value of the local buffer at each position, true if dest = 2
 
 bool r1s1;	//noc[1].bufferArray[south].dest == 1
-bool r1sb1, r1sb2, r1sb3/*, r1sb4*/ = false; //Length of the south buffer
+bool r1sb1, r1sb2, r1sb3, r1sb4 = false; //Length of the south buffer
 
 bool r1w1;	//noc[1].bufferArray[west].dest == 1
 bool r1w3;	//noc[1].bufferArray[west].dest == 3
-bool r1wb1, r1wb2, r1wb3/*, r1wb4*/ = false; //Length of the east buffer
-bool r1wbv1, r1wbv2, r1wbv3/*, r1wbv4*/ = false; //Value of the east buffer at each position, true if dest = 3, false if dest = 1
+bool r1wb1, r1wb2, r1wb3, r1wb4 = false; //Length of the east buffer
+bool r1wbv1, r1wbv2, r1wbv3, r1wbv4 = false; //Value of the east buffer at each position, true if dest = 3, false if dest = 1
 
 bool r1a1, r1a2, r1a3 = false; //priority positions of the arbiter  noc[1].bufferArray[0] == local, noc[1].bufferArray[1] == local, (noc[1].bufferArray[0] == south || (noc[1].bufferArray[1] = south && r1a1))
 
@@ -65,17 +66,17 @@ bool r1a1, r1a2, r1a3 = false; //priority positions of the arbiter  noc[1].buffe
 bool r2l0;	//noc[2].bufferArray[local].dest == 0
 bool r2l1;	//noc[2].bufferArray[local].dest == 1
 bool r2l3;	//noc[2].bufferArray[local].dest == 3
-bool r2lb1, r2lb2, r2lb3/*, r2lb4*/ = false; //Length of the local buffer
-bool r2lbv11, r2lbv12, r2lbv13/*, r2lbv14*/ = false; //Value of the local buffer at each position, true if dest = 0
-bool r2lbv21, r2lbv22, r2lbv23/*, r2lbv24*/ = false; //Value of the local buffer at each position, true if dest = 1
+bool r2lb1, r2lb2, r2lb3, r2lb4 = false; //Length of the local buffer
+bool r2lbv11, r2lbv12, r2lbv13, r2lbv14 = false; //Value of the local buffer at each position, true if dest = 0
+bool r2lbv21, r2lbv22, r2lbv23, r2lbv24 = false; //Value of the local buffer at each position, true if dest = 1
 
 bool r2n2;	//noc[2].bufferArray[north].dest == 2
-bool r2nb1, r2nb2, r2nb3/*, r2nb4*/ = false; //Length of the north buffer
+bool r2nb1, r2nb2, r2nb3, r2nb4 = false; //Length of the north buffer
 
 bool r2e0;	//noc[2].bufferArray[east].dest == 0
 bool r2e2;	//noc[2].bufferArray[east].dest == 2
-bool r2eb1, r2eb2, r2eb3/*, r2eb4*/ = false; //Length of the east buffer
-bool r2ebv1, r2ebv2, r2ebv3/*, r2ebv4*/ = false; //Value of the east buffer at each position, true if dest = 2, false if dest = 0
+bool r2eb1, r2eb2, r2eb3, r2eb4 = false; //Length of the east buffer
+bool r2ebv1, r2ebv2, r2ebv3, r2ebv4 = false; //Value of the east buffer at each position, true if dest = 2, false if dest = 0
 
 bool r2a1, r2a2, r2a3 = false; //priority positions of the arbiter  noc[2].bufferArray[0] == local, noc[2].bufferArray[1] == local, noc[2].bufferArray[0] == north || (noc[2].bufferArray[1] == north && r2a1)
 
@@ -83,17 +84,17 @@ bool r2a1, r2a2, r2a3 = false; //priority positions of the arbiter  noc[2].buffe
 bool r3l0;	//noc[3].bufferArray[local].dest == 0
 bool r3l1;	//noc[3].bufferArray[local].dest == 1
 bool r3l2;	//noc[3].bufferArray[local].dest == 2
-bool r3lb1, r3lb2, r3lb3/*, r3lb4*/ = false; //Length of the local buffer
-bool r3lbv11, r3lbv12, r3lbv13/*, r3lbv14*/ = false; //Value of the local buffer at each position, true if dest = 0
-bool r3lbv21, r3lbv22, r3lbv23/*, r3lbv24*/ = false; //Value of the local buffer at each position, true if dest = 1
+bool r3lb1, r3lb2, r3lb3, r3lb4 = false; //Length of the local buffer
+bool r3lbv11, r3lbv12, r3lbv13, r3lbv14 = false; //Value of the local buffer at each position, true if dest = 0
+bool r3lbv21, r3lbv22, r3lbv23, r3lbv24 = false; //Value of the local buffer at each position, true if dest = 1
 
 bool r3n3;	//noc[3].bufferArray[north].dest == 3
-bool r3nb1, r3nb2, r3nb3/*, r3nb4*/ = false; //Length of the north buffer
+bool r3nb1, r3nb2, r3nb3, r3nb4 = false; //Length of the north buffer
 
 bool r3w1;	//noc[3].bufferArray[west].dest == 1
 bool r3w3;	//noc[3].bufferArray[west].dest == 3
-bool r3wb1, r3wb2, r3wb3/*, r3wb4*/ = false; //Length of the east buffer
-bool r3wbv1, r3wbv2, r3wbv3/*, r3wbv4*/ = false; //Value of the east buffer at each position, true if dest = 1, false if dest = 3
+bool r3wb1, r3wb2, r3wb3, r3wb4 = false; //Length of the east buffer
+bool r3wbv1, r3wbv2, r3wbv3, r3wbv4 = false; //Value of the east buffer at each position, true if dest = 1, false if dest = 3
 
 bool r3a1, r3a2, r3a3 = false; //priority positions of the arbiter  noc[3].bufferArray[0] == local, noc[3].bufferArray[1] == local, noc[3].bufferArray[0] == north || (noc[3].bufferArray[1] == north && r3a1)
 // ---- End predicates ---
@@ -259,173 +260,1116 @@ process Populate(){
 }
 	
 process shiftBuffers(){
-	//shift local buffer in router 0
-	if((r0lb1 == true || r0lb2 == true || r0lb3 == true) && (r0l1 == false && r0l2 == false && r0l3 == false)){
-		//dequeue buffer
-		{=
-		r0l1 = (r0lbv11 && !r0lbv21), r0l2 = (!r0lbv11 && r0lbv21), r0l3 = (r0lbv11 && r0lbv21),
-		r0lbv11 = r0lbv12, r0lbv21 = r0lbv22, r0lb1 = r0lb2,
-		r0lbv12 = r0lbv13, r0lbv22 = r0lbv23, r0lb2 = r0lb3,
-		r0lbv13 = false, r0lbv23 = false, r0lb3 = false
-		=}
+	//shift r0 local buffer
+	if(r0lb1 == false){
+		if(r0lb2 == false){
+			if(r0lb3 == false){
+				{=
+				 r0lbv11 = r0lbv14,
+				 r0lbv14 = false,
+				 
+				 r0lbv21 = r0lbv24,
+				 r0lbv24 = false,
+				 
+				 r0lb1 = r0lb4,
+				 r0lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r0lbv11 = r0lbv13,
+				 r0lbv12 = r0lbv14,
+				 r0lbv13 = false,
+				 r0lbv14 = false,
+				 
+				 r0lbv21 = r0lbv23,
+				 r0lbv22 = r0lbv24,
+				 r0lbv23 = false,
+				 r0lbv24 = false,
+				 
+				 r0lb1 = r0lb3,
+				 r0lb2 = r0lb4,
+				 r0lb3 = false,
+				 r0lb4 = false
+				=}
+			}
+		}
+		else{
+			if(r0lb3 == false){
+				{=
+				 r0lbv11 = r0lbv12,
+				 r0lbv12 = r0lbv14,
+				 r0lbv14 = false,
+				 
+				 r0lbv21 = r0lbv22,
+				 r0lbv22 = r0lbv24,
+				 r0lbv24 = false,
+				 
+				 r0lb1 = r0lb2,
+				 r0lb2 = r0lb4,
+				 r0lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r0lbv11 = r0lbv12,
+				 r0lbv12 = r0lbv13,
+				 r0lbv13 = r0lbv14,
+				 r0lbv14 = false,
+				 
+				 r0lbv21 = r0lbv22,
+				 r0lbv22 = r0lbv23,
+				 r0lbv23 = r0lbv24,
+				 r0lbv24 = false,
+				 
+				 r0lb1 = r0lb2,
+				 r0lb2 = r0lb3, 
+				 r0lb3 = r0lb4,
+				 r0lb4 = false
+				=}
+			}
+		}
 	}
 	else{
-		tau
+		if(r0lb2 == false){
+			if(r0lb3 == false){
+				{=
+				 r0lbv12 = r0lbv14,
+				 r0lbv14 = false,
+				 
+				 r0lbv22 = r0lbv24,
+				 r0lbv24 = false,
+				 
+				 r0lb2 = r0lb4,
+				 r0lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r0lbv12 = r0lbv13,
+				 r0lbv13 = r0lbv14,
+				 r0lbv14 = false,
+				 
+				 r0lbv22 = r0lbv23,
+				 r0lbv23 = r0lbv24,
+				 r0lbv24 = false,
+				 
+				 r0lb2 = r0lb3,
+				 r0lb3 = r0lb4,
+				 r0lb4 = false
+				=}
+			}
+		}
+		else{
+			if(r0lb3 == false){
+				{=
+				 r0lbv13 = r0lbv14,
+				 r0lbv14 = false,
+				 
+				 r0lbv23 = r0lbv24,
+				 r0lbv24 = false,
+				 
+				 r0lb3 = r0lb4,
+				 r0lb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
+		
 	};
 	
-	//shift east buffer in router 0
-	if((r0eb1 == true || r0eb2 == true || r0eb3 == true) && (r0e0 == false && r0e2 == false)){
-		//dequeue buffer
-		{=
-		r0e0 = (!r0ebv1), r0e2 = (r0ebv1),
-		r0ebv1 = r0ebv2, r0eb1 = r0eb2,
-		r0ebv2 = r0ebv3, r0eb2 = r0eb3,
-		r0ebv3 = false, r0eb3 = false
-		=}
+	//shift r0 east buffer
+	if(r0eb1 == false){
+		if(r0eb2 == false){
+			if(r0eb3 == false){
+				{=
+				 r0ebv1 = r0ebv4,
+				 r0ebv4 = false,
+				 
+				 r0eb1 = r0eb4,
+				 r0eb4 = false
+				=}
+			}
+			else{
+				{=
+				 r0ebv1 = r0ebv3,
+				 r0ebv2 = r0ebv4,
+				 r0ebv3 = false,
+				 r0ebv4 = false,
+				 
+				 r0eb1 = r0eb3,
+				 r0eb2 = r0eb4,
+				 r0eb3 = false,
+				 r0eb4 = false
+				=}
+			}
+		}
+		else{
+			if(r0eb3 == false){
+				{=
+				 r0ebv1 = r0ebv2,
+				 r0ebv2 = r0ebv4,
+				 r0ebv4 = false,
+				 
+				 r0eb1 = r0eb2,
+				 r0eb2 = r0eb4,
+				 r0eb4 = false
+				=}
+			}
+			else{
+				{=
+				 r0ebv1 = r0ebv2,
+				 r0ebv2 = r0ebv3,
+				 r0ebv3 = r0ebv4,
+				 r0ebv4 = false,
+				 
+				 r0eb1 = r0eb2,
+				 r0eb2 = r0eb3, 
+				 r0eb3 = r0eb4,
+				 r0eb4 = false
+				=}
+			}
+		}
 	}
 	else{
-		tau
+		if(r0eb2 == false){
+			if(r0eb3 == false){
+				{=
+				 r0ebv2 = r0ebv4,
+				 r0ebv4 = false,
+				 
+				 r0eb2 = r0eb4,
+				 r0eb4 = false
+				=}
+			}
+			else{
+				{=
+				 r0ebv2 = r0ebv3,
+				 r0ebv3 = r0ebv4,
+				 r0ebv4 = false,
+				 
+				 r0eb2 = r0eb3,
+				 r0eb3 = r0eb4,
+				 r0eb4 = false
+				=}
+			}
+		}
+		else{
+			if(r0eb3 == false){
+				{=
+				 r0ebv3 = r0ebv4,
+				 r0ebv4 = false,
+				 
+				 r0eb3 = r0eb4,
+				 r0eb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
+		
 	};
 	
-	//shift south buffer in router 0
-	if((r0sb1 == true || r0sb2 == true || r0sb3 == true) && r0s0 == false){
-		//dequeue buffer
-		{=
-		r0s0 = r0sb1,
-		r0sb1 = r0sb2,
-		r0sb2 = r0sb3,
-		r0sb3 = false
-		=}
+	//shift r0 south buffer
+	if(r0sb1 == false){
+		if(r0sb2 == false){
+			if(r0sb3 == false){
+				{=
+				 r0sb1 = r0sb4,
+				 r0sb4 = false
+				=}
+			}
+			else{
+				{=
+				 r0sb1 = r0sb3,
+				 r0sb2 = r0sb4,
+				 r0sb3 = false,
+				 r0sb4 = false
+				=}
+			}
+		}
+		else{
+			if(r0sb3 == false){
+				{=
+				 r0sb1 = r0sb2,
+				 r0sb2 = r0sb4,
+				 r0sb4 = false
+				=}
+			}
+			else{
+				{=
+				 r0sb1 = r0sb2,
+				 r0sb2 = r0sb3, 
+				 r0sb3 = r0sb4,
+				 r0sb4 = false
+				=}
+			}
+		}
 	}
 	else{
-		tau
+		if(r0sb2 == false){
+			if(r0sb3 == false){
+				{=
+				 r0sb2 = r0sb4,
+				 r0sb4 = false
+				=}
+			}
+			else{
+				{=
+				 r0sb2 = r0sb3,
+				 r0sb3 = r0sb4,
+				 r0sb4 = false
+				=}
+			}
+		}
+		else{
+			if(r0sb3 == false){
+				{=
+				 r0sb3 = r0sb4,
+				 r0sb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
 	};
 	
-	//shift local buffer in router 1
-	if((r1lb1 == true || r1lb2 == true || r1lb3 == true) && (r1l0 == false && r1l2 == false && r1l3 == false)){
-		//dequeue buffer
-		{=
-		r1l0 = (r1lbv11 && !r1lbv21), r1l2 = (!r1lbv11 && r1lbv21), r1l3 = (r1lbv11 && r1lbv21),
-		r1lbv11 = r1lbv12, r1lbv21 = r1lbv22, r1lb1 = r1lb2,
-		r1lbv12 = r1lbv13, r1lbv22 = r1lbv23, r1lb2 = r1lb3,
-		r1lbv13 = false, r1lbv23 = false, r1lb3 = false
-		=}
+	//shift r1 local buffer
+	if(r1lb1 == false){
+		if(r1lb2 == false){
+			if(r1lb3 == false){
+				{=
+				 r1lbv11 = r1lbv14,
+				 r1lbv14 = false,
+				 
+				 r1lbv21 = r1lbv24,
+				 r1lbv24 = false,
+				 
+				 r1lb1 = r1lb4,
+				 r1lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r1lbv11 = r1lbv13,
+				 r1lbv12 = r1lbv14,
+				 r1lbv13 = false,
+				 r1lbv14 = false,
+				 
+				 r1lbv21 = r1lbv23,
+				 r1lbv22 = r1lbv24,
+				 r1lbv23 = false,
+				 r1lbv24 = false,
+				 
+				 r1lb1 = r1lb3,
+				 r1lb2 = r1lb4,
+				 r1lb3 = false,
+				 r1lb4 = false
+				=}
+			}
+		}
+		else{
+			if(r1lb3 == false){
+				{=
+				 r1lbv11 = r1lbv12,
+				 r1lbv12 = r1lbv14,
+				 r1lbv14 = false,
+				 
+				 r1lbv21 = r1lbv22,
+				 r1lbv22 = r1lbv24,
+				 r1lbv24 = false,
+				 
+				 r1lb1 = r1lb2,
+				 r1lb2 = r1lb4,
+				 r1lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r1lbv11 = r1lbv12,
+				 r1lbv12 = r1lbv13,
+				 r1lbv13 = r1lbv14,
+				 r1lbv14 = false,
+				 
+				 r1lbv21 = r1lbv22,
+				 r1lbv22 = r1lbv23,
+				 r1lbv23 = r1lbv24,
+				 r1lbv24 = false,
+				 
+				 r1lb1 = r1lb2,
+				 r1lb2 = r1lb3, 
+				 r1lb3 = r1lb4,
+				 r1lb4 = false
+				=}
+			}
+		}
 	}
 	else{
-		tau
+		if(r1lb2 == false){
+			if(r1lb3 == false){
+				{=
+				 r1lbv12 = r1lbv14,
+				 r1lbv14 = false,
+				 
+				 r1lbv22 = r1lbv24,
+				 r1lbv24 = false,
+				 
+				 r1lb2 = r1lb4,
+				 r1lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r1lbv12 = r1lbv13,
+				 r1lbv13 = r1lbv14,
+				 r1lbv14 = false,
+				 
+				 r1lbv22 = r1lbv23,
+				 r1lbv23 = r1lbv24,
+				 r1lbv24 = false,
+				 
+				 r1lb2 = r1lb3,
+				 r1lb3 = r1lb4,
+				 r1lb4 = false
+				=}
+			}
+		}
+		else{
+			if(r1lb3 == false){
+				{=
+				 r1lbv13 = r1lbv14,
+				 r1lbv14 = false,
+				 
+				 r1lbv23 = r1lbv24,
+				 r1lbv24 = false,
+				 
+				 r1lb3 = r1lb4,
+				 r1lb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
+		
 	};
 	
-	//shift west buffer in router 1
-	if((r1wb1 == true || r1wb2 == true || r1wb3 == true) && (r1w1 == false && r1w3 == false)){
-		//dequeue buffer
-		{=
-		r1w1 = (!r1wbv1), r1w3 = (r1wbv1),
-		r1wbv1 = r1wbv2, r1wb1 = r1wb2,
-		r1wbv2 = r1wbv3, r1wb2 = r1wb3,
-		r1wbv3 = false, r1wb3 = false
-		=}
+	//shift r1 west buffer
+	if(r1wb1 == false){
+		if(r1wb2 == false){
+			if(r1wb3 == false){
+				{=
+				 r1wbv1 = r1wbv4,
+				 r1wbv4 = false,
+				 
+				 r1wb1 = r1wb4,
+				 r1wb4 = false
+				=}
+			}
+			else{
+				{=
+				 r1wbv1 = r1wbv3,
+				 r1wbv2 = r1wbv4,
+				 r1wbv3 = false,
+				 r1wbv4 = false,
+				 
+				 r1wb1 = r1wb3,
+				 r1wb2 = r1wb4,
+				 r1wb3 = false,
+				 r1wb4 = false
+				=}
+			}
+		}
+		else{
+			if(r1wb3 == false){
+				{=
+				 r1wbv1 = r1wbv2,
+				 r1wbv2 = r1wbv4,
+				 r1wbv4 = false,
+				 
+				 r1wb1 = r1wb2,
+				 r1wb2 = r1wb4,
+				 r1wb4 = false
+				=}
+			}
+			else{
+				{=
+				 r1wbv1 = r1wbv2,
+				 r1wbv2 = r1wbv3,
+				 r1wbv3 = r1wbv4,
+				 r1wbv4 = false,
+				 
+				 r1wb1 = r1wb2,
+				 r1wb2 = r1wb3, 
+				 r1wb3 = r1wb4,
+				 r1wb4 = false
+				=}
+			}
+		}
 	}
 	else{
-		tau
+		if(r1wb2 == false){
+			if(r1wb3 == false){
+				{=
+				 r1wbv2 = r1wbv4,
+				 r1wbv4 = false,
+				 
+				 r1wb2 = r1wb4,
+				 r1wb4 = false
+				=}
+			}
+			else{
+				{=
+				 r1wbv2 = r1wbv3,
+				 r1wbv3 = r1wbv4,
+				 r1wbv4 = false,
+				 
+				 r1wb2 = r1wb3,
+				 r1wb3 = r1wb4,
+				 r1wb4 = false
+				=}
+			}
+		}
+		else{
+			if(r1wb3 == false){
+				{=
+				 r1wbv3 = r1wbv4,
+				 r1wbv4 = false,
+				 
+				 r1wb3 = r1wb4,
+				 r1wb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
+		
 	};
 	
-	//shift south buffer in router 1
-	if((r1sb1 == true || r1sb2 == true || r1sb3 == true) && r1s1 == false){
-		//dequeue buffer
-		{=
-		r1s1 = r1sb1,
-		r1sb1 = r1sb2,
-		r1sb2 = r1sb3,
-		r1sb3 = false
-		=}
+	//shift r1 south buffer
+	if(r1sb1 == false){
+		if(r1sb2 == false){
+			if(r1sb3 == false){
+				{=
+				 r1sb1 = r1sb4,
+				 r1sb4 = false
+				=}
+			}
+			else{
+				{=
+				 r1sb1 = r1sb3,
+				 r1sb2 = r1sb4,
+				 r1sb3 = false,
+				 r1sb4 = false
+				=}
+			}
+		}
+		else{
+			if(r1sb3 == false){
+				{=
+				 r1sb1 = r1sb2,
+				 r1sb2 = r1sb4,
+				 r1sb4 = false
+				=}
+			}
+			else{
+				{=
+				 r1sb1 = r1sb2,
+				 r1sb2 = r1sb3, 
+				 r1sb3 = r1sb4,
+				 r1sb4 = false
+				=}
+			}
+		}
 	}
 	else{
-		tau
+		if(r1sb2 == false){
+			if(r1sb3 == false){
+				{=
+				 r1sb2 = r1sb4,
+				 r1sb4 = false
+				=}
+			}
+			else{
+				{=
+				 r1sb2 = r1sb3,
+				 r1sb3 = r1sb4,
+				 r1sb4 = false
+				=}
+			}
+		}
+		else{
+			if(r1sb3 == false){
+				{=
+				 r1sb3 = r1sb4,
+				 r1sb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
+	};
+
+//shift r2 local buffer
+	if(r2lb1 == false){
+		if(r2lb2 == false){
+			if(r2lb3 == false){
+				{=
+				 r2lbv11 = r2lbv14,
+				 r2lbv14 = false,
+				 
+				 r2lbv21 = r2lbv24,
+				 r2lbv24 = false,
+				 
+				 r2lb1 = r2lb4,
+				 r2lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r2lbv11 = r2lbv13,
+				 r2lbv12 = r2lbv14,
+				 r2lbv13 = false,
+				 r2lbv14 = false,
+				 
+				 r2lbv21 = r2lbv23,
+				 r2lbv22 = r2lbv24,
+				 r2lbv23 = false,
+				 r2lbv24 = false,
+				 
+				 r2lb1 = r2lb3,
+				 r2lb2 = r2lb4,
+				 r2lb3 = false,
+				 r2lb4 = false
+				=}
+			}
+		}
+		else{
+			if(r2lb3 == false){
+				{=
+				 r2lbv11 = r2lbv12,
+				 r2lbv12 = r2lbv14,
+				 r2lbv14 = false,
+				 
+				 r2lbv21 = r2lbv22,
+				 r2lbv22 = r2lbv24,
+				 r2lbv24 = false,
+				 
+				 r2lb1 = r2lb2,
+				 r2lb2 = r2lb4,
+				 r2lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r2lbv11 = r2lbv12,
+				 r2lbv12 = r2lbv13,
+				 r2lbv13 = r2lbv14,
+				 r2lbv14 = false,
+				 
+				 r2lbv21 = r2lbv22,
+				 r2lbv22 = r2lbv23,
+				 r2lbv23 = r2lbv24,
+				 r2lbv24 = false,
+				 
+				 r2lb1 = r2lb2,
+				 r2lb2 = r2lb3, 
+				 r2lb3 = r2lb4,
+				 r2lb4 = false
+				=}
+			}
+		}
+	}
+	else{
+		if(r2lb2 == false){
+			if(r2lb3 == false){
+				{=
+				 r2lbv12 = r2lbv14,
+				 r2lbv14 = false,
+				 
+				 r2lbv22 = r2lbv24,
+				 r2lbv24 = false,
+				 
+				 r2lb2 = r2lb4,
+				 r2lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r2lbv12 = r2lbv13,
+				 r2lbv13 = r2lbv14,
+				 r2lbv14 = false,
+				 
+				 r2lbv22 = r2lbv23,
+				 r2lbv23 = r2lbv24,
+				 r2lbv24 = false,
+				 
+				 r2lb2 = r2lb3,
+				 r2lb3 = r2lb4,
+				 r2lb4 = false
+				=}
+			}
+		}
+		else{
+			if(r2lb3 == false){
+				{=
+				 r2lbv13 = r2lbv14,
+				 r2lbv14 = false,
+				 
+				 r2lbv23 = r2lbv24,
+				 r2lbv24 = false,
+				 
+				 r2lb3 = r2lb4,
+				 r2lb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
+		
 	};
 	
-	
-	//shift local buffer in router 2
-	if((r2lb1 == true || r2lb2 == true || r2lb3 == true) && (r2l0 == false && r2l1 == false && r2l3 == false)){
-		//dequeue buffer
-		{=
-		r2l0 = (r2lbv11 && !r2lbv21), r2l1 = (!r2lbv11 && r2lbv21), r2l3 = (r2lbv11 && r2lbv21),
-		r2lbv11 = r2lbv12, r2lbv21 = r2lbv22, r2lb1 = r2lb2,
-		r2lbv12 = r2lbv13, r2lbv22 = r2lbv23, r2lb2 = r2lb3,
-		r2lbv13 = false, r2lbv23 = false, r2lb3 = false
-		=}
+	//shift r2 east buffer
+	if(r2eb1 == false){
+		if(r2eb2 == false){
+			if(r2eb3 == false){
+				{=
+				 r2ebv1 = r2ebv4,
+				 r2ebv4 = false,
+				 
+				 r2eb1 = r2eb4,
+				 r2eb4 = false
+				=}
+			}
+			else{
+				{=
+				 r2ebv1 = r2ebv3,
+				 r2ebv2 = r2ebv4,
+				 r2ebv3 = false,
+				 r2ebv4 = false,
+				 
+				 r2eb1 = r2eb3,
+				 r2eb2 = r2eb4,
+				 r2eb3 = false,
+				 r2eb4 = false
+				=}
+			}
+		}
+		else{
+			if(r2eb3 == false){
+				{=
+				 r2ebv1 = r2ebv2,
+				 r2ebv2 = r2ebv4,
+				 r2ebv4 = false,
+				 
+				 r2eb1 = r2eb2,
+				 r2eb2 = r2eb4,
+				 r2eb4 = false
+				=}
+			}
+			else{
+				{=
+				 r2ebv1 = r2ebv2,
+				 r2ebv2 = r2ebv3,
+				 r2ebv3 = r2ebv4,
+				 r2ebv4 = false,
+				 
+				 r2eb1 = r2eb2,
+				 r2eb2 = r2eb3, 
+				 r2eb3 = r2eb4,
+				 r2eb4 = false
+				=}
+			}
+		}
 	}
 	else{
-		tau
+		if(r2eb2 == false){
+			if(r2eb3 == false){
+				{=
+				 r2ebv2 = r2ebv4,
+				 r2ebv4 = false,
+				 
+				 r2eb2 = r2eb4,
+				 r2eb4 = false
+				=}
+			}
+			else{
+				{=
+				 r2ebv2 = r2ebv3,
+				 r2ebv3 = r2ebv4,
+				 r2ebv4 = false,
+				 
+				 r2eb2 = r2eb3,
+				 r2eb3 = r2eb4,
+				 r2eb4 = false
+				=}
+			}
+		}
+		else{
+			if(r2eb3 == false){
+				{=
+				 r2ebv3 = r2ebv4,
+				 r2ebv4 = false,
+				 
+				 r2eb3 = r2eb4,
+				 r2eb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
+		
 	};
 	
-	//shift east buffer in router 2
-	if((r2eb1 == true || r2eb2 == true || r2eb3 == true) && (r2e0 == false && r2e2 == false)){
-		//dequeue buffer
-		{=
-		r2e0 = (!r2ebv1), r2e2 = (r2ebv1),
-		r2ebv1 = r2ebv2, r2eb1 = r2eb2,
-		r2ebv2 = r2ebv3, r2eb2 = r2eb3,
-		r2ebv3 = false, r2eb3 = false
-		=}
+	//shift r2 north buffer
+	if(r2nb1 == false){
+		if(r2nb2 == false){
+			if(r2nb3 == false){
+				{=
+				 r2nb1 = r2nb4,
+				 r2nb4 = false
+				=}
+			}
+			else{
+				{=
+				 r2nb1 = r2nb3,
+				 r2nb2 = r2nb4,
+				 r2nb3 = false,
+				 r2nb4 = false
+				=}
+			}
+		}
+		else{
+			if(r2nb3 == false){
+				{=
+				 r2nb1 = r2nb2,
+				 r2nb2 = r2nb4,
+				 r2nb4 = false
+				=}
+			}
+			else{
+				{=
+				 r2nb1 = r2nb2,
+				 r2nb2 = r2nb3, 
+				 r2nb3 = r2nb4,
+				 r2nb4 = false
+				=}
+			}
+		}
 	}
 	else{
-		tau
+		if(r2nb2 == false){
+			if(r2nb3 == false){
+				{=
+				 r2nb2 = r2nb4,
+				 r2nb4 = false
+				=}
+			}
+			else{
+				{=
+				 r2nb2 = r2nb3,
+				 r2nb3 = r2nb4,
+				 r2nb4 = false
+				=}
+			}
+		}
+		else{
+			if(r2nb3 == false){
+				{=
+				 r2nb3 = r2nb4,
+				 r2nb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
+	};
+
+	//shift r3 local buffer
+	if(r3lb1 == false){
+		if(r3lb2 == false){
+			if(r3lb3 == false){
+				{=
+				 r3lbv11 = r3lbv14,
+				 r3lbv14 = false,
+				 
+				 r3lbv21 = r3lbv24,
+				 r3lbv24 = false,
+				 
+				 r3lb1 = r3lb4,
+				 r3lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r3lbv11 = r3lbv13,
+				 r3lbv12 = r3lbv14,
+				 r3lbv13 = false,
+				 r3lbv14 = false,
+				 
+				 r3lbv21 = r3lbv23,
+				 r3lbv22 = r3lbv24,
+				 r3lbv23 = false,
+				 r3lbv24 = false,
+				 
+				 r3lb1 = r3lb3,
+				 r3lb2 = r3lb4,
+				 r3lb3 = false,
+				 r3lb4 = false
+				=}
+			}
+		}
+		else{
+			if(r3lb3 == false){
+				{=
+				 r3lbv11 = r3lbv12,
+				 r3lbv12 = r3lbv14,
+				 r3lbv14 = false,
+				 
+				 r3lbv21 = r3lbv22,
+				 r3lbv22 = r3lbv24,
+				 r3lbv24 = false,
+				 
+				 r3lb1 = r3lb2,
+				 r3lb2 = r3lb4,
+				 r3lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r3lbv11 = r3lbv12,
+				 r3lbv12 = r3lbv13,
+				 r3lbv13 = r3lbv14,
+				 r3lbv14 = false,
+				 
+				 r3lbv21 = r3lbv22,
+				 r3lbv22 = r3lbv23,
+				 r3lbv23 = r3lbv24,
+				 r3lbv24 = false,
+				 
+				 r3lb1 = r3lb2,
+				 r3lb2 = r3lb3, 
+				 r3lb3 = r3lb4,
+				 r3lb4 = false
+				=}
+			}
+		}
+	}
+	else{
+		if(r3lb2 == false){
+			if(r3lb3 == false){
+				{=
+				 r3lbv12 = r3lbv14,
+				 r3lbv14 = false,
+				 
+				 r3lbv22 = r3lbv24,
+				 r3lbv24 = false,
+				 
+				 r3lb2 = r3lb4,
+				 r3lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r3lbv12 = r3lbv13,
+				 r3lbv13 = r3lbv14,
+				 r3lbv14 = false,
+				 
+				 r3lbv22 = r3lbv23,
+				 r3lbv23 = r3lbv24,
+				 r3lbv24 = false,
+				 
+				 r3lb2 = r3lb3,
+				 r3lb3 = r3lb4,
+				 r3lb4 = false
+				=}
+			}
+		}
+		else{
+			if(r3lb3 == false){
+				{=
+				 r3lbv13 = r3lbv14,
+				 r3lbv14 = false,
+				 
+				 r3lbv23 = r3lbv24,
+				 r3lbv24 = false,
+				 
+				 r3lb3 = r3lb4,
+				 r3lb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
+		
 	};
 	
-	//shift north buffer in router 2
-	if((r2nb1 == true || r2nb2 == true || r2nb3 == true) && (r2n2 == false)){
-		//dequeue buffer
-		{=
-		r2n2 = r2nb1,
-		r2nb1 = r2nb2,
-		r2nb2 = r2nb3,
-		r2nb3 = false
-		=}
+	//shift r3 west buffer
+	if(r3wb1 == false){
+		if(r3wb2 == false){
+			if(r3wb3 == false){
+				{=
+				 r3wbv1 = r3wbv4,
+				 r3wbv4 = false,
+				 
+				 r3wb1 = r3wb4,
+				 r3wb4 = false
+				=}
+			}
+			else{
+				{=
+				 r3wbv1 = r3wbv3,
+				 r3wbv2 = r3wbv4,
+				 r3wbv3 = false,
+				 r3wbv4 = false,
+				 
+				 r3wb1 = r3wb3,
+				 r3wb2 = r3wb4,
+				 r3wb3 = false,
+				 r3wb4 = false
+				=}
+			}
+		}
+		else{
+			if(r3wb3 == false){
+				{=
+				 r3wbv1 = r3wbv2,
+				 r3wbv2 = r3wbv4,
+				 r3wbv4 = false,
+				 
+				 r3wb1 = r3wb2,
+				 r3wb2 = r3wb4,
+				 r3wb4 = false
+				=}
+			}
+			else{
+				{=
+				 r3wbv1 = r3wbv2,
+				 r3wbv2 = r3wbv3,
+				 r3wbv3 = r3wbv4,
+				 r3wbv4 = false,
+				 
+				 r3wb1 = r3wb2,
+				 r3wb2 = r3wb3, 
+				 r3wb3 = r3wb4,
+				 r3wb4 = false
+				=}
+			}
+		}
 	}
 	else{
-		tau
+		if(r3wb2 == false){
+			if(r3wb3 == false){
+				{=
+				 r3wbv2 = r3wbv4,
+				 r3wbv4 = false,
+				 
+				 r3wb2 = r3wb4,
+				 r3wb4 = false
+				=}
+			}
+			else{
+				{=
+				 r3wbv2 = r3wbv3,
+				 r3wbv3 = r3wbv4,
+				 r3wbv4 = false,
+				 
+				 r3wb2 = r3wb3,
+				 r3wb3 = r3wb4,
+				 r3wb4 = false
+				=}
+			}
+		}
+		else{
+			if(r3wb3 == false){
+				{=
+				 r3wbv3 = r3wbv4,
+				 r3wbv4 = false,
+				 
+				 r3wb3 = r3wb4,
+				 r3wb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
+		
 	};
 	
-	//shift local buffer in router 3
-	if((r3lb1 == true || r3lb2 == true || r3lb3 == true) && (r3l0 == false && r3l1 == false && r3l2 == false)){
-		//dequeue buffer
-		{=
-		r3l0 = (r3lbv11 && !r3lbv21), r3l1 = (!r3lbv11 && r3lbv21), r3l2 = (r3lbv11 && r3lbv21),
-		r3lbv11 = r3lbv12, r3lbv21 = r3lbv22, r3lb1 = r3lb2,
-		r3lbv12 = r3lbv13, r3lbv22 = r3lbv23, r3lb2 = r3lb3,
-		r3lbv13 = false, r3lbv23 = false, r3lb3 = false
-		=}
+	//shift r3 north buffer
+	if(r3nb1 == false){
+		if(r3nb2 == false){
+			if(r3nb3 == false){
+				{=
+				 r3nb1 = r3nb4,
+				 r3nb4 = false
+				=}
+			}
+			else{
+				{=
+				 r3nb1 = r3nb3,
+				 r3nb2 = r3nb4,
+				 r3nb3 = false,
+				 r3nb4 = false
+				=}
+			}
+		}
+		else{
+			if(r3nb3 == false){
+				{=
+				 r3nb1 = r3nb2,
+				 r3nb2 = r3nb4,
+				 r3nb4 = false
+				=}
+			}
+			else{
+				{=
+				 r3nb1 = r3nb2,
+				 r3nb2 = r3nb3, 
+				 r3nb3 = r3nb4,
+				 r3nb4 = false
+				=}
+			}
+		}
 	}
 	else{
-		tau
-	};
-	
-	//shift west buffer in router 3
-	if((r3wb1 == true || r3wb2 == true || r3wb3 == true) && (r3w1 == false && r3w3 == false)){
-		//dequeue buffer
-		{=
-		r3w1 = (r3wbv1), r3w3 = (!r3wbv1),		///different from other patterns, may need to change
-		r3wbv1 = r3wbv2, r3wb1 = r3wb2,
-		r3wbv2 = r3wbv3, r3wb2 = r3wb3,
-		r3wbv3 = false, r3wb3 = false
-		=}
-	}
-	else{
-		tau
-	};
-	
-	//shift north buffer in router 3
-	if((r3nb1 == true || r3nb2 == true || r3nb3 == true) && (r3n3 == false)){
-		//dequeue buffer
-		{=
-		r3n3 = r3nb1,
-		r3nb1 = r3nb2,
-		r3nb2 = r3nb3,
-		r3nb3 = false
-		=}
-	}
-	else{
-		tau
+		if(r3nb2 == false){
+			if(r3nb3 == false){
+				{=
+				 r3nb2 = r3nb4,
+				 r3nb4 = false
+				=}
+			}
+			else{
+				{=
+				 r3nb2 = r3nb3,
+				 r3nb3 = r3nb4,
+				 r3nb4 = false
+				=}
+			}
+		}
+		else{
+			if(r3nb3 == false){
+				{=
+				 r3nb3 = r3nb4,
+				 r3nb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
 	}
 }
 
