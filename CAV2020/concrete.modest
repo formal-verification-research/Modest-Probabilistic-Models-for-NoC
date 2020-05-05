@@ -66,15 +66,25 @@ function intlist option enqueue(int n, intlist option ls) =
 	else some(intlist { hd: n, tl: ls });		 
 
 //Routing function	(x-y routing)
+/*
 function int route(int dest, int routerID) =
-	if dest == -1 then -1/*no flit*/
-	else if (dest % NOCSIZE) > (routerID % NOCSIZE) then 1/*east*/
-	else if (dest % NOCSIZE) < (routerID % NOCSIZE) then 3/*west*/
-	else if (dest / NOCSIZE) > (routerID / NOCSIZE) then 2/*south*/
-	else if (dest / NOCSIZE) < (routerID / NOCSIZE) then 0/*north*/
-	else 4/*local*/
+	if dest == -1 then -1//no flit
+	else if (dest % NOCSIZE) > (routerID % NOCSIZE) then 1//east
+	else if (dest % NOCSIZE) < (routerID % NOCSIZE) then 3//west
+	else if (dest / NOCSIZE) > (routerID / NOCSIZE) then 2//south
+	else if (dest / NOCSIZE) < (routerID / NOCSIZE) then 0//north
+	else 4//local
 	;
-
+*/
+function int route(int dest, int routerID) =
+	if dest == -1 then -1//no flit
+	else if (dest == routerID) then 4//local
+	else if (dest == routerID + 1) then 1//east
+	else if (dest == routerID - 1) then 3//west
+	else if (dest == routerID + NOCSIZE) then 2//south
+	else if (dest == routerID - NOCSIZE) then 0//north
+	else 4//local
+	;
 
 // ------ Begin: process definitions ------
 //---- Paralell Processes ----
@@ -357,7 +367,6 @@ process initialize_node_se(int routerID){
 
 //runs routing after initial setup (for testing)
 process initialRoute(int routerID){
-	
 	{=
 	noc[routerID].bufferArray[0].val = route(peekFront(noc[routerID].bufferArray[0].buff), routerID),
 	noc[routerID].bufferArray[1].val = route(peekFront(noc[routerID].bufferArray[1].buff), routerID),
