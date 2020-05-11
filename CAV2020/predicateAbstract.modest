@@ -61,7 +61,8 @@ bool r1w4;	//noc[1].bufferArray[west].val == 4
 bool r1wb1, r1wb2, r1wb3, r1wb4 = false; //Length of the east buffer
 bool r1wbv1, r1wbv2, r1wbv3, r1wbv4 = false; //Value of the east buffer at each position, true if dest = 3, false if dest = 1
 
-bool r1a1, r1a2, r1a3 = false; //priority positions of the arbiter  noc[1].bufferArray[0] == local, noc[1].bufferArray[1] == local, (noc[1].bufferArray[0] == south || (noc[1].bufferArray[1] = south && r1a1))
+bool r1a1, r1a2 = false; //priority positions of the arbiter  noc[1].bufferArray[0] == local, noc[1].bufferArray[1] == local, (noc[1].bufferArray[0] == south || (noc[1].bufferArray[1] = south && r1a1))
+bool r1a3 = true;
 
 
 bool r2l0;	//noc[2].bufferArray[local].val == 0
@@ -80,8 +81,8 @@ bool r2e4;	//noc[2].bufferArray[east].val == 4
 bool r2eb1, r2eb2, r2eb3, r2eb4 = false; //Length of the east buffer
 bool r2ebv1, r2ebv2, r2ebv3, r2ebv4 = false; //Value of the east buffer at each position, true if dest = 2, false if dest = 0
 
-bool r2a1, r2a2, r2a3 = false; //priority positions of the arbiter  noc[2].bufferArray[0] == local, noc[2].bufferArray[1] == local, noc[2].bufferArray[0] == north || (noc[2].bufferArray[1] == north && r2a1)
-
+bool r2a1, r2a2 = false; //priority positions of the arbiter  noc[2].bufferArray[0] == local, noc[2].bufferArray[1] == local, noc[2].bufferArray[0] == north || (noc[2].bufferArray[1] == north && r2a1)
+bool r2a3 = true;
 
 bool r3l0;	//noc[3].bufferArray[local].val == 0
 bool r3l3;	//noc[3].bufferArray[local].val == 3
@@ -152,15 +153,25 @@ process Top(){
 //Sub Processes
 process Populate(){
 	if((clk % INJECTIONRATEDENOMINATOR) < INJECTIONRATENUMERATOR){
-		/*
-		{=
-		r0lbv14 = true, r0lbv24 = true, r0lb4 = true,
-		r1lbv14 = false, r1lbv24 = true, r1lb4 = true,
-		r2lbv14 = true, r2lbv24 = false, r2lb4 = true,
-		r3lbv14 = true, r3lbv24 = true, r3lb4 = true
-		=}
-		*/
 		
+		if(clkLower + clk < 8){
+			{=
+			r0lbv14 = true, r0lbv24 = true, r0lb4 = true,
+			r1lbv14 = false, r1lbv24 = true, r1lb4 = true,
+			r2lbv14 = true, r2lbv24 = true, r2lb4 = true,
+			r3lbv14 = false, r3lbv24 = true, r3lb4 = true
+			=}
+		}
+		else{
+			{=
+			r0lbv14 = true, r0lbv24 = true, r0lb4 = true,
+			r1lbv14 = false, r1lbv24 = true, r1lb4 = true,
+			r2lbv14 = true, r2lbv24 = true, r2lb4 = true,
+			r3lbv14 = true, r3lbv24 = false, r3lb4 = true
+			=}
+		}
+		
+		/*
 		//populate router 0
 		if(r0lb4 == true){
 			tau		// buffer is full
@@ -210,6 +221,7 @@ process Populate(){
 				:(1/3): {= r3lbv14 = true, r3lbv24 = true, r3lb4 = true =}
 			}
 		}
+		*/
 	}
 	else {tau}
 }
