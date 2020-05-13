@@ -26,38 +26,38 @@ action tick;
 // ---- End varialbes
 
 // ---- Predicates ----
-bool r0l1;	//noc[0].bufferArray[local].val == 1
-bool r0l2;	//noc[0].bufferArray[local].val == 2
+bool r0l1 = false;	//noc[0].bufferArray[local].val == 1
+bool r0l2 = false;	//noc[0].bufferArray[local].val == 2
 //bool r0l3;	//noc[0].bufferArray[local].dest == 3
 bool r0lb1, r0lb2, r0lb3, r0lb4 = false; //Length of the local buffer
 bool r0lbv11, r0lbv12, r0lbv13, r0lbv14 = false; //Value of the local buffer at each position, true if dest = 1
 bool r0lbv21, r0lbv22, r0lbv23, r0lbv24 = false; //Value of the local buffer at each position, true if dest = 2
 											//If both are true, dest = 3
 
-bool r0e4;	//noc[0].bufferArray[east].val == 4
-bool r0e2;	//noc[0].bufferArray[east].val == 2
+bool r0e4 = false;	//noc[0].bufferArray[east].val == 4
+bool r0e2 = false;	//noc[0].bufferArray[east].val == 2
 bool r0eb1, r0eb2, r0eb3, r0eb4 = false; //Length of the east buffer
 bool r0ebv1, r0ebv2, r0ebv3, r0ebv4 = false; //Value of the east buffer at each position, true if dest = 2, false if dest = 0
 
-bool r0s4;	//noc[0].bufferArray[south].val == 4
+bool r0s4 = false;	//noc[0].bufferArray[south].val == 4
 bool r0sb1, r0sb2, r0sb3, r0sb4 = false; //Length of the south buffer
 
 bool r0a1, r0a2, r0a3 = false; //priority positions of the arbiter  noc[0].bufferArray[0] == local, noc[0].bufferArray[1] == local, noc[0].bufferArray[0] == south || (noc[0].bufferArray[1] == south && r0a1)
 
 
 //bool r1l0;	//noc[1].bufferArray[local].val == 0
-bool r1l2;	//noc[1].bufferArray[local].val == 2
-bool r1l3;	//noc[1].bufferArray[local].val == 3
+bool r1l2 = false;	//noc[1].bufferArray[local].val == 2
+bool r1l3 = false;	//noc[1].bufferArray[local].val == 3
 bool r1lb1, r1lb2, r1lb3, r1lb4 = false; //Length of the local buffer
 bool r1lbv11, r1lbv12, r1lbv13, r1lbv14 = false; //Value of the local buffer at each position, true if dest = 0
 bool r1lbv21, r1lbv22, r1lbv23, r1lbv24 = false; //Value of the local buffer at each position, true if dest = 3
 											//If both are true, dest = 2
 
-bool r1s4;	//noc[1].bufferArray[south].val == 4
+bool r1s4 = false;	//noc[1].bufferArray[south].val == 4
 bool r1sb1, r1sb2, r1sb3, r1sb4 = false; //Length of the south buffer
 
-bool r1w2;	//noc[1].bufferArray[west].val == 2
-bool r1w4;	//noc[1].bufferArray[west].val == 4
+bool r1w2 = false;	//noc[1].bufferArray[west].val == 2
+bool r1w4 = false;	//noc[1].bufferArray[west].val == 4
 bool r1wb1, r1wb2, r1wb3, r1wb4 = false; //Length of the east buffer
 bool r1wbv1, r1wbv2, r1wbv3, r1wbv4 = false; //Value of the east buffer at each position, true if dest = 3, false if dest = 1
 
@@ -65,38 +65,38 @@ bool r1a1, r1a2 = false; //priority positions of the arbiter  noc[1].bufferArray
 bool r1a3 = true;
 
 
-bool r2l0;	//noc[2].bufferArray[local].val == 0
-bool r2l1;	//noc[2].bufferArray[local].val == 1
+bool r2l0 = false;	//noc[2].bufferArray[local].val == 0
+bool r2l1 = false;	//noc[2].bufferArray[local].val == 1
 //bool r2l3;	//noc[2].bufferArray[local].dest == 3
 bool r2lb1, r2lb2, r2lb3, r2lb4 = false; //Length of the local buffer
 bool r2lbv11, r2lbv12, r2lbv13, r2lbv14 = false; //Value of the local buffer at each position, true if dest = 3
 bool r2lbv21, r2lbv22, r2lbv23, r2lbv24 = false; //Value of the local buffer at each position, true if dest = 0
 											//If both are true, dest = 1
 
-bool r2n4;	//noc[2].bufferArray[north].val == 4
+bool r2n4 = false;	//noc[2].bufferArray[north].val == 4
 bool r2nb1, r2nb2, r2nb3, r2nb4 = false; //Length of the north buffer
 
-bool r2e0;	//noc[2].bufferArray[east].val == 0
-bool r2e4;	//noc[2].bufferArray[east].val == 4
+bool r2e0 = false;	//noc[2].bufferArray[east].val == 0
+bool r2e4 = false;	//noc[2].bufferArray[east].val == 4
 bool r2eb1, r2eb2, r2eb3, r2eb4 = false; //Length of the east buffer
 bool r2ebv1, r2ebv2, r2ebv3, r2ebv4 = false; //Value of the east buffer at each position, true if dest = 2, false if dest = 0
 
 bool r2a1, r2a2 = false; //priority positions of the arbiter  noc[2].bufferArray[0] == local, noc[2].bufferArray[1] == local, noc[2].bufferArray[0] == north || (noc[2].bufferArray[1] == north && r2a1)
 bool r2a3 = true;
 
-bool r3l0;	//noc[3].bufferArray[local].val == 0
-bool r3l3;	//noc[3].bufferArray[local].val == 3
+bool r3l0 = false;	//noc[3].bufferArray[local].val == 0
+bool r3l3 = false;	//noc[3].bufferArray[local].val == 3
 //bool r3l2;	//noc[3].bufferArray[local].dest == 2
 bool r3lb1, r3lb2, r3lb3, r3lb4 = false; //Length of the local buffer
 bool r3lbv11, r3lbv12, r3lbv13, r3lbv14 = false; //Value of the local buffer at each position, true if dest = 2
 bool r3lbv21, r3lbv22, r3lbv23, r3lbv24 = false; //Value of the local buffer at each position, true if dest = 1
 											//If both are true, dest = 0
 
-bool r3n4;	//noc[3].bufferArray[north].val == 4
+bool r3n4 = false;	//noc[3].bufferArray[north].val == 4
 bool r3nb1, r3nb2, r3nb3, r3nb4 = false; //Length of the north buffer
 
-bool r3w0;	//noc[3].bufferArray[west].val == 0
-bool r3w4;	//noc[3].bufferArray[west].val == 4
+bool r3w0 = false;	//noc[3].bufferArray[west].val == 0
+bool r3w4 = false;	//noc[3].bufferArray[west].val == 4
 bool r3wb1, r3wb2, r3wb3, r3wb4 = false; //Length of the east buffer
 bool r3wbv1, r3wbv2, r3wbv3, r3wbv4 = false; //Value of the east buffer at each position, true if dest = 1, false if dest = 3
 
@@ -154,7 +154,8 @@ process Top(){
 process Populate(){
 	if((clk % INJECTIONRATEDENOMINATOR) < INJECTIONRATENUMERATOR){
 		
-		if(clkLower + clk < 8){
+		/*
+		if(clk < clkLower + 8){
 			{=
 			r0lbv14 = true, r0lbv24 = true, r0lb4 = true,
 			r1lbv14 = false, r1lbv24 = true, r1lb4 = true,
@@ -163,15 +164,58 @@ process Populate(){
 			=}
 		}
 		else{
-			{=
-			r0lbv14 = true, r0lbv24 = true, r0lb4 = true,
-			r1lbv14 = false, r1lbv24 = true, r1lb4 = true,
-			r2lbv14 = true, r2lbv24 = true, r2lb4 = true,
-			r3lbv14 = true, r3lbv24 = false, r3lb4 = true
-			=}
+			if(r0lb4 == true){
+			tau		// buffer is full
 		}
+		else {
+			palt{
+				:(1/3): {= r0lbv14 = true, r0lbv24 = false, r0lb4 = true =}
+				:(1/3): {= r0lbv14 = false, r0lbv24 = true, r0lb4 = true =}
+				:(1/3): {= r0lbv14 = true, r0lbv24 = true, r0lb4 = true =}
+			}
+		};
+	
+	//populate router 1
+		if(r1lb3 == true){
+			tau		// buffer is full
+		}
+		else{
+			palt{
+				:(1/3): {= r1lbv14 = true, r1lbv24 = false, r1lb4 = true =}
+				:(1/3): {= r1lbv14 = false, r1lbv24 = true, r1lb4 = true =}
+				:(1/3): {= r1lbv14 = true, r1lbv24 = true, r1lb4 = true =}
+			}
+		};
 		
-		/*
+		
+		//populate router 2
+		if(r2lb3 == true){
+			tau		// buffer is full
+		}
+		else{
+			palt{
+				:(1/3): {= r2lbv14 = true, r2lbv24 = false, r2lb4 = true =}
+				:(1/3): {= r2lbv14 = false, r2lbv24 = true, r2lb4 = true =}
+				:(1/3): {= r2lbv14 = true, r2lbv24 = true, r2lb4 = true =}
+			}
+		};
+		
+		
+		//populate router 3
+		if(r3lb3 == true){
+			tau		// buffer is full
+		}
+		else {
+			palt{
+				:(1/3): {= r3lbv14 = true, r3lbv24 = false, r3lb4 = true =}
+				:(1/3): {= r3lbv14 = false, r3lbv24 = true, r3lb4 = true =}
+				:(1/3): {= r3lbv14 = true, r3lbv24 = true, r3lb4 = true =}
+			}
+		}
+		}
+		*/
+		
+		
 		//populate router 0
 		if(r0lb4 == true){
 			tau		// buffer is full
@@ -221,7 +265,7 @@ process Populate(){
 				:(1/3): {= r3lbv14 = true, r3lbv24 = true, r3lb4 = true =}
 			}
 		}
-		*/
+		
 	}
 	else {tau}
 }
@@ -1363,7 +1407,12 @@ process Arbiter_corner0(){
 				{= 
 				r2nb4 = true,
 				r0l2 = false,
+				r0lbv11 = false,
+				r0lbv21 = false,
+				r0lb1 = false,
+				
 				r0s4 = false, //If this was true, a flit was delivered
+				r0sb1 = false,
 				
 				//update priority values
 				r0a1 = (!(r2nb4) && !(r0a1) && !(r0a2)) || (!(r2nb4) && r0a2 && !(r0a3)) || (r2nb4 && r0a1) || (r2nb4 && r0a2 && r0a3),
@@ -1374,6 +1423,7 @@ process Arbiter_corner0(){
 			else{
 				{=
 				r0s4 = false, //If this was true, a flit was delivered
+				r0sb1 = false,
 				
 				//update priority values
 				r0a1 = (!(r2nb4) && !(r0a1) && !(r0a2)) || (!(r2nb4) && r0a2 && !(r0a3)) || (r2nb4 && r0a1) || (r2nb4 && r0a2 && r0a3),
@@ -1387,8 +1437,11 @@ process Arbiter_corner0(){
 				{= 
 				r2nb4 = true,
 				r0e2 = false,
+				r0ebv1 = false,
+				r0eb1 = false,
 				
 				r0s4 = false, //If this was true, a flit was delivered
+				r0sb1 = false,
 				
 				//update priority values
 				r0a1 = (!(r2nb4) && !(r0a1) && !(r0a2)) || (!(r2nb4) && r0a2 && !(r0a3)) || (r2nb4 && r0a1) || (r2nb4 && r0a2 && r0a3),
@@ -1399,6 +1452,7 @@ process Arbiter_corner0(){
 			else{
 				{=
 				r0s4 = false, //If this was true, a flit was delivered
+				r0sb1 = false,
 				
 				//update priority values
 				r0a1 = (!(r2nb4) && !(r0a1) && !(r0a2)) || (!(r2nb4) && r0a2 && !(r0a3)) || (r2nb4 && r0a1) || (r2nb4 && r0a2 && r0a3),
@@ -1415,9 +1469,13 @@ process Arbiter_corner0(){
 					{= 
 					r1wb4 = true,
 					r1wbv4 = r0lbv11 && r0lbv21,	//forwards the destination value. if r0lbv11 && r0lbv21 , then the destination is router 3
+					r0lbv11 = false,
+					r0lbv21 = false,
+					r0lb1 = false,
 					r0l1 = false,
 					
 					r0s4 = false,	//If r0s4 is true, a flit is delivered
+					r0sb1 = false,
 					
 					r0a1 = (r1wb4 && r0a1) || (r1wb4 && r0a2),
 					r0a2 = (!(r1wb4) && r0a1) || (r1wb4 && !(r0a1) && !(r0a2)),
@@ -1427,6 +1485,7 @@ process Arbiter_corner0(){
 				else{
 					{=
 					r0s4 = false,	//If r0s4 is true, a flit is delivered
+					r0sb1 = false,
 					
 					r0a1 = (r1wb4 && r0a1) || (r1wb4 && r0a2),
 					r0a2 = (!(r1wb4) && r0a1) || (r1wb4 && !(r0a1) && !(r0a2)),
@@ -1439,8 +1498,12 @@ process Arbiter_corner0(){
 					{= 
 					r2nb4 = true,
 					r0l2 = false,
+					r0lbv11 = false,
+					r0lbv21 = false,
+					r0lb1 = false,
 					
 					r0s4 = false,	//If r0s4 is true, a flit is delivered
+					r0sb1 = false,
 					
 					r0a1 = (r1wb4 && r0a1) || (r1wb4 && r0a2),
 					r0a2 = (!(r1wb4) && r0a1) || (r1wb4 && !(r0a1) && !(r0a2)),
@@ -1450,6 +1513,7 @@ process Arbiter_corner0(){
 				else{
 					{=
 					r0s4 = false,	//If r0s4 is true, a flit is delivered
+					r0sb1 = false,
 					
 					r0a1 = (r1wb4 && r0a1) || (r1wb4 && r0a2),
 					r0a2 = (!(r1wb4) && r0a1) || (r1wb4 && !(r0a1) && !(r0a2)),
@@ -1460,6 +1524,7 @@ process Arbiter_corner0(){
 			else {		//local empty
 				{=
 					r0s4 = false,	//If r0s4 is true, a flit is delivered
+					r0sb1 = false,
 					
 					r0a1 = (r1wb4 && r0a1) || (r1wb4 && r0a2),
 					r0a2 = (!(r1wb4) && r0a1) || (r1wb4 && !(r0a1) && !(r0a2)),
@@ -1468,9 +1533,78 @@ process Arbiter_corner0(){
 			}
 		}
 		else{		//east and local are serviced, south is not
-			{= 
-			r0e4 = false
-			=}
+			if(r0l1){ //local sends east
+				if(r1wb4 == false){   //r1 west buffer not full
+					{= 
+					r1wb4 = true,
+					r1wbv4 = r0lbv11 && r0lbv21,	//forwards the destination value. if r0lbv11 && r0lbv21 , then the destination is router 3
+					r0lbv11 = false,
+					r0lbv21 = false,
+					r0lb1 = false,
+					r0l1 = false,
+					
+					r0e4 = false,	//If r0s4 is true, a flit is delivered
+					r0eb1 = false,
+					r0ebv1 = false,
+					
+					r0a1 = (r1wb4 && r0a1) || (r1wb4 && r0a2),
+					r0a2 = (!(r1wb4) && r0a1) || (r1wb4 && !(r0a1) && !(r0a2)),
+					r0a3 = !r0a3
+					=}
+				}
+				else{
+					{=
+					r0e4 = false,	//If r0e4 is true, a flit is delivered
+					r0eb1 = false,
+					r0ebv1 = false,
+					
+					r0a1 = (r1wb4 && r0a1) || (r1wb4 && r0a2),
+					r0a2 = (!(r1wb4) && r0a1) || (r1wb4 && !(r0a1) && !(r0a2)),
+					r0a3 = !r0a3
+					=}
+				}
+			}
+			else if(r0l2){ //local sends south
+				if(r2nb4 == false){   //r2 north buffer not full
+					{= 
+					r2nb4 = true,
+					r0l2 = false,
+					r0lbv11 = false,
+					r0lbv21 = false,
+					r0lb1 = false,
+					
+					r0e4 = false,	//If r0e4 is true, a flit is delivered
+					r0eb1 = false,
+					r0ebv1 = false,
+					
+					r0a1 = (r1wb4 && r0a1) || (r1wb4 && r0a2),
+					r0a2 = (!(r1wb4) && r0a1) || (r1wb4 && !(r0a1) && !(r0a2)),
+					r0a3 = !r0a3
+					=}
+				}
+				else{
+					{=
+					r0e4 = false,	//If r0e4 is true, a flit is delivered
+					r0eb1 = false,
+					r0ebv1 = false,
+					
+					r0a1 = (r1wb4 && r0a1) || (r1wb4 && r0a2),
+					r0a2 = (!(r1wb4) && r0a1) || (r1wb4 && !(r0a1) && !(r0a2)),
+					r0a3 = !r0a3
+					=}
+				}
+			}
+			else {		//local empty
+				{=
+					r0e4 = false,	//If r0e4 is true, a flit is delivered
+					r0eb1 = false,
+					r0ebv1 = false,
+					
+					r0a1 = (r1wb4 && r0a1) || (r1wb4 && r0a2),
+					r0a2 = (!(r1wb4) && r0a1) || (r1wb4 && !(r0a1) && !(r0a2)),
+					r0a3 = !r0a3
+					=}
+			}
 		}
 	}
 	else{		//no conflict
@@ -1481,11 +1615,17 @@ process Arbiter_corner0(){
 					r1wb4 = true,
 					r1wbv4 = r0lbv11 && r0lbv21,	//forwards the destination value. if r0lbv11 && r0lbv21 , then the destination is router 3
 					r0l1 = false,
+					r0lbv11 = false,
+					r0lbv21 = false,
+					r0lb1 = false,
 					
 					r2nb4 = true,
 					r0e2 = false,
+					r0eb1 = false,
+					r0ebv1 = false,
 					
 					r0s4 = false,
+					r0sb1 = false,
 					
 					optimalRuns++
 					//priorities remain the same
@@ -1496,9 +1636,14 @@ process Arbiter_corner0(){
 					r1wb4 = true,
 					r1wbv4 = r0lbv11 && r0lbv21,	//forwards the destination value. if r0lbv11 && r0lbv21 , then the destination is router 3
 					r0l1 = false,
+					r0lbv11 = false,
+					r0lbv21 = false,
+					r0lb1 = false,
 					
 					r2nb4 = true,
-					r0e2 = false
+					r0e2 = false,
+					r0eb1 = false,
+					r0ebv1 = false
 					//priorities remain the same
 					=}
 				}
@@ -1506,8 +1651,11 @@ process Arbiter_corner0(){
 					{= 
 					r2nb4 = true,
 					r0e2 = false,
+					r0eb1 = false,
+					r0ebv1 = false,
 					
-					r0s4 = false,	//if this was true, there was a flit delivered
+					r0s4 = false,
+					r0sb1 = false,	//if this was true, there was a flit delivered
 					
 					//update priorities local gets priority
 					r0a1 = true,
@@ -1520,8 +1668,12 @@ process Arbiter_corner0(){
 					r1wb4 = true,
 					r1wbv4 = r0lbv11 && r0lbv21,	//forwards the destination value. if r0lbv11 && r0lbv21 , then the destination is router 3
 					r0l1 = false,
+					r0lbv11 = false,
+					r0lbv21 = false,
+					r0lb1 = false,
 					
 					r0s4 = false,
+					r0sb1 = false,
 					
 					//update priorities east gets priority
 					r0a1 = false,
@@ -1529,9 +1681,10 @@ process Arbiter_corner0(){
 					r0a3 = false
 					=}
 				}
-				else{
+				else{		//r1 west buffer is full, r2 north buffer is full
 					{=
-					r0s4 = false,	//If r0s4 is true, a flit is delivered
+					r0s4 = false,
+					r0sb1 = false,	//If r0s4 is true, a flit is delivered
 					
 					//update priorities local and east get priority
 					r0a1 = r0a1 || (r0a2 && r0a3),
@@ -1546,14 +1699,21 @@ process Arbiter_corner0(){
 					r1wb4 = true,
 					r1wbv4 = r0lbv11 && r0lbv21,	//forwards the destination value. if r0lbv11 && r0lbv21 , then the destination is router 3
 					r0l1 = false,
+					r0lbv11 = false,
+					r0lbv21 = false,
+					r0lb1 = false,
 					
-					r0e4 = false //if this was true, a flit was sent
+					r0e4 = false, //if this was true, a flit was sent
+					r0ebv1 = false,
+					r0eb1 = false
 					//priorities remain the same
 					=}
 				}
 				else{
 					{=
-					r0e4 = false, //if this was true, a flit was sent
+					r0e4 = false,
+					r0eb1 = false,
+					r0ebv1 = false, //if this was true, a flit was sent
 					
 					//update priorities local gets priority
 					r0a1 = true,
@@ -1567,16 +1727,21 @@ process Arbiter_corner0(){
 					{= 
 					r1wb4 = true,
 					r1wbv4 = r0lbv11 && r0lbv21,	//forwards the destination value. if r0lbv11 && r0lbv21 , then the destination is router 3
+					r0lbv11 = false,
+					r0lbv21 = false,
+					r0lb1 = false,
 					r0l1 = false,
 					
-					r0s4 = false //if this was true, a flit was sent
+					r0s4 = false, //if this was true, a flit was sent
+					r0sb1 = false 
 					
 					//priorities remain the same
 					=}
 				}
 				else{
 					{=
-					r0s4 = false, //if this was true, a flit was sent
+					r0s4 = false,
+					r0sb1 = false, //if this was true, a flit was sent
 					
 					//update priorities local gets priority
 					r0a1 = true,
@@ -1590,18 +1755,29 @@ process Arbiter_corner0(){
 			if(r2nb4 == false){
 				{=
 				r2nb4 = true,
+				r0lbv11 = false,
+				r0lbv21 = false,
+				r0lb1 = false,
 				r0l2 = false,
 				
-				r0e4 = false,	//if this was true, a flit was delivered
-				r0s4 = false	//if this was true, a flit was delivered
+				r0e4 = false,
+				r0eb1 = false,
+				r0ebv1 = false,	//if this was true, a flit was delivered
+				
+				r0s4 = false,
+				r0sb1 = false	//if this was true, a flit was delivered
 				
 				//priorities remain the same
 				=}
 			}
 			else{
 				{=
-				r0e4 = false,	//if this was true, a flit was delivered
-				r0s4 = false,	//if this was true, a flit was delivered
+				r0e4 = false,
+				r0eb1 = false,
+				r0ebv1 = false,	//if this was true, a flit was delivered
+				
+				r0s4 = false,
+				r0sb1 = false,	//if this was true, a flit was delivered
 				
 				//update priorities local gets priority
 				r0a1 = true,
@@ -1617,8 +1793,11 @@ process Arbiter_corner0(){
 					{=
 					r2nb4 = true,
 					r0e2 = false,
+					r0eb1 = false,
+					r0ebv1 = false,
 					
-					r0s4 = false
+					r0s4 = false,
+					r0sb1 = false
 					
 					//priorities remain the same
 					=}
@@ -1626,6 +1805,7 @@ process Arbiter_corner0(){
 				else{
 					{=
 					r0s4 = false,
+					r0sb1 = false,
 					
 					//update priorities east gets priority
 					r0a1 = false,
@@ -1636,7 +1816,9 @@ process Arbiter_corner0(){
 			}
 			else{		//east sends local
 				{=
-				r0e4 = false
+				r0e4 = false,
+				r0eb1 = false,
+				r0ebv1 = false
 				
 				//priorities remain the same
 				=}
@@ -1646,13 +1828,18 @@ process Arbiter_corner0(){
 }
 
 process Arbiter_corner1(){
-	if(r1l2 && r1w2){		//local and west conflict
-		if(!(r1a1 || (r1a2 && r1a3))){		//local and south are serviced, west unserviced
+	if(r1l2 && r1w2){		//local and east conflict
+		if(!(r1a1 || (r1a2 && r1a3))){		//local and south are serviced, east unserviced
 			if(r3nb4 == false){
 				{= 
 				r3nb4 = true,
 				r1l2 = false,
+				r1lbv11 = false,
+				r1lbv21 = false,
+				r1lb1 = false,
+				
 				r1s4 = false, //If this was true, a flit was delivered
+				r1sb1 = false,
 				
 				//update priority values
 				r1a1 = (!(r3nb4) && !(r1a1) && !(r1a2)) || (!(r3nb4) && r1a2 && !(r1a3)) || (r3nb4 && r1a1) || (r3nb4 && r1a2 && r1a3),
@@ -1663,6 +1850,7 @@ process Arbiter_corner1(){
 			else{
 				{=
 				r1s4 = false, //If this was true, a flit was delivered
+				r1sb1 = false,
 				
 				//update priority values
 				r1a1 = (!(r3nb4) && !(r1a1) && !(r1a2)) || (!(r3nb4) && r1a2 && !(r1a3)) || (r3nb4 && r1a1) || (r3nb4 && r1a2 && r1a3),
@@ -1671,13 +1859,16 @@ process Arbiter_corner1(){
 				=}
 			}
 		}
-		else{		//west and south are serviced, local unserviced
+		else{		//east and south are serviced, local unserviced
 			if(r3nb4 == false){
 				{= 
 				r3nb4 = true,
 				r1w2 = false,
+				r1wbv1 = false,
+				r1wb1 = false,
 				
 				r1s4 = false, //If this was true, a flit was delivered
+				r1sb1 = false,
 				
 				//update priority values
 				r1a1 = (!(r3nb4) && !(r1a1) && !(r1a2)) || (!(r3nb4) && r1a2 && !(r1a3)) || (r3nb4 && r1a1) || (r3nb4 && r1a2 && r1a3),
@@ -1688,6 +1879,7 @@ process Arbiter_corner1(){
 			else{
 				{=
 				r1s4 = false, //If this was true, a flit was delivered
+				r1sb1 = false,
 				
 				//update priority values
 				r1a1 = (!(r3nb4) && !(r1a1) && !(r1a2)) || (!(r3nb4) && r1a2 && !(r1a3)) || (r3nb4 && r1a1) || (r3nb4 && r1a2 && r1a3),
@@ -1697,16 +1889,20 @@ process Arbiter_corner1(){
 			}
 		}
 	}
-	else if(r1w4 && r1s4){		//west and south conflict
-		if(r1a3){		//south and local are serviced, west is not
-			if(r1l3){ //local sends west
-				if(r0eb4 == false){   //r1 west buffer not full
+	else if(r1w4 && r1s4){		//east and south conflict
+		if(r1a3){		//south and local are serviced, east is not
+			if(r1l3){ //local sends east
+				if(r0eb4 == false){   //r0 east buffer not full
 					{= 
 					r0eb4 = true,
 					r0ebv4 = r1lbv11 && r1lbv21,	//forwards the destination value. if r1lbv11 && r1lbv21 , then the destination is router 3
+					r1lbv11 = false,
+					r1lbv21 = false,
+					r1lb1 = false,
 					r1l3 = false,
 					
 					r1s4 = false,	//If r1s4 is true, a flit is delivered
+					r1sb1 = false,
 					
 					r1a1 = (r0eb4 && r1a1) || (r0eb4 && r1a2),
 					r1a2 = (!(r0eb4) && r1a1) || (r0eb4 && !(r1a1) && !(r1a2)),
@@ -1716,6 +1912,7 @@ process Arbiter_corner1(){
 				else{
 					{=
 					r1s4 = false,	//If r1s4 is true, a flit is delivered
+					r1sb1 = false,
 					
 					r1a1 = (r0eb4 && r1a1) || (r0eb4 && r1a2),
 					r1a2 = (!(r0eb4) && r1a1) || (r0eb4 && !(r1a1) && !(r1a2)),
@@ -1724,12 +1921,16 @@ process Arbiter_corner1(){
 				}
 			}
 			else if(r1l2){ //local sends south
-				if(r3nb4 == false){   //r2 north buffer not full
+				if(r3nb4 == false){   //r3 north buffer not full
 					{= 
 					r3nb4 = true,
 					r1l2 = false,
+					r1lbv11 = false,
+					r1lbv21 = false,
+					r1lb1 = false,
 					
 					r1s4 = false,	//If r1s4 is true, a flit is delivered
+					r1sb1 = false,
 					
 					r1a1 = (r0eb4 && r1a1) || (r0eb4 && r1a2),
 					r1a2 = (!(r0eb4) && r1a1) || (r0eb4 && !(r1a1) && !(r1a2)),
@@ -1739,6 +1940,7 @@ process Arbiter_corner1(){
 				else{
 					{=
 					r1s4 = false,	//If r1s4 is true, a flit is delivered
+					r1sb1 = false,
 					
 					r1a1 = (r0eb4 && r1a1) || (r0eb4 && r1a2),
 					r1a2 = (!(r0eb4) && r1a1) || (r0eb4 && !(r1a1) && !(r1a2)),
@@ -1749,6 +1951,7 @@ process Arbiter_corner1(){
 			else {		//local empty
 				{=
 					r1s4 = false,	//If r1s4 is true, a flit is delivered
+					r1sb1 = false,
 					
 					r1a1 = (r0eb4 && r1a1) || (r0eb4 && r1a2),
 					r1a2 = (!(r0eb4) && r1a1) || (r0eb4 && !(r1a1) && !(r1a2)),
@@ -1756,47 +1959,130 @@ process Arbiter_corner1(){
 					=}
 			}
 		}
-		else{		//west and local are serviced, south is not
-			{= 
-			r1w4 = false
-			=}
+		else{		//east and local are serviced, south is not
+			if(r1l3){ //local sends east
+				if(r0eb4 == false){   //r0 east buffer not full
+					{= 
+					r0eb4 = true,
+					r0ebv4 = r1lbv11 && r1lbv21,	//forwards the destination value. if r1lbv11 && r1lbv21 , then the destination is router 3
+					r1lbv11 = false,
+					r1lbv21 = false,
+					r1lb1 = false,
+					r1l3 = false,
+					
+					r1w4 = false,	//If r1w4 is true, a flit is delivered
+					r1wb1 = false,
+					r1wbv1 = false,
+					
+					r1a1 = (r0eb4 && r1a1) || (r0eb4 && r1a2),
+					r1a2 = (!(r0eb4) && r1a1) || (r0eb4 && !(r1a1) && !(r1a2)),
+					r1a3 = !r1a3
+					=}
+				}
+				else{
+					{=
+					r1w4 = false,	//If r1w4 is true, a flit is delivered
+					r1wb1 = false,
+					r1wbv1 = false,
+					
+					r1a1 = (r0eb4 && r1a1) || (r0eb4 && r1a2),
+					r1a2 = (!(r0eb4) && r1a1) || (r0eb4 && !(r1a1) && !(r1a2)),
+					r1a3 = !r1a3
+					=}
+				}
+			}
+			else if(r1l2){ //local sends south
+				if(r3nb4 == false){   //r3 north buffer not full
+					{= 
+					r3nb4 = true,
+					r1l2 = false,
+					r1lbv11 = false,
+					r1lbv21 = false,
+					r1lb1 = false,
+					
+					r1w4 = false,	//If r1w4 is true, a flit is delivered
+					r1wb1 = false,
+					r1wbv1 = false,
+					
+					r1a1 = (r0eb4 && r1a1) || (r0eb4 && r1a2),
+					r1a2 = (!(r0eb4) && r1a1) || (r0eb4 && !(r1a1) && !(r1a2)),
+					r1a3 = !r1a3
+					=}
+				}
+				else{
+					{=
+					r1w4 = false,	//If r1w4 is true, a flit is delivered
+					r1wb1 = false,
+					r1wbv1 = false,
+					
+					r1a1 = (r0eb4 && r1a1) || (r0eb4 && r1a2),
+					r1a2 = (!(r0eb4) && r1a1) || (r0eb4 && !(r1a1) && !(r1a2)),
+					r1a3 = !r1a3
+					=}
+				}
+			}
+			else {		//local empty
+				{=
+					r1w4 = false,	//If r1w4 is true, a flit is delivered
+					r1wb1 = false,
+					r1wbv1 = false,
+					
+					r1a1 = (r0eb4 && r1a1) || (r0eb4 && r1a2),
+					r1a2 = (!(r0eb4) && r1a1) || (r0eb4 && !(r1a1) && !(r1a2)),
+					r1a3 = !r1a3
+					=}
+			}
 		}
 	}
 	else{		//no conflict
-		if(r1l3){ //local sends west
-			if(r1w2){	//west buffer sends south
-				if(r0eb4 == false && r3nb4 == false && r1s4 == true){   //r1 west buffer not full and r2 north buffer not full and south buffer sends
+		if(r1l3){ //local sends east
+			if(r1w2){	//east buffer sends south
+				if(r0eb4 == false && r3nb4 == false && r1s4 == true){   //r0 east buffer not full and r3 north buffer not full and south buffer sends
 					{= 
 					r0eb4 = true,
-					r1wbv4 = r1lbv11 && r1lbv21,	//forwards the destination value. if r1lbv11 && r1lbv21 , then the destination is router 3
+					r0ebv4 = r1lbv11 && r1lbv21,	//forwards the destination value. if r1lbv11 && r1lbv21 , then the destination is router 3
 					r1l3 = false,
+					r1lbv11 = false,
+					r1lbv21 = false,
+					r1lb1 = false,
 					
 					r3nb4 = true,
 					r1w2 = false,
+					r1wb1 = false,
+					r1wbv1 = false,
 					
 					r1s4 = false,
+					r1sb1 = false,
 					
 					optimalRuns++
 					//priorities remain the same
 					=}
 				}
-				else if(r0eb4 == false && r3nb4 == false && r1s4 == false){		//r1 west buffer not full and r2 north buffer not full and south buffer empty
+				else if(r0eb4 == false && r3nb4 == false && r1s4 == false){		//r0 east buffer not full and r3 north buffer not full and south buffer empty
 					{= 
 					r0eb4 = true,
-					r1wbv4 = r1lbv11 && r1lbv21,	//forwards the destination value. if r1lbv11 && r1lbv21 , then the destination is router 3
+					r0ebv4 = r1lbv11 && r1lbv21,	//forwards the destination value. if r1lbv11 && r1lbv21 , then the destination is router 3
 					r1l3 = false,
+					r1lbv11 = false,
+					r1lbv21 = false,
+					r1lb1 = false,
 					
 					r3nb4 = true,
-					r1w2 = false
+					r1w2 = false,
+					r1wb1 = false,
+					r1wbv1 = false
 					//priorities remain the same
 					=}
 				}
-				else if(r0eb4 == true && r3nb4 == false){	//r1 west buffer is full, r2 north buffer is not full
+				else if(r0eb4 == true && r3nb4 == false){	//r0 east buffer is full, r3 north buffer is not full
 					{= 
 					r3nb4 = true,
 					r1w2 = false,
+					r1wb1 = false,
+					r1wbv1 = false,
 					
-					r1s4 = false,	//if this was true, there was a flit delivered
+					r1s4 = false,
+					r1sb1 = false,	//if this was true, there was a flit delivered
 					
 					//update priorities local gets priority
 					r1a1 = true,
@@ -1804,45 +2090,57 @@ process Arbiter_corner1(){
 					//r1a3 = r1a3 redundant
 					=}
 				}
-				else if(r0eb4 == false && r3nb4 == true){	//r1 west buffer is not full, r2 north buffer is full
+				else if(r0eb4 == false && r3nb4 == true){	//r0 east buffer is not full, r3 north buffer is full
 					{= 
 					r0eb4 = true,
-					r1wbv4 = r1lbv11 && r1lbv21,	//forwards the destination value. if r1lbv11 && r1lbv21 , then the destination is router 3
+					r0ebv4 = r1lbv11 && r1lbv21,	//forwards the destination value. if r1lbv11 && r1lbv21 , then the destination is router 3
 					r1l3 = false,
+					r1lbv11 = false,
+					r1lbv21 = false,
+					r1lb1 = false,
 					
 					r1s4 = false,
+					r1sb1 = false,
 					
-					//update priorities west gets priority
+					//update priorities east gets priority
 					r1a1 = false,
 					r1a2 = r1a1 || (r1a2 && !r1a3),
 					r1a3 = false
 					=}
 				}
-				else{
+				else{		//r0 east buffer is full, r3 north buffer is full
 					{=
-					r1s4 = false,	//If r1s4 is true, a flit is delivered
+					r1s4 = false,
+					r1sb1 = false,	//If r1s4 is true, a flit is delivered
 					
-					//update priorities local and west get priority
+					//update priorities local and east get priority
 					r1a1 = r1a1 || (r1a2 && r1a3),
 					r1a2 = !(r1a1 || (r1a2 && r1a3)),
 					r1a3 = false
 					=}
 				}
 			}
-			else if(r1w4){	//west buffer sends local
-				if(r0eb4 == false){ //r1 west buffer not full
+			else if(r1w4){	//east buffer sends local
+				if(r0eb4 == false){ //r0 east buffer not full
 					{= 
 					r0eb4 = true,
-					r1wbv4 = r1lbv11 && r1lbv21,	//forwards the destination value. if r1lbv11 && r1lbv21 , then the destination is router 3
+					r0ebv4 = r1lbv11 && r1lbv21,	//forwards the destination value. if r1lbv11 && r1lbv21 , then the destination is router 3
 					r1l3 = false,
+					r1lbv11 = false,
+					r1lbv21 = false,
+					r1lb1 = false,
 					
-					r1w4 = false //if this was true, a flit was sent
+					r1w4 = false, //if this was true, a flit was sent
+					r1wbv1 = false,
+					r1wb1 = false
 					//priorities remain the same
 					=}
 				}
 				else{
 					{=
-					r1w4 = false, //if this was true, a flit was sent
+					r1w4 = false,
+					r1wb1 = false,
+					r1wbv1 = false, //if this was true, a flit was sent
 					
 					//update priorities local gets priority
 					r1a1 = true,
@@ -1851,21 +2149,26 @@ process Arbiter_corner1(){
 					=}
 				}				
 			}
-			else{	//west buffer does not send
-				if(r0eb4 == false){ //r1 west buffer not full
+			else{	//east buffer does not send
+				if(r0eb4 == false){ //r0 east buffer not full
 					{= 
 					r0eb4 = true,
-					r1wbv4 = r1lbv11 && r1lbv21,	//forwards the destination value. if r1lbv11 && r1lbv21 , then the destination is router 3
+					r0ebv4 = r1lbv11 && r1lbv21,	//forwards the destination value. if r1lbv11 && r1lbv21 , then the destination is router 3
+					r1lbv11 = false,
+					r1lbv21 = false,
+					r1lb1 = false,
 					r1l3 = false,
 					
-					r1s4 = false //if this was true, a flit was sent
+					r1s4 = false, //if this was true, a flit was sent
+					r1sb1 = false 
 					
 					//priorities remain the same
 					=}
 				}
 				else{
 					{=
-					r1s4 = false, //if this was true, a flit was sent
+					r1s4 = false,
+					r1sb1 = false, //if this was true, a flit was sent
 					
 					//update priorities local gets priority
 					r1a1 = true,
@@ -1879,18 +2182,29 @@ process Arbiter_corner1(){
 			if(r3nb4 == false){
 				{=
 				r3nb4 = true,
+				r1lbv11 = false,
+				r1lbv21 = false,
+				r1lb1 = false,
 				r1l2 = false,
 				
-				r1w4 = false,	//if this was true, a flit was delivered
-				r1s4 = false	//if this was true, a flit was delivered
+				r1w4 = false,
+				r1wb1 = false,
+				r1wbv1 = false,	//if this was true, a flit was delivered
+				
+				r1s4 = false,
+				r1sb1 = false	//if this was true, a flit was delivered
 				
 				//priorities remain the same
 				=}
 			}
 			else{
 				{=
-				r1w4 = false,	//if this was true, a flit was delivered
-				r1s4 = false,	//if this was true, a flit was delivered
+				r1w4 = false,
+				r1wb1 = false,
+				r1wbv1 = false,	//if this was true, a flit was delivered
+				
+				r1s4 = false,
+				r1sb1 = false,	//if this was true, a flit was delivered
 				
 				//update priorities local gets priority
 				r1a1 = true,
@@ -1901,13 +2215,16 @@ process Arbiter_corner1(){
 			}
 		}
 		else{	//local does not send
-			if(r1w2){ 	// west sends south
-				if(r3nb4 ==false){ //r2 north buffer not full
+			if(r1w2){ 	// east sends south
+				if(r3nb4 ==false){ //r3 north buffer not full
 					{=
 					r3nb4 = true,
 					r1w2 = false,
+					r1wb1 = false,
+					r1wbv1 = false,
 					
-					r1s4 = false
+					r1s4 = false,
+					r1sb1 = false
 					
 					//priorities remain the same
 					=}
@@ -1915,17 +2232,20 @@ process Arbiter_corner1(){
 				else{
 					{=
 					r1s4 = false,
+					r1sb1 = false,
 					
-					//update priorities west gets priority
+					//update priorities east gets priority
 					r1a1 = false,
 					r1a2 = r1a1 || (r1a2 && !r1a3),
 					r1a3 = false
 					=}
 				}
 			}
-			else{		//west sends local
+			else{		//east sends local
 				{=
-				r1w4 = false
+				r1w4 = false,
+				r1wb1 = false,
+				r1wbv1 = false
 				
 				//priorities remain the same
 				=}
@@ -1936,66 +2256,80 @@ process Arbiter_corner1(){
 
 process Arbiter_corner2(){
 	if(r2l0 && r2e0){		//local and east conflict
-		if(!(r2a1 || (r2a2 && r2a3))){		//local and north are serviced, east unserviced
-			if(r2nb4 == false){
+		if(!(r2a1 || (r2a2 && r2a3))){		//local and south are serviced, east unserviced
+			if(r0sb4 == false){
 				{= 
-				r2nb4 = true,
+				r0sb4 = true,
 				r2l0 = false,
+				r2lbv11 = false,
+				r2lbv21 = false,
+				r2lb1 = false,
+				
 				r2n4 = false, //If this was true, a flit was delivered
+				r2nb1 = false,
 				
 				//update priority values
-				r2a1 = (!(r2nb4) && !(r2a1) && !(r2a2)) || (!(r2nb4) && r2a2 && !(r2a3)) || (r2nb4 && r2a1) || (r2nb4 && r2a2 && r2a3),
-				r2a2 = (!(r2nb4) && r2a1) || (r2nb4 && !(r2a1) && !(r2a2)) || (r2nb4 && r2a2 && !(r2a3)),
-				r2a3 = !(r2nb4) && !(r2a1) && !(r2a2) && r2a3
+				r2a1 = (!(r0sb4) && !(r2a1) && !(r2a2)) || (!(r0sb4) && r2a2 && !(r2a3)) || (r0sb4 && r2a1) || (r0sb4 && r2a2 && r2a3),
+				r2a2 = (!(r0sb4) && r2a1) || (r0sb4 && !(r2a1) && !(r2a2)) || (r0sb4 && r2a2 && !(r2a3)),
+				r2a3 = !(r0sb4) && !(r2a1) && !(r2a2) && r2a3
 				=}
 			}
 			else{
 				{=
 				r2n4 = false, //If this was true, a flit was delivered
+				r2nb1 = false,
 				
 				//update priority values
-				r2a1 = (!(r2nb4) && !(r2a1) && !(r2a2)) || (!(r2nb4) && r2a2 && !(r2a3)) || (r2nb4 && r2a1) || (r2nb4 && r2a2 && r2a3),
-				r2a2 = (!(r2nb4) && r2a1) || (r2nb4 && !(r2a1) && !(r2a2)) || (r2nb4 && r2a2 && !(r2a3)),
-				r2a3 = !(r2nb4) && !(r2a1) && !(r2a2) && r2a3
+				r2a1 = (!(r0sb4) && !(r2a1) && !(r2a2)) || (!(r0sb4) && r2a2 && !(r2a3)) || (r0sb4 && r2a1) || (r0sb4 && r2a2 && r2a3),
+				r2a2 = (!(r0sb4) && r2a1) || (r0sb4 && !(r2a1) && !(r2a2)) || (r0sb4 && r2a2 && !(r2a3)),
+				r2a3 = !(r0sb4) && !(r2a1) && !(r2a2) && r2a3
 				=}
 			}
 		}
-		else{		//east and north are serviced, local unserviced
-			if(r2nb4 == false){
+		else{		//east and south are serviced, local unserviced
+			if(r0sb4 == false){
 				{= 
-				r2nb4 = true,
+				r0sb4 = true,
 				r2e0 = false,
+				r2ebv1 = false,
+				r2eb1 = false,
 				
 				r2n4 = false, //If this was true, a flit was delivered
+				r2nb1 = false,
 				
 				//update priority values
-				r2a1 = (!(r2nb4) && !(r2a1) && !(r2a2)) || (!(r2nb4) && r2a2 && !(r2a3)) || (r2nb4 && r2a1) || (r2nb4 && r2a2 && r2a3),
-				r2a2 = (!(r2nb4) && r2a1) || (r2nb4 && !(r2a1) && !(r2a2)) || (r2nb4 && r2a2 && !(r2a3)),
-				r2a3 = !(r2nb4) && !(r2a1) && !(r2a2) && r2a3
+				r2a1 = (!(r0sb4) && !(r2a1) && !(r2a2)) || (!(r0sb4) && r2a2 && !(r2a3)) || (r0sb4 && r2a1) || (r0sb4 && r2a2 && r2a3),
+				r2a2 = (!(r0sb4) && r2a1) || (r0sb4 && !(r2a1) && !(r2a2)) || (r0sb4 && r2a2 && !(r2a3)),
+				r2a3 = !(r0sb4) && !(r2a1) && !(r2a2) && r2a3
 				=}
 			}
 			else{
 				{=
 				r2n4 = false, //If this was true, a flit was delivered
+				r2nb1 = false,
 				
 				//update priority values
-				r2a1 = (!(r2nb4) && !(r2a1) && !(r2a2)) || (!(r2nb4) && r2a2 && !(r2a3)) || (r2nb4 && r2a1) || (r2nb4 && r2a2 && r2a3),
-				r2a2 = (!(r2nb4) && r2a1) || (r2nb4 && !(r2a1) && !(r2a2)) || (r2nb4 && r2a2 && !(r2a3)),
-				r2a3 = !(r2nb4) && !(r2a1) && !(r2a2) && r2a3
+				r2a1 = (!(r0sb4) && !(r2a1) && !(r2a2)) || (!(r0sb4) && r2a2 && !(r2a3)) || (r0sb4 && r2a1) || (r0sb4 && r2a2 && r2a3),
+				r2a2 = (!(r0sb4) && r2a1) || (r0sb4 && !(r2a1) && !(r2a2)) || (r0sb4 && r2a2 && !(r2a3)),
+				r2a3 = !(r0sb4) && !(r2a1) && !(r2a2) && r2a3
 				=}
 			}
 		}
 	}
-	else if(r2e4 && r2n4){		//east and north conflict
-		if(r2a3){		//north and local are serviced, east is not
+	else if(r2e4 && r2n4){		//east and south conflict
+		if(r2a3){		//south and local are serviced, east is not
 			if(r2l1){ //local sends east
-				if(r3wb4 == false){   //r1 west buffer not full
+				if(r3wb4 == false){   //r3 west buffer not full
 					{= 
 					r3wb4 = true,
 					r3wbv4 = r2lbv11 && r2lbv21,	//forwards the destination value. if r2lbv11 && r2lbv21 , then the destination is router 3
+					r2lbv11 = false,
+					r2lbv21 = false,
+					r2lb1 = false,
 					r2l1 = false,
 					
 					r2n4 = false,	//If r2n4 is true, a flit is delivered
+					r2nb1 = false,
 					
 					r2a1 = (r3wb4 && r2a1) || (r3wb4 && r2a2),
 					r2a2 = (!(r3wb4) && r2a1) || (r3wb4 && !(r2a1) && !(r2a2)),
@@ -2005,6 +2339,7 @@ process Arbiter_corner2(){
 				else{
 					{=
 					r2n4 = false,	//If r2n4 is true, a flit is delivered
+					r2nb1 = false,
 					
 					r2a1 = (r3wb4 && r2a1) || (r3wb4 && r2a2),
 					r2a2 = (!(r3wb4) && r2a1) || (r3wb4 && !(r2a1) && !(r2a2)),
@@ -2012,13 +2347,17 @@ process Arbiter_corner2(){
 					=}
 				}
 			}
-			else if(r2l0){ //local sends north
-				if(r2nb4 == false){   //r2 north buffer not full
+			else if(r2l0){ //local sends south
+				if(r0sb4 == false){   //r0 north buffer not full
 					{= 
-					r2nb4 = true,
+					r0sb4 = true,
 					r2l0 = false,
+					r2lbv11 = false,
+					r2lbv21 = false,
+					r2lb1 = false,
 					
 					r2n4 = false,	//If r2n4 is true, a flit is delivered
+					r2nb1 = false,
 					
 					r2a1 = (r3wb4 && r2a1) || (r3wb4 && r2a2),
 					r2a2 = (!(r3wb4) && r2a1) || (r3wb4 && !(r2a1) && !(r2a2)),
@@ -2028,6 +2367,7 @@ process Arbiter_corner2(){
 				else{
 					{=
 					r2n4 = false,	//If r2n4 is true, a flit is delivered
+					r2nb1 = false,
 					
 					r2a1 = (r3wb4 && r2a1) || (r3wb4 && r2a2),
 					r2a2 = (!(r3wb4) && r2a1) || (r3wb4 && !(r2a1) && !(r2a2)),
@@ -2038,6 +2378,7 @@ process Arbiter_corner2(){
 			else {		//local empty
 				{=
 					r2n4 = false,	//If r2n4 is true, a flit is delivered
+					r2nb1 = false,
 					
 					r2a1 = (r3wb4 && r2a1) || (r3wb4 && r2a2),
 					r2a2 = (!(r3wb4) && r2a1) || (r3wb4 && !(r2a1) && !(r2a2)),
@@ -2045,47 +2386,130 @@ process Arbiter_corner2(){
 					=}
 			}
 		}
-		else{		//east and local are serviced, north is not
-			{= 
-			r2e4 = false
-			=}
+		else{		//east and local are serviced, south is not
+			if(r2l1){ //local sends east
+				if(r3wb4 == false){   //r3 west buffer not full
+					{= 
+					r3wb4 = true,
+					r3wbv4 = r2lbv11 && r2lbv21,	//forwards the destination value. if r2lbv11 && r2lbv21 , then the destination is router 3
+					r2lbv11 = false,
+					r2lbv21 = false,
+					r2lb1 = false,
+					r2l1 = false,
+					
+					r2e4 = false,	//If r2n4 is true, a flit is delivered
+					r2eb1 = false,
+					r2ebv1 = false,
+					
+					r2a1 = (r3wb4 && r2a1) || (r3wb4 && r2a2),
+					r2a2 = (!(r3wb4) && r2a1) || (r3wb4 && !(r2a1) && !(r2a2)),
+					r2a3 = !r2a3
+					=}
+				}
+				else{
+					{=
+					r2e4 = false,	//If r2e4 is true, a flit is delivered
+					r2eb1 = false,
+					r2ebv1 = false,
+					
+					r2a1 = (r3wb4 && r2a1) || (r3wb4 && r2a2),
+					r2a2 = (!(r3wb4) && r2a1) || (r3wb4 && !(r2a1) && !(r2a2)),
+					r2a3 = !r2a3
+					=}
+				}
+			}
+			else if(r2l0){ //local sends south
+				if(r0sb4 == false){   //r0 north buffer not full
+					{= 
+					r0sb4 = true,
+					r2l0 = false,
+					r2lbv11 = false,
+					r2lbv21 = false,
+					r2lb1 = false,
+					
+					r2e4 = false,	//If r2e4 is true, a flit is delivered
+					r2eb1 = false,
+					r2ebv1 = false,
+					
+					r2a1 = (r3wb4 && r2a1) || (r3wb4 && r2a2),
+					r2a2 = (!(r3wb4) && r2a1) || (r3wb4 && !(r2a1) && !(r2a2)),
+					r2a3 = !r2a3
+					=}
+				}
+				else{
+					{=
+					r2e4 = false,	//If r2e4 is true, a flit is delivered
+					r2eb1 = false,
+					r2ebv1 = false,
+					
+					r2a1 = (r3wb4 && r2a1) || (r3wb4 && r2a2),
+					r2a2 = (!(r3wb4) && r2a1) || (r3wb4 && !(r2a1) && !(r2a2)),
+					r2a3 = !r2a3
+					=}
+				}
+			}
+			else {		//local empty
+				{=
+					r2e4 = false,	//If r2e4 is true, a flit is delivered
+					r2eb1 = false,
+					r2ebv1 = false,
+					
+					r2a1 = (r3wb4 && r2a1) || (r3wb4 && r2a2),
+					r2a2 = (!(r3wb4) && r2a1) || (r3wb4 && !(r2a1) && !(r2a2)),
+					r2a3 = !r2a3
+					=}
+			}
 		}
 	}
 	else{		//no conflict
 		if(r2l1){ //local sends east
-			if(r2e0){	//east buffer sends north
-				if(r3wb4 == false && r2nb4 == false && r2n4 == true){   //r1 west buffer not full and r2 north buffer not full and north buffer sends
+			if(r2e0){	//east buffer sends south
+				if(r3wb4 == false && r0sb4 == false && r2n4 == true){   //r3 west buffer not full and r0 north buffer not full and south buffer sends
 					{= 
 					r3wb4 = true,
 					r3wbv4 = r2lbv11 && r2lbv21,	//forwards the destination value. if r2lbv11 && r2lbv21 , then the destination is router 3
 					r2l1 = false,
+					r2lbv11 = false,
+					r2lbv21 = false,
+					r2lb1 = false,
 					
-					r2nb4 = true,
+					r0sb4 = true,
 					r2e0 = false,
+					r2eb1 = false,
+					r2ebv1 = false,
 					
 					r2n4 = false,
+					r2nb1 = false,
 					
 					optimalRuns++
 					//priorities remain the same
 					=}
 				}
-				else if(r3wb4 == false && r2nb4 == false && r2n4 == false){		//r1 west buffer not full and r2 north buffer not full and north buffer empty
+				else if(r3wb4 == false && r0sb4 == false && r2n4 == false){		//r3 west buffer not full and r0 north buffer not full and south buffer empty
 					{= 
 					r3wb4 = true,
 					r3wbv4 = r2lbv11 && r2lbv21,	//forwards the destination value. if r2lbv11 && r2lbv21 , then the destination is router 3
 					r2l1 = false,
+					r2lbv11 = false,
+					r2lbv21 = false,
+					r2lb1 = false,
 					
-					r2nb4 = true,
-					r2e0 = false
+					r0sb4 = true,
+					r2e0 = false,
+					r2eb1 = false,
+					r2ebv1 = false
 					//priorities remain the same
 					=}
 				}
-				else if(r3wb4 == true && r2nb4 == false){	//r1 west buffer is full, r2 north buffer is not full
+				else if(r3wb4 == true && r0sb4 == false){	//r3 west buffer is full, r0 north buffer is not full
 					{= 
-					r2nb4 = true,
+					r0sb4 = true,
 					r2e0 = false,
+					r2eb1 = false,
+					r2ebv1 = false,
 					
-					r2n4 = false,	//if this was true, there was a flit delivered
+					r2n4 = false,
+					r2nb1 = false,	//if this was true, there was a flit delivered
 					
 					//update priorities local gets priority
 					r2a1 = true,
@@ -2093,13 +2517,17 @@ process Arbiter_corner2(){
 					//r2a3 = r2a3 redundant
 					=}
 				}
-				else if(r3wb4 == false && r2nb4 == true){	//r1 west buffer is not full, r2 north buffer is full
+				else if(r3wb4 == false && r0sb4 == true){	//r3 west buffer is not full, r0 north buffer is full
 					{= 
 					r3wb4 = true,
 					r3wbv4 = r2lbv11 && r2lbv21,	//forwards the destination value. if r2lbv11 && r2lbv21 , then the destination is router 3
 					r2l1 = false,
+					r2lbv11 = false,
+					r2lbv21 = false,
+					r2lb1 = false,
 					
 					r2n4 = false,
+					r2nb1 = false,
 					
 					//update priorities east gets priority
 					r2a1 = false,
@@ -2107,9 +2535,10 @@ process Arbiter_corner2(){
 					r2a3 = false
 					=}
 				}
-				else{
+				else{		//r3 west buffer is full, r0 north buffer is full
 					{=
-					r2n4 = false,	//If r2n4 is true, a flit is delivered
+					r2n4 = false,
+					r2nb1 = false,	//If r2n4 is true, a flit is delivered
 					
 					//update priorities local and east get priority
 					r2a1 = r2a1 || (r2a2 && r2a3),
@@ -2119,19 +2548,26 @@ process Arbiter_corner2(){
 				}
 			}
 			else if(r2e4){	//east buffer sends local
-				if(r3wb4 == false){ //r1 west buffer not full
+				if(r3wb4 == false){ //r3 west buffer not full
 					{= 
 					r3wb4 = true,
 					r3wbv4 = r2lbv11 && r2lbv21,	//forwards the destination value. if r2lbv11 && r2lbv21 , then the destination is router 3
 					r2l1 = false,
+					r2lbv11 = false,
+					r2lbv21 = false,
+					r2lb1 = false,
 					
-					r2e4 = false //if this was true, a flit was sent
+					r2e4 = false, //if this was true, a flit was sent
+					r2ebv1 = false,
+					r2eb1 = false
 					//priorities remain the same
 					=}
 				}
 				else{
 					{=
-					r2e4 = false, //if this was true, a flit was sent
+					r2e4 = false,
+					r2eb1 = false,
+					r2ebv1 = false, //if this was true, a flit was sent
 					
 					//update priorities local gets priority
 					r2a1 = true,
@@ -2141,20 +2577,25 @@ process Arbiter_corner2(){
 				}				
 			}
 			else{	//east buffer does not send
-				if(r3wb4 == false){ //r1 west buffer not full
+				if(r3wb4 == false){ //r3 west buffer not full
 					{= 
 					r3wb4 = true,
 					r3wbv4 = r2lbv11 && r2lbv21,	//forwards the destination value. if r2lbv11 && r2lbv21 , then the destination is router 3
+					r2lbv11 = false,
+					r2lbv21 = false,
+					r2lb1 = false,
 					r2l1 = false,
 					
-					r2n4 = false //if this was true, a flit was sent
+					r2n4 = false, //if this was true, a flit was sent
+					r2nb1 = false 
 					
 					//priorities remain the same
 					=}
 				}
 				else{
 					{=
-					r2n4 = false, //if this was true, a flit was sent
+					r2n4 = false,
+					r2nb1 = false, //if this was true, a flit was sent
 					
 					//update priorities local gets priority
 					r2a1 = true,
@@ -2164,22 +2605,33 @@ process Arbiter_corner2(){
 				}	
 			}
 		}
-		else if (r2l0){ //local sends north
-			if(r2nb4 == false){
+		else if (r2l0){ //local sends south
+			if(r0sb4 == false){
 				{=
-				r2nb4 = true,
+				r0sb4 = true,
+				r2lbv11 = false,
+				r2lbv21 = false,
+				r2lb1 = false,
 				r2l0 = false,
 				
-				r2e4 = false,	//if this was true, a flit was delivered
-				r2n4 = false	//if this was true, a flit was delivered
+				r2e4 = false,
+				r2eb1 = false,
+				r2ebv1 = false,	//if this was true, a flit was delivered
+				
+				r2n4 = false,
+				r2nb1 = false	//if this was true, a flit was delivered
 				
 				//priorities remain the same
 				=}
 			}
 			else{
 				{=
-				r2e4 = false,	//if this was true, a flit was delivered
-				r2n4 = false,	//if this was true, a flit was delivered
+				r2e4 = false,
+				r2eb1 = false,
+				r2ebv1 = false,	//if this was true, a flit was delivered
+				
+				r2n4 = false,
+				r2nb1 = false,	//if this was true, a flit was delivered
 				
 				//update priorities local gets priority
 				r2a1 = true,
@@ -2190,13 +2642,16 @@ process Arbiter_corner2(){
 			}
 		}
 		else{	//local does not send
-			if(r2e0){ 	// east sends north
-				if(r2nb4 ==false){ //r2 north buffer not full
+			if(r2e0){ 	// east sends south
+				if(r0sb4 ==false){ //r0 north buffer not full
 					{=
-					r2nb4 = true,
+					r0sb4 = true,
 					r2e0 = false,
+					r2eb1 = false,
+					r2ebv1 = false,
 					
-					r2n4 = false
+					r2n4 = false,
+					r2nb1 = false
 					
 					//priorities remain the same
 					=}
@@ -2204,6 +2659,7 @@ process Arbiter_corner2(){
 				else{
 					{=
 					r2n4 = false,
+					r2nb1 = false,
 					
 					//update priorities east gets priority
 					r2a1 = false,
@@ -2214,7 +2670,9 @@ process Arbiter_corner2(){
 			}
 			else{		//east sends local
 				{=
-				r2e4 = false
+				r2e4 = false,
+				r2eb1 = false,
+				r2ebv1 = false
 				
 				//priorities remain the same
 				=}
@@ -2230,7 +2688,12 @@ process Arbiter_corner3(){
 				{= 
 				r1sb4 = true,
 				r3l0 = false,
+				r3lbv11 = false,
+				r3lbv21 = false,
+				r3lb1 = false,
+				
 				r3n4 = false, //If this was true, a flit was delivered
+				r3nb1 = false,
 				
 				//update priority values
 				r3a1 = (!(r1sb4) && !(r3a1) && !(r3a2)) || (!(r1sb4) && r3a2 && !(r3a3)) || (r1sb4 && r3a1) || (r1sb4 && r3a2 && r3a3),
@@ -2241,6 +2704,7 @@ process Arbiter_corner3(){
 			else{
 				{=
 				r3n4 = false, //If this was true, a flit was delivered
+				r3nb1 = false,
 				
 				//update priority values
 				r3a1 = (!(r1sb4) && !(r3a1) && !(r3a2)) || (!(r1sb4) && r3a2 && !(r3a3)) || (r1sb4 && r3a1) || (r1sb4 && r3a2 && r3a3),
@@ -2254,8 +2718,11 @@ process Arbiter_corner3(){
 				{= 
 				r1sb4 = true,
 				r3w0 = false,
+				r3wbv1 = false,
+				r3wb1 = false,
 				
 				r3n4 = false, //If this was true, a flit was delivered
+				r3nb1 = false,
 				
 				//update priority values
 				r3a1 = (!(r1sb4) && !(r3a1) && !(r3a2)) || (!(r1sb4) && r3a2 && !(r3a3)) || (r1sb4 && r3a1) || (r1sb4 && r3a2 && r3a3),
@@ -2266,6 +2733,7 @@ process Arbiter_corner3(){
 			else{
 				{=
 				r3n4 = false, //If this was true, a flit was delivered
+				r3nb1 = false,
 				
 				//update priority values
 				r3a1 = (!(r1sb4) && !(r3a1) && !(r3a2)) || (!(r1sb4) && r3a2 && !(r3a3)) || (r1sb4 && r3a1) || (r1sb4 && r3a2 && r3a3),
@@ -2278,13 +2746,17 @@ process Arbiter_corner3(){
 	else if(r3w4 && r3n4){		//east and south conflict
 		if(r3a3){		//south and local are serviced, east is not
 			if(r3l3){ //local sends east
-				if(r2eb4 == false){   //r1 west buffer not full
+				if(r2eb4 == false){   //r2 west buffer not full
 					{= 
 					r2eb4 = true,
 					r2ebv4 = r3lbv11 && r3lbv21,	//forwards the destination value. if r3lbv11 && r3lbv21 , then the destination is router 3
+					r3lbv11 = false,
+					r3lbv21 = false,
+					r3lb1 = false,
 					r3l3 = false,
 					
 					r3n4 = false,	//If r3n4 is true, a flit is delivered
+					r3nb1 = false,
 					
 					r3a1 = (r2eb4 && r3a1) || (r2eb4 && r3a2),
 					r3a2 = (!(r2eb4) && r3a1) || (r2eb4 && !(r3a1) && !(r3a2)),
@@ -2294,6 +2766,7 @@ process Arbiter_corner3(){
 				else{
 					{=
 					r3n4 = false,	//If r3n4 is true, a flit is delivered
+					r3nb1 = false,
 					
 					r3a1 = (r2eb4 && r3a1) || (r2eb4 && r3a2),
 					r3a2 = (!(r2eb4) && r3a1) || (r2eb4 && !(r3a1) && !(r3a2)),
@@ -2302,12 +2775,16 @@ process Arbiter_corner3(){
 				}
 			}
 			else if(r3l0){ //local sends south
-				if(r1sb4 == false){   //r2 north buffer not full
+				if(r1sb4 == false){   //r1 north buffer not full
 					{= 
 					r1sb4 = true,
 					r3l0 = false,
+					r3lbv11 = false,
+					r3lbv21 = false,
+					r3lb1 = false,
 					
 					r3n4 = false,	//If r3n4 is true, a flit is delivered
+					r3nb1 = false,
 					
 					r3a1 = (r2eb4 && r3a1) || (r2eb4 && r3a2),
 					r3a2 = (!(r2eb4) && r3a1) || (r2eb4 && !(r3a1) && !(r3a2)),
@@ -2317,6 +2794,7 @@ process Arbiter_corner3(){
 				else{
 					{=
 					r3n4 = false,	//If r3n4 is true, a flit is delivered
+					r3nb1 = false,
 					
 					r3a1 = (r2eb4 && r3a1) || (r2eb4 && r3a2),
 					r3a2 = (!(r2eb4) && r3a1) || (r2eb4 && !(r3a1) && !(r3a2)),
@@ -2327,6 +2805,7 @@ process Arbiter_corner3(){
 			else {		//local empty
 				{=
 					r3n4 = false,	//If r3n4 is true, a flit is delivered
+					r3nb1 = false,
 					
 					r3a1 = (r2eb4 && r3a1) || (r2eb4 && r3a2),
 					r3a2 = (!(r2eb4) && r3a1) || (r2eb4 && !(r3a1) && !(r3a2)),
@@ -2335,46 +2814,129 @@ process Arbiter_corner3(){
 			}
 		}
 		else{		//east and local are serviced, south is not
-			{= 
-			r3w4 = false
-			=}
+			if(r3l3){ //local sends east
+				if(r2eb4 == false){   //r2 west buffer not full
+					{= 
+					r2eb4 = true,
+					r2ebv4 = r3lbv11 && r3lbv21,	//forwards the destination value. if r3lbv11 && r3lbv21 , then the destination is router 3
+					r3lbv11 = false,
+					r3lbv21 = false,
+					r3lb1 = false,
+					r3l3 = false,
+					
+					r3w4 = false,	//If r3n4 is true, a flit is delivered
+					r3wb1 = false,
+					r3wbv1 = false,
+					
+					r3a1 = (r2eb4 && r3a1) || (r2eb4 && r3a2),
+					r3a2 = (!(r2eb4) && r3a1) || (r2eb4 && !(r3a1) && !(r3a2)),
+					r3a3 = !r3a3
+					=}
+				}
+				else{
+					{=
+					r3w4 = false,	//If r3w4 is true, a flit is delivered
+					r3wb1 = false,
+					r3wbv1 = false,
+					
+					r3a1 = (r2eb4 && r3a1) || (r2eb4 && r3a2),
+					r3a2 = (!(r2eb4) && r3a1) || (r2eb4 && !(r3a1) && !(r3a2)),
+					r3a3 = !r3a3
+					=}
+				}
+			}
+			else if(r3l0){ //local sends south
+				if(r1sb4 == false){   //r1 north buffer not full
+					{= 
+					r1sb4 = true,
+					r3l0 = false,
+					r3lbv11 = false,
+					r3lbv21 = false,
+					r3lb1 = false,
+					
+					r3w4 = false,	//If r3w4 is true, a flit is delivered
+					r3wb1 = false,
+					r3wbv1 = false,
+					
+					r3a1 = (r2eb4 && r3a1) || (r2eb4 && r3a2),
+					r3a2 = (!(r2eb4) && r3a1) || (r2eb4 && !(r3a1) && !(r3a2)),
+					r3a3 = !r3a3
+					=}
+				}
+				else{
+					{=
+					r3w4 = false,	//If r3w4 is true, a flit is delivered
+					r3wb1 = false,
+					r3wbv1 = false,
+					
+					r3a1 = (r2eb4 && r3a1) || (r2eb4 && r3a2),
+					r3a2 = (!(r2eb4) && r3a1) || (r2eb4 && !(r3a1) && !(r3a2)),
+					r3a3 = !r3a3
+					=}
+				}
+			}
+			else {		//local empty
+				{=
+					r3w4 = false,	//If r3w4 is true, a flit is delivered
+					r3wb1 = false,
+					r3wbv1 = false,
+					
+					r3a1 = (r2eb4 && r3a1) || (r2eb4 && r3a2),
+					r3a2 = (!(r2eb4) && r3a1) || (r2eb4 && !(r3a1) && !(r3a2)),
+					r3a3 = !r3a3
+					=}
+			}
 		}
 	}
 	else{		//no conflict
 		if(r3l3){ //local sends east
 			if(r3w0){	//east buffer sends south
-				if(r2eb4 == false && r1sb4 == false && r3n4 == true){   //r1 west buffer not full and r2 north buffer not full and south buffer sends
+				if(r2eb4 == false && r1sb4 == false && r3n4 == true){   //r2 west buffer not full and r1 north buffer not full and south buffer sends
 					{= 
 					r2eb4 = true,
 					r2ebv4 = r3lbv11 && r3lbv21,	//forwards the destination value. if r3lbv11 && r3lbv21 , then the destination is router 3
 					r3l3 = false,
+					r3lbv11 = false,
+					r3lbv21 = false,
+					r3lb1 = false,
 					
 					r1sb4 = true,
 					r3w0 = false,
+					r3wb1 = false,
+					r3wbv1 = false,
 					
 					r3n4 = false,
+					r3nb1 = false,
 					
 					optimalRuns++
 					//priorities remain the same
 					=}
 				}
-				else if(r2eb4 == false && r1sb4 == false && r3n4 == false){		//r1 west buffer not full and r2 north buffer not full and south buffer empty
+				else if(r2eb4 == false && r1sb4 == false && r3n4 == false){		//r2 west buffer not full and r1 north buffer not full and south buffer empty
 					{= 
 					r2eb4 = true,
 					r2ebv4 = r3lbv11 && r3lbv21,	//forwards the destination value. if r3lbv11 && r3lbv21 , then the destination is router 3
 					r3l3 = false,
+					r3lbv11 = false,
+					r3lbv21 = false,
+					r3lb1 = false,
 					
 					r1sb4 = true,
-					r3w0 = false
+					r3w0 = false,
+					r3wb1 = false,
+					r3wbv1 = false
 					//priorities remain the same
 					=}
 				}
-				else if(r2eb4 == true && r1sb4 == false){	//r1 west buffer is full, r2 north buffer is not full
+				else if(r2eb4 == true && r1sb4 == false){	//r2 west buffer is full, r1 north buffer is not full
 					{= 
 					r1sb4 = true,
 					r3w0 = false,
+					r3wb1 = false,
+					r3wbv1 = false,
 					
-					r3n4 = false,	//if this was true, there was a flit delivered
+					r3n4 = false,
+					r3nb1 = false,	//if this was true, there was a flit delivered
 					
 					//update priorities local gets priority
 					r3a1 = true,
@@ -2382,13 +2944,17 @@ process Arbiter_corner3(){
 					//r3a3 = r3a3 redundant
 					=}
 				}
-				else if(r2eb4 == false && r1sb4 == true){	//r1 west buffer is not full, r2 north buffer is full
+				else if(r2eb4 == false && r1sb4 == true){	//r2 west buffer is not full, r1 north buffer is full
 					{= 
 					r2eb4 = true,
 					r2ebv4 = r3lbv11 && r3lbv21,	//forwards the destination value. if r3lbv11 && r3lbv21 , then the destination is router 3
 					r3l3 = false,
+					r3lbv11 = false,
+					r3lbv21 = false,
+					r3lb1 = false,
 					
 					r3n4 = false,
+					r3nb1 = false,
 					
 					//update priorities east gets priority
 					r3a1 = false,
@@ -2396,9 +2962,10 @@ process Arbiter_corner3(){
 					r3a3 = false
 					=}
 				}
-				else{
+				else{		//r2 west buffer is full, r1 north buffer is full
 					{=
-					r3n4 = false,	//If r3n4 is true, a flit is delivered
+					r3n4 = false,
+					r3nb1 = false,	//If r3n4 is true, a flit is delivered
 					
 					//update priorities local and east get priority
 					r3a1 = r3a1 || (r3a2 && r3a3),
@@ -2408,19 +2975,26 @@ process Arbiter_corner3(){
 				}
 			}
 			else if(r3w4){	//east buffer sends local
-				if(r2eb4 == false){ //r1 west buffer not full
+				if(r2eb4 == false){ //r2 west buffer not full
 					{= 
 					r2eb4 = true,
 					r2ebv4 = r3lbv11 && r3lbv21,	//forwards the destination value. if r3lbv11 && r3lbv21 , then the destination is router 3
 					r3l3 = false,
+					r3lbv11 = false,
+					r3lbv21 = false,
+					r3lb1 = false,
 					
-					r3w4 = false //if this was true, a flit was sent
+					r3w4 = false, //if this was true, a flit was sent
+					r3wbv1 = false,
+					r3wb1 = false
 					//priorities remain the same
 					=}
 				}
 				else{
 					{=
-					r3w4 = false, //if this was true, a flit was sent
+					r3w4 = false,
+					r3wb1 = false,
+					r3wbv1 = false, //if this was true, a flit was sent
 					
 					//update priorities local gets priority
 					r3a1 = true,
@@ -2430,20 +3004,25 @@ process Arbiter_corner3(){
 				}				
 			}
 			else{	//east buffer does not send
-				if(r2eb4 == false){ //r1 west buffer not full
+				if(r2eb4 == false){ //r2 west buffer not full
 					{= 
 					r2eb4 = true,
 					r2ebv4 = r3lbv11 && r3lbv21,	//forwards the destination value. if r3lbv11 && r3lbv21 , then the destination is router 3
+					r3lbv11 = false,
+					r3lbv21 = false,
+					r3lb1 = false,
 					r3l3 = false,
 					
-					r3n4 = false //if this was true, a flit was sent
+					r3n4 = false, //if this was true, a flit was sent
+					r3nb1 = false 
 					
 					//priorities remain the same
 					=}
 				}
 				else{
 					{=
-					r3n4 = false, //if this was true, a flit was sent
+					r3n4 = false,
+					r3nb1 = false, //if this was true, a flit was sent
 					
 					//update priorities local gets priority
 					r3a1 = true,
@@ -2457,18 +3036,29 @@ process Arbiter_corner3(){
 			if(r1sb4 == false){
 				{=
 				r1sb4 = true,
+				r3lbv11 = false,
+				r3lbv21 = false,
+				r3lb1 = false,
 				r3l0 = false,
 				
-				r3w4 = false,	//if this was true, a flit was delivered
-				r3n4 = false	//if this was true, a flit was delivered
+				r3w4 = false,
+				r3wb1 = false,
+				r3wbv1 = false,	//if this was true, a flit was delivered
+				
+				r3n4 = false,
+				r3nb1 = false	//if this was true, a flit was delivered
 				
 				//priorities remain the same
 				=}
 			}
 			else{
 				{=
-				r3w4 = false,	//if this was true, a flit was delivered
-				r3n4 = false,	//if this was true, a flit was delivered
+				r3w4 = false,
+				r3wb1 = false,
+				r3wbv1 = false,	//if this was true, a flit was delivered
+				
+				r3n4 = false,
+				r3nb1 = false,	//if this was true, a flit was delivered
 				
 				//update priorities local gets priority
 				r3a1 = true,
@@ -2480,12 +3070,15 @@ process Arbiter_corner3(){
 		}
 		else{	//local does not send
 			if(r3w0){ 	// east sends south
-				if(r1sb4 ==false){ //r2 north buffer not full
+				if(r1sb4 ==false){ //r1 north buffer not full
 					{=
 					r1sb4 = true,
 					r3w0 = false,
+					r3wb1 = false,
+					r3wbv1 = false,
 					
-					r3n4 = false
+					r3n4 = false,
+					r3nb1 = false
 					
 					//priorities remain the same
 					=}
@@ -2493,6 +3086,7 @@ process Arbiter_corner3(){
 				else{
 					{=
 					r3n4 = false,
+					r3nb1 = false,
 					
 					//update priorities east gets priority
 					r3a1 = false,
@@ -2503,7 +3097,9 @@ process Arbiter_corner3(){
 			}
 			else{		//east sends local
 				{=
-				r3w4 = false
+				r3w4 = false,
+				r3wb1 = false,
+				r3wbv1 = false
 				
 				//priorities remain the same
 				=}

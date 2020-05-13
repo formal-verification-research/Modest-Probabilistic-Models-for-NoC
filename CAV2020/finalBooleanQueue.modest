@@ -348,7 +348,7 @@ process arbiter0(){
 			if (noc[0].ewLockedns) {
 
 				tick {= noc[0].localLockedns = !nsNotFull(2), 	//Local stays locked if it is unable to send
-					noc[0].localPriority = !nsNotFull(2),
+						noc[0].localPriority = !nsNotFull(2),
 						noc[0].localLen -= nsNotFull1(2),  //Local sends if the ns direction is not already full
 						nsShouldInc2 = nsNotFull1(2), //The ns direction receives under the same conditions
 						noc[0].nsPriority = false,

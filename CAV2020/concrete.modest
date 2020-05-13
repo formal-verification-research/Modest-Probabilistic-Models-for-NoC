@@ -8,7 +8,7 @@ NoC router IDs
 option "dtmc";
 
 //Top level varables
-const int BUFFERLENGTH = 3; //Each buffer actually has length of BUFFERLENGTH + 1 because one value is stored in the arbiter itself for easy use when routing.
+const int BUFFERLENGTH = 3; //Each buffer actually has length of BUFFERLENGTH + 1 because one directionue is stored in the arbiter itself for easy use when routing.
 const int NOCSIZE = 2;
 const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
@@ -21,9 +21,9 @@ int(clkLower..clkUpper) clk;
 
 datatype intlist = { int(0.. ((NOCSIZE*NOCSIZE)-1)) hd, intlist option tl };
 
-datatype buffer = {int(-1..3) dest, int(-1..4) val, int(0..4) id, bool serviced, int(0..4) priority, intlist option buff};		//Datatype for a buffer with the next buffer value, id of the buffer, whether the buffer was serviced last clock cycle or not, and the priority number of the buffer
+datatype channel = {int(-1..4) direction, int(0..4) id, bool serviced, int(0..4) priority, intlist option buff};		//Datatype for a channel with the next buffer directionue, id of the buffer, whether the buffer was serviced last clock cycle or not, and the priority number of the buffer
 
-datatype router = {int(0..3) unserviced, int(0..3) totalUnserviced, buffer[] bufferArray, buffer[] temp, int[]bufferID};	//Datatype for a router, includes router-specific variables and an array of buffers
+datatype router = {int(0..3) unserviced, int(0..3) totalUnserviced, channel[] channelArray, channel[] temp, int[]bufferID};	//Datatype for a router, includes router-specific variables and an array of buffers
 
 int(0..4) optimalRunsIncrement = 0;
 
@@ -46,7 +46,7 @@ property Pr1 = Pmax(<> (optimalRuns >= 1));
 
 // ------ Begin: function definitions ------- 
 // Calculate length of list:
-function int len(intlist option ls) = if ls == none then 0 else 1 + len(ls!.tl); // "!" accesses the value of a non-empty option (causes an error if the option is empty)
+function int len(intlist option ls) = if ls == none then 0 else 1 + len(ls!.tl); // "!" accesses the directionue of a non-empty option (causes an error if the option is empty)
 
 // Return the front of the queue, i.e., the last element of the given integer list. No changes are made to the list.
 function int peekFront(intlist option ls) =
@@ -168,61 +168,61 @@ process Arbiter_corner(int routerID){
 	//Service buffers-------------------------------------------------------------------------------------------------------
 		
 		//Buffer priority 0
-		//<Service Buffer bufferArray[0]>--------------------------------------------------------
-		if((noc[routerID].bufferArray[0].val == -1) ||  
-			(noc[routerID].bufferArray[0].val == 4) || 
-			((noc[routerID].bufferArray[0].val == 0) && (len(noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff) < BUFFERLENGTH)) || 
-			((noc[routerID].bufferArray[0].val == 1) && (len(noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff) < BUFFERLENGTH)) ||
-			((noc[routerID].bufferArray[0].val == 2) && (len(noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff) < BUFFERLENGTH)) ||
-			((noc[routerID].bufferArray[0].val == 3) && (len(noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff) < BUFFERLENGTH))){
+		//<Service Buffer channelArray[0]>--------------------------------------------------------
+		if((noc[routerID].channelArray[0].direction == -1) ||  
+			(noc[routerID].channelArray[0].direction == 4) || 
+			((noc[routerID].channelArray[0].direction == 0) && (len(noc[routerID - NOCSIZE].channelArray[noc[routerID - NOCSIZE].bufferID[2]].buff) < BUFFERLENGTH)) || 
+			((noc[routerID].channelArray[0].direction == 1) && (len(noc[routerID + 1].channelArray[noc[routerID + 1].bufferID[3]].buff) < BUFFERLENGTH)) ||
+			((noc[routerID].channelArray[0].direction == 2) && (len(noc[routerID + NOCSIZE].channelArray[noc[routerID + NOCSIZE].bufferID[0]].buff) < BUFFERLENGTH)) ||
+			((noc[routerID].channelArray[0].direction == 3) && (len(noc[routerID - 1].channelArray[noc[routerID - 1].bufferID[1]].buff) < BUFFERLENGTH))){
 			{= 
-			noc[routerID].bufferArray[0].serviced = true
+			noc[routerID].channelArray[0].serviced = true
 			=}
 		}
 		else{
 			{= 
-			noc[routerID].bufferArray[0].serviced = false,
+			noc[routerID].channelArray[0].serviced = false,
 			noc[routerID].totalUnserviced++,
 			noc[routerID].unserviced++ 		//Increment unserviced
 			=}
 		};
 		
-		//<Service buffer <bufferArray[1]> ------------------------------------------------------
-		if((noc[routerID].bufferArray[1].val == -1) || ((noc[routerID].bufferArray[1].val != noc[routerID].bufferArray[0].val) &&
-			(noc[routerID].bufferArray[1].val == 4) ||
-			(noc[routerID].bufferArray[1].val == 0 && len(noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff) < BUFFERLENGTH) || 
-			(noc[routerID].bufferArray[1].val == 1 && len(noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff) < BUFFERLENGTH) ||
-			(noc[routerID].bufferArray[1].val == 2 && len(noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff) < BUFFERLENGTH) ||
-			(noc[routerID].bufferArray[1].val == 3 && len(noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff) < BUFFERLENGTH))
-			) {			//If buffer bufferArray[1] conflicts with bufferArray[0]
+		//<Service buffer <channelArray[1]> ------------------------------------------------------
+		if((noc[routerID].channelArray[1].direction == -1) || ((noc[routerID].channelArray[1].direction != noc[routerID].channelArray[0].direction) &&
+			(noc[routerID].channelArray[1].direction == 4) ||
+			(noc[routerID].channelArray[1].direction == 0 && len(noc[routerID - NOCSIZE].channelArray[noc[routerID - NOCSIZE].bufferID[2]].buff) < BUFFERLENGTH) || 
+			(noc[routerID].channelArray[1].direction == 1 && len(noc[routerID + 1].channelArray[noc[routerID + 1].bufferID[3]].buff) < BUFFERLENGTH) ||
+			(noc[routerID].channelArray[1].direction == 2 && len(noc[routerID + NOCSIZE].channelArray[noc[routerID + NOCSIZE].bufferID[0]].buff) < BUFFERLENGTH) ||
+			(noc[routerID].channelArray[1].direction == 3 && len(noc[routerID - 1].channelArray[noc[routerID - 1].bufferID[1]].buff) < BUFFERLENGTH))
+			) {			//If buffer channelArray[1] conflicts with channelArray[0]
 			{= 	//Service Buffer
-			noc[routerID].bufferArray[1].serviced = true
+			noc[routerID].channelArray[1].serviced = true
 			=}
 		}
 		else {
 			{= 
-			noc[routerID].bufferArray[1].serviced = false,
+			noc[routerID].channelArray[1].serviced = false,
 			noc[routerID].totalUnserviced++,
 			noc[routerID].unserviced++ 		//Increment unserviced
 			=}
 		};
 		
-		//<Service buffer bufferArray[2]> --------------------------------------------------------
-		//If buffer bufferArray[2] conflicts with bufferArray[1] or bufferArray[0]
-		if((noc[routerID].bufferArray[2].val == -1) || ((noc[routerID].bufferArray[2].val != noc[routerID].bufferArray[1].val && noc[routerID].bufferArray[2].val != noc[routerID].bufferArray[0].val) &&
-			(noc[routerID].bufferArray[2].val == 4) ||
-			(noc[routerID].bufferArray[2].val == 0 && len(noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff) < BUFFERLENGTH) || 
-			(noc[routerID].bufferArray[2].val == 1 && len(noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff) < BUFFERLENGTH) ||
-			(noc[routerID].bufferArray[2].val == 2 && len(noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff) < BUFFERLENGTH) ||
-			(noc[routerID].bufferArray[2].val == 3 && len(noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff) < BUFFERLENGTH))
+		//<Service buffer channelArray[2]> --------------------------------------------------------
+		//If buffer channelArray[2] conflicts with channelArray[1] or channelArray[0]
+		if((noc[routerID].channelArray[2].direction == -1) || ((noc[routerID].channelArray[2].direction != noc[routerID].channelArray[1].direction && noc[routerID].channelArray[2].direction != noc[routerID].channelArray[0].direction) &&
+			(noc[routerID].channelArray[2].direction == 4) ||
+			(noc[routerID].channelArray[2].direction == 0 && len(noc[routerID - NOCSIZE].channelArray[noc[routerID - NOCSIZE].bufferID[2]].buff) < BUFFERLENGTH) || 
+			(noc[routerID].channelArray[2].direction == 1 && len(noc[routerID + 1].channelArray[noc[routerID + 1].bufferID[3]].buff) < BUFFERLENGTH) ||
+			(noc[routerID].channelArray[2].direction == 2 && len(noc[routerID + NOCSIZE].channelArray[noc[routerID + NOCSIZE].bufferID[0]].buff) < BUFFERLENGTH) ||
+			(noc[routerID].channelArray[2].direction == 3 && len(noc[routerID - 1].channelArray[noc[routerID - 1].bufferID[1]].buff) < BUFFERLENGTH))
 		){	
 			{= 		//Service Buffer
-			noc[routerID].bufferArray[2].serviced = true
+			noc[routerID].channelArray[2].serviced = true
 			=}
 		}
 		else {
 			{= 
-			noc[routerID].bufferArray[2].serviced = false, 
+			noc[routerID].channelArray[2].serviced = false, 
 			noc[routerID].totalUnserviced++,
 			noc[routerID].unserviced++			//Increment unserviced
 			=}
@@ -230,7 +230,7 @@ process Arbiter_corner(int routerID){
 		
 		
 		//Increment optimal runs if there were no conflitcs -------------------------------------------------------------------
-		if(noc[routerID].unserviced == 0 && noc[routerID].bufferArray[0].val != -1 && noc[routerID].bufferArray[1].val != -1 && noc[routerID].bufferArray[2].val != -1){
+		if(noc[routerID].unserviced == 0 && noc[routerID].channelArray[0].direction != -1 && noc[routerID].channelArray[1].direction != -1 && noc[routerID].channelArray[2].direction != -1){
 			{= 
 				optimalRunsIncrement++
 			=}
@@ -238,7 +238,7 @@ process Arbiter_corner(int routerID){
 		
 		else{tau};
 		
-		//Set priority values for the next run and update the value of the buffers----------------------------------------------
+		//Set priority directionues for the next run and update the directionue of the buffers----------------------------------------------
 		setPriority(0, routerID);
 		setPriority(1, routerID);
 		setPriority(2, routerID);
@@ -248,50 +248,50 @@ process Arbiter_corner(int routerID){
 		
 		if(routerID == 0){
 			{=
-				noc[routerID].bufferID[1] = noc[routerID].bufferArray[noc[routerID].bufferID[1]].priority,
-				noc[routerID].bufferID[2] = noc[routerID].bufferArray[noc[routerID].bufferID[2]].priority,
-				noc[routerID].bufferID[4] = noc[routerID].bufferArray[noc[routerID].bufferID[4]].priority
+				noc[routerID].bufferID[1] = noc[routerID].channelArray[noc[routerID].bufferID[1]].priority,
+				noc[routerID].bufferID[2] = noc[routerID].channelArray[noc[routerID].bufferID[2]].priority,
+				noc[routerID].bufferID[4] = noc[routerID].channelArray[noc[routerID].bufferID[4]].priority
 			=}
 		}
 		else if(routerID == 1){
 			{=
-				noc[routerID].bufferID[2] = noc[routerID].bufferArray[noc[routerID].bufferID[2]].priority,
-				noc[routerID].bufferID[3] = noc[routerID].bufferArray[noc[routerID].bufferID[3]].priority,
-				noc[routerID].bufferID[4] = noc[routerID].bufferArray[noc[routerID].bufferID[4]].priority
+				noc[routerID].bufferID[2] = noc[routerID].channelArray[noc[routerID].bufferID[2]].priority,
+				noc[routerID].bufferID[3] = noc[routerID].channelArray[noc[routerID].bufferID[3]].priority,
+				noc[routerID].bufferID[4] = noc[routerID].channelArray[noc[routerID].bufferID[4]].priority
 			=}
 		}
 		else if(routerID == 2){
 			{=
-				noc[routerID].bufferID[0] = noc[routerID].bufferArray[noc[routerID].bufferID[0]].priority,
-				noc[routerID].bufferID[1] = noc[routerID].bufferArray[noc[routerID].bufferID[1]].priority,
-				noc[routerID].bufferID[4] = noc[routerID].bufferArray[noc[routerID].bufferID[4]].priority
+				noc[routerID].bufferID[0] = noc[routerID].channelArray[noc[routerID].bufferID[0]].priority,
+				noc[routerID].bufferID[1] = noc[routerID].channelArray[noc[routerID].bufferID[1]].priority,
+				noc[routerID].bufferID[4] = noc[routerID].channelArray[noc[routerID].bufferID[4]].priority
 			=}
 		}
 		else if(routerID == 3){
 			{=
-				noc[routerID].bufferID[0] = noc[routerID].bufferArray[noc[routerID].bufferID[0]].priority,
-				noc[routerID].bufferID[3] = noc[routerID].bufferArray[noc[routerID].bufferID[3]].priority,
-				noc[routerID].bufferID[4] = noc[routerID].bufferArray[noc[routerID].bufferID[4]].priority
+				noc[routerID].bufferID[0] = noc[routerID].channelArray[noc[routerID].bufferID[0]].priority,
+				noc[routerID].bufferID[3] = noc[routerID].channelArray[noc[routerID].bufferID[3]].priority,
+				noc[routerID].bufferID[4] = noc[routerID].channelArray[noc[routerID].bufferID[4]].priority
 			=}
 		}
 		else{tau};
 		
 		
-		//Rewrite buffer array with new priority values-------------------------------------------------------------------------
+		//Rewrite buffer array with new priority directionues-------------------------------------------------------------------------
 		{= 
-		noc[routerID].temp[noc[routerID].bufferArray[0].priority] = noc[routerID].bufferArray[0],
-		noc[routerID].temp[noc[routerID].bufferArray[1].priority] = noc[routerID].bufferArray[1],
-		noc[routerID].temp[noc[routerID].bufferArray[2].priority] = noc[routerID].bufferArray[2],
+		noc[routerID].temp[noc[routerID].channelArray[0].priority] = noc[routerID].channelArray[0],
+		noc[routerID].temp[noc[routerID].channelArray[1].priority] = noc[routerID].channelArray[1],
+		noc[routerID].temp[noc[routerID].channelArray[2].priority] = noc[routerID].channelArray[2],
 		
-		noc[routerID].bufferID[noc[routerID].bufferArray[0].id] = noc[routerID].bufferArray[0].priority,
-		noc[routerID].bufferID[noc[routerID].bufferArray[1].id] = noc[routerID].bufferArray[1].priority,
-		noc[routerID].bufferID[noc[routerID].bufferArray[2].id] = noc[routerID].bufferArray[2].priority
+		noc[routerID].bufferID[noc[routerID].channelArray[0].id] = noc[routerID].channelArray[0].priority,
+		noc[routerID].bufferID[noc[routerID].channelArray[1].id] = noc[routerID].channelArray[1].priority,
+		noc[routerID].bufferID[noc[routerID].channelArray[2].id] = noc[routerID].channelArray[2].priority
 		=};
 		
-		{= noc[routerID].bufferArray = noc[routerID].temp =}
+		{= noc[routerID].channelArray = noc[routerID].temp =}
 }
 	
-//initialize values --------------------------------------------------------------------------------------------------------------------------------------------
+//initialize directionues --------------------------------------------------------------------------------------------------------------------------------------------
 process initialize(){
 	initialize_node_nw(0);
 	initialize_node_ne(1);
@@ -300,16 +300,16 @@ process initialize(){
 }
 
 process initialize_node_nw(int routerID){
-	buffer east, south, local;
+	channel east, south, local;
 	{=
-	noc[routerID].bufferArray = [east, south, local],
+	noc[routerID].channelArray = [east, south, local],
 	noc[routerID].temp = [east, south, local],
 	
 	noc[routerID].bufferID = [-1, 0, 1, -1, 2],
 	
-	noc[routerID].bufferArray[0].id = 1, 
-	noc[routerID].bufferArray[1].id = 2, 
-	noc[routerID].bufferArray[2].id = 4,
+	noc[routerID].channelArray[0].id = 1, 
+	noc[routerID].channelArray[1].id = 2, 
+	noc[routerID].channelArray[2].id = 4,
 	
 	noc[routerID].unserviced = 0
 	
@@ -317,48 +317,48 @@ process initialize_node_nw(int routerID){
 }
 
 process initialize_node_ne(int routerID){
-	buffer south, west, local;
+	channel south, west, local;
 	{=
-	noc[routerID].bufferArray = [south, west, local],
+	noc[routerID].channelArray = [south, west, local],
 	noc[routerID].temp = [south, west, local], 
 	
 	noc[routerID].bufferID = [-1, -1, 0, 1, 2],
 	
-	noc[routerID].bufferArray[0].id = 2, 
-	noc[routerID].bufferArray[1].id = 3, 
-	noc[routerID].bufferArray[2].id = 4,
+	noc[routerID].channelArray[0].id = 2, 
+	noc[routerID].channelArray[1].id = 3, 
+	noc[routerID].channelArray[2].id = 4,
 	
 	noc[routerID].unserviced = 0
 	=}
 }
 
 process initialize_node_sw(int routerID){
-	buffer north, east, local;
+	channel north, east, local;
 	{=
-	noc[routerID].bufferArray = [north, east, local],
+	noc[routerID].channelArray = [north, east, local],
 	noc[routerID].temp = [north, east, local], 
 	
 	noc[routerID].bufferID = [0, 1, -1, -1, 2],
 	
-	noc[routerID].bufferArray[0].id = 0, 
-	noc[routerID].bufferArray[1].id = 1, 
-	noc[routerID].bufferArray[2].id = 4,
+	noc[routerID].channelArray[0].id = 0, 
+	noc[routerID].channelArray[1].id = 1, 
+	noc[routerID].channelArray[2].id = 4,
 	
 	noc[routerID].unserviced = 0
 	=}
 }
 
 process initialize_node_se(int routerID){
-	buffer north, west, local;
+	channel north, west, local;
 	{=
-	noc[routerID].bufferArray = [north, west, local],
+	noc[routerID].channelArray = [north, west, local],
 	noc[routerID].temp = [north, west, local], 
 	
 	noc[routerID].bufferID = [0, -1, -1, 1, 2],
 	
-	noc[routerID].bufferArray[0].id = 0, 
-	noc[routerID].bufferArray[1].id = 3, 
-	noc[routerID].bufferArray[2].id = 4,
+	noc[routerID].channelArray[0].id = 0, 
+	noc[routerID].channelArray[1].id = 3, 
+	noc[routerID].channelArray[2].id = 4,
 	
 	noc[routerID].unserviced = 0
 	=}
@@ -368,61 +368,61 @@ process initialize_node_se(int routerID){
 //runs routing after initial setup (for testing)
 process initialRoute(int routerID){
 	{=
-	noc[routerID].bufferArray[0].val = route(peekFront(noc[routerID].bufferArray[0].buff), routerID),
-	noc[routerID].bufferArray[1].val = route(peekFront(noc[routerID].bufferArray[1].buff), routerID),
-	noc[routerID].bufferArray[2].val = route(peekFront(noc[routerID].bufferArray[2].buff), routerID)
+	noc[routerID].channelArray[0].direction = route(peekFront(noc[routerID].channelArray[0].buff), routerID),
+	noc[routerID].channelArray[1].direction = route(peekFront(noc[routerID].channelArray[1].buff), routerID),
+	noc[routerID].channelArray[2].direction = route(peekFront(noc[routerID].channelArray[2].buff), routerID)
 	=}
 }
 
 
-//Sets the new priority value of buffer bufferArray[i] and forwards the detination if the buffer was serviced ------------------------------------------------------------------
+//Sets the new priority directionue of buffer channelArray[i] and forwards the detination if the buffer was serviced ------------------------------------------------------------------
 process setPriority(int i, int routerID){
-	if (noc[routerID].bufferArray[i].serviced == true){
-		if(noc[routerID].bufferArray[i].val == -1){ tau }
-		else if(noc[routerID].bufferArray[i].val == 4){			//Send in the local direction
+	if (noc[routerID].channelArray[i].serviced == true){
+		if(noc[routerID].channelArray[i].direction == -1){ tau }
+		else if(noc[routerID].channelArray[i].direction == 4){			//Send in the local direction
 			
 			{= 
-			noc[routerID].bufferArray[i].val = -1,
-			noc[routerID].bufferArray[i].buff = dequeue(noc[routerID].bufferArray[i].buff)			
+			noc[routerID].channelArray[i].direction = -1,
+			noc[routerID].channelArray[i].buff = dequeue(noc[routerID].channelArray[i].buff)			
 			=}			//flit delivered
 		}
-		else if(noc[routerID].bufferArray[i].val == 0){			//Send in the north direction
+		else if(noc[routerID].channelArray[i].direction == 0){			//Send in the north direction
 			{=
-			noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff = enqueue(peekFront(noc[routerID].bufferArray[i].buff), noc[routerID - NOCSIZE].bufferArray[noc[routerID - NOCSIZE].bufferID[2]].buff),
-			noc[routerID].bufferArray[i].val = -1,
-			noc[routerID].bufferArray[i].buff = dequeue(noc[routerID].bufferArray[i].buff)
+			noc[routerID - NOCSIZE].channelArray[noc[routerID - NOCSIZE].bufferID[2]].buff = enqueue(peekFront(noc[routerID].channelArray[i].buff), noc[routerID - NOCSIZE].channelArray[noc[routerID - NOCSIZE].bufferID[2]].buff),
+			noc[routerID].channelArray[i].direction = -1,
+			noc[routerID].channelArray[i].buff = dequeue(noc[routerID].channelArray[i].buff)
 			=}
 		}
-		else if(noc[routerID].bufferArray[i].val == 1){			//Send in the east direction
+		else if(noc[routerID].channelArray[i].direction == 1){			//Send in the east direction
 			{=
-			noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff = enqueue(peekFront(noc[routerID].bufferArray[i].buff), noc[routerID + 1].bufferArray[noc[routerID + 1].bufferID[3]].buff),
-			noc[routerID].bufferArray[i].val = -1,
-			noc[routerID].bufferArray[i].buff = dequeue(noc[routerID].bufferArray[i].buff)
+			noc[routerID + 1].channelArray[noc[routerID + 1].bufferID[3]].buff = enqueue(peekFront(noc[routerID].channelArray[i].buff), noc[routerID + 1].channelArray[noc[routerID + 1].bufferID[3]].buff),
+			noc[routerID].channelArray[i].direction = -1,
+			noc[routerID].channelArray[i].buff = dequeue(noc[routerID].channelArray[i].buff)
 			=}
 		}
-		else if(noc[routerID].bufferArray[i].val == 2){			//Send in the south direction
+		else if(noc[routerID].channelArray[i].direction == 2){			//Send in the south direction
 			{=
-			noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff = enqueue(peekFront(noc[routerID].bufferArray[i].buff), noc[routerID + NOCSIZE].bufferArray[noc[routerID + NOCSIZE].bufferID[0]].buff),
-			noc[routerID].bufferArray[i].val = -1,
-			noc[routerID].bufferArray[i].buff = dequeue(noc[routerID].bufferArray[i].buff)
+			noc[routerID + NOCSIZE].channelArray[noc[routerID + NOCSIZE].bufferID[0]].buff = enqueue(peekFront(noc[routerID].channelArray[i].buff), noc[routerID + NOCSIZE].channelArray[noc[routerID + NOCSIZE].bufferID[0]].buff),
+			noc[routerID].channelArray[i].direction = -1,
+			noc[routerID].channelArray[i].buff = dequeue(noc[routerID].channelArray[i].buff)
 			=}
 		}
-		else if(noc[routerID].bufferArray[i].val == 3){			//Send in the west direction
+		else if(noc[routerID].channelArray[i].direction == 3){			//Send in the west direction
 			{=
-			noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff = enqueue(peekFront(noc[routerID].bufferArray[i].buff), noc[routerID - 1].bufferArray[noc[routerID - 1].bufferID[1]].buff),
-			noc[routerID].bufferArray[i].val = -1,
-			noc[routerID].bufferArray[i].buff = dequeue(noc[routerID].bufferArray[i].buff)
+			noc[routerID - 1].channelArray[noc[routerID - 1].bufferID[1]].buff = enqueue(peekFront(noc[routerID].channelArray[i].buff), noc[routerID - 1].channelArray[noc[routerID - 1].bufferID[1]].buff),
+			noc[routerID].channelArray[i].direction = -1,
+			noc[routerID].channelArray[i].buff = dequeue(noc[routerID].channelArray[i].buff)
 			=}
 		}
 		else {tau};
 		
 		{=
-		noc[routerID].bufferArray[i].priority = i + noc[routerID].unserviced 				//Set new priority
+		noc[routerID].channelArray[i].priority = i + noc[routerID].unserviced 				//Set new priority
 		=}
 	}
 	else {
 		{= 
-		noc[routerID].bufferArray[i].priority = noc[routerID].totalUnserviced - noc[routerID].unserviced,		//Set new priority
+		noc[routerID].channelArray[i].priority = noc[routerID].totalUnserviced - noc[routerID].unserviced,		//Set new priority
 		noc[routerID].unserviced-- 						//decrement unserviced
 		=}
 	}
@@ -430,21 +430,21 @@ process setPriority(int i, int routerID){
 
 //Updates the destination from the buffer if the buffer was serviced
 process updateDestination(int i , int routerID){
-	if(noc[routerID].bufferArray[i].serviced == true){
+	if(noc[routerID].channelArray[i].serviced == true){
 		//{= 
-		//noc[routerID].bufferArray[i].dest = peekFront(noc[routerID].bufferArray[i].buff)
+		//noc[routerID].channelArray[i].dest = peekFront(noc[routerID].channelArray[i].buff)
 		//=};
 		{=
-		noc[routerID].bufferArray[i].val = route(peekFront(noc[routerID].bufferArray[i].buff), routerID)		//Update value from buffer
-		//noc[routerID].bufferArray[i].buff = dequeue(noc[routerID].bufferArray[i].buff)
+		noc[routerID].channelArray[i].direction = route(peekFront(noc[routerID].channelArray[i].buff), routerID)		//Update directionue from buffer
+		//noc[routerID].channelArray[i].buff = dequeue(noc[routerID].channelArray[i].buff)
 		=}
 	}
 	else {tau}
 }
 
-//Populate the buffers with new values
+//Populate the buffers with new directionues
 process subPopulate(int routerID){
-	{= noc[routerID].bufferArray[noc[routerID].bufferID[4]].buff = enqueue(((DiscreteUniform(1, 3) + routerID) % 4), noc[routerID].bufferArray[noc[routerID].bufferID[4]].buff) =}
+	{= noc[routerID].channelArray[noc[routerID].bufferID[4]].buff = enqueue(((DiscreteUniform(1, 3) + routerID) % 4), noc[routerID].channelArray[noc[routerID].bufferID[4]].buff) =}
 }
 // ------- End: process definitions -------
 
