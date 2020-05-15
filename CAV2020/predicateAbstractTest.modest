@@ -1408,10 +1408,10 @@ process shiftBuffers(){
 }
 
 process Arbiter_corner0(){
-	if(r0a1 == false && r0a2 == false && r0a3 == false){ //priority east, south, local
-		r0east(r0a1, r0a2, r0a3);
-		r0south(r0a1, r0a2, r0a3);
-		r0local(r0a1, r0a2, r0a3);
+	r0east(r0a1, r0a2, r0a3);
+	r0south(r0a1, r0a2, r0a3);
+	r0local(r0a1, r0a2, r0a3);
+	if(r0a1 == false && r0a2 == false && r0a3 == false){ //priority east, south, local	
 		{=
 		r0a1 = !(r0lServiced) && r0eServiced && r0sServiced,
 		r0a2 = (!(r0lServiced) && r0eServiced && !(r0sServiced)) || (!(r0lServiced) && !(r0eServiced) && r0sServiced),
@@ -1419,9 +1419,6 @@ process Arbiter_corner0(){
 		=}
 	}
 	else if(r0a1 == false && r0a2 == false && r0a3 == true){ //priority south, east, local
-		r0south(r0a1, r0a2, r0a3);
-		r0east(r0a1, r0a2, r0a3);
-		r0local(r0a1, r0a2, r0a3);
 		{=
 		r0a1 = !(r0lServiced) && r0eServiced && r0sServiced,
 		r0a2 = (!(r0lServiced) && r0eServiced && !(r0sServiced)) || (!(r0lServiced) && !(r0eServiced) && r0sServiced), 
@@ -1429,9 +1426,6 @@ process Arbiter_corner0(){
 		=}
 	}
 	else if(r0a1 == false && r0a2 == true && r0a3 == false){ //priority east, local, south
-		r0east(r0a1, r0a2, r0a3);
-		r0local(r0a1, r0a2, r0a3);
-		r0south(r0a1, r0a2, r0a3);
 		{=
 		r0a1 = !(r0lServiced) && r0eServiced,
 		r0a2 = (!(r0lServiced) && !(r0eServiced)) || (r0lServiced && r0sServiced),
@@ -1439,9 +1433,6 @@ process Arbiter_corner0(){
 		=}
 	}
 	else if(r0a1 == false && r0a2 == true && r0a3 == true){ //priority south, local, east
-		r0south(r0a1, r0a2, r0a3);
-		r0local(r0a1, r0a2, r0a3);
-		r0east(r0a1, r0a2, r0a3);
 		{=
 		r0a1 = !(r0lServiced) && r0sServiced,
 		r0a2 = (!(r0lServiced) && !(r0sServiced)) || (r0lServiced && r0eServiced),
@@ -1449,9 +1440,6 @@ process Arbiter_corner0(){
 		=}
 	}
 	else if(r0a1 == true && r0a2 == false && r0a3 == false){ //priority local, east, south
-		r0local(r0a1, r0a2, r0a3);
-		r0east(r0a1, r0a2, r0a3);
-		r0south(r0a1, r0a2, r0a3);
 		{=
 		r0a1 = (!(r0lServiced) && !(r0sServiced)) || (r0eServiced && r0sServiced),
 		r0a2 = (!(r0lServiced) && !(r0eServiced) && r0sServiced) || (r0lServiced && r0eServiced && !(r0sServiced)) || (r0lServiced && !(r0eServiced) && r0sServiced),
@@ -1459,9 +1447,6 @@ process Arbiter_corner0(){
 		=}
 	}
 	else if(r0a1 == true && r0a2 == false && r0a3 == true){ //priority local, south, east
-		r0local(r0a1, r0a2, r0a3);
-		r0south(r0a1, r0a2, r0a3);
-		r0east(r0a1, r0a2, r0a3);
 		{=
 		r0a1 = !(r0lServiced) || (r0eServiced && r0sServiced),
 		r0a2 = (r0lServiced && r0eServiced && !(r0sServiced)) || (r0lServiced && !(r0eServiced) && r0sServiced),
@@ -1498,10 +1483,10 @@ process Arbiter_corner0(){
 }
 
 process Arbiter_corner1(){
+	r1west(r1a1, r1a2, r1a3);
+	r1south(r1a1, r1a2, r1a3);
+	r1local(r1a1, r1a2, r1a3);
 	if(r1a1 == false && r1a2 == false && r1a3 == false){ //priority west, south, local
-		r1west(r1a1, r1a2, r1a3);
-		r1south(r1a1, r1a2, r1a3);
-		r1local(r1a1, r1a2, r1a3);
 		{=
 		r1a1 = !(r1lServiced) && r1wServiced && r1sServiced,
 		r1a2 = (!(r1lServiced) && r1wServiced && !(r1sServiced)) || (!(r1lServiced) && !(r1wServiced) && r1sServiced),
@@ -1509,9 +1494,6 @@ process Arbiter_corner1(){
 		=}
 	}
 	else if(r1a1 == false && r1a2 == false && r1a3 == true){ //priority south, west, local
-		r1south(r1a1, r1a2, r1a3);
-		r1west(r1a1, r1a2, r1a3);
-		r1local(r1a1, r1a2, r1a3);
 		{=
 		r1a1 = !(r1lServiced) && r1wServiced && r1sServiced,
 		r1a2 = (!(r1lServiced) && r1wServiced && !(r1sServiced)) || (!(r1lServiced) && !(r1wServiced) && r1sServiced), 
@@ -1519,9 +1501,6 @@ process Arbiter_corner1(){
 		=}
 	}
 	else if(r1a1 == false && r1a2 == true && r1a3 == false){ //priority west, local, south
-		r1west(r1a1, r1a2, r1a3);
-		r1local(r1a1, r1a2, r1a3);
-		r1south(r1a1, r1a2, r1a3);
 		{=
 		r1a1 = !(r1lServiced) && r1wServiced,
 		r1a2 = (!(r1lServiced) && !(r1wServiced)) || (r1lServiced && r1sServiced),
@@ -1529,9 +1508,6 @@ process Arbiter_corner1(){
 		=}
 	}
 	else if(r1a1 == false && r1a2 == true && r1a3 == true){ //priority south, local, west
-		r1south(r1a1, r1a2, r1a3);
-		r1local(r1a1, r1a2, r1a3);
-		r1west(r1a1, r1a2, r1a3);
 		{=
 		r1a1 = !(r1lServiced) && r1sServiced,
 		r1a2 = (!(r1lServiced) && !(r1sServiced)) || (r1lServiced && r1wServiced),
@@ -1539,9 +1515,6 @@ process Arbiter_corner1(){
 		=}
 	}
 	else if(r1a1 == true && r1a2 == false && r1a3 == false){ //priority local, west, south
-		r1local(r1a1, r1a2, r1a3);
-		r1west(r1a1, r1a2, r1a3);
-		r1south(r1a1, r1a2, r1a3);
 		{=
 		r1a1 = (!(r1lServiced) && !(r1sServiced)) || (r1wServiced && r1sServiced),
 		r1a2 = (!(r1lServiced) && !(r1wServiced) && r1sServiced) || (r1lServiced && r1wServiced && !(r1sServiced)) || (r1lServiced && !(r1wServiced) && r1sServiced),
@@ -1549,9 +1522,6 @@ process Arbiter_corner1(){
 		=}
 	}
 	else if(r1a1 == true && r1a2 == false && r1a3 == true){ //priority local, south, west
-		r1local(r1a1, r1a2, r1a3);
-		r1south(r1a1, r1a2, r1a3);
-		r1west(r1a1, r1a2, r1a3);
 		{=
 		r1a1 = !(r1lServiced) || (r1wServiced && r1sServiced),
 		r1a2 = (r1lServiced && r1wServiced && !(r1sServiced)) || (r1lServiced && !(r1wServiced) && r1sServiced),
@@ -1588,10 +1558,10 @@ process Arbiter_corner1(){
 }
 
 process Arbiter_corner2(){
+	r2east(r2a1, r2a2, r2a3);
+	r2north(r2a1, r2a2, r2a3);
+	r2local(r2a1, r2a2, r2a3);
 	if(r2a1 == false && r2a2 == false && r2a3 == false){ //priority east, north, local
-		r2east(r2a1, r2a2, r2a3);
-		r2north(r2a1, r2a2, r2a3);
-		r2local(r2a1, r2a2, r2a3);
 		{=
 		r2a1 = !(r2lServiced) && r2eServiced && r2nServiced,
 		r2a2 = (!(r2lServiced) && r2eServiced && !(r2nServiced)) || (!(r2lServiced) && !(r2eServiced) && r2nServiced),
@@ -1599,9 +1569,6 @@ process Arbiter_corner2(){
 		=}
 	}
 	else if(r2a1 == false && r2a2 == false && r2a3 == true){ //priority north, east, local
-		r2north(r2a1, r2a2, r2a3);
-		r2east(r2a1, r2a2, r2a3);
-		r2local(r2a1, r2a2, r2a3);
 		{=
 		r2a1 = !(r2lServiced) && r2eServiced && r2nServiced,
 		r2a2 = (!(r2lServiced) && r2eServiced && !(r2nServiced)) || (!(r2lServiced) && !(r2eServiced) && r2nServiced), 
@@ -1609,9 +1576,6 @@ process Arbiter_corner2(){
 		=}
 	}
 	else if(r2a1 == false && r2a2 == true && r2a3 == false){ //priority east, local, north
-		r2east(r2a1, r2a2, r2a3);
-		r2local(r2a1, r2a2, r2a3);
-		r2north(r2a1, r2a2, r2a3);
 		{=
 		r2a1 = !(r2lServiced) && r2eServiced,
 		r2a2 = (!(r2lServiced) && !(r2eServiced)) || (r2lServiced && r2nServiced),
@@ -1619,9 +1583,6 @@ process Arbiter_corner2(){
 		=}
 	}
 	else if(r2a1 == false && r2a2 == true && r2a3 == true){ //priority north, local, east
-		r2north(r2a1, r2a2, r2a3);
-		r2local(r2a1, r2a2, r2a3);
-		r2east(r2a1, r2a2, r2a3);
 		{=
 		r2a1 = !(r2lServiced) && r2nServiced,
 		r2a2 = (!(r2lServiced) && !(r2nServiced)) || (r2lServiced && r2eServiced),
@@ -1629,9 +1590,6 @@ process Arbiter_corner2(){
 		=}
 	}
 	else if(r2a1 == true && r2a2 == false && r2a3 == false){ //priority local, east, north
-		r2local(r2a1, r2a2, r2a3);
-		r2east(r2a1, r2a2, r2a3);
-		r2north(r2a1, r2a2, r2a3);
 		{=
 		r2a1 = (!(r2lServiced) && !(r2nServiced)) || (r2eServiced && r2nServiced),
 		r2a2 = (!(r2lServiced) && !(r2eServiced) && r2nServiced) || (r2lServiced && r2eServiced && !(r2nServiced)) || (r2lServiced && !(r2eServiced) && r2nServiced),
@@ -1639,9 +1597,6 @@ process Arbiter_corner2(){
 		=}
 	}
 	else if(r2a1 == true && r2a2 == false && r2a3 == true){ //priority local, north, east
-		r2local(r2a1, r2a2, r2a3);
-		r2north(r2a1, r2a2, r2a3);
-		r2east(r2a1, r2a2, r2a3);
 		{=
 		r2a1 = !(r2lServiced) || (r2eServiced && r2nServiced),
 		r2a2 = (r2lServiced && r2eServiced && !(r2nServiced)) || (r2lServiced && !(r2eServiced) && r2nServiced),
@@ -1678,10 +1633,10 @@ process Arbiter_corner2(){
 }
 
 process Arbiter_corner3(){
+	r3west(r3a1, r3a2, r3a3);
+	r3north(r3a1, r3a2, r3a3);
+	r3local(r3a1, r3a2, r3a3);
 	if(r3a1 == false && r3a2 == false && r3a3 == false){ //priority west, north, local
-		r3west(r3a1, r3a2, r3a3);
-		r3north(r3a1, r3a2, r3a3);
-		r3local(r3a1, r3a2, r3a3);
 		{=
 		r3a1 = !(r3lServiced) && r3wServiced && r3nServiced,
 		r3a2 = (!(r3lServiced) && r3wServiced && !(r3nServiced)) || (!(r3lServiced) && !(r3wServiced) && r3nServiced),
@@ -1689,9 +1644,6 @@ process Arbiter_corner3(){
 		=}
 	}
 	else if(r3a1 == false && r3a2 == false && r3a3 == true){ //priority north, west, local
-		r3north(r3a1, r3a2, r3a3);
-		r3west(r3a1, r3a2, r3a3);
-		r3local(r3a1, r3a2, r3a3);
 		{=
 		r3a1 = !(r3lServiced) && r3wServiced && r3nServiced,
 		r3a2 = (!(r3lServiced) && r3wServiced && !(r3nServiced)) || (!(r3lServiced) && !(r3wServiced) && r3nServiced), 
@@ -1699,9 +1651,6 @@ process Arbiter_corner3(){
 		=}
 	}
 	else if(r3a1 == false && r3a2 == true && r3a3 == false){ //priority west, local, north
-		r3west(r3a1, r3a2, r3a3);
-		r3local(r3a1, r3a2, r3a3);
-		r3north(r3a1, r3a2, r3a3);
 		{=
 		r3a1 = !(r3lServiced) && r3wServiced,
 		r3a2 = (!(r3lServiced) && !(r3wServiced)) || (r3lServiced && r3nServiced),
@@ -1709,9 +1658,6 @@ process Arbiter_corner3(){
 		=}
 	}
 	else if(r3a1 == false && r3a2 == true && r3a3 == true){ //priority north, local, west
-		r3north(r3a1, r3a2, r3a3);
-		r3local(r3a1, r3a2, r3a3);
-		r3west(r3a1, r3a2, r3a3);
 		{=
 		r3a1 = !(r3lServiced) && r3nServiced,
 		r3a2 = (!(r3lServiced) && !(r3nServiced)) || (r3lServiced && r3wServiced),
@@ -1719,9 +1665,6 @@ process Arbiter_corner3(){
 		=}
 	}
 	else if(r3a1 == true && r3a2 == false && r3a3 == false){ //priority local, west, north
-		r3local(r3a1, r3a2, r3a3);
-		r3west(r3a1, r3a2, r3a3);
-		r3north(r3a1, r3a2, r3a3);
 		{=
 		r3a1 = (!(r3lServiced) && !(r3nServiced)) || (r3wServiced && r3nServiced),
 		r3a2 = (!(r3lServiced) && !(r3wServiced) && r3nServiced) || (r3lServiced && r3wServiced && !(r3nServiced)) || (r3lServiced && !(r3wServiced) && r3nServiced),
@@ -1729,9 +1672,6 @@ process Arbiter_corner3(){
 		=}
 	}
 	else if(r3a1 == true && r3a2 == false && r3a3 == true){ //priority local, north, west
-		r3local(r3a1, r3a2, r3a3);
-		r3north(r3a1, r3a2, r3a3);
-		r3west(r3a1, r3a2, r3a3);
 		{=
 		r3a1 = !(r3lServiced) || (r3wServiced && r3nServiced),
 		r3a2 = (r3lServiced && r3wServiced && !(r3nServiced)) || (r3lServiced && !(r3wServiced) && r3nServiced),
