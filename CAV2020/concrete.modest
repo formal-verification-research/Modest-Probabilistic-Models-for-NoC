@@ -25,11 +25,9 @@ datatype channel = {int(-1..4) direction, bool serviced, int(0..2) priority, int
 
 datatype router = {int(0..3) unserviced, int(0..3) totalUnserviced, channel[] channelArray, channel[] temp, int(0..2) localPos, int(0..2)nsPos, int(0..2)ewPos /*int[]bufferID*/};	//Datatype for a router, includes router-specific variables and an array of buffers
 
-int optimalRunsIncrement = 0;
+int (0..40) optimalRuns;
 
-int optimalRuns;
-
-int test = 0;
+//int test = 0;
 
 router[] noc = [router {unserviced:0}, router {unserviced:0}, router {unserviced:0}, router {unserviced:0}];
 
@@ -277,10 +275,10 @@ process initialize(){
 }
 
 process initialize_node_nw(int routerID){
-	channel east, south, local, spare;
+	channel east, south, local, spare1, spare2, spare3;
 	{=
-	noc[routerID].channelArray = [east, south, local, spare],
-	noc[routerID].temp = [east, south, local, spare],
+	noc[routerID].channelArray = [east, south, local, spare1, spare2, spare3],
+	noc[routerID].temp = [east, south, local, spare1, spare2, spare3],
 	
 	noc[routerID].ewPos = 0,
 	noc[routerID].nsPos = 1,
@@ -298,10 +296,10 @@ process initialize_node_nw(int routerID){
 }
 
 process initialize_node_ne(int routerID){
-	channel south, west, local, spare;
+	channel south, west, local, spare1, spare2, spare3;
 	{=
-	noc[routerID].channelArray = [south, west, local, spare],
-	noc[routerID].temp = [south, west, local, spare], 
+	noc[routerID].channelArray = [south, west, local, spare1, spare2, spare3],
+	noc[routerID].temp = [south, west, local, spare1, spare2, spare3], 
 	
 	noc[routerID].nsPos = 0,
 	noc[routerID].ewPos = 1,
@@ -318,10 +316,10 @@ process initialize_node_ne(int routerID){
 }
 
 process initialize_node_sw(int routerID){
-	channel north, east, local, spare;
+	channel north, east, local, spare1, spare2, spare3;
 	{=
-	noc[routerID].channelArray = [north, east, local, spare],
-	noc[routerID].temp = [north, east, local, spare], 
+	noc[routerID].channelArray = [north, east, local, spare1, spare2, spare3],
+	noc[routerID].temp = [north, east, local, spare1, spare2, spare3], 
 	
 	noc[routerID].nsPos = 0,
 	noc[routerID].ewPos = 1,
@@ -338,10 +336,10 @@ process initialize_node_sw(int routerID){
 }
 
 process initialize_node_se(int routerID){
-	channel north, west, local, spare;
+	channel north, west, local, spare1, spare2, spare3;
 	{=
-	noc[routerID].channelArray = [north, west, local, spare],
-	noc[routerID].temp = [north, west, local, spare], 
+	noc[routerID].channelArray = [north, west, local, spare1, spare2, spare3],
+	noc[routerID].temp = [north, west, local, spare1, spare2, spare3], 
 	
 	noc[routerID].nsPos = 0,
 	noc[routerID].ewPos = 1,
