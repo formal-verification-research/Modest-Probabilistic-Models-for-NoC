@@ -26,7 +26,7 @@ datatype intlist = { int(0.. ((NOCSIZE*NOCSIZE)-1)) hd, intlist option tl };
 
 datatype channel = {int(-1..3) dest, int(-1..4) direction, int(0..4) id, bool serviced, int(0..2) priority, intlist option buff};		//Datatype for a channel with the next channel value, id of the channel, whether the channel was serviced last clock cycle or not, and the priority number of the channel
 
-datatype router = {int(0..3) unserviced, int(0..3) totalUnserviced, channel[] channelArray, channel[] temp, int(0..2) localPos, int(0..2)nsPos, int(0..2)ewPos};	//Datatype for a router, includes router-specific variables and an array of channels
+datatype router = {int(0..3) unserviced, int(0..3) totalUnserviced, channel[] channelArray, channel[] temp, int[]channelID};	//Datatype for a router, includes router-specific variables and an array of channels
 
 router r0, r1, r2, r3;
 
@@ -82,10 +82,10 @@ function int route(int dest, int routerID) =
 
 function bool checkNotFull(int direction, int routerID) = 
 	if direction == -1 then true //no flit
-	else if (direction == 0 && routerID - NOCSIZE >= 0) then len(noc[routerID - NOCSIZE].channelArray[noc[routerID - NOCSIZE].nsPos].buff) < BUFFERLENGTH
-	else if (direction == 1  && routerID + 1 <= 3) then len(noc[routerID + 1].channelArray[noc[routerID + 1].ewPos].buff) < BUFFERLENGTH
-	else if (direction == 2  && routerID + NOCSIZE <= 3) then len(noc[routerID + NOCSIZE].channelArray[noc[routerID + NOCSIZE].nsPos].buff) < BUFFERLENGTH
-	else if (direction == 3  && routerID - 1 >= 0) then len(noc[routerID - 1].channelArray[noc[routerID - 1].ewPos].buff) < BUFFERLENGTH
+	else if (direction == 0 && routerID - NOCSIZE >= 0) then len(noc[routerID - NOCSIZE].channelArray[noc[routerID - NOCSIZE].channelID[2]].buff) < BUFFERLENGTH
+	else if (direction == 1  && routerID + 1 <= 3) then len(noc[routerID + 1].channelArray[noc[routerID + 1].channelID[3]].buff) < BUFFERLENGTH
+	else if (direction == 2  && routerID + NOCSIZE <= 3) then len(noc[routerID + NOCSIZE].channelArray[noc[routerID + NOCSIZE].channelID[0]].buff) < BUFFERLENGTH
+	else if (direction == 3  && routerID - 1 >= 0) then len(noc[routerID - 1].channelArray[noc[routerID - 1].channelID[3]].buff) < BUFFERLENGTH
 	else if direction == 4 then true //send local
 	else false //catch all case
 	;
@@ -231,38 +231,12 @@ process Arbiter_corner(int routerID){
 		{= 
 		noc[routerID].temp[noc[routerID].channelArray[0].priority] = noc[routerID].channelArray[0],
 		noc[routerID].temp[noc[routerID].channelArray[1].priority] = noc[routerID].channelArray[1],
-		noc[routerID].temp[noc[routerID].channelArray[2].priority] = noc[routerID].channelArray[2]
+		noc[routerID].temp[noc[routerID].channelArray[2].priority] = noc[routerID].channelArray[2],
+		
+		noc[routerID].channelID[noc[routerID].channelArray[0].id] = noc[routerID].channelArray[0].priority,
+		noc[routerID].channelID[noc[routerID].channelArray[1].id] = noc[routerID].channelArray[1].priority,
+		noc[routerID].channelID[noc[routerID].channelArray[2].id] = noc[routerID].channelArray[2].priority
 		=};
-		
-		if(noc[routerID].channelArray[0].id == 0 || noc[routerID].channelArray[0].id == 2){		//ns
-			{= noc[routerID].nsPos = noc[routerID].channelArray[0].priority =}
-		}
-		else if(noc[routerID].channelArray[0].id == 1 || noc[routerID].channelArray[0].id == 3){		//ew
-			{= noc[routerID].ewPos = noc[routerID].channelArray[0].priority =}
-		}
-		else {		//local
-			{= noc[routerID].localPos = noc[routerID].channelArray[0].priority =}
-		};
-		
-		if(noc[routerID].channelArray[1].id == 0 || noc[routerID].channelArray[1].id == 2){		//ns
-			{= noc[routerID].nsPos = noc[routerID].channelArray[1].priority =}
-		}
-		else if(noc[routerID].channelArray[1].id == 1 || noc[routerID].channelArray[1].id == 3){		//ew
-			{= noc[routerID].ewPos = noc[routerID].channelArray[1].priority =}
-		}
-		else {		//local
-			{= noc[routerID].localPos = noc[routerID].channelArray[1].priority =}
-		};
-		
-		if(noc[routerID].channelArray[2].id == 0 || noc[routerID].channelArray[2].id == 2){		//ns
-			{= noc[routerID].nsPos = noc[routerID].channelArray[2].priority =}
-		}
-		else if(noc[routerID].channelArray[2].id == 1 || noc[routerID].channelArray[2].id == 3){		//ew
-			{= noc[routerID].ewPos = noc[routerID].channelArray[2].priority =}
-		}
-		else {		//local
-			{= noc[routerID].localPos = noc[routerID].channelArray[2].priority =}
-		};
 		
 		{= noc[routerID].channelArray = noc[routerID].temp =}
 }
@@ -283,9 +257,7 @@ process initialize_node_nw(int routerID){
 	noc[routerID].channelArray = [east, south, local],
 	noc[routerID].temp = [east, south, local],
 	
-	noc[routerID].ewPos = 0,
-	noc[routerID].nsPos = 1,
-	noc[routerID].localPos = 2,
+	noc[routerID].channelID = [0/*-1*/, 0, 1, 0/*-1*/, 2],
 	
 	noc[routerID].channelArray[0].id = 1, 
 	noc[routerID].channelArray[1].id = 2, 
@@ -306,9 +278,7 @@ process initialize_node_ne(int routerID){
 	noc[routerID].channelArray = [south, west, local],
 	noc[routerID].temp = [south, west, local], 
 	
-	noc[routerID].nsPos = 0,
-	noc[routerID].ewPos = 1,
-	noc[routerID].localPos = 2,
+	noc[routerID].channelID = [0/*-1*/, 0/*-1*/, 0, 1, 2],
 	
 	noc[routerID].channelArray[0].id = 2, 
 	noc[routerID].channelArray[1].id = 3, 
@@ -328,9 +298,7 @@ process initialize_node_sw(int routerID){
 	noc[routerID].channelArray = [north, east, local],
 	noc[routerID].temp = [north, east, local], 
 	
-	noc[routerID].nsPos = 0,
-	noc[routerID].ewPos = 1,
-	noc[routerID].localPos = 2,
+	noc[routerID].channelID = [0, 1, 0/*-1*/, 0/*-1*/, 2],
 	
 	noc[routerID].channelArray[0].id = 0, 
 	noc[routerID].channelArray[1].id = 1, 
@@ -350,9 +318,7 @@ process initialize_node_se(int routerID){
 	noc[routerID].channelArray = [north, west, local],
 	noc[routerID].temp = [north, west, local], 
 	
-	noc[routerID].nsPos = 0,
-	noc[routerID].ewPos = 1,
-	noc[routerID].localPos = 2,
+	noc[routerID].channelID = [0, 0/*-1*/, 0/*-1*/, 1, 2],
 	
 	noc[routerID].channelArray[0].id = 0, 
 	noc[routerID].channelArray[1].id = 3, 
@@ -432,12 +398,14 @@ process updateDestination(int i , int routerID){
 process sendNorth(int routerID, intlist option source){
 	if(routerID == 2){
 		{=
-		noc[0].channelArray[noc[0].nsPos].buff = enqueue(peekFront(source), noc[0].channelArray[noc[0].nsPos].buff)
+		noc[0].channelArray[noc[0].channelID[2]].buff = enqueue(peekFront(source), noc[0].channelArray[noc[0].channelID[2]].buff)
+		//,source = dequeue(source)
 		=}
 	}
 	else if(routerID == 3){
 		{=
-		noc[1].channelArray[noc[1].nsPos].buff = enqueue(peekFront(source), noc[1].channelArray[noc[1].nsPos].buff)
+		noc[1].channelArray[noc[1].channelID[2]].buff = enqueue(peekFront(source), noc[1].channelArray[noc[1].channelID[2]].buff)
+		//,source = dequeue(source)
 		=}
 	}
 	else{tau}
@@ -446,12 +414,14 @@ process sendNorth(int routerID, intlist option source){
 process sendEast(int routerID, intlist option source){
 	if(routerID == 0){
 		{=
-		noc[1].channelArray[noc[1].ewPos].buff = enqueue(peekFront(source), noc[1].channelArray[noc[1].ewPos].buff)
+		noc[1].channelArray[noc[1].channelID[3]].buff = enqueue(peekFront(source), noc[1].channelArray[noc[1].channelID[3]].buff)
+		//,source = dequeue(source)
 		=}
 	}
 	else if(routerID == 2){
 		{=
-		noc[3].channelArray[noc[3].ewPos].buff = enqueue(peekFront(source), noc[3].channelArray[noc[3].ewPos].buff)
+		noc[3].channelArray[noc[3].channelID[3]].buff = enqueue(peekFront(source), noc[3].channelArray[noc[3].channelID[3]].buff)
+		//,source = dequeue(source)
 		=}
 	}
 	else{tau}
@@ -460,13 +430,13 @@ process sendEast(int routerID, intlist option source){
 process sendSouth(int routerID, intlist option source){
 	if(routerID == 0){
 		{=
-		noc[2].channelArray[noc[2].nsPos].buff = enqueue(peekFront(source), noc[2].channelArray[noc[2].nsPos].buff),
+		noc[2].channelArray[noc[2].channelID[0]].buff = enqueue(peekFront(source), noc[2].channelArray[noc[2].channelID[0]].buff),
 		source = dequeue(source)
 		=}
 	}
 	else if(routerID == 1){
 		{=
-		noc[3].channelArray[noc[3].nsPos].buff = enqueue(peekFront(source), noc[3].channelArray[noc[3].nsPos].buff),
+		noc[3].channelArray[noc[3].channelID[0]].buff = enqueue(peekFront(source), noc[3].channelArray[noc[3].channelID[0]].buff),
 		source = dequeue(source)
 		=}
 	}
@@ -476,13 +446,13 @@ process sendSouth(int routerID, intlist option source){
 process sendWest(int routerID, intlist option source){
 	if(routerID == 1){
 		{=
-		noc[0].channelArray[noc[0].ewPos].buff = enqueue(peekFront(source), noc[0].channelArray[noc[0].ewPos].buff),
+		noc[0].channelArray[noc[0].channelID[1]].buff = enqueue(peekFront(source), noc[0].channelArray[noc[0].channelID[1]].buff),
 		source = dequeue(source)
 		=}
 	}
 	else if(routerID == 3){
 		{=
-		noc[2].channelArray[noc[2].ewPos].buff = enqueue(peekFront(source), noc[2].channelArray[noc[2].ewPos].buff),
+		noc[2].channelArray[noc[2].channelID[1]].buff = enqueue(peekFront(source), noc[2].channelArray[noc[2].channelID[1]].buff),
 		source = dequeue(source)
 		=}
 	}
@@ -491,7 +461,7 @@ process sendWest(int routerID, intlist option source){
 
 //Populate the channels with new values
 process subPopulate(int routerID){
-	{= noc[routerID].channelArray[noc[routerID].localPos].buff = enqueue(((DiscreteUniform(1, 3) + routerID) % 4), noc[routerID].channelArray[noc[routerID].localPos].buff) =}
+	{= noc[routerID].channelArray[noc[routerID].channelID[4]].buff = enqueue(((DiscreteUniform(1, 3) + routerID) % 4), noc[routerID].channelArray[noc[routerID].channelID[4]].buff) =}
 }
 // ------- End: process definitions -------
 
