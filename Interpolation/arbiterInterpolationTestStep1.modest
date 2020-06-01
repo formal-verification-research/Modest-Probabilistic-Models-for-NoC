@@ -1,0 +1,334 @@
+//Version of the concrete model to calculate probabilities for the 4 state abstract model
+
+datatype buffer = {int(-1..3) val, int(0..3) id, bool serviced, int(0..3) priority, int timesServiced};		//Datatype for a buffer with the next buffer value, id of the buffer, whether the buffer was serviced last clock cycle or not, and the priority number of the buffer
+int unserviced;		//Number of unserviced buffers, iterates down when unserviced buffer's priority is set
+int totalUnserviced = 0;
+int optimalRuns = 0;
+const int clkLower = 100; 
+const int clkUpper = 102;
+int(clkLower..clkUpper) clk;
+
+int(0..7) state;
+int(0..7) pstate;
+
+buffer north, east, south, west;
+
+buffer[] a; // = [north, east, south, west]; 	//Array of the four buffers. a[0] is the highest priority
+buffer[] temp;		//Temporary buffer used to update buffer a
+
+action tick;
+
+// ------ Begin: properties ---------
+//property Pr1 = Pmax(<> (clk >= clkUpper));
+
+//1 clock cycle
+//0a := 0 && !I, 0b := 0 && I,..
+//I := a[0].val = a[3].id && a[1].val = a[2].id
+/*
+property State0a = Pmax(<> ((clk >= clkUpper) && (state == 0)));
+property State0b = Pmax(<> ((clk >= clkUpper) && (state == 1)));
+property State1a = Pmax(<> ((clk >= clkUpper) && (state == 2)));
+property State1b = Pmax(<> ((clk >= clkUpper) && (state == 3)));
+property State2a = Pmax(<> ((clk >= clkUpper) && (state == 4)));
+property State2b = Pmax(<> ((clk >= clkUpper) && (state == 5)));
+property State3a = Pmax(<> ((clk >= clkUpper) && (state == 6)));
+*/
+
+//2 clock cycles
+
+property error = Pmax(<> (state == 7));
+
+property State0a_0a = Pmax(<> ((clk >= clkUpper) && (pstate == 0) && (state == 0)));
+property State0a_0b = Pmax(<> ((clk >= clkUpper) && (pstate == 0) && (state == 1)));
+property State0a_1a = Pmax(<> ((clk >= clkUpper) && (pstate == 0) && (state == 2)));
+property State0a_1b = Pmax(<> ((clk >= clkUpper) && (pstate == 0) && (state == 3)));
+property State0a_2a = Pmax(<> ((clk >= clkUpper) && (pstate == 0) && (state == 4)));
+property State0a_2b = Pmax(<> ((clk >= clkUpper) && (pstate == 0) && (state == 5)));
+property State0a_3a = Pmax(<> ((clk >= clkUpper) && (pstate == 0) && (state == 6)));
+
+property State0b_0a = Pmax(<> ((clk >= clkUpper) && (pstate == 1) && (state == 0)));
+property State0b_0b = Pmax(<> ((clk >= clkUpper) && (pstate == 1) && (state == 1)));
+property State0b_1a = Pmax(<> ((clk >= clkUpper) && (pstate == 1) && (state == 2)));
+property State0b_1b = Pmax(<> ((clk >= clkUpper) && (pstate == 1) && (state == 3)));
+property State0b_2a = Pmax(<> ((clk >= clkUpper) && (pstate == 1) && (state == 4)));
+property State0b_2b = Pmax(<> ((clk >= clkUpper) && (pstate == 1) && (state == 5)));
+property State0b_3a = Pmax(<> ((clk >= clkUpper) && (pstate == 1) && (state == 6)));
+
+property State1a_0a = Pmax(<> ((clk >= clkUpper) && (pstate == 2) && (state == 0)));
+property State1a_0b = Pmax(<> ((clk >= clkUpper) && (pstate == 2) && (state == 1)));
+property State1a_1a = Pmax(<> ((clk >= clkUpper) && (pstate == 2) && (state == 2)));
+property State1a_1b = Pmax(<> ((clk >= clkUpper) && (pstate == 2) && (state == 3)));
+property State1a_2a = Pmax(<> ((clk >= clkUpper) && (pstate == 2) && (state == 4)));
+property State1a_2b = Pmax(<> ((clk >= clkUpper) && (pstate == 2) && (state == 5)));
+property State1a_3a = Pmax(<> ((clk >= clkUpper) && (pstate == 2) && (state == 6)));
+
+property State1b_0a = Pmax(<> ((clk >= clkUpper) && (pstate == 3) && (state == 0)));
+property State1b_0b = Pmax(<> ((clk >= clkUpper) && (pstate == 3) && (state == 1)));
+property State1b_1a = Pmax(<> ((clk >= clkUpper) && (pstate == 3) && (state == 2)));
+property State1b_1b = Pmax(<> ((clk >= clkUpper) && (pstate == 3) && (state == 3)));
+property State1b_2a = Pmax(<> ((clk >= clkUpper) && (pstate == 3) && (state == 4)));
+property State1b_2b = Pmax(<> ((clk >= clkUpper) && (pstate == 3) && (state == 5)));
+property State1b_3a = Pmax(<> ((clk >= clkUpper) && (pstate == 3) && (state == 6)));
+
+property State2a_0a = Pmax(<> ((clk >= clkUpper) && (pstate == 4) && (state == 0)));
+property State2a_0b = Pmax(<> ((clk >= clkUpper) && (pstate == 4) && (state == 1)));
+property State2a_1a = Pmax(<> ((clk >= clkUpper) && (pstate == 4) && (state == 2)));
+property State2a_1b = Pmax(<> ((clk >= clkUpper) && (pstate == 4) && (state == 3)));
+property State2a_2a = Pmax(<> ((clk >= clkUpper) && (pstate == 4) && (state == 4)));
+property State2a_2b = Pmax(<> ((clk >= clkUpper) && (pstate == 4) && (state == 5)));
+property State2a_3a = Pmax(<> ((clk >= clkUpper) && (pstate == 4) && (state == 6)));
+
+property State2b_0a = Pmax(<> ((clk >= clkUpper) && (pstate == 5) && (state == 0)));
+property State2b_0b = Pmax(<> ((clk >= clkUpper) && (pstate == 5) && (state == 1)));
+property State2b_1a = Pmax(<> ((clk >= clkUpper) && (pstate == 5) && (state == 2)));
+property State2b_1b = Pmax(<> ((clk >= clkUpper) && (pstate == 5) && (state == 3)));
+property State2b_2a = Pmax(<> ((clk >= clkUpper) && (pstate == 5) && (state == 4)));
+property State2b_2b = Pmax(<> ((clk >= clkUpper) && (pstate == 5) && (state == 5)));
+property State2b_3a = Pmax(<> ((clk >= clkUpper) && (pstate == 5) && (state == 6)));
+
+property State3a_0a = Pmax(<> ((clk >= clkUpper) && (pstate == 6) && (state == 0)));
+property State3a_0b = Pmax(<> ((clk >= clkUpper) && (pstate == 6) && (state == 1)));
+property State3a_1a = Pmax(<> ((clk >= clkUpper) && (pstate == 6) && (state == 2)));
+property State3a_1b = Pmax(<> ((clk >= clkUpper) && (pstate == 6) && (state == 3)));
+property State3a_2a = Pmax(<> ((clk >= clkUpper) && (pstate == 6) && (state == 4)));
+property State3a_2b = Pmax(<> ((clk >= clkUpper) && (pstate == 6) && (state == 5)));
+property State3a_3a = Pmax(<> ((clk >= clkUpper) && (pstate == 6) && (state == 6)));
+
+
+//property Runs1 = Pmax(<> (optimalRuns == 1));		//Probablility that there was at least 1 cycle where all buffers were serviced
+//property Runs2 = Pmax(<> (optimalRuns == 2));		//Probablility that there was at least 2 cycles where all buffers were serviced
+//property Runs3 = Pmax(<> (optimalRuns == 3));		//Probablility that there was at least 3 cycles where all buffers were serviced
+//property Runs4 = Pmax(<> (optimalRuns == 4));		//Probablility that there was at least 4 cycles where all buffers were serviced
+//property Runs5 = Pmax(<> (optimalRuns == 5));		//Probablility that there was at least 5 cycles where all buffers were serviced
+// ------ End: properties ---------
+
+process Clock(){	
+	/*
+	do {
+	tick
+	}
+	*/
+	tick {= clk++ =};
+	if (clk <= clkUpper) {
+	   Clock()
+	}
+	else {
+	   stop
+	}   
+	
+}
+
+
+//Main process for the arbiter -------------------------------------------------------------------------------------------------------------------------------------------------
+process Arbiter(){
+	initialize();
+	
+	//runtime loop
+	do {
+		//Service buffers-------------------------------------------------------------------------------------------------------
+		
+		//Buffer priority 0
+		//<Service Buffer a[0]>--------------------------------------------------------
+		{= 
+		a[0].timesServiced++,
+		a[0].serviced = true 
+		=};
+		
+		//<Service buffer <a[1]> ------------------------------------------------------
+		if( a[1].val == a[0].val) {			//If buffer a[1] conflicts with a[0]
+			{= 
+			a[1].serviced = false,
+			unserviced++ 		//Increment unserviced
+			=}
+		}
+		else {
+			{= 
+			a[1].timesServiced++,		//Service Buffer
+			a[1].serviced = true 
+			=}
+		};
+		
+		//<Service buffer a[2]> --------------------------------------------------------
+		//If buffer a[2] conflicts with a[1] or a[0]
+		if(a[2].val == a[1].val || a[2].val == a[0].val){	
+			{= 
+			a[2].serviced = false, 
+			unserviced++			//Increment unserviced
+			=}
+		}
+		else {
+			{= 
+			a[2].timesServiced++,		//Service Buffer
+			a[2].serviced = true 
+			=}
+		};
+		
+		//<Service buffer a[3]> ---------------------------------------------------------
+		//If buffer a[3] conflicts with a[2], a[1], or a[0]
+		if( a[3].val == a[2].val || a[3].val == a[1].val || a[3].val == a[0].val){	
+			{= 
+			a[3].serviced = false,
+			unserviced++ 			//Increment unserviced
+			=}
+		}
+		else {
+			{= 
+			a[3].timesServiced++,		//Service Buffer
+			a[3].serviced = true 
+			=}
+		};
+		
+		/*
+		{= 
+		totalUnserviced = unserviced,
+		totalServiced = totalServiced + 4 - unserviced
+		=};
+		*/
+		//{= p4state = p3state =};
+		//{= p3state = pPstate =};
+		//{= pPstate = pstate =};
+		{= pstate = state =};
+		
+		//Increment optimal runs if there were no conflitcs -------------------------------------------------------------------
+		//state 0a
+		if (unserviced == 0 && !(a[0].val == a[3].id && a[1].val == a[2].id)){
+			{= 
+			optimalRuns++,
+			totalUnserviced = unserviced,
+			state = 0
+			=}
+		}
+		//state 0b
+		else if(unserviced == 0 && a[0].val == a[3].id && a[1].val == a[2].id){
+			{= 
+			optimalRuns++,
+			totalUnserviced = unserviced,
+			state = 1
+			=}
+		}
+		//state 1a
+		else if(unserviced == 1 && !(a[0].val == a[3].id && a[1].val == a[2].id)){
+			{= 
+			totalUnserviced = unserviced,
+			state = 2
+			=}
+		}
+		//state 1b
+		else if(unserviced == 1 && a[0].val == a[3].id && a[1].val == a[2].id){
+			{= 
+			totalUnserviced = unserviced,
+			state = 3
+			=}
+		}
+		//state 2a
+		else if(unserviced == 2 && !((a[0].val == a[1].val && a[1].val == a[2].val) || (a[0].val == a[1].val && a[1].val == a[3].val) || (a[0].val == a[2].val && a[2].val == a[3].val)|| (a[1].val == a[2].val && a[2].val == a[3].val)) && !(a[0].val == a[3].id && a[1].val == a[2].id)){
+			{= 
+			totalUnserviced = unserviced,
+			state = 4
+			=}
+		}
+		//state 2b
+		else if(a[0].val == a[3].id && a[1].val == a[2].id && a[2].val == a[3].id && a[3].val == a[2].id){ //unserviced == 2 && !((a[0].val == a[1].val && a[1].val == a[2].val) || (a[0].val == a[1].val && a[1].val == a[3].val) || (a[0].val == a[2].val && a[2].val == a[3].val)|| (a[1].val == a[2].val && a[2].val == a[3].val)) && a[0].val == a[3].id && a[1].val == a[2].id){
+			{= 
+			totalUnserviced = unserviced,
+			state = 5
+			=}
+		}
+		//state 3a
+		else if(unserviced == 2 && ((a[0].val == a[1].val && a[1].val == a[2].val) || (a[0].val == a[1].val && a[1].val == a[3].val) || (a[0].val == a[2].val && a[2].val == a[3].val)|| (a[1].val == a[2].val && a[2].val == a[3].val)) && !(a[0].val == a[3].id && a[1].val == a[2].id)){
+			{= 
+			totalUnserviced = unserviced,
+			state = 6
+			=}
+		}
+		//error checking
+		else{
+			{= 
+			totalUnserviced = unserviced,
+			state = 7
+			=}
+		};
+		
+		//Set priority values for the next run and update the value of the buffers----------------------------------------------
+		setPriority(0);
+		setPriority(1);
+		setPriority(2);
+		setPriority(3);
+		
+		
+		/*
+		if ((a[0].val == a[1].val) && totalUnserviced == 2) {
+			{= tri = true =}
+		}
+		else {tau};
+		*/
+		
+		
+		//Rewrite buffer array with new priority values-------------------------------------------------------------------------
+		{= 
+		temp[a[0].priority] = a[0],
+		temp[a[1].priority] = a[1],
+		temp[a[2].priority] = a[2],
+		temp[a[3].priority] = a[3] 
+		=};
+		
+		tick {= a = temp =};
+		
+		
+		if (clk >= clkUpper) {
+			stop
+		}
+		else {
+			tau
+		}
+		
+		
+	}
+}
+
+//initialize values -------------------------------------------------------------------------------------------------------------------------------------------------------------
+process initialize(){
+	{= 
+	a = [north, east, south, west],
+	temp = [north, east, south, west], 
+	
+	a[0].id = 0, 
+	a[1].id = 1, 
+	a[2].id = 2, 
+	a[3].id = 3,  
+	
+	
+	a[0].val = DiscreteUniform(1, 3),
+	a[1].val = (DiscreteUniform(1, 3) + 1) % 4,
+	a[2].val = (DiscreteUniform(1, 3) + 2) % 4,
+	a[3].val = DiscreteUniform(0, 2),
+	
+	
+	unserviced = 0
+	=}
+
+	
+}
+
+//Sets the new priority value of buffer a[i] and updates the value if the buffer was serviced ------------------------------------------------------------------------------------
+process setPriority(int i){
+	if (a[i].serviced == true){
+		{= 
+		a[i].val = (DiscreteUniform(1, 3) + a[i].id) % 4,	//Update value	
+		a[i].priority = i + unserviced 						//Set new priority
+		=}
+		//<update buffer value and dequeue buffer>
+	}
+	else {
+		{= 
+		a[i].priority = totalUnserviced - unserviced,		//Set new priority
+		unserviced-- 						//decrement unserviced
+		=}
+	}
+}
+
+
+par{
+::	Clock()
+::	Arbiter()
+}
