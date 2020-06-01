@@ -128,16 +128,51 @@
 
 ;; Assertation (B)
 (define-fun B () Bool 
-	(or
+	(and 
 		(or
-			(and (and a10_1 a20_1) a30_1)
-			(and (and a01_1 a21_1) a31_1)
+			(and (and a02 a12) (and a20 a30))
+			(or
+				(and (and a02 a12) (and a21 a31))
+				(or
+					(and (and a03 a13) (and a20 a30))
+					(or
+						(and (and a03 a13) (and a21 a31))
+						(or	
+							(and (and a01 a10) (and a21 a30))
+							(or
+								(and (and a01 a12) (and a21 a32))
+								(or
+									(and (and a03 a10) (and a23 a30))
+									(or
+										(and (and a03 a12) (and a23 a32))
+										(or
+											(and (and a01 a10) (and a20 a31))
+											(or
+												(and (and a01 a13) (and a23 a31))
+												(or
+													(and (and a02 a10) (and a20 a32))
+													(and (and a02 a13) (and a23 a32))
+												)
+											)
+										)
+									)
+								)
+							)
+						)
+					)
+				)
+			)
 		)
 		(or
-			(and (and a02_1 a12_1) a32_1)
-			(and (and a03_1 a13_1) a23_1)
-		)
-	)	
+			(or
+				(and (and a10_1 a20_1) a30_1)
+				(and (and a01_1 a21_1) a31_1)
+			)
+			(or
+				(and (and a02_1 a12_1) a32_1)
+				(and (and a03_1 a13_1) a23_1)
+			)
+		)	
 )
 ;; use annotation :interpolation-group to partition the input problem into
 ;; several groups
