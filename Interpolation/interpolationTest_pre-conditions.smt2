@@ -172,7 +172,8 @@
 				(and (and a02_1 a12_1) a32_1)
 				(and (and a03_1 a13_1) a23_1)
 			)
-		)	
+		)
+	)	
 )
 ;; use annotation :interpolation-group to partition the input problem into
 ;; several groups
