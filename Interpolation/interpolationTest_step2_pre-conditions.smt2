@@ -129,6 +129,8 @@
 ;; Assertation (B)
 (define-fun B () Bool 
 	(and 
+	;;state 2b
+		(and
 		(or
 			(and (and a02 a12) (and a20 a30))
 			(or
@@ -163,6 +165,9 @@
 				)
 			)
 		)
+		(and a03 a12)
+		)
+		;;state 3a
 		(or
 			(or
 				(and (and a10_1 a20_1) a30_1)
@@ -172,8 +177,8 @@
 				(and (and a02_1 a12_1) a32_1)
 				(and (and a03_1 a13_1) a23_1)
 			)
-		)
-	)	
+		)	
+	)
 )
 ;; use annotation :interpolation-group to partition the input problem into
 ;; several groups
