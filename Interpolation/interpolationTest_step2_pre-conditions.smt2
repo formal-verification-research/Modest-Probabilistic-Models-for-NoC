@@ -129,7 +129,8 @@
 ;; Assertation (B)
 (define-fun B () Bool 
 	(and 
-	;;state 2
+	;;state 2b
+		(and
 		(or
 			(and (and a02 a12) (and a20 a30))
 			(or
@@ -164,7 +165,9 @@
 				)
 			)
 		)
-		;;state 3
+		(and a03 a12)
+		)
+		;;state 3a
 		(or
 			(or
 				(and (and a10_1 a20_1) a30_1)
