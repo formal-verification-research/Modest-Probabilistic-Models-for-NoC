@@ -36,7 +36,9 @@
 (declare-fun a32_1 () Bool) ;; a[3].val = a[2].id
 
 ;;Inherit properties of the model
+;;The value in a buffer can only equal one id.
 (define-fun P0_0 () Bool 
+
 	(or 
 		(or 
 			(and (and a01 (not a02)) (not a03)) 
@@ -128,12 +130,12 @@
 (define-fun B () Bool 
 	(or
 		(or
-			(and (and a10 a20) a30)
-			(and (and a01 a21) a31)
+			(and (and a10_1 a20_1) a30_1)
+			(and (and a01_1 a21_1) a31_1)
 		)
 		(or
-			(and (and a02 a12) a32)
-			(and (and a03 a13) a23)
+			(and (and a02_1 a12_1) a32_1)
+			(and (and a03_1 a13_1) a23_1)
 		)
 	)	
 )
