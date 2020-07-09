@@ -14,8 +14,9 @@ const int OPTIMALRUNSMEASURE = 4;
 const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
+const int DUR;
 const int clkLower = 100; 
-const int clkUpper = 105;
+const int clkUpper = clkLower + DUR;
 int(clkLower..clkUpper) clk;
 //transient int(0..1) clk;
 

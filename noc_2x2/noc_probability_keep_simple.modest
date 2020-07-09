@@ -111,8 +111,7 @@ process subPopulate(int routerID){
 	else {tau};
 	if(noc[routerID].localB2 == false){
 		{= 	noc[routerID].localB2 = noc[routerID].localB3,
-			noc[routerID].localB3 = noc[routerID].localB4,
-			noc[routerID].localB4 = false
+			noc[routerID].localB3 = noc[routerID].localB4
 		=}
 	}
 	else {tau};
@@ -133,8 +132,7 @@ process subPopulate(int routerID){
 	else {tau};
 	if(noc[routerID].ewB2 == false){
 		{= 	noc[routerID].ewB2 = noc[routerID].ewB3,
-			noc[routerID].ewB3 = noc[routerID].ewB4,
-			noc[routerID].ewB4 = false
+			noc[routerID].ewB3 = noc[routerID].ewB4
 		=}
 	}
 	else {tau};
@@ -155,8 +153,7 @@ process subPopulate(int routerID){
 	else {tau};
 	if(noc[routerID].nsB2 == false){
 		{= 	noc[routerID].nsB2 = noc[routerID].nsB3,
-			noc[routerID].nsB3 = noc[routerID].nsB4,
-			noc[routerID].nsB4 = false
+			noc[routerID].nsB3 = noc[routerID].nsB4
 		=}
 	}
 	else {tau};
