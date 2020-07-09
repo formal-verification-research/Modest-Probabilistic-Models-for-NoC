@@ -1,5 +1,8 @@
 ;; activate interpolation
-(set-option :produce-interpolants true)
+;;(set-option :produce-interpolants true)
+
+;;activate model production
+(set-option :produce-models true)
 
 ;;Variables
 (declare-fun a01 () Bool) ;; a[0].val = a[1].id
@@ -113,16 +116,16 @@
 )
 
 ;;Clock cycle t=0
-(define-fun C0_state2 () Bool 
+(define-fun C0_state3a () Bool 
 	(and 
-		(and a02 a12)
-		(and a20 a30)
+		(and a03 a13)
+		(and a23 a30)
 	)
 )
 
 ;;Clock cycle t=1
 (define-fun C1_1 () Bool
-	(and a03_1 a12_1)
+	(and a03_1 a13_1)
 )
 
 
@@ -130,37 +133,13 @@
 (define-fun B () Bool 
 	(and 
 		(or
-			(and (and a02 a12) (and a20 a30))
 			(or
-				(and (and a02 a12) (and a21 a31))
-				(or
-					(and (and a03 a13) (and a20 a30))
-					(or
-						(and (and a03 a13) (and a21 a31))
-						(or	
-							(and (and a01 a10) (and a21 a30))
-							(or
-								(and (and a01 a12) (and a21 a32))
-								(or
-									(and (and a03 a10) (and a23 a30))
-									(or
-										(and (and a03 a12) (and a23 a32))
-										(or
-											(and (and a01 a10) (and a20 a31))
-											(or
-												(and (and a01 a13) (and a23 a31))
-												(or
-													(and (and a02 a10) (and a20 a32))
-													(and (and a02 a13) (and a23 a32))
-												)
-											)
-										)
-									)
-								)
-							)
-						)
-					)
-				)
+				(and (and a10 a20) a30)
+				(and (and a01 a21) a31)
+			)
+			(or
+				(and (and a02 a12) a32)
+				(and (and a03 a13) a23)
 			)
 		)
 		(or
@@ -187,7 +166,7 @@
 (assert (! P2_1 :interpolation-group g2_1))
 (assert (! P3_1 :interpolation-group g3_1))
 
-(assert (! C0_state2 :interpolation-group gc0_2))
+(assert (! C0_state3a :interpolation-group gc0_2))
 (assert (! C1_1 :interpolation-group gc1))
 
 
@@ -195,10 +174,12 @@
 
 (check-sat)
 
+(get-value (a01_1 a02_1 a03_1 a10_1 a12_1 a13_1 a20_1 a21_1 a23_1 a30_1 a31_1 a32_1))
+
 ;; compute an interpolant for the given partition: the argument to
 ;; get-interpolant is a list of groups forming the A-part of the interpolation
 ;; problem
 
-(get-interpolant (g0_0 g1_0 g2_0 g3_0 g0_1 g1_1 g2_1 g3_1 gc0_2 gc1))
+;;(get-interpolant (g0_0 g1_0 g2_0 g3_0 g0_1 g1_1 g2_1 g3_1 gc0_2 gc1))
 
 (exit)
