@@ -1,7 +1,7 @@
 import os
 import re
 
-probabilityFormat = re.compile('\d.\d*')
+probabilityRegex = re.compile(r'(\d\.\d+|0)\n')
 
 probabilityTable = {
         "0" : [(1/9), (4/27), (16/81), (20/81), (1/27), (1/9), (1/27), (1/81), (2/81), (2/81), (1/81), (1/81), (2/81)],
@@ -21,86 +21,86 @@ probabilityTable = {
 
 stateTable = {
 	"1000" : "4",
-	"1030" : "1a",
-	"1210" : "1b",
-	"1300" : "1a",
-	"1330" : "1c",
-	"2010" : "1a",
-	"2200" : "2c",
-	"2230" : "1b",
+	"1030" : "1",
+	"1210" : "2",
+	"1300" : "1",
+	"1330" : "3",
+	"2010" : "1",
+	"2200" : "8",
+	"2230" : "2",
 	"2310" : "0",
-	"3000" : "3a",
-	"3030" : "2d",
+	"3000" : "4",
+	"3030" : "9",
         "3210" : "0",
-	"3300" : "2d",
-	"3330" : "3b",
-	"1001" : "2b",
-	"1031" : "1b",
-	"1211" : "3b",
-	"1301" : "1b",
-	"1331" : "2c",
-	"2011" : "1b",
-	"2201" : "1b",
-	"2231" : "1b",
-	"2311" : "1b",
-	"3001" : "1a",
-	"3031" : "1c",
-	"3211" : "1b",
-	"3301" : "1c",
-	"3331" : "3b",
-	"1002" : "1a",
+	"3300" : "9",
+	"3330" : "5",
+	"1001" : "7",
+	"1031" : "2",
+	"1211" : "5",
+	"1301" : "2",
+	"1331" : "10",
+	"2011" : "2",
+	"2201" : "2",
+	"2231" : "2",
+	"2311" : "2",
+	"3001" : "1",
+	"3031" : "3",
+	"3211" : "2",
+	"3301" : "3",
+	"3331" : "5",
+	"1002" : "1",
 	"1032" : "0",
-	"1212" : "2g",
+	"1212" : "12",
 	"1302" : "0",
-	"1332" : "1c",
-	"2012" : "1c",
-	"2202" : "3b",
-	"2232" : "3b",
-	"2312" : "1c",
-	"3002" : "1a",
-	"3032" : "1c",
-	"3212" : "1c",
-	"3302" : "1c",
-	"3332" : "3b",
-	"1010" : "2c",
-	"1200" : "1a",
+	"1332" : "3",
+	"2012" : "3",
+	"2202" : "5",
+	"2232" : "5",
+	"2312" : "3",
+	"3002" : "1",
+	"3032" : "3",
+	"3212" : "3",
+	"3302" : "3",
+	"3332" : "5",
+	"1010" : "8",
+	"1200" : "1",
 	"1230" : "0",
-	"1310" : "1b",
-	"2000" : "3a",
-	"2030" : "1a",
-	"2210" : "1b",
-	"2300" : "1a",
-	"2330" : "1c",
-	"3010" : "1a",
-	"3200" : "1a",
+	"1310" : "2",
+	"2000" : "4",
+	"2030" : "1",
+	"2210" : "2",
+	"2300" : "1",
+	"2330" : "3",
+	"3010" : "1",
+	"3200" : "1",
 	"3230" : "0",
-	"3310" : "1c",
-	"1011" : "3b",
-	"1201" : "1b",
-	"1231" : "1b",
-	"1311" : "3b",
-	"2001" : "1a",
+	"3310" : "3",
+	"1011" : "5",
+	"1201" : "2",
+	"1231" : "2",
+	"1311" : "5",
+	"2001" : "1",
 	"2031" : "0",
-	"2211" : "2g",
+	"2211" : "12",
 	"2301" : "0",
-	"2331" : "1c",
-	"3011" : "1b",
+	"2331" : "3",
+	"3011" : "2",
 	"3201" : "0",
-	"3231" : "1c",
-	"3311" : "2a",
-	"1012" : "1b",
-	"1202" : "1c",
-	"1232" : "1c",
-	"1312" : "1b",
-	"2002" : "2f",
-	"2032" : "1c",
-	"2212" : "3b",
-	"2302" : "1c",
-	"2332" : "2a",
+	"3231" : "3",
+	"3311" : "6",
+	"1012" : "2",
+	"1202" : "3",
+	"1232" : "3",
+	"1312" : "2",
+	"2002" : "11",
+	"2032" : "3",
+	"2212" : "5",
+	"2302" : "3",
+	"2332" : "6",
 	"3012" : "0",
-	"3202" : "1c",
-	"3232" : "2a",
-	"3312" : "1c"
+	"3202" : "3",
+	"3232" : "6",
+	"3312" : "3"
          }
 
 for val0 in range (1,4):
@@ -109,12 +109,40 @@ for val0 in range (1,4):
 		for j in range (1,4):
 			val2 = (j + 2) % 4
 			for val3 in range (0,3):
-				outputFile = "dataFiles/output" + str(val0) + str(val1) + str(val2) + str(val3)
-				command = "mono /home/benjaylew/Modest/mcsta.exe arbiterTest13state.modest -E \"val0=" + str(val0) + ", val1=" + str(val1) + ", val2=" + str(val2) + ", val3=" + str(val3) + "\" -O " + str(outputFile)
-				os.system(command)
-                                dataFile = open(outputFile)
-                                data = dataFile.read()
-                                data = data.split("Probability:")
+                            outputFile = "dataFiles/output" + str(val0) + str(val1) + str(val2) + str(val3)
+                            command = "mono /home/benjaylew/Modest/mcsta.exe arbiterTest13state.modest -E \"val0=" + str(val0) + ", val1=" + str(val1) + ", val2=" + str(val2) + ", val3=" + str(val3) + "\" > " + str(outputFile)
+                            os.system(command)
+                            dataFile = open(outputFile)
+                            probabilityList = []
+                            data = dataFile.read()
+                            data = data.split("Probability:")
+                            for item in data:
+                                match = probabilityRegex.search(item)
+                                if match:
+                                    probabilityList.append(match.group().split('\n')[0])
+                            dataFile.close()
+                            probabilityList = probabilityList[1:13]
+                            
+                            state81 = str(val0) + str(val1) + str(val2) + str(val3)
+                            state = stateTable.get(state81)
+                            abstractProbability = probabilityTable.get(state)
 
-
-
+                            probabilityFile = open("dataFiles/probabilities" + str(val0) + str(val1) + str(val2) + str(val3), "a")
+                            probabilityFile.write(state81)
+                            probabilityFile.write("\n")
+                            for i in range(0, len(probabilityList)):
+                                probabilityFile.write("Abstract probability: ")
+                                probabilityFile.write(str(abstractProbability[i]))
+                                probabilityFile.write("\t Concrete probability: ")
+                                probabilityFile.write(probabilityList[i])
+                                probabilityFile.write("\t Difference:")
+                                probabilityFile.write(str(abstractProbability[i] - float(probabilityList[i])))
+                                probabilityFile.write("\n")
+                            
+                            
+                            #print(probabilityList)
+                            #probabilityFile = open("dataFiles/probabilities" + str(val0) + str(val1) + str(val2) + str(val3), "a")
+                            #for item in data:
+                            #    probabilityFile.write(item)
+                            #    probabilityFile.write("\n")
+                            #probabilityFile.close()
