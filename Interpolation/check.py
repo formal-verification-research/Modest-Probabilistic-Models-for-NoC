@@ -73,7 +73,7 @@ stateTable = {
 	"2330" : "3",
 	"3010" : "1",
 	"3200" : "1",
-	"3230" : "0",
+	"3230" : "3",
 	"3310" : "3",
 	"1011" : "5",
 	"1201" : "2",
@@ -121,7 +121,7 @@ for val0 in range (1,4):
                                 if match:
                                     probabilityList.append(match.group().split('\n')[0])
                             dataFile.close()
-                            probabilityList = probabilityList[1:13]
+                            probabilityList = probabilityList[1:14]
                             
                             state81 = str(val0) + str(val1) + str(val2) + str(val3)
                             state = stateTable.get(state81)
@@ -135,14 +135,20 @@ for val0 in range (1,4):
                                 probabilityFile.write(str(abstractProbability[i]))
                                 probabilityFile.write("\t Concrete probability: ")
                                 probabilityFile.write(probabilityList[i])
-                                probabilityFile.write("\t Difference:")
-                                probabilityFile.write(str(abstractProbability[i] - float(probabilityList[i])))
+                                probabilityFile.write("\t Difference: ")
+                                
+                                difference = abstractProbability[i] - float(probabilityList[i])
+                                probabilityFile.write(str(difference))
                                 probabilityFile.write("\n")
-                            
-                            
-                            #print(probabilityList)
-                            #probabilityFile = open("dataFiles/probabilities" + str(val0) + str(val1) + str(val2) + str(val3), "a")
-                            #for item in data:
-                            #    probabilityFile.write(item)
-                            #    probabilityFile.write("\n")
-                            #probabilityFile.close()
+
+                                if (difference > 0.00000001 or difference < -0.00000001):
+                                    print(state81, end="")
+                                    print("->", end="")
+                                    print(i, end="")
+                                    print("\tAbstract probability: ", end= "")
+                                    print(str(abstractProbability[i]), end="")
+                                    print("\tConcrete probability: ", end="")
+                                    print(probabilityList[i], end="")
+                                    print("\tDifference: ", end="")
+                                    print(difference)
+
