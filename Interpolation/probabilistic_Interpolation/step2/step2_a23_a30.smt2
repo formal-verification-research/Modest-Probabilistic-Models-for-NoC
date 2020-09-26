@@ -115,14 +115,14 @@
 ;;Clock cycle t=0
 (define-fun C0_state2 () Bool 
 	(and 
-		(and a02 a12)
+		(and a03 a13)
 		(and a20 a30)
 	)
 )
 
 ;;Clock cycle t=1
 (define-fun C1_1 () Bool
-	(and (and a03_1 a12_1) (and a23_1 a30_1))
+	(and (and a01_1 a12_1) (and a23_1 a30_1)) ;;Change this line for each iteration
 )
 
 
@@ -130,42 +130,36 @@
 (define-fun B () Bool 
 	(and 
 	;;state 2b
-		(and
 		(or
-			(and (and a02 a12) (and a20 a30))
-			(or
-				(and (and a02 a12) (and a21 a31))
-				(or
-					(and (and a03 a13) (and a20 a30))
-					(or
-						(and (and a03 a13) (and a21 a31))
-						(or	
-							(and (and a01 a10) (and a21 a30))
-							(or
-								(and (and a01 a12) (and a21 a32))
-								(or
-									(and (and a03 a10) (and a23 a30))
-									(or
-										(and (and a03 a12) (and a23 a32))
-										(or
-											(and (and a01 a10) (and a20 a31))
-											(or
-												(and (and a01 a13) (and a23 a31))
-												(or
-													(and (and a02 a10) (and a20 a32))
-													(and (and a02 a13) (and a23 a32))
-												)
-											)
-										)
-									)
-								)
-							)
-						)
-					)
-				)
-			)
+		(and (and a02 a12) (and a21 a31))
+		(or
+		(and (and a03 a13) (and a20 a30))
+		(or
+		(and (and a03 a13) (and a21 a31))
+		(or
+		(and (and a01 a12) (and a21 a32))
+		(or	
+		(and (and a03 a10) (and a23 a30))
+		(or
+		(and (and a03 a12) (and a23 a32))
+		(or
+		(and (and a01 a10) (and a20 a31))
+		(or
+		(and (and a01 a13) (and a23 a31))
+		(or
+		(and (and a02 a10) (and a20 a32))
+		(or
+		(and (and a01 a13) (and a23 a31))
+		(and (and a02 a13) (and a23 a32))
 		)
-		(and a03 a12)
+		)
+		)
+		)
+		)
+		)
+		)
+		)
+		)
 		)
 		;;state 3a
 		(or
