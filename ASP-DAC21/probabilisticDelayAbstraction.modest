@@ -12,7 +12,7 @@ const int clkUpper = clkLower + DUR;
 int(clkLower..clkUpper) clk;
 //transient int(0..1) clk;
 
-int(0..4) optimalRunsIncrement = 0;
+//int(0..4) optimalRunsIncrement = 0;
 
 int(0..10) optimalRuns;
 
@@ -46,8 +46,8 @@ process Clock(){
 	//Clock()
 	
 	
-	tick {= clk++,
-			optimalRuns += optimalRunsIncrement	
+	tick {= clk++//,
+//			optimalRuns += optimalRunsIncrement	
 		=};
 	if (clk <= clkUpper) {
 	   Clock()
@@ -639,7 +639,7 @@ process no_conflict_all(int n){
 	noc[n].a2 = (!(noc[nsChannel(n)].nsB4) && !(noc[ewChannel(n)].ewB4) && noc[n].a2) || (noc[nsChannel(n)].nsB4 && !(noc[ewChannel(n)].ewB4) && noc[n].a1) || (noc[nsChannel(n)].nsB4 && noc[n].a2 && !(noc[n].a3)) || (noc[nsChannel(n)].nsB4 && noc[ewChannel(n)].ewB4 && !(noc[n].a1) && !(noc[n].a2)),
 	noc[n].a3 = !(noc[nsChannel(n)].nsB4) && noc[n].a3,
 	
-	optimalRunsIncrement+= (!noc[ewChannel(n)].ewB4 && !noc[nsChannel(n)].nsB4) ? 1 : 0
+	optimalRuns/*Increment*/+= (!noc[ewChannel(n)].ewB4 && !noc[nsChannel(n)].nsB4) ? 1 : 0
 	
 	=}
 }

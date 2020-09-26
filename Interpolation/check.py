@@ -1,3 +1,21 @@
+<<<<<<< HEAD
+import re
+
+probabilityRegex = re.compile(r'(\d\.\d+)\n')
+
+file = open("testResults/output1000.txt")
+data = file.read()
+dataList = str(data).split("Probability: ")
+finalData = []
+
+for item in dataList:
+    match = probabilityRegex.search(item)
+    if match:
+        print(match)
+        finalData.append(match.group().split('\n')[0])
+
+print(finalData)
+=======
 import os
 import re
 
@@ -152,3 +170,4 @@ for val0 in range (1,4):
                                     print("\tDifference: ", end="")
                                     print(difference)
 
+>>>>>>> 33470b5ad66e4d8fe8b457446d0cf9bf55a0b3fc
