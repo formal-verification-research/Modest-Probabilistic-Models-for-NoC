@@ -499,7 +499,7 @@ process arbiter0(){
 
 				tick palt { 
 				//Local and EW both send to 2	
-				:(1/3): {=	noc[0].ewLockedns = (localNotEmpty(0)) || (!localNotEmpty(0) && nsNotFull(2)),                //The ew buffer gets locked in the ns direction if local is not empty 
+				:(1/3): {=	noc[0].ewLockedns = (localNotEmpty(0)) || (!localNotEmpty(0) && !nsNotFull(2)),                //The ew buffer gets locked in the ns direction if local is not empty 
 							noc[0].localPriority = (localNotEmpty(0) && !nsNotFull(2)) || (!localNotEmpty(0) && nsNotFull(2)),   //Local remains in priority if it is non-empty and is unable to send
 							noc[0].localLockedns = (localNotEmpty(0) && !nsNotFull(2)), // Local gets locked to ns under the same conditions
 							localShouldDec0 = (localNotEmpty1(0))*(nsNotFull1(2)),  	//Local sends the ns direction if it is not empty, and the receiving buffer is not full
@@ -534,7 +534,7 @@ process arbiter0(){
 
 				tick palt { 
 				//Local and EW both send to 2	
-				:(1/6):  {= noc[0].ewLockedns = (localNotEmpty(0)) || (!localNotEmpty(0) && nsNotFull(2)),                //The ew buffer gets locked in the ns direction if local is not empty 
+				:(1/6):  {= noc[0].ewLockedns = (localNotEmpty(0)) || (!localNotEmpty(0) && !nsNotFull(2)),                //The ew buffer gets locked in the ns direction if local is not empty 
 							noc[0].localPriority = (localNotEmpty(0) && !nsNotFull(2)) || (!localNotEmpty(0) && nsNotFull(2)),   //Local remains in priority if it is non-empty and is unable to send
 							noc[0].localLockedns = (localNotEmpty(0) && !nsNotFull(2)), // Local gets locked to ns under the same conditions
 							localShouldDec0 = (localNotEmpty1(0))*(nsNotFull1(2)),  	//Local sends the ns direction if it is not empty, and the receiving buffer is not full
@@ -1483,7 +1483,7 @@ process arbiter1(){
 
 				tick palt { 
 				//Local and EW both send to 2	
-				:(1/3): {=	noc[1].ewLockedns = (localNotEmpty(1)) || (!localNotEmpty(1) && nsNotFull(3)),                 //The ew buffer gets locked in the ns direction if local is not empty 
+				:(1/3): {=	noc[1].ewLockedns = (localNotEmpty(1)) || (!localNotEmpty(1) && !nsNotFull(3)),                 //The ew buffer gets locked in the ns direction if local is not empty 
 							noc[1].localPriority = (localNotEmpty(1) && !nsNotFull(3)) || (!localNotEmpty(1) && nsNotFull(3)),    //Local remains in priority if it is non-empty and is unable to send
 							noc[1].localLockedns = (localNotEmpty(1) && !nsNotFull(3)),  // Local gets locked to ns under the same conditions
 							localShouldDec1 = (localNotEmpty1(1))*(nsNotFull1(3)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
@@ -1518,7 +1518,7 @@ process arbiter1(){
 
 				tick palt { 
 				//Local and EW both send to 2	
-				:(1/6):  {= noc[1].ewLockedns = (localNotEmpty(1)) || (!localNotEmpty(1) && nsNotFull(3)),                 //The ew buffer gets locked in the ns direction if local is not empty 
+				:(1/6):  {= noc[1].ewLockedns = (localNotEmpty(1)) || (!localNotEmpty(1) && !nsNotFull(3)),                 //The ew buffer gets locked in the ns direction if local is not empty 
 							noc[1].localPriority = (localNotEmpty(1) && !nsNotFull(3)) || (!localNotEmpty(1) && nsNotFull(3)),    //Local remains in priority if it is non-empty and is unable to send
 							noc[1].localLockedns = (localNotEmpty(1) && !nsNotFull(3)),  // Local gets locked to ns under the same conditions
 							localShouldDec1 = (localNotEmpty1(1))*(nsNotFull1(3)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
@@ -2467,7 +2467,7 @@ process arbiter2(){
 
 				tick palt { 
 				//Local and EW both send to 2	
-				:(1/3): {= 	noc[2].ewLockedns = (localNotEmpty(2)) || (!localNotEmpty(2) && nsNotFull(0)),                 //The ew buffer gets locked in the ns direction if local is not empty 
+				:(1/3): {= 	noc[2].ewLockedns = (localNotEmpty(2)) || (!localNotEmpty(2) && !nsNotFull(0)),                 //The ew buffer gets locked in the ns direction if local is not empty 
 							noc[2].localPriority = (localNotEmpty(2) && !nsNotFull(0)) || (!localNotEmpty(2) && nsNotFull(0)),    //Local remains in priority if it is non-empty and is unable to send
 							noc[2].localLockedns = (localNotEmpty(2) && !nsNotFull(0)),  // Local gets locked to ns under the same conditions
 							localShouldDec2 = (localNotEmpty1(2))*(nsNotFull1(0)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
@@ -2502,7 +2502,7 @@ process arbiter2(){
 
 				tick palt { 
 				//Local and EW both send to 2	
-				:(1/6):  {=  noc[2].ewLockedns = (localNotEmpty(2)) || (!localNotEmpty(2) && nsNotFull(0)),                 //The ew buffer gets locked in the ns direction if local is not empty 
+				:(1/6):  {=  noc[2].ewLockedns = (localNotEmpty(2)) || (!localNotEmpty(2) && !nsNotFull(0)),                 //The ew buffer gets locked in the ns direction if local is not empty 
 							noc[2].localPriority = (localNotEmpty(2) && !nsNotFull(0)) || (!localNotEmpty(2) && nsNotFull(0)),    //Local remains in priority if it is non-empty and is unable to send
 							noc[2].localLockedns = (localNotEmpty(2) && !nsNotFull(0)),  // Local gets locked to ns under the same conditions
 							localShouldDec2 = (localNotEmpty1(2))*(nsNotFull1(0)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
@@ -3451,7 +3451,7 @@ process arbiter3(){
 
 				tick palt { 
 				//Local and EW both send to 2	
-				:(1/3): {= 	noc[3].ewLockedns = (localNotEmpty(3)) || (!localNotEmpty(3) && nsNotFull(1)),                 //The ew buffer gets locked in the ns direction if local is not empty 
+				:(1/3): {= 	noc[3].ewLockedns = (localNotEmpty(3)) || (!localNotEmpty(3) && !nsNotFull(1)),                 //The ew buffer gets locked in the ns direction if local is not empty 
 							noc[3].localPriority = (localNotEmpty(3) && !nsNotFull(1)) || (!localNotEmpty(3) && nsNotFull(1)),    //Local remains in priority if it is non-empty and is unable to send
 							noc[3].localLockedns = (localNotEmpty(3) && !nsNotFull(1)),  // Local gets locked to ns under the same conditions
 							localShouldDec3 = (localNotEmpty1(3))*(nsNotFull1(1)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
@@ -3486,7 +3486,7 @@ process arbiter3(){
 
 				tick palt { 
 				//Local and EW both send to 2	
-				:(1/6):  {=  noc[3].ewLockedns = (localNotEmpty(3)) || (!localNotEmpty(3) && nsNotFull(1)),                 //The ew buffer gets locked in the ns direction if local is not empty 
+				:(1/6):  {=  noc[3].ewLockedns = (localNotEmpty(3)) || (!localNotEmpty(3) && !nsNotFull(1)),                 //The ew buffer gets locked in the ns direction if local is not empty 
 							noc[3].localPriority = (localNotEmpty(3) && !nsNotFull(1)) || (!localNotEmpty(3) && nsNotFull(1)),    //Local remains in priority if it is non-empty and is unable to send
 							noc[3].localLockedns = (localNotEmpty(3) && !nsNotFull(1)),  // Local gets locked to ns under the same conditions
 							localShouldDec3 = (localNotEmpty1(3))*(nsNotFull1(1)),   	//Local sends the ns direction if it is not empty,  and the receiving buffer is not full
