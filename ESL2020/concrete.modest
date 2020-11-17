@@ -245,7 +245,9 @@ process Arbiter_corner(int routerID){
 		{=
 			noc[routerID].ewPos = noc[routerID].channelArray[noc[routerID].ewPos].priority,
 			noc[routerID].nsPos = noc[routerID].channelArray[noc[routerID].nsPos].priority,
-			noc[routerID].localPos = noc[routerID].channelArray[noc[routerID].localPos].priority
+			noc[routerID].localPos = noc[routerID].channelArray[noc[routerID].localPos].priority,
+			
+			noc[routerID.totalUnserviced = 0			//reset Total Unserviced to 0 for next cycle
 		=};
 		
 		
@@ -261,7 +263,7 @@ process Arbiter_corner(int routerID){
 		//noc[routerID].bufferID[noc[routerID].channelArray[2].id] = noc[routerID].channelArray[2].priority
 		=};
 		
-		{= noc[routerID].channelArray = noc[routerID].temp =}
+		{= noc[routerID].channelArray = noc[routerID].temp=}
 		
 		
 }
