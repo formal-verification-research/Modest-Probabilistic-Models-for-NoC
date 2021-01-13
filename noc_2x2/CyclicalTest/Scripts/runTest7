@@ -1,0 +1,12 @@
+#!/bin/bash
+
+for loc0 in 'true false'; do
+    for ns0 in 'true false'; do
+        for loc1 in 'true false'; do
+            for ns1 in 'true false'; do
+                for loc2 in 'true false'; do
+                    for ns2 in 'true false'; do
+                        for loc3 in 'true false'; do
+                            for ns3 in 'true false'; do
+                                mcsta ../CyclicalTest.modest -E "DUR = 10, Mvar = 3, Nvar = 7, Startvar = 0, NSPRI0 = $ns0, LOCPRI0 = $loc0, NSPRI1 = $ns1, \
+                                LOCPRI1 = $loc1, NSPRI2 = $ns2, LOCPRI2 = $loc2, NSPRI3 = $ns3, LOCPRI3 = $loc3" --unsafe -O Results/7$loc0$ns0$loc1$ns1$loc2$ns2$loc3$ns3.txt Minimal --props PROPERTIES
