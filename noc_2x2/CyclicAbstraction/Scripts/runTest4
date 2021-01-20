@@ -1,0 +1,20 @@
+#!/bin/bash
+
+for loc0 in 'true false'; do
+    for ns0 in 'true false'; do
+        for loc1 in 'true false'; do
+            for ns1 in 'true false'; do
+                for loc2 in 'true false'; do
+                    for ns2 in 'true false'; do
+                        for loc3 in 'true false'; do
+                            for ns3 in 'true false'; do
+                                mcsta ../CyclicalTest.modest -E "DUR = 10, Mvar = 3, Nvar = 7, Startvar = 0, NSPRI0 = $ns0, LOCPRI0 = $loc0, NSPRI1 = $ns1, \
+                                LOCPRI1 = $loc1, NSPRI2 = $ns2, LOCPRI2 = $loc2, NSPRI3 = $ns3, LOCPRI3 = $loc3" --unsafe -O Results/4$loc0$ns0$loc1$ns1$loc2$ns2$loc3$ns3.txt Minimal --props "p252, p253, p254, p255, p256, p257, p258, p259, p260, p261, p262, p263, p264, p265, p266, p267, p268, p269, p270, p271, p272, p273, p274, p275, p276, p277, p278, p279, p280, p281, p282, p283, p284, p285, p286, p287, p288, p289, p290, p291, p292, p293, p294, p295, p296, p297, p298, p299, p300, p301, p302, p303, p304, p305, p306, p307, p308, p309, p310, p311, p312, p313, p314"
+                            done
+                        done
+                    done
+                done
+            done
+        done
+    done
+done
