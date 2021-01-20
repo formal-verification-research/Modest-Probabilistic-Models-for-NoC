@@ -9,4 +9,12 @@ for loc0 in 'true false'; do
                         for loc3 in 'true false'; do
                             for ns3 in 'true false'; do
                                 mcsta ../CyclicalTest.modest -E "DUR = 10, Mvar = 3, Nvar = 7, Startvar = 0, NSPRI0 = $ns0, LOCPRI0 = $loc0, NSPRI1 = $ns1, \
-                                LOCPRI1 = $loc1, NSPRI2 = $ns2, LOCPRI2 = $loc2, NSPRI3 = $ns3, LOCPRI3 = $loc3" --unsafe -O Results/7$loc0$ns0$loc1$ns1$loc2$ns2$loc3$ns3.txt Minimal --props PROPERTIES
+                                LOCPRI1 = $loc1, NSPRI2 = $ns2, LOCPRI2 = $loc2, NSPRI3 = $ns3, LOCPRI3 = $loc3" --unsafe -O Results/7$loc0$ns0$loc1$ns1$loc2$ns2$loc3$ns3.txt Minimal --props "p441, p442, p443, p444, p445, p446, p447, p448, p449, p450, p451, p452, p453, p454, p455, p456, p457, p458, p459, p460, p461, p462, p463, p464, p465, p466, p467, p468, p469, p470, p471, p472, p473, p474, p475, p476, p477, p478, p479, p480, p481, p482, p483, p484, p485, p486, p487, p488, p489, p490, p491, p492, p493, p494, p495, p496, p497, p498, p499, p500, p501, p502, p503"
+                            done
+                        done
+                    done
+                done
+            done
+        done
+    done
+done
