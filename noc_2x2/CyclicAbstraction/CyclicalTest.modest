@@ -184,7 +184,7 @@ property p1 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 16));
 property p1 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 17));
 property p1 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 18));
 property p1 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 19));
-property p1 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 20)); */
+property p1 = Pmax(<>[S(clk2) <= DUR] ((optimalRuns) >= 20)); 
 
 property p0 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns >= 1) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
                                     && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
@@ -3257,7 +3257,776 @@ property p1022 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns >= 3) && ((noc[0
 
 property p1023 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns >= 4) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
                                     && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+*/
 
+
+property p1024 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1025 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1026 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1027 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1028 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1029 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1030 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1031 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1032 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1033 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1034 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1035 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1036 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1037 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1038 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1039 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1040 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1041 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1042 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1043 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1044 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1045 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1046 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1047 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1048 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1049 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1050 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1051 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1052 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1053 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1054 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1055 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1056 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1057 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1058 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1059 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1060 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1061 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1062 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1063 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1064 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1065 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1066 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1067 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1068 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1069 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1070 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1071 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1072 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1073 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1074 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1075 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1076 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1077 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1078 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1079 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1080 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1081 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1082 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1083 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1084 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1085 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1086 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1087 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1088 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1089 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1090 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1091 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1092 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1093 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1094 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1095 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1096 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1097 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1098 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1099 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1100 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1101 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1102 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1103 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1104 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1105 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1106 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1107 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1108 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1109 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1110 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1111 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1112 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1113 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1114 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1115 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1116 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1117 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1118 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1119 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1120 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1121 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1122 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1123 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1124 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1125 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1126 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1127 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1128 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1129 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1130 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1131 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1132 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1133 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1134 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1135 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1136 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1137 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1138 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1139 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1140 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1141 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1142 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1143 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1144 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1145 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1146 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1147 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1148 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1149 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1150 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1151 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == true) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1152 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1153 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1154 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1155 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1156 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1157 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1158 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1159 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1160 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1161 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1162 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1163 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1164 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1165 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1166 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1167 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1168 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1169 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1170 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1171 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1172 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1173 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1174 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1175 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1176 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1177 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1178 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1179 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1180 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1181 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1182 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1183 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1184 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1185 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1186 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1187 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1188 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1189 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1190 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1191 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1192 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1193 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1194 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1195 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1196 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1197 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1198 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1199 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1200 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1201 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1202 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1203 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1204 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1205 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1206 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1207 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1208 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1209 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1210 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1211 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1212 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1213 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1214 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1215 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == true) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1216 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1217 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1218 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1219 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1220 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1221 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1222 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1223 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1224 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1225 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1226 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1227 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1228 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1229 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1230 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1231 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1232 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1233 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1234 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1235 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1236 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1237 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1238 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1239 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1240 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1241 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1242 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1243 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1244 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1245 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1246 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1247 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == true) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1248 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1249 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1250 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1251 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1252 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1253 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1254 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1255 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1256 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1257 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1258 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1259 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1260 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1261 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1262 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1263 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == true) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1264 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1265 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1266 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1267 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1268 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1269 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1270 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1271 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == true) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1272 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1273 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1274 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1275 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == true) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
+
+property p1276 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == true))));
+
+property p1277 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == true) && (noc[3].nsPriority == false))));
+
+property p1278 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == true))));
+
+property p1279 = Pmax(<>[S(clk2) <= 10] (clk==0 && (optimalRuns == 0) && ((noc[0].localPriority == false) && (noc[0].nsPriority == false) && (noc[1].localPriority == false) 
+                                && (noc[1].nsPriority == false) && (noc[2].localPriority == false) && (noc[2].nsPriority == false) && (noc[3].localPriority == false) && (noc[3].nsPriority == false))));
 
 // ------ End: properties ---------
 
