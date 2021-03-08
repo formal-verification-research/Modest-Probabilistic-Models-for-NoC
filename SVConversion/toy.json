@@ -1,0 +1,252 @@
+﻿{
+	"jani-version": 1,
+	"name": "toy",
+	"type": "dtmc",
+	"actions": [ {
+		"name": "tick"
+	} ],
+	"variables": [
+		{
+			"name": "x",
+			"type": "int",
+			"initial-value": 0
+		},
+		{
+			"name": "y",
+			"type": "int",
+			"initial-value": 0
+		},
+		{
+			"name": "z",
+			"type": "int",
+			"initial-value": 0
+		},
+		{
+			"name": "clk",
+			"type": "int",
+			"initial-value": 0
+		}
+	],
+	"automata": [
+		{
+			"name": "Top",
+			"locations": [
+				{
+					"name": "loc_1"
+				},
+				{
+					"name": "loc_8"
+				},
+				{
+					"name": "loc_10"
+				},
+				{
+					"name": "loc_12"
+				}
+			],
+			"initial-locations": [ "loc_1" ],
+			"edges": [
+				{
+					"location": "loc_1",
+					"guard": {
+						"exp": {
+							"op": "=",
+							"left": "x",
+							"right": "y"
+						}
+					},
+					"destinations": [ {
+						"location": "loc_8",
+						"assignments": [ {
+							"ref": "z",
+							"value": {
+								"op": "+",
+								"left": "z",
+								"right": 1
+							}
+						} ]
+					} ]
+				},
+				{
+					"location": "loc_1",
+					"guard": {
+						"exp": {
+							"op": "≠",
+							"left": "x",
+							"right": "y"
+						}
+					},
+					"destinations": [ {
+						"location": "loc_8"
+					} ]
+				},
+				{
+					"location": "loc_8",
+					"destinations": [
+						{
+							"location": "loc_10",
+							"probability": {
+								"exp": {
+									"op": "/",
+									"left": 1,
+									"right": 2
+								}
+							},
+							"assignments": [ {
+								"ref": "x",
+								"value": {
+									"op": "+",
+									"left": "x",
+									"right": 1
+								}
+							} ]
+						},
+						{
+							"location": "loc_10",
+							"probability": {
+								"exp": {
+									"op": "/",
+									"left": 1,
+									"right": 2
+								}
+							},
+							"assignments": [ {
+								"ref": "y",
+								"value": {
+									"op": "+",
+									"left": "y",
+									"right": 1
+								}
+							} ]
+						}
+					]
+				},
+				{
+					"location": "loc_10",
+					"action": "tick",
+					"destinations": [ {
+						"location": "loc_12"
+					} ]
+				},
+				{
+					"location": "loc_12",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "=",
+								"left": "x",
+								"right": "y"
+							},
+							"right": {
+								"op": "≠",
+								"left": "clk",
+								"right": 5
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_8",
+						"assignments": [ {
+							"ref": "z",
+							"value": {
+								"op": "+",
+								"left": "z",
+								"right": 1
+							}
+						} ]
+					} ]
+				},
+				{
+					"location": "loc_12",
+					"guard": {
+						"exp": {
+							"op": "∧",
+							"left": {
+								"op": "≠",
+								"left": "x",
+								"right": "y"
+							},
+							"right": {
+								"op": "≠",
+								"left": "clk",
+								"right": 5
+							}
+						}
+					},
+					"destinations": [ {
+						"location": "loc_8"
+					} ]
+				}
+			]
+		},
+		{
+			"name": "Clock",
+			"locations": [
+				{
+					"name": "loc_1"
+				},
+				{
+					"name": "loc_5"
+				}
+			],
+			"initial-locations": [ "loc_1" ],
+			"edges": [
+				{
+					"location": "loc_1",
+					"action": "tick",
+					"destinations": [ {
+						"location": "loc_5",
+						"assignments": [ {
+							"ref": "clk",
+							"value": {
+								"op": "+",
+								"left": "clk",
+								"right": 1
+							}
+						} ]
+					} ]
+				},
+				{
+					"location": "loc_5",
+					"action": "tick",
+					"guard": {
+						"exp": {
+							"op": "≠",
+							"left": "clk",
+							"right": 5
+						}
+					},
+					"destinations": [ {
+						"location": "loc_5",
+						"assignments": [ {
+							"ref": "clk",
+							"value": {
+								"op": "+",
+								"left": "clk",
+								"right": 1
+							}
+						} ]
+					} ]
+				}
+			]
+		}
+	],
+	"system": {
+		"elements": [
+			{
+				"automaton": "Top"
+			},
+			{
+				"automaton": "Clock"
+			}
+		],
+		"syncs": [ {
+			"synchronise": [
+				"tick",
+				"tick"
+			],
+			"result": "tick"
+		} ]
+	}
+}
