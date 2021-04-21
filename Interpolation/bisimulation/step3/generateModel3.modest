@@ -1,0 +1,475 @@
+//Version of the concrete model to calculate probabilities for the 4 state abstract model
+
+datatype buffer = {int(-1..3) val, int(0..3) id, bool serviced, int(0..3) priority};		//Datatype for a buffer with the next buffer value, id of the buffer, whether the buffer was serviced last clock cycle or not, and the priority number of the buffer
+int(0..2) unserviced;		//Number of unserviced buffers, iterates down when unserviced buffer's priority is set
+int(0..2) totalUnserviced;	//Total number of unserviced buffers in a clock cycle
+//int totalServiced = 0;
+//int optimalRuns = 0;
+const int clkLower = 100; 
+const int clkUpper = 102;
+int(clkLower..clkUpper) clk;
+
+const int totalStates = 10;
+int(0..totalStates-1) state;
+int(0..totalStates-1) pstate;
+
+buffer north, east, south, west;
+
+buffer[] a; // = [north, east, south, west]; 	//Array of the four buffers. a[0] is the highest priority
+buffer[] temp;		//Temporary buffer used to update buffer a
+
+action tick;
+
+// ------ Begin: properties ---------
+//property Pr1 = Pmax(<> (clk >= clkUpper));
+
+//1 clock cycle
+/*
+property State0 = Pmax(<> ((clk >= clkUpper) && (state == 0)));
+property State1 = Pmax(<> ((clk >= clkUpper) && (state == 1)));
+property State2 = Pmax(<> ((clk >= clkUpper) && (state == 2)));
+property State3 = Pmax(<> ((clk >= clkUpper) && (state == 3)));
+property State4 = Pmax(<> ((clk >= clkUpper) && (state == 4)));
+property State5 = Pmax(<> ((clk >= clkUpper) && (state == 5)));
+property State6 = Pmax(<> ((clk >= clkUpper) && (state == 6)));
+property State7 = Pmax(<> ((clk >= clkUpper) && (state == 7)));
+property State8 = Pmax(<> ((clk >= clkUpper) && (state == 8)));
+property State9 = Pmax(<> ((clk >= clkUpper) && (state == 9)));
+*/
+
+//2 clock cycles
+/*
+property State0_0 = Pmax(<> ((clk >= clkUpper) && (pstate == 0) && (state == 0)));
+property State0_1 = Pmax(<> ((clk >= clkUpper) && (pstate == 0) && (state == 1)));
+property State0_2 = Pmax(<> ((clk >= clkUpper) && (pstate == 0) && (state == 2)));
+property State0_3 = Pmax(<> ((clk >= clkUpper) && (pstate == 0) && (state == 3)));
+property State0_4 = Pmax(<> ((clk >= clkUpper) && (pstate == 0) && (state == 4)));
+property State0_5 = Pmax(<> ((clk >= clkUpper) && (pstate == 0) && (state == 5)));
+property State0_6 = Pmax(<> ((clk >= clkUpper) && (pstate == 0) && (state == 6)));
+property State0_7 = Pmax(<> ((clk >= clkUpper) && (pstate == 0) && (state == 7)));
+property State0_8 = Pmax(<> ((clk >= clkUpper) && (pstate == 0) && (state == 8)));
+property State0_9 = Pmax(<> ((clk >= clkUpper) && (pstate == 0) && (state == 9)));
+
+property State1_0 = Pmax(<> ((clk >= clkUpper) && (pstate == 1) && (state == 0)));
+property State1_1 = Pmax(<> ((clk >= clkUpper) && (pstate == 1) && (state == 1)));
+property State1_2 = Pmax(<> ((clk >= clkUpper) && (pstate == 1) && (state == 2)));
+property State1_3 = Pmax(<> ((clk >= clkUpper) && (pstate == 1) && (state == 3)));
+property State1_4 = Pmax(<> ((clk >= clkUpper) && (pstate == 1) && (state == 4)));
+property State1_5 = Pmax(<> ((clk >= clkUpper) && (pstate == 1) && (state == 5)));
+property State1_6 = Pmax(<> ((clk >= clkUpper) && (pstate == 1) && (state == 6)));
+property State1_7 = Pmax(<> ((clk >= clkUpper) && (pstate == 1) && (state == 7)));
+property State1_8 = Pmax(<> ((clk >= clkUpper) && (pstate == 1) && (state == 8)));
+property State1_9 = Pmax(<> ((clk >= clkUpper) && (pstate == 1) && (state == 9)));
+
+property State2_0 = Pmax(<> ((clk >= clkUpper) && (pstate == 2) && (state == 0)));
+property State2_1 = Pmax(<> ((clk >= clkUpper) && (pstate == 2) && (state == 1)));
+property State2_2 = Pmax(<> ((clk >= clkUpper) && (pstate == 2) && (state == 2)));
+property State2_3 = Pmax(<> ((clk >= clkUpper) && (pstate == 2) && (state == 3)));
+property State2_4 = Pmax(<> ((clk >= clkUpper) && (pstate == 2) && (state == 4)));
+property State2_5 = Pmax(<> ((clk >= clkUpper) && (pstate == 2) && (state == 5)));
+property State2_6 = Pmax(<> ((clk >= clkUpper) && (pstate == 2) && (state == 6)));
+property State2_7 = Pmax(<> ((clk >= clkUpper) && (pstate == 2) && (state == 7)));
+property State2_8 = Pmax(<> ((clk >= clkUpper) && (pstate == 2) && (state == 8)));
+property State2_9 = Pmax(<> ((clk >= clkUpper) && (pstate == 2) && (state == 9)));
+
+property State3_0 = Pmax(<> ((clk >= clkUpper) && (pstate == 3) && (state == 0)));
+property State3_1 = Pmax(<> ((clk >= clkUpper) && (pstate == 3) && (state == 1)));
+property State3_2 = Pmax(<> ((clk >= clkUpper) && (pstate == 3) && (state == 2)));
+property State3_3 = Pmax(<> ((clk >= clkUpper) && (pstate == 3) && (state == 3)));
+property State3_4 = Pmax(<> ((clk >= clkUpper) && (pstate == 3) && (state == 4)));
+property State3_5 = Pmax(<> ((clk >= clkUpper) && (pstate == 3) && (state == 5)));
+property State3_6 = Pmax(<> ((clk >= clkUpper) && (pstate == 3) && (state == 6)));
+property State3_7 = Pmax(<> ((clk >= clkUpper) && (pstate == 3) && (state == 7)));
+property State3_8 = Pmax(<> ((clk >= clkUpper) && (pstate == 3) && (state == 8)));
+property State3_9 = Pmax(<> ((clk >= clkUpper) && (pstate == 3) && (state == 9)));
+
+property State4_0 = Pmax(<> ((clk >= clkUpper) && (pstate == 4) && (state == 0)));
+property State4_1 = Pmax(<> ((clk >= clkUpper) && (pstate == 4) && (state == 1)));
+property State4_2 = Pmax(<> ((clk >= clkUpper) && (pstate == 4) && (state == 2)));
+property State4_3 = Pmax(<> ((clk >= clkUpper) && (pstate == 4) && (state == 3)));
+property State4_4 = Pmax(<> ((clk >= clkUpper) && (pstate == 4) && (state == 4)));
+property State4_5 = Pmax(<> ((clk >= clkUpper) && (pstate == 4) && (state == 5)));
+property State4_6 = Pmax(<> ((clk >= clkUpper) && (pstate == 4) && (state == 6)));
+property State4_7 = Pmax(<> ((clk >= clkUpper) && (pstate == 4) && (state == 7)));
+property State4_8 = Pmax(<> ((clk >= clkUpper) && (pstate == 4) && (state == 8)));
+property State4_9 = Pmax(<> ((clk >= clkUpper) && (pstate == 4) && (state == 9)));
+
+property State5_0 = Pmax(<> ((clk >= clkUpper) && (pstate == 5) && (state == 0)));
+property State5_1 = Pmax(<> ((clk >= clkUpper) && (pstate == 5) && (state == 1)));
+property State5_2 = Pmax(<> ((clk >= clkUpper) && (pstate == 5) && (state == 2)));
+property State5_3 = Pmax(<> ((clk >= clkUpper) && (pstate == 5) && (state == 3)));
+property State5_4 = Pmax(<> ((clk >= clkUpper) && (pstate == 5) && (state == 4)));
+property State5_5 = Pmax(<> ((clk >= clkUpper) && (pstate == 5) && (state == 5)));
+property State5_6 = Pmax(<> ((clk >= clkUpper) && (pstate == 5) && (state == 6)));
+property State5_7 = Pmax(<> ((clk >= clkUpper) && (pstate == 5) && (state == 7)));
+property State5_8 = Pmax(<> ((clk >= clkUpper) && (pstate == 5) && (state == 8)));
+property State5_9 = Pmax(<> ((clk >= clkUpper) && (pstate == 5) && (state == 9)));
+*/
+
+property State6_0 = Pmax(<> ((clk >= clkUpper) && (pstate == 6) && (state == 0)));
+property State6_1 = Pmax(<> ((clk >= clkUpper) && (pstate == 6) && (state == 1)));
+property State6_2 = Pmax(<> ((clk >= clkUpper) && (pstate == 6) && (state == 2)));
+property State6_3 = Pmax(<> ((clk >= clkUpper) && (pstate == 6) && (state == 3)));
+property State6_4 = Pmax(<> ((clk >= clkUpper) && (pstate == 6) && (state == 4)));
+property State6_5 = Pmax(<> ((clk >= clkUpper) && (pstate == 6) && (state == 5)));
+property State6_6 = Pmax(<> ((clk >= clkUpper) && (pstate == 6) && (state == 6)));
+property State6_7 = Pmax(<> ((clk >= clkUpper) && (pstate == 6) && (state == 7)));
+property State6_8 = Pmax(<> ((clk >= clkUpper) && (pstate == 6) && (state == 8)));
+property State6_9 = Pmax(<> ((clk >= clkUpper) && (pstate == 6) && (state == 9)));
+
+property State7_0 = Pmax(<> ((clk >= clkUpper) && (pstate == 7) && (state == 0)));
+property State7_1 = Pmax(<> ((clk >= clkUpper) && (pstate == 7) && (state == 1)));
+property State7_2 = Pmax(<> ((clk >= clkUpper) && (pstate == 7) && (state == 2)));
+property State7_3 = Pmax(<> ((clk >= clkUpper) && (pstate == 7) && (state == 3)));
+property State7_4 = Pmax(<> ((clk >= clkUpper) && (pstate == 7) && (state == 4)));
+property State7_5 = Pmax(<> ((clk >= clkUpper) && (pstate == 7) && (state == 5)));
+property State7_6 = Pmax(<> ((clk >= clkUpper) && (pstate == 7) && (state == 6)));
+property State7_7 = Pmax(<> ((clk >= clkUpper) && (pstate == 7) && (state == 7)));
+property State7_8 = Pmax(<> ((clk >= clkUpper) && (pstate == 7) && (state == 8)));
+property State7_9 = Pmax(<> ((clk >= clkUpper) && (pstate == 7) && (state == 9)));
+
+property State8_0 = Pmax(<> ((clk >= clkUpper) && (pstate == 8) && (state == 0)));
+property State8_1 = Pmax(<> ((clk >= clkUpper) && (pstate == 8) && (state == 1)));
+property State8_2 = Pmax(<> ((clk >= clkUpper) && (pstate == 8) && (state == 2)));
+property State8_3 = Pmax(<> ((clk >= clkUpper) && (pstate == 8) && (state == 3)));
+property State8_4 = Pmax(<> ((clk >= clkUpper) && (pstate == 8) && (state == 4)));
+property State8_5 = Pmax(<> ((clk >= clkUpper) && (pstate == 8) && (state == 5)));
+property State8_6 = Pmax(<> ((clk >= clkUpper) && (pstate == 8) && (state == 6)));
+property State8_7 = Pmax(<> ((clk >= clkUpper) && (pstate == 8) && (state == 7)));
+property State8_8 = Pmax(<> ((clk >= clkUpper) && (pstate == 8) && (state == 8)));
+property State8_9 = Pmax(<> ((clk >= clkUpper) && (pstate == 8) && (state == 9)));
+
+property State9_0 = Pmax(<> ((clk >= clkUpper) && (pstate == 9) && (state == 0)));
+property State9_1 = Pmax(<> ((clk >= clkUpper) && (pstate == 9) && (state == 1)));
+property State9_2 = Pmax(<> ((clk >= clkUpper) && (pstate == 9) && (state == 2)));
+property State9_3 = Pmax(<> ((clk >= clkUpper) && (pstate == 9) && (state == 3)));
+property State9_4 = Pmax(<> ((clk >= clkUpper) && (pstate == 9) && (state == 4)));
+property State9_5 = Pmax(<> ((clk >= clkUpper) && (pstate == 9) && (state == 5)));
+property State9_6 = Pmax(<> ((clk >= clkUpper) && (pstate == 9) && (state == 6)));
+property State9_7 = Pmax(<> ((clk >= clkUpper) && (pstate == 9) && (state == 7)));
+property State9_8 = Pmax(<> ((clk >= clkUpper) && (pstate == 9) && (state == 8)));
+property State9_9 = Pmax(<> ((clk >= clkUpper) && (pstate == 9) && (state == 9)));
+
+
+// ------ End: properties ---------
+
+process Clock(){	
+	tick {= clk++ =};
+	if (clk <= clkUpper) {
+	   Clock()
+	}
+	else {
+	   stop
+	}   
+	
+}
+
+
+//Main process for the arbiter -------------------------------------------------------------------------------------------------------------------------------------------------
+process Arbiter(){
+	initialize();
+	
+	//runtime loop
+	do {
+		
+		{= pstate = state =};	
+		if(
+		((a[0].val == a[2].id) && (a[1].val == a[3].id) && (a[2].val == a[1].id) && (a[3].val == a[0].id)) || 
+		((a[0].val == a[2].id) && (a[1].val == a[3].id) && (a[2].val == a[0].id) && (a[3].val == a[1].id)) || 
+		((a[0].val == a[3].id) && (a[1].val == a[0].id) && (a[2].val == a[1].id) && (a[3].val == a[2].id)) || 
+		((a[0].val == a[3].id) && (a[1].val == a[2].id) && (a[2].val == a[1].id) && (a[3].val == a[0].id)) || 
+		((a[0].val == a[3].id) && (a[1].val == a[2].id) && (a[2].val == a[0].id) && (a[3].val == a[1].id))
+		){
+			{= state = 0 =}
+		}
+		else if(
+		((a[0].val == a[2].id) && (a[1].val == a[2].id) && (a[2].val == a[1].id) && (a[3].val == a[0].id)) || 
+		((a[0].val == a[2].id) && (a[1].val == a[3].id) && (a[2].val == a[1].id) && (a[3].val == a[1].id)) || 
+		((a[0].val == a[2].id) && (a[1].val == a[0].id) && (a[2].val == a[1].id) && (a[3].val == a[1].id)) || 
+		((a[0].val == a[3].id) && (a[1].val == a[2].id) && (a[2].val == a[1].id) && (a[3].val == a[1].id)) || 
+		((a[0].val == a[3].id) && (a[1].val == a[0].id) && (a[2].val == a[1].id) && (a[3].val == a[1].id))
+		){
+			{= state = 1 =}
+		}
+		else if (
+		((a[0].val == a[3].id) && (a[1].val == a[3].id) && (a[2].val == a[0].id) && (a[3].val == a[2].id)) || 
+		((a[0].val == a[3].id) && (a[1].val == a[3].id) && (a[2].val == a[1].id) && (a[3].val == a[0].id)) || 
+		((a[0].val == a[3].id) && (a[1].val == a[3].id) && (a[2].val == a[1].id) && (a[3].val == a[2].id)) || 
+		((a[0].val == a[3].id) && (a[1].val == a[0].id) && (a[2].val == a[3].id) && (a[3].val == a[1].id)) || 
+		((a[0].val == a[3].id) && (a[1].val == a[0].id) && (a[2].val == a[3].id) && (a[3].val == a[2].id))
+		){
+			{= state = 2 =}
+		}
+		else if (
+		((a[0].val == a[2].id) && (a[1].val == a[0].id) && (a[2].val == a[1].id) && (a[3].val == a[0].id)) || 
+		((a[0].val == a[3].id) && (a[1].val == a[2].id) && (a[2].val == a[0].id) && (a[3].val == a[0].id)) || 
+		((a[0].val == a[3].id) && (a[1].val == a[0].id) && (a[2].val == a[0].id) && (a[3].val == a[1].id)) || 
+		((a[0].val == a[3].id) && (a[1].val == a[0].id) && (a[2].val == a[0].id) && (a[3].val == a[2].id)) || 
+		((a[0].val == a[3].id) && (a[1].val == a[0].id) && (a[2].val == a[1].id) && (a[3].val == a[0].id)) 
+		){
+			{= state = 3 =}
+		}
+		else if (
+		((a[0].val == a[1].id) && (a[1].val == a[2].id) && (a[2].val == a[1].id) && (a[3].val == a[1].id)) || 
+		((a[0].val == a[1].id) && (a[1].val == a[3].id) && (a[2].val == a[1].id) && (a[3].val == a[1].id)) || 
+		((a[0].val == a[2].id) && (a[1].val == a[2].id) && (a[2].val == a[0].id) && (a[3].val == a[2].id)) || 
+		((a[0].val == a[2].id) && (a[1].val == a[2].id) && (a[2].val == a[1].id) && (a[3].val == a[2].id)) || 
+		((a[0].val == a[2].id) && (a[1].val == a[2].id) && (a[2].val == a[3].id) && (a[3].val == a[2].id)) 
+		){
+			{= state = 4 =}
+		}
+		else if (
+		((a[0].val == a[1].id) && (a[1].val == a[0].id) && (a[2].val == a[0].id) && (a[3].val == a[0].id)) || 
+		((a[0].val == a[2].id) && (a[1].val == a[0].id) && (a[2].val == a[0].id) && (a[3].val == a[0].id)) || 
+		((a[0].val == a[3].id) && (a[1].val == a[0].id) && (a[2].val == a[0].id) && (a[3].val == a[0].id)) 
+		){
+			{= state = 5 =}
+		}
+		else if (
+		((a[0].val == a[2].id) && (a[1].val == a[3].id) && (a[2].val == a[3].id) && (a[3].val == a[2].id)) || 
+		((a[0].val == a[3].id) && (a[1].val == a[2].id) && (a[2].val == a[3].id) && (a[3].val == a[2].id)) || 
+		((a[0].val == a[3].id) && (a[1].val == a[3].id) && (a[2].val == a[1].id) && (a[3].val == a[1].id)) 
+		){
+			{= state = 6 =}
+		}
+		else if (
+		((a[0].val == a[1].id) && (a[1].val == a[0].id) && (a[2].val == a[0].id) && (a[3].val == a[1].id)) || 
+		((a[0].val == a[1].id) && (a[1].val == a[0].id) && (a[2].val == a[1].id) && (a[3].val == a[0].id)) || 
+		((a[0].val == a[2].id) && (a[1].val == a[2].id) && (a[2].val == a[0].id) && (a[3].val == a[0].id)) 
+		){
+			{= state = 7 =}
+		}
+		else if (
+		((a[0].val == a[2].id) && (a[1].val == a[2].id) && (a[2].val == a[1].id) && (a[3].val == a[1].id)) || 
+		((a[0].val == a[2].id) && (a[1].val == a[0].id) && (a[2].val == a[0].id) && (a[3].val == a[2].id)) || 
+		((a[0].val == a[1].id) && (a[1].val == a[2].id) && (a[2].val == a[1].id) && (a[3].val == a[2].id))
+		){
+			{= state = 8 =}
+		}
+		else if(
+		((a[0].val == a[1].id) && (a[1].val == a[3].id) && (a[2].val == a[3].id) && (a[3].val == a[1].id)) || 
+		((a[0].val == a[3].id) && (a[1].val == a[3].id) && (a[2].val == a[0].id) && (a[3].val == a[0].id)) || 
+		((a[0].val == a[3].id) && (a[1].val == a[0].id) && (a[2].val == a[3].id) && (a[3].val == a[0].id)) 
+		){
+			{= state = 9 =}
+		}
+		else{ tau };
+
+		if(
+		((a[0].val == a[1].id) && (a[1].val == a[0].id) && (a[2].val == a[3].id) && (a[3].val == a[2].id)) || 
+		((a[0].val == a[1].id) && (a[1].val == a[3].id) && (a[2].val == a[0].id) && (a[3].val == a[2].id)) || 
+		((a[0].val == a[1].id) && (a[1].val == a[2].id) && (a[2].val == a[3].id) && (a[3].val == a[0].id)) || 
+		((a[0].val == a[2].id) && (a[1].val == a[0].id) && (a[2].val == a[3].id) && (a[3].val == a[1].id))
+		){
+			{= state = 0 =}
+		}
+		else if (
+		((a[0].val == a[1].id) && (a[1].val == a[2].id) && (a[2].val == a[3].id) && (a[3].val == a[1].id)) || 
+		((a[0].val == a[1].id) && (a[1].val == a[2].id) && (a[2].val == a[0].id) && (a[3].val == a[1].id)) || 
+		((a[0].val == a[1].id) && (a[1].val == a[2].id) && (a[2].val == a[1].id) && (a[3].val == a[0].id)) || 
+		((a[0].val == a[1].id) && (a[1].val == a[3].id) && (a[2].val == a[0].id) && (a[3].val == a[1].id)) || 
+		((a[0].val == a[1].id) && (a[1].val == a[3].id) && (a[2].val == a[1].id) && (a[3].val == a[0].id)) 
+		){
+			{= state = 1 =}
+		}
+		else if (
+		((a[0].val == a[1].id) && (a[1].val == a[2].id) && (a[2].val == a[3].id) && (a[3].val == a[2].id)) || 
+		((a[0].val == a[1].id) && (a[1].val == a[2].id) && (a[2].val == a[0].id) && (a[3].val == a[2].id)) || 
+		((a[0].val == a[1].id) && (a[1].val == a[3].id) && (a[2].val == a[3].id) && (a[3].val == a[0].id)) || 
+		((a[0].val == a[1].id) && (a[1].val == a[3].id) && (a[2].val == a[3].id) && (a[3].val == a[2].id)) || 
+		((a[0].val == a[2].id) && (a[1].val == a[3].id) && (a[2].val == a[3].id) && (a[3].val == a[0].id)) 
+		){
+			{= state = 2 =}
+		}	
+		else if (
+		((a[0].val == a[1].id) && (a[1].val == a[2].id) && (a[2].val == a[0].id) && (a[3].val == a[0].id)) || 
+		((a[0].val == a[1].id) && (a[1].val == a[3].id) && (a[2].val == a[0].id) && (a[3].val == a[0].id)) || 
+		((a[0].val == a[1].id) && (a[1].val == a[0].id) && (a[2].val == a[3].id) && (a[3].val == a[0].id)) || 
+		((a[0].val == a[1].id) && (a[1].val == a[0].id) && (a[2].val == a[0].id) && (a[3].val == a[2].id)) || 
+		((a[0].val == a[2].id) && (a[1].val == a[3].id) && (a[2].val == a[0].id) && (a[3].val == a[0].id)) 
+		){
+			{= state = 3 =}
+		} 
+		else if(
+		((a[0].val == a[3].id) && (a[1].val == a[3].id) && (a[2].val == a[3].id) && (a[3].val == a[0].id)) || 
+		((a[0].val == a[3].id) && (a[1].val == a[3].id) && (a[2].val == a[3].id) && (a[3].val == a[1].id)) || 
+		((a[0].val == a[1].id) && (a[1].val == a[0].id) && (a[2].val == a[1].id) && (a[3].val == a[1].id)) ||
+		((a[0].val == a[3].id) && (a[1].val == a[3].id) && (a[2].val == a[3].id) && (a[3].val == a[2].id))
+		){
+			{= state = 4 =}
+		}	
+		else{ tau };
+		
+		if(
+		((a[0].val == a[1].id) && (a[1].val == a[3].id) && (a[2].val == a[1].id) && (a[3].val == a[2].id)) || 
+		((a[0].val == a[1].id) && (a[1].val == a[0].id) && (a[2].val == a[3].id) && (a[3].val == a[1].id)) || 
+		((a[0].val == a[1].id) && (a[1].val == a[0].id) && (a[2].val == a[1].id) && (a[3].val == a[2].id)) || 
+		((a[0].val == a[2].id) && (a[1].val == a[2].id) && (a[2].val == a[3].id) && (a[3].val == a[0].id)) || 
+		((a[0].val == a[2].id) && (a[1].val == a[2].id) && (a[2].val == a[3].id) && (a[3].val == a[1].id))
+		){
+			{= state = 1 =}
+		}
+		else if (
+		((a[0].val == a[2].id) && (a[1].val == a[3].id) && (a[2].val == a[3].id) && (a[3].val == a[1].id)) || 
+		((a[0].val == a[2].id) && (a[1].val == a[3].id) && (a[2].val == a[0].id) && (a[3].val == a[2].id)) || 
+		((a[0].val == a[2].id) && (a[1].val == a[3].id) && (a[2].val == a[1].id) && (a[3].val == a[2].id)) || 
+		((a[0].val == a[2].id) && (a[1].val == a[0].id) && (a[2].val == a[3].id) && (a[3].val == a[2].id)) || 
+		((a[0].val == a[2].id) && (a[1].val == a[0].id) && (a[2].val == a[1].id) && (a[3].val == a[2].id))
+		){
+			{= state = 2 =}
+		}
+		else if (
+		((a[0].val == a[2].id) && (a[1].val == a[0].id) && (a[2].val == a[3].id) && (a[3].val == a[0].id)) || 
+		((a[0].val == a[2].id) && (a[1].val == a[0].id) && (a[2].val == a[0].id) && (a[3].val == a[1].id))
+		){
+			{= state = 3 =}
+		}
+		else{ tau };
+
+		if(
+		((a[0].val == a[2].id) && (a[1].val == a[2].id) && (a[2].val == a[0].id) && (a[3].val == a[1].id)) 
+		){
+			{= state = 1 =}
+		}	
+		else if (
+		((a[0].val == a[3].id) && (a[1].val == a[2].id) && (a[2].val == a[3].id) && (a[3].val == a[0].id)) || 
+		((a[0].val == a[3].id) && (a[1].val == a[2].id) && (a[2].val == a[3].id) && (a[3].val == a[1].id)) || 
+		((a[0].val == a[3].id) && (a[1].val == a[2].id) && (a[2].val == a[0].id) && (a[3].val == a[2].id)) || 
+		((a[0].val == a[3].id) && (a[1].val == a[2].id) && (a[2].val == a[1].id) && (a[3].val == a[2].id)) || 
+		((a[0].val == a[3].id) && (a[1].val == a[3].id) && (a[2].val == a[0].id) && (a[3].val == a[1].id))
+		){
+			{= state = 2 =}
+		}
+		else{ tau };
+
+//Service buffers-------------------------------------------------------------------------------------------------------
+		
+		//Buffer priority 0
+		//<Service Buffer a[0]>--------------------------------------------------------
+		{= 
+		a[0].serviced = true 
+		=};
+		
+		//<Service buffer <a[1]> ------------------------------------------------------
+		if( a[1].val == a[0].val) {			//If buffer a[1] conflicts with a[0]
+			{= 
+			a[1].serviced = false,
+			unserviced++ 		//Increment unserviced
+			=}
+		}
+		else {
+			{= 
+			a[1].serviced = true 
+			=}
+		};
+		
+		//<Service buffer a[2]> --------------------------------------------------------
+		//If buffer a[2] conflicts with a[1] or a[0]
+		if(a[2].val == a[1].val || a[2].val == a[0].val){	
+			{= 
+			a[2].serviced = false, 
+			unserviced++			//Increment unserviced
+			=}
+		}
+		else {
+			{= 
+			a[2].serviced = true 
+			=}
+		};
+		
+		//<Service buffer a[3]> ---------------------------------------------------------
+		//If buffer a[3] conflicts with a[2], a[1], or a[0]
+		if( a[3].val == a[2].val || a[3].val == a[1].val || a[3].val == a[0].val){	
+			{= 
+			a[3].serviced = false,
+			unserviced++ 			//Increment unserviced
+			=}
+		}
+		else {
+			{= 
+			a[3].serviced = true 
+			=}
+		};
+		
+		
+		{= 
+		totalUnserviced = unserviced
+		=};
+		
+
+		
+		//Set priority values for the next run and update the value of the buffers----------------------------------------------
+		setPriority(0);
+		setPriority(1);
+		setPriority(2);
+		setPriority(3);
+		
+		
+		//Rewrite buffer array with new priority values-------------------------------------------------------------------------
+		{= 
+		temp[a[0].priority] = a[0],
+		temp[a[1].priority] = a[1],
+		temp[a[2].priority] = a[2],
+		temp[a[3].priority] = a[3] 
+		=};
+		
+		{= a = temp =};
+		
+
+		tick;
+
+		if (clk >= clkUpper) {
+			stop
+		}
+		else {
+			tau
+		}
+		
+		
+	}
+}
+
+//initialize values -------------------------------------------------------------------------------------------------------------------------------------------------------------
+process initialize(){
+	{= 
+	a = [north, east, south, west],
+	temp = [north, east, south, west], 
+	
+	a[0].id = 0, 
+	a[1].id = 1, 
+	a[2].id = 2, 
+	a[3].id = 3,  
+	
+	a[0].val = DiscreteUniform(1, 3),
+	a[1].val = (DiscreteUniform(1, 3) + 1) % 4,
+	a[2].val = (DiscreteUniform(1, 3) + 2) % 4,
+	a[3].val = DiscreteUniform(0, 2),
+	
+	unserviced = 0
+	=}
+
+	
+}
+
+//Sets the new priority value of buffer a[i] and updates the value if the buffer was serviced ------------------------------------------------------------------------------------
+process setPriority(int i){
+	if (a[i].serviced == true){
+		{= 
+		a[i].val = (DiscreteUniform(1, 3) + a[i].id) % 4,	//Update value	
+		a[i].priority = i + unserviced 						//Set new priority
+		=}
+		//<update buffer value and dequeue buffer>
+	}
+	else {
+		{= 
+		a[i].priority = totalUnserviced - unserviced,		//Set new priority
+		unserviced-- 						//decrement unserviced
+		=}
+	}
+}
+
+
+par{
+::	Clock()
+::	Arbiter()
+}
