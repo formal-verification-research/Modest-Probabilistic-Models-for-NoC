@@ -273,7 +273,7 @@ process populate() {
 		1: noc[2].ewLen += (ewShouldInc2 - ewShouldDec2),
 		1: noc[3].ewLen += (ewShouldInc3 - ewShouldDec3),
 
-		1: optimalRuns += (optimalRuns >= 12)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
+		1: optimalRuns += (optimalRuns >= 20)?0:(optimalRuns0 + optimalRuns1 + optimalRuns2 + optimalRuns3),
 
 		1: clk += (clk == Mvar+Nvar - 1)? (-(Mvar+Nvar-1)): 1,
 		1: clk2 = 1
