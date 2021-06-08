@@ -1,0 +1,281 @@
+/***************************************************************************************************************************
+ * This is a modularized version of the concrete model for NoC model verification.
+ *
+ * Current NoC router IDs
+ *	0 - 1
+ *	|   |
+ *	2 - 3
+ *
+ * In order to add routers to the NoC visit all coments labled with #MODULARIZE
+ *
+ * Editors: Jonah Boe
+ * Date: Apr 23, 2021
+ **************************************************************************************************************************/
+
+option "dtmc";
+
+// ------------------------------------------------------- Datatypes -------------------------------------------------------
+
+datatype flit = int(0..NOC_MAX_ID) id_destination;
+datatype buffer = {flit hd, buffer option tl};
+
+// TODO: change name to channel
+datatype channel = {buffer buffer, int(0..4) priority};
+datatype router = {channel channel_local, channel channel_north, channel channel_west, channel channel_east, channel channel_south,
+	int(0..NOC_MAX_ID) id_north, int(0..NOC_MAX_ID) id_west, int(0..NOC_MAX_ID) id_east, int(0..NOC_MAX_ID) id_south};
+
+
+
+// --------------------------------------------------- Top level varables --------------------------------------------------
+
+// #MODULARIZE by setting NOC_MAX_ID to 1 less than the total number of routers and allocating spaces for more routers
+const int NOC_MAX_ID = 3;
+router[] noc = [none, none, none, none];
+
+const int BUFFER_LENGTH = 3;
+const int INJECTION_RATE_NUMERATOR = 2;
+const int INJECTION_RATE_DENOMINATOR = 5;
+const int TOTAL_CYCLES = 20;
+
+const int DUR;
+const int CLK_LOWER = 100; 
+const int CLK_UPPER = CLK_LOWER + DUR;
+int(CLK_LOWER..CLK_UPPER) clk;
+
+const int NORTH = 0;
+const int WEST = 1;
+const int EAST = 2;
+const int SOUTH = 3;
+
+
+
+// -------------------------------------------------------- Actions --------------------------------------------------------
+
+// For keeping parallel processes synced
+action tick;
+action tock;
+
+
+
+// ------------------------------------------------------- Functions -------------------------------------------------------
+
+// Get the id of the first router in this row
+function int firstInRow(id) =
+	if noc[id].id_west != none
+		then firstInRow(noc[id].id_west)
+	else id;
+
+// Get the id of the last router in this row
+function int lastInRow(id) =
+	if noc[id].id_east != none
+		return lastInRow(noc[id].id_east)
+	else id;
+
+// Tell if the buffer is full
+function bool isBufferFull(id, direction) =
+	// Buffer should never have more than BUFFER_LENGTH, but just in case
+	if (direction == NORTH) then len(noc[id].channel_north.buffer) >= BUFFER_LENGTH
+	if (direction == WEST) then len(noc[id]channel_west.buffer) >= BUFFER_LENGTH
+	if (direction == EAST) then len(noc[id].channel_west.buffer) >= BUFFER_LENGTH
+	if (direction == SOUTH) then len(noc[id].channel_south.buffer) >= BUFFER_LENGTH;
+
+// Return the front of the queue
+function flit peekFront(buffer option ls) =
+	 if ls == none then -1
+	 else if ls!.tl == none then ls!.hd
+	      else peekFront(ls!.tl);
+
+// Add a flit to the buffer
+function buffer option enqueue(flit n, buffer option ls) = 
+	if len(ls) == BUFFER_LENGTH then ls
+	else some(buffer { 
+			hd: n,
+			tl: ls 
+		});
+
+// Remove a flit from the buffer
+function buffer option dequeue(buffer option ls) = 
+	if ls == none then none
+	else if	ls!.tl == none then none 
+	else some(buffer {
+		hd: ls!.hd,
+		tl: dequeue(ls!.tl)
+	});
+
+
+
+
+
+// ------------------------------------------------------- Processes -------------------------------------------------------
+
+// Send flit to northern router
+process SendNorth(int id){
+	// We want to chech the south buffer of the NoC we are headed into, to see if it is full
+	if(!isBufferFull(noc[id].id_north, SOUTH)){
+		{=
+			// Add flit to next buffer
+			noc[noc[id].id_north].channel_south = enqueue(peekFront(noc[id].channel_north)),
+			// Remove it from this buffer
+			noc[id].channel_north = dequeue(noc[id].channel_north),
+		=}
+	}
+}
+
+// Send flit to western router
+process SendWest(int id){
+	// We want to chech the east buffer of the NoC we are headed into, to see if it is full
+	if(!isBufferFull(noc[id].id_west, EAST)){
+		{=
+			// Add flit to next buffer
+			noc[noc[id].id_west].channel_east = enqueue(peekFront(noc[id].channel_west)),
+			// Remove it from this buffer
+			noc[id].channel_west = dequeue(noc[id].channel_west)
+		=}
+	}
+}
+
+// Send flit to eastern router
+process SendEast(int id){
+	// We want to chech the west buffer of the NoC we are headed into, to see if it is full
+	if(!isBufferFull(noc[id].id_west, EAST)){
+		{=
+			// Add flit to next buffer
+			noc[noc[id].id_east].channel_west = enqueue(peekFront(noc[id].channel_east)),
+			// Remove it from this buffer
+			noc[id].channel_east = dequeue(noc[id].channel_east)
+		=}
+	}
+}
+
+// Send flit to southern router
+process SendSouth(int id){
+	// We want to chech the north buffer of the NoC we are headed into, to see if it is full
+	if(!isBufferFull(noc[id].id_west, EAST)){
+		{=
+			// Add flit to next buffer
+			noc[noc[id].id_north].channel_south = enqueue(peekFront(noc[id].channel_north)),
+			// Remove it from this buffer
+			noc[id].channel_north = dequeue(noc[id].channel_north)
+		=}
+	}
+}
+
+// Create new flits
+process GenerateFlits(int id){
+	// Only execute 
+	if((clk % INJECTION_RATE_DENOMINATOR) < INJECTION_RATE_NUMERATOR){
+		// Index for destination router
+		int(0..(NOC_MAX_ID - 1)) index;
+
+		// #MODULARIZE by adding probabilities for additional routers
+		// Note: index must always be 1 less than NOC_MAX_ID
+		palt{
+				:(1/NOC_MAX_ID): {= index = 0 =}
+				:(1/NOC_MAX_ID): {= index = 1 =}
+				:(1/NOC_MAX_ID): {= index = 2 =}
+		};
+
+		// Add the new flit to our local buffer so that the destination is never ourself
+		if(index >= id){
+			noc[id].channel_local.buffer = enqueue(some(buffer {hd: index + 1, tl: noc[id].channel_local.buffer}))
+		}
+		else{
+			noc[id].channel_local.buffer = enqueue(some(buffer {hd: index, tl: noc[id].channel_local.buffer}))
+		}
+	}
+	else {tau}
+}
+
+// Move the flit to the next queue in the destination chain
+process AdvanceFlits(int id){
+	// TODO: adjust for priority
+	
+	// If flit needs to stay on this row
+	if(noc[id].flits[0].id_destination >= firstInRow(id) && noc[id].flits[0].id_destination <= lastInRow(id)){
+		// Send it west
+		if(noc[id].flits[0].id_destination < id){
+			SendWest(id, 0);
+		}
+		// Or send it east
+		else{
+			SendEast(id, 0);
+		}
+	}
+	// If flit needs to go north
+	else if(noc[id].flits[0].id_destination < id){
+		SendNorth(id, 0);
+	}
+	// Else flit needs to go south
+	else{
+		SendSouth(id, 0);
+	}
+}
+
+// Remove flits who match this routers id
+process ResolveFlits(){
+	// TODO: add method
+}
+
+// For syncing parallell processes
+process Clock(){}
+	tick {= 
+		clk++
+	=};
+	if (clk <= CLK_UPPER) {
+	   Clock()
+	}
+	else {
+	   stop
+	} 
+}
+
+// Process for Arbiter 1
+process Arbiter(int id, int id_north, int id_west, buffer id_east, buffer id_south){
+	// Initialize
+	{=
+	channel temp = some(channel {priority: 0}),
+	noc[id] = some(router[] {channel_local: temp, channel_north: temp, channel_west: temp, channel_east: temp, channel_south: temp,
+		id_north: id_north, id_west: id_west, id_east: id_east, id_south: id_south})
+	=}
+
+	// Run
+	do{
+		tick;
+
+		// Send the flits and update priorities
+		AdvanceFlits(id);
+
+		tock;
+
+		// Remove flits that have reached their destinations
+		ResolveFlits(id);
+
+		// Generate new flits
+		GenerateFlits(id);
+
+		if(clk>=clkUpper){
+			stop
+		}
+		else{
+			tau
+		} 
+	}
+}
+
+
+
+// ------------------------------------------------------- Execution -------------------------------------------------------
+
+par{
+::	Clock()
+// #MODULARIZE by adding new arbiter processes for any additional routers
+::  Arbiter(0, none, none, 1, 2)
+::  Arbiter(1, none, 0, none, 3)
+::  Arbiter(2, 0, none, 3, none)
+::  Arbiter(3, 1, 2, none, none)
+}
+
+
+
+
+
