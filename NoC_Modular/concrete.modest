@@ -14,6 +14,8 @@
 
 option "dtmc";
 
+
+
 // ------------------------------------------------------- Datatypes -------------------------------------------------------
 
 datatype flit = int(0..NOC_MAX_ID) id_destination;
@@ -104,8 +106,6 @@ function buffer option dequeue(buffer option ls) =
 
 
 
-
-
 // ------------------------------------------------------- Processes -------------------------------------------------------
 
 // Send flit to northern router
@@ -177,10 +177,14 @@ process GenerateFlits(int id){
 
 		// Add the new flit to our local buffer so that the destination is never ourself
 		if(index >= id){
-			noc[id].channel_local.buffer = enqueue(some(buffer {hd: index + 1, tl: noc[id].channel_local.buffer}))
+			{=
+				noc[id].channel_local.buffer = enqueue(some(buffer {hd: index + 1, tl: noc[id].channel_local.buffer}))
+			=}
 		}
 		else{
-			noc[id].channel_local.buffer = enqueue(some(buffer {hd: index, tl: noc[id].channel_local.buffer}))
+			{=
+				noc[id].channel_local.buffer = enqueue(some(buffer {hd: index, tl: noc[id].channel_local.buffer}))
+			=}
 		}
 	}
 	else {tau}
