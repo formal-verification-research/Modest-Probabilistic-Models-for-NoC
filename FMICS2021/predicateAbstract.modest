@@ -1,0 +1,2634 @@
+/*
+NoC router IDs
+	0 - 1
+	|   |
+	2 - 3
+*/
+option "dtmc";
+
+// ---- Begin Varialbes ----
+const int DUR;
+const int clkLower = 100; 
+const int clkUpper = clkLower + DUR;
+int(clkLower..clkUpper) clk;
+//transient int(0..1) clk;
+
+const int INJECTIONRATENUMERATOR = 1;
+const int INJECTIONRATEDENOMINATOR = 2;
+
+// int totalFlitsDelivered = 0;
+// int totalFlits = 0;
+// int totalLatency = 0;
+
+int(0..10) optimalRuns = 0;
+
+action tick;
+// ---- End varialbes
+
+// ---- Predicates ----
+bool r0l1 = false;	//noc[0].bufferArray[local].val == 1
+bool r0l2 = false;	//noc[0].bufferArray[local].val == 2
+//bool r0l3;	//noc[0].bufferArray[local].dest == 3
+bool r0lServiced = false;
+bool r0lb1, r0lb2, r0lb3, r0lb4 = false; //Length of the local buffer
+bool r0lbv11, r0lbv12, r0lbv13, r0lbv14 = false; //Value of the local buffer at each position, true if dest = 1
+bool r0lbv21, r0lbv22, r0lbv23, r0lbv24 = false; //Value of the local buffer at each position, true if dest = 2
+											//If both are true, dest = 3
+
+bool r0e4 = false;	//noc[0].bufferArray[east].val == 4
+bool r0e2 = false;	//noc[0].bufferArray[east].val == 2
+bool r0eServiced = false;
+bool r0eb1, r0eb2, r0eb3, r0eb4 = false; //Length of the east buffer
+bool r0ebv1, r0ebv2, r0ebv3, r0ebv4 = false; //Value of the east buffer at each position, true if dest = 2, false if dest = 0
+
+bool r0s4 = false;	//noc[0].bufferArray[south].val == 4
+bool r0sServiced = false;
+bool r0sb1, r0sb2, r0sb3, r0sb4 = false; //Length of the south buffer
+
+bool r0a1, r0a2, r0a3 = false; //priority positions of the arbiter  noc[0].bufferArray[0] == local, noc[0].bufferArray[1] == local, noc[0].bufferArray[0] == south || (noc[0].bufferArray[1] == south && r0a1)
+
+
+//bool r1l0;	//noc[1].bufferArray[local].val == 0
+bool r1l2 = false;	//noc[1].bufferArray[local].val == 2
+bool r1l3 = false;	//noc[1].bufferArray[local].val == 3
+bool r1lServiced = false;
+bool r1lb1, r1lb2, r1lb3, r1lb4 = false; //Length of the local buffer
+bool r1lbv11, r1lbv12, r1lbv13, r1lbv14 = false; //Value of the local buffer at each position, true if dest = 0
+bool r1lbv21, r1lbv22, r1lbv23, r1lbv24 = false; //Value of the local buffer at each position, true if dest = 3
+											//If both are true, dest = 2
+
+bool r1s4 = false;	//noc[1].bufferArray[south].val == 4
+bool r1sServiced = false;
+bool r1sb1, r1sb2, r1sb3, r1sb4 = false; //Length of the south buffer
+
+bool r1w2 = false;	//noc[1].bufferArray[west].val == 2
+bool r1w4 = false;	//noc[1].bufferArray[west].val == 4
+bool r1wServiced = false;
+bool r1wb1, r1wb2, r1wb3, r1wb4 = false; //Length of the east buffer
+bool r1wbv1, r1wbv2, r1wbv3, r1wbv4 = false; //Value of the east buffer at each position, true if dest = 3, false if dest = 1
+
+bool r1a1, r1a2 = false; //priority positions of the arbiter  noc[1].bufferArray[0] == local, noc[1].bufferArray[1] == local, (noc[1].bufferArray[0] == south || (noc[1].bufferArray[1] = south && r1a1))
+bool r1a3 = true;
+
+
+bool r2l0 = false;	//noc[2].bufferArray[local].val == 0
+bool r2l1 = false;	//noc[2].bufferArray[local].val == 1
+//bool r2l3;	//noc[2].bufferArray[local].dest == 3
+bool r2lServiced = false;
+bool r2lb1, r2lb2, r2lb3, r2lb4 = false; //Length of the local buffer
+bool r2lbv11, r2lbv12, r2lbv13, r2lbv14 = false; //Value of the local buffer at each position, true if dest = 3
+bool r2lbv21, r2lbv22, r2lbv23, r2lbv24 = false; //Value of the local buffer at each position, true if dest = 0
+											//If both are true, dest = 1
+
+bool r2n4 = false;	//noc[2].bufferArray[north].val == 4
+bool r2nServiced = false;
+bool r2nb1, r2nb2, r2nb3, r2nb4 = false; //Length of the north buffer
+
+bool r2e0 = false;	//noc[2].bufferArray[east].val == 0
+bool r2e4 = false;	//noc[2].bufferArray[east].val == 4
+bool r2eServiced = false;
+bool r2eb1, r2eb2, r2eb3, r2eb4 = false; //Length of the east buffer
+bool r2ebv1, r2ebv2, r2ebv3, r2ebv4 = false; //Value of the east buffer at each position, true if dest = 2, false if dest = 0
+
+bool r2a1, r2a2 = false; //priority positions of the arbiter  noc[2].bufferArray[0] == local, noc[2].bufferArray[1] == local, noc[2].bufferArray[0] == north || (noc[2].bufferArray[1] == north && r2a1)
+bool r2a3 = true;
+
+bool r3l0 = false;	//noc[3].bufferArray[local].val == 0
+bool r3l3 = false;	//noc[3].bufferArray[local].val == 3
+//bool r3l2;	//noc[3].bufferArray[local].dest == 2
+bool r3lServiced = false;
+bool r3lb1, r3lb2, r3lb3, r3lb4 = false; //Length of the local buffer
+bool r3lbv11, r3lbv12, r3lbv13, r3lbv14 = false; //Value of the local buffer at each position, true if dest = 2
+bool r3lbv21, r3lbv22, r3lbv23, r3lbv24 = false; //Value of the local buffer at each position, true if dest = 1
+											//If both are true, dest = 0
+
+bool r3n4 = false;	//noc[3].bufferArray[north].val == 4
+bool r3nServiced = false;
+bool r3nb1, r3nb2, r3nb3, r3nb4 = false; //Length of the north buffer
+
+bool r3w0 = false;	//noc[3].bufferArray[west].val == 0
+bool r3w4 = false;	//noc[3].bufferArray[west].val == 4
+bool r3wServiced = false;
+bool r3wb1, r3wb2, r3wb3, r3wb4 = false; //Length of the east buffer
+bool r3wbv1, r3wbv2, r3wbv3, r3wbv4 = false; //Value of the east buffer at each position, true if dest = 1, false if dest = 3
+
+bool r3a1, r3a2, r3a3 = false; //priority positions of the arbiter  noc[3].bufferArray[0] == local, noc[3].bufferArray[1] == local, noc[3].bufferArray[0] == north || (noc[3].bufferArray[1] == north && r3a1)
+// ---- End predicates ---
+
+
+// ------ Begin: properties ---------
+property optimalR = Pmax(<> (optimalRuns >= 1));
+property Pr1 = Pmax(<> (clk >= clkUpper));
+//property averageLatency = Pmax(<> ((clk >= clkUpper) && ((totalLatency/totalFlits) <= 1.75)));
+//property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 1));
+// ------ End: properties ---------
+
+
+// ------ Begin: process definitions ------
+//---- Paralell Processes ----
+process Clock(){	
+	tick {= clk++ =};
+	if (clk <= clkUpper) {
+	   Clock()
+	}
+	else {
+	   stop
+	} 
+	//tick{= clk = 1 =};
+	//Clock()
+}
+
+process Top(){
+	do{
+		Populate();
+		shiftBuffers();
+		
+		Arbiter_corner0();
+		Arbiter_corner1();
+		Arbiter_corner2();
+		Arbiter_corner3();	
+		
+		tick;
+
+		if(clk>=clkUpper){
+			stop
+		}
+		else{tau} 	
+	}
+}
+
+
+//Sub Processes
+process Populate(){
+	if((clk % INJECTIONRATEDENOMINATOR) < INJECTIONRATENUMERATOR){
+		
+		/*
+		if(clk < clkLower + 8){
+			{=
+			r0lbv14 = true, r0lbv24 = true, r0lb4 = true,
+			r1lbv14 = false, r1lbv24 = true, r1lb4 = true,
+			r2lbv14 = true, r2lbv24 = true, r2lb4 = true,
+			r3lbv14 = false, r3lbv24 = true, r3lb4 = true
+			=}
+		}
+		else{
+			if(r0lb4 == true){
+			tau		// buffer is full
+		}
+		else {
+			palt{
+				:(1/3): {= r0lbv14 = true, r0lbv24 = false, r0lb4 = true =}
+				:(1/3): {= r0lbv14 = false, r0lbv24 = true, r0lb4 = true =}
+				:(1/3): {= r0lbv14 = true, r0lbv24 = true, r0lb4 = true =}
+			}
+		};
+	
+	//populate router 1
+		if(r1lb3 == true){
+			tau		// buffer is full
+		}
+		else{
+			palt{
+				:(1/3): {= r1lbv14 = true, r1lbv24 = false, r1lb4 = true =}
+				:(1/3): {= r1lbv14 = false, r1lbv24 = true, r1lb4 = true =}
+				:(1/3): {= r1lbv14 = true, r1lbv24 = true, r1lb4 = true =}
+			}
+		};
+		
+		
+		//populate router 2
+		if(r2lb3 == true){
+			tau		// buffer is full
+		}
+		else{
+			palt{
+				:(1/3): {= r2lbv14 = true, r2lbv24 = false, r2lb4 = true =}
+				:(1/3): {= r2lbv14 = false, r2lbv24 = true, r2lb4 = true =}
+				:(1/3): {= r2lbv14 = true, r2lbv24 = true, r2lb4 = true =}
+			}
+		};
+		
+		
+		//populate router 3
+		if(r3lb3 == true){
+			tau		// buffer is full
+		}
+		else {
+			palt{
+				:(1/3): {= r3lbv14 = true, r3lbv24 = false, r3lb4 = true =}
+				:(1/3): {= r3lbv14 = false, r3lbv24 = true, r3lb4 = true =}
+				:(1/3): {= r3lbv14 = true, r3lbv24 = true, r3lb4 = true =}
+			}
+		}
+		}
+		*/
+		
+		
+		//populate router 0
+		if(r0lb4 == true){
+			tau		// buffer is full
+		}
+		else {
+			palt{
+				:(1/3): {= r0lbv14 = true, r0lbv24 = false, r0lb4 = true =}
+				:(1/3): {= r0lbv14 = false, r0lbv24 = true, r0lb4 = true =}
+				:(1/3): {= r0lbv14 = true, r0lbv24 = true, r0lb4 = true =}
+			}
+		};
+	
+	//populate router 1
+		if(r1lb3 == true){
+			tau		// buffer is full
+		}
+		else{
+			palt{
+				:(1/3): {= r1lbv14 = true, r1lbv24 = false, r1lb4 = true =}
+				:(1/3): {= r1lbv14 = false, r1lbv24 = true, r1lb4 = true =}
+				:(1/3): {= r1lbv14 = true, r1lbv24 = true, r1lb4 = true =}
+			}
+		};
+		
+		
+		//populate router 2
+		if(r2lb3 == true){
+			tau		// buffer is full
+		}
+		else{
+			palt{
+				:(1/3): {= r2lbv14 = true, r2lbv24 = false, r2lb4 = true =}
+				:(1/3): {= r2lbv14 = false, r2lbv24 = true, r2lb4 = true =}
+				:(1/3): {= r2lbv14 = true, r2lbv24 = true, r2lb4 = true =}
+			}
+		};
+		
+		
+		//populate router 3
+		if(r3lb3 == true){
+			tau		// buffer is full
+		}
+		else {
+			palt{
+				:(1/3): {= r3lbv14 = true, r3lbv24 = false, r3lb4 = true =}
+				:(1/3): {= r3lbv14 = false, r3lbv24 = true, r3lb4 = true =}
+				:(1/3): {= r3lbv14 = true, r3lbv24 = true, r3lb4 = true =}
+			}
+		}
+		
+	}
+	else {tau}
+}
+	
+process shiftBuffers(){
+	//shift r0 local buffer
+	if(r0lb1 == false){
+		if(r0lb2 == false){
+			if(r0lb3 == false){
+				{=
+				 r0lbv11 = r0lbv14,
+				 r0lbv14 = false,
+				 
+				 r0lbv21 = r0lbv24,
+				 r0lbv24 = false,
+				 
+				 r0lb1 = r0lb4,
+				 r0lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r0lbv11 = r0lbv13,
+				 r0lbv12 = r0lbv14,
+				 r0lbv13 = false,
+				 r0lbv14 = false,
+				 
+				 r0lbv21 = r0lbv23,
+				 r0lbv22 = r0lbv24,
+				 r0lbv23 = false,
+				 r0lbv24 = false,
+				 
+				 r0lb1 = r0lb3,
+				 r0lb2 = r0lb4,
+				 r0lb3 = false,
+				 r0lb4 = false
+				=}
+			}
+		}
+		else{
+			if(r0lb3 == false){
+				{=
+				 r0lbv11 = r0lbv12,
+				 r0lbv12 = r0lbv14,
+				 r0lbv14 = false,
+				 
+				 r0lbv21 = r0lbv22,
+				 r0lbv22 = r0lbv24,
+				 r0lbv24 = false,
+				 
+				 r0lb1 = r0lb2,
+				 r0lb2 = r0lb4,
+				 r0lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r0lbv11 = r0lbv12,
+				 r0lbv12 = r0lbv13,
+				 r0lbv13 = r0lbv14,
+				 r0lbv14 = false,
+				 
+				 r0lbv21 = r0lbv22,
+				 r0lbv22 = r0lbv23,
+				 r0lbv23 = r0lbv24,
+				 r0lbv24 = false,
+				 
+				 r0lb1 = r0lb2,
+				 r0lb2 = r0lb3, 
+				 r0lb3 = r0lb4,
+				 r0lb4 = false
+				=}
+			}
+		}
+	}
+	else{
+		if(r0lb2 == false){
+			if(r0lb3 == false){
+				{=
+				 r0lbv12 = r0lbv14,
+				 r0lbv14 = false,
+				 
+				 r0lbv22 = r0lbv24,
+				 r0lbv24 = false,
+				 
+				 r0lb2 = r0lb4,
+				 r0lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r0lbv12 = r0lbv13,
+				 r0lbv13 = r0lbv14,
+				 r0lbv14 = false,
+				 
+				 r0lbv22 = r0lbv23,
+				 r0lbv23 = r0lbv24,
+				 r0lbv24 = false,
+				 
+				 r0lb2 = r0lb3,
+				 r0lb3 = r0lb4,
+				 r0lb4 = false
+				=}
+			}
+		}
+		else{
+			if(r0lb3 == false){
+				{=
+				 r0lbv13 = r0lbv14,
+				 r0lbv14 = false,
+				 
+				 r0lbv23 = r0lbv24,
+				 r0lbv24 = false,
+				 
+				 r0lb3 = r0lb4,
+				 r0lb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
+		
+	};
+	
+	//shift r0 east buffer
+	if(r0eb1 == false){
+		if(r0eb2 == false){
+			if(r0eb3 == false){
+				{=
+				 r0ebv1 = r0ebv4,
+				 r0ebv4 = false,
+				 
+				 r0eb1 = r0eb4,
+				 r0eb4 = false
+				=}
+			}
+			else{
+				{=
+				 r0ebv1 = r0ebv3,
+				 r0ebv2 = r0ebv4,
+				 r0ebv3 = false,
+				 r0ebv4 = false,
+				 
+				 r0eb1 = r0eb3,
+				 r0eb2 = r0eb4,
+				 r0eb3 = false,
+				 r0eb4 = false
+				=}
+			}
+		}
+		else{
+			if(r0eb3 == false){
+				{=
+				 r0ebv1 = r0ebv2,
+				 r0ebv2 = r0ebv4,
+				 r0ebv4 = false,
+				 
+				 r0eb1 = r0eb2,
+				 r0eb2 = r0eb4,
+				 r0eb4 = false
+				=}
+			}
+			else{
+				{=
+				 r0ebv1 = r0ebv2,
+				 r0ebv2 = r0ebv3,
+				 r0ebv3 = r0ebv4,
+				 r0ebv4 = false,
+				 
+				 r0eb1 = r0eb2,
+				 r0eb2 = r0eb3, 
+				 r0eb3 = r0eb4,
+				 r0eb4 = false
+				=}
+			}
+		}
+	}
+	else{
+		if(r0eb2 == false){
+			if(r0eb3 == false){
+				{=
+				 r0ebv2 = r0ebv4,
+				 r0ebv4 = false,
+				 
+				 r0eb2 = r0eb4,
+				 r0eb4 = false
+				=}
+			}
+			else{
+				{=
+				 r0ebv2 = r0ebv3,
+				 r0ebv3 = r0ebv4,
+				 r0ebv4 = false,
+				 
+				 r0eb2 = r0eb3,
+				 r0eb3 = r0eb4,
+				 r0eb4 = false
+				=}
+			}
+		}
+		else{
+			if(r0eb3 == false){
+				{=
+				 r0ebv3 = r0ebv4,
+				 r0ebv4 = false,
+				 
+				 r0eb3 = r0eb4,
+				 r0eb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
+		
+	};
+	
+	//shift r0 south buffer
+	if(r0sb1 == false){
+		if(r0sb2 == false){
+			if(r0sb3 == false){
+				{=
+				 r0sb1 = r0sb4,
+				 r0sb4 = false
+				=}
+			}
+			else{
+				{=
+				 r0sb1 = r0sb3,
+				 r0sb2 = r0sb4,
+				 r0sb3 = false,
+				 r0sb4 = false
+				=}
+			}
+		}
+		else{
+			if(r0sb3 == false){
+				{=
+				 r0sb1 = r0sb2,
+				 r0sb2 = r0sb4,
+				 r0sb4 = false
+				=}
+			}
+			else{
+				{=
+				 r0sb1 = r0sb2,
+				 r0sb2 = r0sb3, 
+				 r0sb3 = r0sb4,
+				 r0sb4 = false
+				=}
+			}
+		}
+	}
+	else{
+		if(r0sb2 == false){
+			if(r0sb3 == false){
+				{=
+				 r0sb2 = r0sb4,
+				 r0sb4 = false
+				=}
+			}
+			else{
+				{=
+				 r0sb2 = r0sb3,
+				 r0sb3 = r0sb4,
+				 r0sb4 = false
+				=}
+			}
+		}
+		else{
+			if(r0sb3 == false){
+				{=
+				 r0sb3 = r0sb4,
+				 r0sb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
+	};
+	
+	//shift r1 local buffer
+	if(r1lb1 == false){
+		if(r1lb2 == false){
+			if(r1lb3 == false){
+				{=
+				 r1lbv11 = r1lbv14,
+				 r1lbv14 = false,
+				 
+				 r1lbv21 = r1lbv24,
+				 r1lbv24 = false,
+				 
+				 r1lb1 = r1lb4,
+				 r1lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r1lbv11 = r1lbv13,
+				 r1lbv12 = r1lbv14,
+				 r1lbv13 = false,
+				 r1lbv14 = false,
+				 
+				 r1lbv21 = r1lbv23,
+				 r1lbv22 = r1lbv24,
+				 r1lbv23 = false,
+				 r1lbv24 = false,
+				 
+				 r1lb1 = r1lb3,
+				 r1lb2 = r1lb4,
+				 r1lb3 = false,
+				 r1lb4 = false
+				=}
+			}
+		}
+		else{
+			if(r1lb3 == false){
+				{=
+				 r1lbv11 = r1lbv12,
+				 r1lbv12 = r1lbv14,
+				 r1lbv14 = false,
+				 
+				 r1lbv21 = r1lbv22,
+				 r1lbv22 = r1lbv24,
+				 r1lbv24 = false,
+				 
+				 r1lb1 = r1lb2,
+				 r1lb2 = r1lb4,
+				 r1lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r1lbv11 = r1lbv12,
+				 r1lbv12 = r1lbv13,
+				 r1lbv13 = r1lbv14,
+				 r1lbv14 = false,
+				 
+				 r1lbv21 = r1lbv22,
+				 r1lbv22 = r1lbv23,
+				 r1lbv23 = r1lbv24,
+				 r1lbv24 = false,
+				 
+				 r1lb1 = r1lb2,
+				 r1lb2 = r1lb3, 
+				 r1lb3 = r1lb4,
+				 r1lb4 = false
+				=}
+			}
+		}
+	}
+	else{
+		if(r1lb2 == false){
+			if(r1lb3 == false){
+				{=
+				 r1lbv12 = r1lbv14,
+				 r1lbv14 = false,
+				 
+				 r1lbv22 = r1lbv24,
+				 r1lbv24 = false,
+				 
+				 r1lb2 = r1lb4,
+				 r1lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r1lbv12 = r1lbv13,
+				 r1lbv13 = r1lbv14,
+				 r1lbv14 = false,
+				 
+				 r1lbv22 = r1lbv23,
+				 r1lbv23 = r1lbv24,
+				 r1lbv24 = false,
+				 
+				 r1lb2 = r1lb3,
+				 r1lb3 = r1lb4,
+				 r1lb4 = false
+				=}
+			}
+		}
+		else{
+			if(r1lb3 == false){
+				{=
+				 r1lbv13 = r1lbv14,
+				 r1lbv14 = false,
+				 
+				 r1lbv23 = r1lbv24,
+				 r1lbv24 = false,
+				 
+				 r1lb3 = r1lb4,
+				 r1lb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
+		
+	};
+	
+	//shift r1 west buffer
+	if(r1wb1 == false){
+		if(r1wb2 == false){
+			if(r1wb3 == false){
+				{=
+				 r1wbv1 = r1wbv4,
+				 r1wbv4 = false,
+				 
+				 r1wb1 = r1wb4,
+				 r1wb4 = false
+				=}
+			}
+			else{
+				{=
+				 r1wbv1 = r1wbv3,
+				 r1wbv2 = r1wbv4,
+				 r1wbv3 = false,
+				 r1wbv4 = false,
+				 
+				 r1wb1 = r1wb3,
+				 r1wb2 = r1wb4,
+				 r1wb3 = false,
+				 r1wb4 = false
+				=}
+			}
+		}
+		else{
+			if(r1wb3 == false){
+				{=
+				 r1wbv1 = r1wbv2,
+				 r1wbv2 = r1wbv4,
+				 r1wbv4 = false,
+				 
+				 r1wb1 = r1wb2,
+				 r1wb2 = r1wb4,
+				 r1wb4 = false
+				=}
+			}
+			else{
+				{=
+				 r1wbv1 = r1wbv2,
+				 r1wbv2 = r1wbv3,
+				 r1wbv3 = r1wbv4,
+				 r1wbv4 = false,
+				 
+				 r1wb1 = r1wb2,
+				 r1wb2 = r1wb3, 
+				 r1wb3 = r1wb4,
+				 r1wb4 = false
+				=}
+			}
+		}
+	}
+	else{
+		if(r1wb2 == false){
+			if(r1wb3 == false){
+				{=
+				 r1wbv2 = r1wbv4,
+				 r1wbv4 = false,
+				 
+				 r1wb2 = r1wb4,
+				 r1wb4 = false
+				=}
+			}
+			else{
+				{=
+				 r1wbv2 = r1wbv3,
+				 r1wbv3 = r1wbv4,
+				 r1wbv4 = false,
+				 
+				 r1wb2 = r1wb3,
+				 r1wb3 = r1wb4,
+				 r1wb4 = false
+				=}
+			}
+		}
+		else{
+			if(r1wb3 == false){
+				{=
+				 r1wbv3 = r1wbv4,
+				 r1wbv4 = false,
+				 
+				 r1wb3 = r1wb4,
+				 r1wb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
+		
+	};
+	
+	//shift r1 south buffer
+	if(r1sb1 == false){
+		if(r1sb2 == false){
+			if(r1sb3 == false){
+				{=
+				 r1sb1 = r1sb4,
+				 r1sb4 = false
+				=}
+			}
+			else{
+				{=
+				 r1sb1 = r1sb3,
+				 r1sb2 = r1sb4,
+				 r1sb3 = false,
+				 r1sb4 = false
+				=}
+			}
+		}
+		else{
+			if(r1sb3 == false){
+				{=
+				 r1sb1 = r1sb2,
+				 r1sb2 = r1sb4,
+				 r1sb4 = false
+				=}
+			}
+			else{
+				{=
+				 r1sb1 = r1sb2,
+				 r1sb2 = r1sb3, 
+				 r1sb3 = r1sb4,
+				 r1sb4 = false
+				=}
+			}
+		}
+	}
+	else{
+		if(r1sb2 == false){
+			if(r1sb3 == false){
+				{=
+				 r1sb2 = r1sb4,
+				 r1sb4 = false
+				=}
+			}
+			else{
+				{=
+				 r1sb2 = r1sb3,
+				 r1sb3 = r1sb4,
+				 r1sb4 = false
+				=}
+			}
+		}
+		else{
+			if(r1sb3 == false){
+				{=
+				 r1sb3 = r1sb4,
+				 r1sb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
+	};
+
+//shift r2 local buffer
+	if(r2lb1 == false){
+		if(r2lb2 == false){
+			if(r2lb3 == false){
+				{=
+				 r2lbv11 = r2lbv14,
+				 r2lbv14 = false,
+				 
+				 r2lbv21 = r2lbv24,
+				 r2lbv24 = false,
+				 
+				 r2lb1 = r2lb4,
+				 r2lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r2lbv11 = r2lbv13,
+				 r2lbv12 = r2lbv14,
+				 r2lbv13 = false,
+				 r2lbv14 = false,
+				 
+				 r2lbv21 = r2lbv23,
+				 r2lbv22 = r2lbv24,
+				 r2lbv23 = false,
+				 r2lbv24 = false,
+				 
+				 r2lb1 = r2lb3,
+				 r2lb2 = r2lb4,
+				 r2lb3 = false,
+				 r2lb4 = false
+				=}
+			}
+		}
+		else{
+			if(r2lb3 == false){
+				{=
+				 r2lbv11 = r2lbv12,
+				 r2lbv12 = r2lbv14,
+				 r2lbv14 = false,
+				 
+				 r2lbv21 = r2lbv22,
+				 r2lbv22 = r2lbv24,
+				 r2lbv24 = false,
+				 
+				 r2lb1 = r2lb2,
+				 r2lb2 = r2lb4,
+				 r2lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r2lbv11 = r2lbv12,
+				 r2lbv12 = r2lbv13,
+				 r2lbv13 = r2lbv14,
+				 r2lbv14 = false,
+				 
+				 r2lbv21 = r2lbv22,
+				 r2lbv22 = r2lbv23,
+				 r2lbv23 = r2lbv24,
+				 r2lbv24 = false,
+				 
+				 r2lb1 = r2lb2,
+				 r2lb2 = r2lb3, 
+				 r2lb3 = r2lb4,
+				 r2lb4 = false
+				=}
+			}
+		}
+	}
+	else{
+		if(r2lb2 == false){
+			if(r2lb3 == false){
+				{=
+				 r2lbv12 = r2lbv14,
+				 r2lbv14 = false,
+				 
+				 r2lbv22 = r2lbv24,
+				 r2lbv24 = false,
+				 
+				 r2lb2 = r2lb4,
+				 r2lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r2lbv12 = r2lbv13,
+				 r2lbv13 = r2lbv14,
+				 r2lbv14 = false,
+				 
+				 r2lbv22 = r2lbv23,
+				 r2lbv23 = r2lbv24,
+				 r2lbv24 = false,
+				 
+				 r2lb2 = r2lb3,
+				 r2lb3 = r2lb4,
+				 r2lb4 = false
+				=}
+			}
+		}
+		else{
+			if(r2lb3 == false){
+				{=
+				 r2lbv13 = r2lbv14,
+				 r2lbv14 = false,
+				 
+				 r2lbv23 = r2lbv24,
+				 r2lbv24 = false,
+				 
+				 r2lb3 = r2lb4,
+				 r2lb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
+		
+	};
+	
+	//shift r2 east buffer
+	if(r2eb1 == false){
+		if(r2eb2 == false){
+			if(r2eb3 == false){
+				{=
+				 r2ebv1 = r2ebv4,
+				 r2ebv4 = false,
+				 
+				 r2eb1 = r2eb4,
+				 r2eb4 = false
+				=}
+			}
+			else{
+				{=
+				 r2ebv1 = r2ebv3,
+				 r2ebv2 = r2ebv4,
+				 r2ebv3 = false,
+				 r2ebv4 = false,
+				 
+				 r2eb1 = r2eb3,
+				 r2eb2 = r2eb4,
+				 r2eb3 = false,
+				 r2eb4 = false
+				=}
+			}
+		}
+		else{
+			if(r2eb3 == false){
+				{=
+				 r2ebv1 = r2ebv2,
+				 r2ebv2 = r2ebv4,
+				 r2ebv4 = false,
+				 
+				 r2eb1 = r2eb2,
+				 r2eb2 = r2eb4,
+				 r2eb4 = false
+				=}
+			}
+			else{
+				{=
+				 r2ebv1 = r2ebv2,
+				 r2ebv2 = r2ebv3,
+				 r2ebv3 = r2ebv4,
+				 r2ebv4 = false,
+				 
+				 r2eb1 = r2eb2,
+				 r2eb2 = r2eb3, 
+				 r2eb3 = r2eb4,
+				 r2eb4 = false
+				=}
+			}
+		}
+	}
+	else{
+		if(r2eb2 == false){
+			if(r2eb3 == false){
+				{=
+				 r2ebv2 = r2ebv4,
+				 r2ebv4 = false,
+				 
+				 r2eb2 = r2eb4,
+				 r2eb4 = false
+				=}
+			}
+			else{
+				{=
+				 r2ebv2 = r2ebv3,
+				 r2ebv3 = r2ebv4,
+				 r2ebv4 = false,
+				 
+				 r2eb2 = r2eb3,
+				 r2eb3 = r2eb4,
+				 r2eb4 = false
+				=}
+			}
+		}
+		else{
+			if(r2eb3 == false){
+				{=
+				 r2ebv3 = r2ebv4,
+				 r2ebv4 = false,
+				 
+				 r2eb3 = r2eb4,
+				 r2eb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
+		
+	};
+	
+	//shift r2 north buffer
+	if(r2nb1 == false){
+		if(r2nb2 == false){
+			if(r2nb3 == false){
+				{=
+				 r2nb1 = r2nb4,
+				 r2nb4 = false
+				=}
+			}
+			else{
+				{=
+				 r2nb1 = r2nb3,
+				 r2nb2 = r2nb4,
+				 r2nb3 = false,
+				 r2nb4 = false
+				=}
+			}
+		}
+		else{
+			if(r2nb3 == false){
+				{=
+				 r2nb1 = r2nb2,
+				 r2nb2 = r2nb4,
+				 r2nb4 = false
+				=}
+			}
+			else{
+				{=
+				 r2nb1 = r2nb2,
+				 r2nb2 = r2nb3, 
+				 r2nb3 = r2nb4,
+				 r2nb4 = false
+				=}
+			}
+		}
+	}
+	else{
+		if(r2nb2 == false){
+			if(r2nb3 == false){
+				{=
+				 r2nb2 = r2nb4,
+				 r2nb4 = false
+				=}
+			}
+			else{
+				{=
+				 r2nb2 = r2nb3,
+				 r2nb3 = r2nb4,
+				 r2nb4 = false
+				=}
+			}
+		}
+		else{
+			if(r2nb3 == false){
+				{=
+				 r2nb3 = r2nb4,
+				 r2nb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
+	};
+
+	//shift r3 local buffer
+	if(r3lb1 == false){
+		if(r3lb2 == false){
+			if(r3lb3 == false){
+				{=
+				 r3lbv11 = r3lbv14,
+				 r3lbv14 = false,
+				 
+				 r3lbv21 = r3lbv24,
+				 r3lbv24 = false,
+				 
+				 r3lb1 = r3lb4,
+				 r3lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r3lbv11 = r3lbv13,
+				 r3lbv12 = r3lbv14,
+				 r3lbv13 = false,
+				 r3lbv14 = false,
+				 
+				 r3lbv21 = r3lbv23,
+				 r3lbv22 = r3lbv24,
+				 r3lbv23 = false,
+				 r3lbv24 = false,
+				 
+				 r3lb1 = r3lb3,
+				 r3lb2 = r3lb4,
+				 r3lb3 = false,
+				 r3lb4 = false
+				=}
+			}
+		}
+		else{
+			if(r3lb3 == false){
+				{=
+				 r3lbv11 = r3lbv12,
+				 r3lbv12 = r3lbv14,
+				 r3lbv14 = false,
+				 
+				 r3lbv21 = r3lbv22,
+				 r3lbv22 = r3lbv24,
+				 r3lbv24 = false,
+				 
+				 r3lb1 = r3lb2,
+				 r3lb2 = r3lb4,
+				 r3lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r3lbv11 = r3lbv12,
+				 r3lbv12 = r3lbv13,
+				 r3lbv13 = r3lbv14,
+				 r3lbv14 = false,
+				 
+				 r3lbv21 = r3lbv22,
+				 r3lbv22 = r3lbv23,
+				 r3lbv23 = r3lbv24,
+				 r3lbv24 = false,
+				 
+				 r3lb1 = r3lb2,
+				 r3lb2 = r3lb3, 
+				 r3lb3 = r3lb4,
+				 r3lb4 = false
+				=}
+			}
+		}
+	}
+	else{
+		if(r3lb2 == false){
+			if(r3lb3 == false){
+				{=
+				 r3lbv12 = r3lbv14,
+				 r3lbv14 = false,
+				 
+				 r3lbv22 = r3lbv24,
+				 r3lbv24 = false,
+				 
+				 r3lb2 = r3lb4,
+				 r3lb4 = false
+				=}
+			}
+			else{
+				{=
+				 r3lbv12 = r3lbv13,
+				 r3lbv13 = r3lbv14,
+				 r3lbv14 = false,
+				 
+				 r3lbv22 = r3lbv23,
+				 r3lbv23 = r3lbv24,
+				 r3lbv24 = false,
+				 
+				 r3lb2 = r3lb3,
+				 r3lb3 = r3lb4,
+				 r3lb4 = false
+				=}
+			}
+		}
+		else{
+			if(r3lb3 == false){
+				{=
+				 r3lbv13 = r3lbv14,
+				 r3lbv14 = false,
+				 
+				 r3lbv23 = r3lbv24,
+				 r3lbv24 = false,
+				 
+				 r3lb3 = r3lb4,
+				 r3lb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
+		
+	};
+	
+	//shift r3 west buffer
+	if(r3wb1 == false){
+		if(r3wb2 == false){
+			if(r3wb3 == false){
+				{=
+				 r3wbv1 = r3wbv4,
+				 r3wbv4 = false,
+				 
+				 r3wb1 = r3wb4,
+				 r3wb4 = false
+				=}
+			}
+			else{
+				{=
+				 r3wbv1 = r3wbv3,
+				 r3wbv2 = r3wbv4,
+				 r3wbv3 = false,
+				 r3wbv4 = false,
+				 
+				 r3wb1 = r3wb3,
+				 r3wb2 = r3wb4,
+				 r3wb3 = false,
+				 r3wb4 = false
+				=}
+			}
+		}
+		else{
+			if(r3wb3 == false){
+				{=
+				 r3wbv1 = r3wbv2,
+				 r3wbv2 = r3wbv4,
+				 r3wbv4 = false,
+				 
+				 r3wb1 = r3wb2,
+				 r3wb2 = r3wb4,
+				 r3wb4 = false
+				=}
+			}
+			else{
+				{=
+				 r3wbv1 = r3wbv2,
+				 r3wbv2 = r3wbv3,
+				 r3wbv3 = r3wbv4,
+				 r3wbv4 = false,
+				 
+				 r3wb1 = r3wb2,
+				 r3wb2 = r3wb3, 
+				 r3wb3 = r3wb4,
+				 r3wb4 = false
+				=}
+			}
+		}
+	}
+	else{
+		if(r3wb2 == false){
+			if(r3wb3 == false){
+				{=
+				 r3wbv2 = r3wbv4,
+				 r3wbv4 = false,
+				 
+				 r3wb2 = r3wb4,
+				 r3wb4 = false
+				=}
+			}
+			else{
+				{=
+				 r3wbv2 = r3wbv3,
+				 r3wbv3 = r3wbv4,
+				 r3wbv4 = false,
+				 
+				 r3wb2 = r3wb3,
+				 r3wb3 = r3wb4,
+				 r3wb4 = false
+				=}
+			}
+		}
+		else{
+			if(r3wb3 == false){
+				{=
+				 r3wbv3 = r3wbv4,
+				 r3wbv4 = false,
+				 
+				 r3wb3 = r3wb4,
+				 r3wb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
+		
+	};
+	
+	//shift r3 north buffer
+	if(r3nb1 == false){
+		if(r3nb2 == false){
+			if(r3nb3 == false){
+				{=
+				 r3nb1 = r3nb4,
+				 r3nb4 = false
+				=}
+			}
+			else{
+				{=
+				 r3nb1 = r3nb3,
+				 r3nb2 = r3nb4,
+				 r3nb3 = false,
+				 r3nb4 = false
+				=}
+			}
+		}
+		else{
+			if(r3nb3 == false){
+				{=
+				 r3nb1 = r3nb2,
+				 r3nb2 = r3nb4,
+				 r3nb4 = false
+				=}
+			}
+			else{
+				{=
+				 r3nb1 = r3nb2,
+				 r3nb2 = r3nb3, 
+				 r3nb3 = r3nb4,
+				 r3nb4 = false
+				=}
+			}
+		}
+	}
+	else{
+		if(r3nb2 == false){
+			if(r3nb3 == false){
+				{=
+				 r3nb2 = r3nb4,
+				 r3nb4 = false
+				=}
+			}
+			else{
+				{=
+				 r3nb2 = r3nb3,
+				 r3nb3 = r3nb4,
+				 r3nb4 = false
+				=}
+			}
+		}
+		else{
+			if(r3nb3 == false){
+				{=
+				 r3nb3 = r3nb4,
+				 r3nb4 = false
+				=}
+			}
+			else{
+				tau
+			}
+		}
+	};
+
+	//route values
+	{=
+	r0l1 = r0lbv11,
+	r0l2 = !(r0lbv11) && r0lbv21,
+	
+	r1l3 = r1lbv11,
+	r1l2 = !(r1lbv11) && r1lbv21,
+	
+	r2l1 = r2lbv11,
+	r2l0 = !(r2lbv11) && r2lbv21,
+	
+	r3l3 = r3lbv11,
+	r3l0 = !(r3lbv11) && r3lbv21
+	=}
+}
+
+process Arbiter_corner0(){
+	r0east(r0a1, r0a2, r0a3);
+	r0south(r0a1, r0a2, r0a3);
+	r0local(r0a1, r0a2, r0a3);
+	if(r0a1 == false && r0a2 == false && r0a3 == false){ //priority east, south, local	
+		{=
+		r0a1 = !(r0lServiced) && r0eServiced && r0sServiced,
+		r0a2 = (!(r0lServiced) && r0eServiced && !(r0sServiced)) || (!(r0lServiced) && !(r0eServiced) && r0sServiced),
+		r0a3 = r0eServiced && !(r0sServiced)
+		=}
+	}
+	else if(r0a1 == false && r0a2 == false && r0a3 == true){ //priority south, east, local
+		{=
+		r0a1 = !(r0lServiced) && r0eServiced && r0sServiced,
+		r0a2 = (!(r0lServiced) && r0eServiced && !(r0sServiced)) || (!(r0lServiced) && !(r0eServiced) && r0sServiced), 
+		r0a3 = r0eServiced || !(r0sServiced)
+		=}
+	}
+	else if(r0a1 == false && r0a2 == true && r0a3 == false){ //priority east, local, south
+		{=
+		r0a1 = !(r0lServiced) && r0eServiced,
+		r0a2 = (!(r0lServiced) && !(r0eServiced)) || (r0lServiced && r0sServiced),
+		r0a3 = r0eServiced && !(r0sServiced) 
+		=}
+	}
+	else if(r0a1 == false && r0a2 == true && r0a3 == true){ //priority south, local, east
+		{=
+		r0a1 = !(r0lServiced) && r0sServiced,
+		r0a2 = (!(r0lServiced) && !(r0sServiced)) || (r0lServiced && r0eServiced),
+		r0a3 = r0eServiced || !(r0sServiced)
+		=}
+	}
+	else if(r0a1 == true && r0a2 == false && r0a3 == false){ //priority local, east, south
+		{=
+		r0a1 = (!(r0lServiced) && !(r0sServiced)) || (r0eServiced && r0sServiced),
+		r0a2 = (!(r0lServiced) && !(r0eServiced) && r0sServiced) || (r0lServiced && r0eServiced && !(r0sServiced)) || (r0lServiced && !(r0eServiced) && r0sServiced),
+		r0a3 = r0eServiced && !(r0sServiced)
+		=}
+	}
+	else if(r0a1 == true && r0a2 == false && r0a3 == true){ //priority local, south, east
+		{=
+		r0a1 = !(r0lServiced) || (r0eServiced && r0sServiced),
+		r0a2 = (r0lServiced && r0eServiced && !(r0sServiced)) || (r0lServiced && !(r0eServiced) && r0sServiced),
+		r0a3 = r0eServiced || !(r0sServiced)
+		=}
+	}
+	else{tau};
+	
+	if(r0lServiced && r0eServiced && r0sServiced && (r0l1 || r0l2) && (r0e2 || r0e4) && r0s4){
+		{=
+		r0l1 = false,
+		r0l2 = false,
+		r0e2 = false,
+		r0e4 = false,
+		r0s4 = false,
+		r0lServiced = false,
+		r0eServiced = false,
+		r0sServiced = false,
+		optimalRuns ++
+		=}
+	}
+	else{
+		{=
+		r0l1 = !(r0lServiced) || r0l1,
+		r0l2 = !(r0lServiced) || r0l2,
+		r0e2 = !(r0eServiced) || r0e2,
+		r0e4 = !(r0eServiced) || r0e4,
+		r0s4 = !(r0sServiced) || r0s4,
+		r0lServiced = false,
+		r0eServiced = false,
+		r0sServiced = false
+		=}
+	}
+}
+
+process Arbiter_corner1(){
+	r1west(r1a1, r1a2, r1a3);
+	r1south(r1a1, r1a2, r1a3);
+	r1local(r1a1, r1a2, r1a3);
+	if(r1a1 == false && r1a2 == false && r1a3 == false){ //priority west, south, local
+		{=
+		r1a1 = !(r1lServiced) && r1wServiced && r1sServiced,
+		r1a2 = (!(r1lServiced) && r1wServiced && !(r1sServiced)) || (!(r1lServiced) && !(r1wServiced) && r1sServiced),
+		r1a3 = r1wServiced && !(r1sServiced)
+		=}
+	}
+	else if(r1a1 == false && r1a2 == false && r1a3 == true){ //priority south, west, local
+		{=
+		r1a1 = !(r1lServiced) && r1wServiced && r1sServiced,
+		r1a2 = (!(r1lServiced) && r1wServiced && !(r1sServiced)) || (!(r1lServiced) && !(r1wServiced) && r1sServiced), 
+		r1a3 = r1wServiced || !(r1sServiced)
+		=}
+	}
+	else if(r1a1 == false && r1a2 == true && r1a3 == false){ //priority west, local, south
+		{=
+		r1a1 = !(r1lServiced) && r1wServiced,
+		r1a2 = (!(r1lServiced) && !(r1wServiced)) || (r1lServiced && r1sServiced),
+		r1a3 = r1wServiced && !(r1sServiced) 
+		=}
+	}
+	else if(r1a1 == false && r1a2 == true && r1a3 == true){ //priority south, local, west
+		{=
+		r1a1 = !(r1lServiced) && r1sServiced,
+		r1a2 = (!(r1lServiced) && !(r1sServiced)) || (r1lServiced && r1wServiced),
+		r1a3 = r1wServiced || !(r1sServiced)
+		=}
+	}
+	else if(r1a1 == true && r1a2 == false && r1a3 == false){ //priority local, west, south
+		{=
+		r1a1 = (!(r1lServiced) && !(r1sServiced)) || (r1wServiced && r1sServiced),
+		r1a2 = (!(r1lServiced) && !(r1wServiced) && r1sServiced) || (r1lServiced && r1wServiced && !(r1sServiced)) || (r1lServiced && !(r1wServiced) && r1sServiced),
+		r1a3 = r1wServiced && !(r1sServiced)
+		=}
+	}
+	else if(r1a1 == true && r1a2 == false && r1a3 == true){ //priority local, south, west
+		{=
+		r1a1 = !(r1lServiced) || (r1wServiced && r1sServiced),
+		r1a2 = (r1lServiced && r1wServiced && !(r1sServiced)) || (r1lServiced && !(r1wServiced) && r1sServiced),
+		r1a3 = r1wServiced || !(r1sServiced)
+		=}
+	}
+	else{tau};
+	
+	if(r1lServiced && r1wServiced && r1sServiced && (r1l2 || r1l3) && (r1w2 || r1w4) && r1s4){
+		{=
+		r1l3 = false,
+		r1l2 = false,
+		r1w2 = false,
+		r1w4 = false,
+		r1s4 = false,
+		r1lServiced = false,
+		r1wServiced = false,
+		r1sServiced = false,
+		optimalRuns ++
+		=}
+	}
+	else{
+		{=
+		r1l3 = !(r1lServiced) || r1l3,
+		r1l2 = !(r1lServiced) || r1l2,
+		r1w2 = !(r1wServiced) || r1w2,
+		r1w4 = !(r1wServiced) || r1w4,
+		r1s4 = !(r1sServiced) || r1s4,
+		r1lServiced = false,
+		r1wServiced = false,
+		r1sServiced = false
+		=}
+	}
+}
+
+process Arbiter_corner2(){
+	r2east(r2a1, r2a2, r2a3);
+	r2north(r2a1, r2a2, r2a3);
+	r2local(r2a1, r2a2, r2a3);
+	if(r2a1 == false && r2a2 == false && r2a3 == false){ //priority east, north, local
+		{=
+		r2a1 = !(r2lServiced) && r2eServiced && r2nServiced,
+		r2a2 = (!(r2lServiced) && r2eServiced && !(r2nServiced)) || (!(r2lServiced) && !(r2eServiced) && r2nServiced),
+		r2a3 = r2eServiced && !(r2nServiced)
+		=}
+	}
+	else if(r2a1 == false && r2a2 == false && r2a3 == true){ //priority north, east, local
+		{=
+		r2a1 = !(r2lServiced) && r2eServiced && r2nServiced,
+		r2a2 = (!(r2lServiced) && r2eServiced && !(r2nServiced)) || (!(r2lServiced) && !(r2eServiced) && r2nServiced), 
+		r2a3 = r2eServiced || !(r2nServiced)
+		=}
+	}
+	else if(r2a1 == false && r2a2 == true && r2a3 == false){ //priority east, local, north
+		{=
+		r2a1 = !(r2lServiced) && r2eServiced,
+		r2a2 = (!(r2lServiced) && !(r2eServiced)) || (r2lServiced && r2nServiced),
+		r2a3 = r2eServiced && !(r2nServiced) 
+		=}
+	}
+	else if(r2a1 == false && r2a2 == true && r2a3 == true){ //priority north, local, east
+		{=
+		r2a1 = !(r2lServiced) && r2nServiced,
+		r2a2 = (!(r2lServiced) && !(r2nServiced)) || (r2lServiced && r2eServiced),
+		r2a3 = r2eServiced || !(r2nServiced)
+		=}
+	}
+	else if(r2a1 == true && r2a2 == false && r2a3 == false){ //priority local, east, north
+		{=
+		r2a1 = (!(r2lServiced) && !(r2nServiced)) || (r2eServiced && r2nServiced),
+		r2a2 = (!(r2lServiced) && !(r2eServiced) && r2nServiced) || (r2lServiced && r2eServiced && !(r2nServiced)) || (r2lServiced && !(r2eServiced) && r2nServiced),
+		r2a3 = r2eServiced && !(r2nServiced)
+		=}
+	}
+	else if(r2a1 == true && r2a2 == false && r2a3 == true){ //priority local, north, east
+		{=
+		r2a1 = !(r2lServiced) || (r2eServiced && r2nServiced),
+		r2a2 = (r2lServiced && r2eServiced && !(r2nServiced)) || (r2lServiced && !(r2eServiced) && r2nServiced),
+		r2a3 = r2eServiced || !(r2nServiced)
+		=}
+	}
+	else{tau};
+	
+	if(r2lServiced && r2eServiced && r2nServiced && (r2l1 || r2l0) && (r2e0 || r2e4) && r2n4){
+		{=
+		r2l1 = false,
+		r2l0 = false,
+		r2e0 = false,
+		r2e4 = false,
+		r2n4 = false,
+		r2lServiced = false,
+		r2eServiced = false,
+		r2nServiced = false,
+		optimalRuns ++
+		=}
+	}
+	else{
+		{=
+		r2l1 = !(r2lServiced) || r2l1,
+		r2l0 = !(r2lServiced) || r2l0,
+		r2e0 = !(r2eServiced) || r2e0,
+		r2e4 = !(r2eServiced) || r2e4,
+		r2n4 = !(r2nServiced) || r2n4,
+		r2lServiced = false,
+		r2eServiced = false,
+		r2nServiced = false
+		=}
+	}
+}
+
+process Arbiter_corner3(){
+	r3west(r3a1, r3a2, r3a3);
+	r3north(r3a1, r3a2, r3a3);
+	r3local(r3a1, r3a2, r3a3);
+	if(r3a1 == false && r3a2 == false && r3a3 == false){ //priority west, north, local
+		{=
+		r3a1 = !(r3lServiced) && r3wServiced && r3nServiced,
+		r3a2 = (!(r3lServiced) && r3wServiced && !(r3nServiced)) || (!(r3lServiced) && !(r3wServiced) && r3nServiced),
+		r3a3 = r3wServiced && !(r3nServiced)
+		=}
+	}
+	else if(r3a1 == false && r3a2 == false && r3a3 == true){ //priority north, west, local
+		{=
+		r3a1 = !(r3lServiced) && r3wServiced && r3nServiced,
+		r3a2 = (!(r3lServiced) && r3wServiced && !(r3nServiced)) || (!(r3lServiced) && !(r3wServiced) && r3nServiced), 
+		r3a3 = r3wServiced || !(r3nServiced)
+		=}
+	}
+	else if(r3a1 == false && r3a2 == true && r3a3 == false){ //priority west, local, north
+		{=
+		r3a1 = !(r3lServiced) && r3wServiced,
+		r3a2 = (!(r3lServiced) && !(r3wServiced)) || (r3lServiced && r3nServiced),
+		r3a3 = r3wServiced && !(r3nServiced) 
+		=}
+	}
+	else if(r3a1 == false && r3a2 == true && r3a3 == true){ //priority north, local, west
+		{=
+		r3a1 = !(r3lServiced) && r3nServiced,
+		r3a2 = (!(r3lServiced) && !(r3nServiced)) || (r3lServiced && r3wServiced),
+		r3a3 = r3wServiced || !(r3nServiced)
+		=}
+	}
+	else if(r3a1 == true && r3a2 == false && r3a3 == false){ //priority local, west, north
+		{=
+		r3a1 = (!(r3lServiced) && !(r3nServiced)) || (r3wServiced && r3nServiced),
+		r3a2 = (!(r3lServiced) && !(r3wServiced) && r3nServiced) || (r3lServiced && r3wServiced && !(r3nServiced)) || (r3lServiced && !(r3wServiced) && r3nServiced),
+		r3a3 = r3wServiced && !(r3nServiced)
+		=}
+	}
+	else if(r3a1 == true && r3a2 == false && r3a3 == true){ //priority local, north, west
+		{=
+		r3a1 = !(r3lServiced) || (r3wServiced && r3nServiced),
+		r3a2 = (r3lServiced && r3wServiced && !(r3nServiced)) || (r3lServiced && !(r3wServiced) && r3nServiced),
+		r3a3 = r3wServiced || !(r3nServiced)
+		=}
+	}
+	else{tau};
+	
+	if(r3lServiced && r3wServiced && r3nServiced && (r3l0 || r3l3) && (r3w0 || r3w4) && r3n4){
+		{=
+		r3l0 = false,
+		r3l3 = false,
+		r3w0 = false,
+		r3w4 = false,
+		r3n4 = false,
+		r3lServiced = false,
+		r3wServiced = false,
+		r3nServiced = false,
+		optimalRuns ++
+		=}
+	}
+	else{
+		{=
+		r3l0 = !(r3lServiced) || r3l0,
+		r3l3 = !(r3lServiced) || r3l3,
+		r3w0 = !(r3wServiced) || r3w0,
+		r3w4 = !(r3wServiced) || r3w4,
+		r3n4 = !(r3nServiced) || r3n4,
+		r3lServiced = false,
+		r3wServiced = false,
+		r3nServiced = false
+		=}
+	}
+}
+
+process r0local(bool a1, bool a2, bool a3){
+	if(a1 || (a2 && a3)){		//local will not conflict
+		if(r0l1 == true){ //local sends east
+			if(r1wb4 == false){  //r1 west buffer not full
+				{=
+				r1wb4 = true,
+				r1wbv4 = r0lbv11 && r0lbv21,
+				//r0l1 = false,
+				r0lb1 = false,
+				r0lbv11 = false,
+				r0lbv21 = false,
+				r0lServiced = true
+				=}
+			}
+			else{ {= r0lServiced = false =}
+			}
+		}
+		else if(r0l2 == true){ //local sends south
+			if(r2nb4 == false){  //r1 west buffer not full
+				{=
+				r2nb4 = true,
+				//r0l2 = false,
+				r0lb1 = false,
+				r0lbv11 = false,
+				r0lbv21 = false,
+				r0lServiced = true
+				=}
+			}
+			else{ {= r0lServiced = false =}
+			}
+		}
+		else{ //local empty
+			{= r0lServiced = true =}
+		}
+	}
+	else{
+		if(r0l1 == true){ //local sends east
+			if(r1wb4 == false){  //r1 west buffer not full
+				{=
+				r1wb4 = true,
+				r1wbv4 = r0lbv11 && r0lbv21,
+				//r0l1 = false,
+				r0lb1 = false,
+				r0lbv11 = false,
+				r0lbv21 = false,
+				r0lServiced = true
+				=}
+			}
+			else{ {= r0lServiced = false =}
+			}
+		}
+		else if(r0l2 == true){ //local sends south
+			if(r0e2 == false){ //only if east is not sending south
+				if(r2nb4 == false){  //r1 west buffer not full
+					{=
+					r2nb4 = true,
+					//r0l2 = false,
+					r0lb1 = false,
+					r0lbv11 = false,
+					r0lbv21 = false,
+					r0lServiced = true
+					=}
+				}
+				else{ {= r0lServiced = false =}
+				}
+			}
+			else{ {= r0lServiced = false =}
+			}
+		}
+		else{ //local empty
+			{= r0lServiced = true =}
+		}
+	}
+}
+process r0east(bool a1, bool a2, bool a3){
+	if((a2 && a3) || (a1 && a3)){	//south and local buffer has priority over east
+		if(r0e2 == true){ //east sends south
+			if(r0l2 == false){ //only if local doesn't send south
+				if(r2nb4 == false){	//r2 north buffer not full
+					{=
+					r2nb4 = true,
+					//r0e2 = false,
+					r0eb1 = false,
+					r0ebv1 = false,
+					r0eServiced = true
+					=}
+				}
+				else{
+					{= r0eServiced = false =}
+				}
+			}
+			else{ {= r0eServiced = false =}
+			}
+		}
+		else if(r0e4 == true){ //east sends local
+			if(r0s4 == false){
+				{=
+				//r0e4 = false,
+				r0eb1 = false,
+				r0ebv1 = false,
+				r0eServiced = true
+				=}
+			}
+			else{ {= r0eServiced = false =}
+			}
+		}
+		else{ //east is empty
+			{= r0eServiced = true =}
+		}
+	}
+	else if(!a1 && !a2 && a3){ //south buffer has priority over east
+		if(r0e2 == true){ //east sends south
+			if(r2nb4 == false){	//r2 north buffer not full
+				{=
+				r2nb4 = true,
+				//r0e2 = false,
+				r0eb1 = false,
+				r0ebv1 = false,
+				r0eServiced = true
+				=}
+			}
+			else{
+				{= r0eServiced = false =}
+			}
+		}
+		else if(r0e4 == true){ //east sends local
+			if(r0s4 == false){
+				{=
+				//r0e4 = false,
+				r0eb1 = false,
+				r0ebv1 = false,
+				r0eServiced = true
+				=}
+			}
+			else { {= r0eServiced = false =}
+			}
+		}
+		else{ //east is empty
+			{= r0eServiced = true =}
+		}
+	}
+	else if(a1 && a2 && !a3){	//local buffer has priority over east
+		if(r0e2 == true){ //east sends south
+			if(r0l2 == false){
+				if(r2nb4 == false){	//r2 north buffer not full
+					{=
+					r2nb4 = true,
+					//r0e2 = false,
+					r0eb1 = false,
+					r0ebv1 = false,
+					r0eServiced = true
+					=}
+				}
+				else{
+					{= r0eServiced = false =}
+				}
+			}
+			else{ {= r0eServiced = false =}
+			}
+		}
+		else if(r0e4 == true){ //east sends local
+			{=
+			//r0e4 = false,
+			r0eb1 = false,
+			r0ebv1 = false,
+			r0eServiced = true
+			=}
+		}
+		else{ //east is empty
+			{= r0eServiced = true =}
+		}
+	}
+	else{	//east has priority
+		if(r0e2 == true){ //east sends south
+			if(r2nb4 == false){	//r2 north buffer not full
+				{=
+				r2nb4 = true,
+				//r0e2 = false,
+				r0eb1 = false,
+				r0ebv1 = false,
+				r0eServiced = true
+				=}
+			}
+			else{
+				{= r0eServiced = false =}
+			}
+		}
+		else if(r0e4 == true){ //east sends local
+			{=
+			//r0e4 = false,
+			r0eb1 = false,
+			r0ebv1 = false,
+			r0eServiced = true
+			=}
+		}
+		else{ //east is empty
+			{= r0eServiced = true =}
+		}
+	}
+}
+process r0south(bool a1, bool a2, bool a3){
+	if(a3 == true){ //south has priority over east
+		if(r0s4 == true){ //south sends local
+			{=
+			//r0s4 = false,
+			r0sb1 = false,
+			r0sServiced = true
+			=}
+		}
+		else{ {=r0sServiced = true =} }//south is empty
+	}
+	else{
+		if(r0s4 == true){ //south sends local
+			if(r0e4 == false){	//south and east don't conflict
+				{=
+				//r0s4 = false,
+				r0sb1 = false,
+				r0sServiced = true
+				=}
+			}
+			else{
+				{=
+				r0sServiced = false
+				=}
+			}
+		}
+		else{ {=r0sServiced = true =} }//south is empty
+	}
+}
+
+process r1local(bool a1, bool a2, bool a3){
+	if(a1 || (a2 && a3)){		//local will not conflict
+		if(r1l3 == true){ //local sends east
+			if(r0eb4 == false){  //r0 east buffer not full
+				{=
+				r0eb4 = true,
+				r0ebv4 = r1lbv11 && r1lbv21,
+				//r1l3 = false,
+				r1lb1 = false,
+				r1lbv11 = false,
+				r1lbv21 = false,
+				r1lServiced = true
+				=}
+			}
+			else{ {= r1lServiced = false =}
+			}
+		}
+		else if(r1l2 == true){ //local sends south
+			if(r3nb4 == false){  //r3 north buffer not full
+				{=
+				r3nb4 = true,
+				//r1l2 = false,
+				r1lb1 = false,
+				r1lbv11 = false,
+				r1lbv21 = false,
+				r1lServiced = true
+				=}
+			}
+			else{ {= r1lServiced = false =}
+			}
+		}
+		else{ //local empty
+			{= r1lServiced = true =}
+		}
+	}
+	else{
+		if(r1l3 == true){ //local sends east
+			if(r0eb4 == false){  //r0 east buffer not full
+				{=
+				r0eb4 = true,
+				r0ebv4 = r1lbv11 && r1lbv21,
+				//r1l3 = false,
+				r1lb1 = false,
+				r1lbv11 = false,
+				r1lbv21 = false,
+				r1lServiced = true
+				=}
+			}
+			else{ {= r1lServiced = false =}
+			}
+		}
+		else if(r1l2 == true){ //local sends south
+			if(r1w2 == false){
+				if(r3nb4 == false){  //r0 east buffer not full
+					{=
+					r3nb4 = true,
+					//r1l2 = false,
+					r1lb1 = false,
+					r1lbv11 = false,
+					r1lbv21 = false,
+					r1lServiced = true
+					=}
+				}
+				else{ {= r1lServiced = false =}
+				}
+			}
+			else{ {= r1lServiced = false =}
+			}
+		}
+		else{ //local empty
+			{= r1lServiced = true =}
+		}
+	}
+}
+process r1west(bool a1, bool a2, bool a3){
+	if((a2 && a3) || (a1 && a3)){	//south and local buffer has priority over west
+		if(r1w2 == true){ //west sends south
+			if(r1l2 == false){
+				if(r3nb4 == false){	//r3 north buffer not full
+					{=
+					r3nb4 = true,
+					//r1w2 = false,
+					r1wb1 = false,
+					r1wbv1 = false,
+					r1wServiced = true
+					=}
+				}
+				else{
+					{= r1wServiced = false =}
+				}
+			}
+			else{ {= r1wServiced = false =}
+			}
+		}
+		else if(r1w4 == true){ //west sends local
+			if(r1s4 == false){
+				{=
+				//r1w4 = false,
+				r1wb1 = false,
+				r1wbv1 = false,
+				r1wServiced = true
+				=}
+			}
+			else{ {= r1wServiced = false =}
+			}
+		}
+		else{ //west is empty
+			{= r1wServiced = true =}
+		}
+	}
+	else if(!a1 && !a2 && a3){ //south buffer has priority over west
+		if(r1w2 == true){ //west sends south
+			if(r3nb4 == false){	//r3 north buffer not full
+				{=
+				r3nb4 = true,
+				//r1w2 = false,
+				r1wb1 = false,
+				r1wbv1 = false,
+				r1wServiced = true
+				=}
+			}
+			else{
+				{= r1wServiced = false =}
+			}
+		}
+		else if(r1w4 == true){ //west sends local
+			if(r1s4 == false){
+				{=
+				//r1w4 = false,
+				r1wb1 = false,
+				r1wbv1 = false,
+				r1wServiced = true
+				=}
+			}
+			else { {= r1wServiced = false =}
+			}
+		}
+		else{ //west is empty
+			{= r1wServiced = true =}
+		}
+	}
+	else if(a1 && a2 && !a3){	//local buffer has priority over west
+		if(r1w2 == true){ //west sends south
+			if(r1l2 == false){
+				if(r3nb4 == false){	//r3 north buffer not full
+					{=
+					r3nb4 = true,
+					//r1w2 = false,
+					r1wb1 = false,
+					r1wbv1 = false,
+					r1wServiced = true
+					=}
+				}
+				else{
+					{= r1wServiced = false =}
+				}
+			}
+			else{ {= r1wServiced = false =}
+			}
+		}
+		else if(r1w4 == true){ //west sends local
+			{=
+			//r1w4 = false,
+			r1wb1 = false,
+			r1wbv1 = false,
+			r1wServiced = true
+			=}
+		}
+		else{ //west is empty
+			{= r1wServiced = true =}
+		}
+	}
+	else{	//west has priority
+		if(r1w2 == true){ //west sends south
+			if(r3nb4 == false){	//r3 north buffer not full
+				{=
+				r3nb4 = true,
+				//r1w2 = false,
+				r1wb1 = false,
+				r1wbv1 = false,
+				r1wServiced = true
+				=}
+			}
+			else{
+				{= r1wServiced = false =}
+			}
+		}
+		else if(r1w4 == true){ //west sends local
+			{=
+			//r1w4 = false,
+			r1wb1 = false,
+			r1wbv1 = false,
+			r1wServiced = true
+			=}
+		}
+		else{ //east is empty
+			{= r1wServiced = true =}
+		}
+	}
+}
+process r1south(bool a1, bool a2, bool a3){
+	if(a3 == true){ //south has priority over west
+		if(r1s4 == true){ //south sends local
+			{=
+			//r1s4 = false,
+			r1sb1 = false,
+			r1sServiced = true
+			=}
+		}
+		else{ {=r1sServiced = true =} }//south is empty
+	}
+	else{
+		if(r1s4 == true){ //south sends local
+			if(r1w4 == false){	//south and west don't conflict
+				{=
+				//r1s4 = false,
+				r1sb1 = false,
+				r1sServiced = true
+				=}
+			}
+			else{
+				{=
+				r1sServiced = false
+				=}
+			}
+		}
+		else{ {=r1sServiced = true =} }//south is empty
+	}
+}
+
+process r2local(bool a1, bool a2, bool a3){
+	if(a1 || (a2 && a3)){		//local will not conflict
+		if(r2l1 == true){ //local sends east
+			if(r3wb4 == false){  //r3 west buffer not full
+				{=
+				r3wb4 = true,
+				r3wbv4 = r2lbv11 && r2lbv21,
+				//r2l1 = false,
+				r2lb1 = false,
+				r2lbv11 = false,
+				r2lbv21 = false,
+				r2lServiced = true
+				=}
+			}
+			else{ {= r2lServiced = false =}
+			}
+		}
+		else if(r2l0 == true){ //local sends north
+			if(r0sb4 == false){  //r0 north buffer not full
+				{=
+				r0sb4 = true,
+				//r2l0 = false,
+				r2lb1 = false,
+				r2lbv11 = false,
+				r2lbv21 = false,
+				r2lServiced = true
+				=}
+			}
+			else{ {= r2lServiced = false =}
+			}
+		}
+		else{ //local empty
+			{= r2lServiced = true =}
+		}
+	}
+	else{
+		if(r2l1 == true){ //local sends east
+			if(r3wb4 == false){  //r3 west buffer not full
+				{=
+				r3wb4 = true,
+				r3wbv4 = r2lbv11 && r2lbv21,
+				//r2l1 = false,
+				r2lb1 = false,
+				r2lbv11 = false,
+				r2lbv21 = false,
+				r2lServiced = true
+				=}
+			}
+			else{ {= r2lServiced = false =}
+			}
+		}
+		else if(r2l0 == true){ //local sends north
+			if(r2e0 == false){
+				if(r0sb4 == false){  //r3 west buffer not full
+					{=
+					r0sb4 = true,
+					//r2l0 = false,
+					r2lb1 = false,
+					r2lbv11 = false,
+					r2lbv21 = false,
+					r2lServiced = true
+					=}
+				}
+				else{ {= r2lServiced = false =}
+				}
+			}
+			else{ {= r2lServiced = false =}
+			}
+		}
+		else{ //local empty
+			{= r2lServiced = true =}
+		}
+	}
+}
+process r2east(bool a1, bool a2, bool a3){
+	if((a2 && a3) || (a1 && a3)){	//south and local buffer has priority over east
+		if(r2e0 == true){ //east sends south
+			if(r2l0 == false){
+				if(r0sb4 == false){	//r0 north buffer not full
+					{=
+					r0sb4 = true,
+					//r2e2 = false,
+					r2eb1 = false,
+					r2ebv1 = false,
+					r2eServiced = true
+					=}
+				}
+				else{
+					{= r2eServiced = false =}
+				}
+			}
+			else{ {= r2eServiced = false =}
+			}
+		}
+		else if(r2e4 == true){ //east sends local
+			if(r2n4 == false){
+				{=
+				//r2e4 = false,
+				r2eb1 = false,
+				r2ebv1 = false,
+				r2eServiced = true
+				=}
+			}
+			else{ {= r2eServiced = false =}
+			}
+		}
+		else{ //east is empty
+			{= r2eServiced = true =}
+		}
+	}
+	else if(!a1 && !a2 && a3){ //south buffer has priority over east
+		if(r2e0 == true){ //east sends south
+			if(r0sb4 == false){	//r0 north buffer not full
+				{=
+				r0sb4 = true,
+				//r2e2 = false,
+				r2eb1 = false,
+				r2ebv1 = false,
+				r2eServiced = true
+				=}
+			}
+			else{
+				{= r2eServiced = false =}
+			}
+		}
+		else if(r2e4 == true){ //east sends local
+			if(r2n4 == false){
+				{=
+				//r2e4 = false,
+				r2eb1 = false,
+				r2ebv1 = false,
+				r2eServiced = true
+				=}
+			}
+			else { {= r2eServiced = false =}
+			}
+		}
+		else{ //east is empty
+			{= r2eServiced = true =}
+		}
+	}
+	else if(a1 && a2 && !a3){	//local buffer has priority over east
+		if(r2e0 == true){ //east sends south
+			if(r2l0 == false){
+				if(r0sb4 == false){	//r0 north buffer not full
+					{=
+					r0sb4 = true,
+					//r2e2 = false,
+					r2eb1 = false,
+					r2ebv1 = false,
+					r2eServiced = true
+					=}
+				}
+				else{
+					{= r2eServiced = false =}
+				}
+			}
+			else{ {= r2eServiced = false =}
+			}
+		}
+		else if(r2e4 == true){ //east sends local
+			{=
+			//r2e4 = false,
+			r2eb1 = false,
+			r2ebv1 = false,
+			r2eServiced = true
+			=}
+		}
+		else{ //east is empty
+			{= r2eServiced = true =}
+		}
+	}
+	else{	//east has priority
+		if(r2e0 == true){ //east sends south
+			if(r0sb4 == false){	//r0 north buffer not full
+				{=
+				r0sb4 = true,
+				//r2e2 = false,
+				r2eb1 = false,
+				r2ebv1 = false,
+				r2eServiced = true
+				=}
+			}
+			else{
+				{= r2eServiced = false =}
+			}
+		}
+		else if(r2e4 == true){ //east sends local
+			{=
+			//r2e4 = false,
+			r2eb1 = false,
+			r2ebv1 = false,
+			r2eServiced = true
+			=}
+		}
+		else{ //east is empty
+			{= r2eServiced = true =}
+		}
+	}
+}
+process r2north(bool a1, bool a2, bool a3){
+	if(a3 == true){ //north has priority over east
+		if(r2n4 == true){ //north sends local
+			{=
+			//r2n4 = false,
+			r2nb1 = false,
+			r2nServiced = true
+			=}
+		}
+		else{ {=r2nServiced = true =} }//north is empty
+	}
+	else{
+		if(r2n4 == true){ //north sends local
+			if(r2e4 == false){	//north and east don't conflict
+				{=
+				//r2n4 = false,
+				r2nb1 = false,
+				r2nServiced = true
+				=}
+			}
+			else{
+				{=
+				r2nServiced = false
+				=}
+			}
+		}
+		else{ {=r2nServiced = true =} }//north is empty
+	}
+}
+
+process r3local(bool a1, bool a2, bool a3){
+	if(a1 || (a2 && a3)){		//local will not conflict
+		if(r3l3 == true){ //local sends west
+			if(r2eb4 == false){  //r3 west buffer not full
+				{=
+				r2eb4 = true,
+				r2ebv4 = r3lbv11 && r3lbv21,
+				//r3l3 = false,
+				r3lb1 = false,
+				r3lbv11 = false,
+				r3lbv21 = false,
+				r3lServiced = true
+				=}
+			}
+			else{ {= r3lServiced = false =}
+			}
+		}
+		else if(r3l0 == true){ //local sends south
+			if(r1sb4 == false){  //r1 north buffer not full
+				{=
+				r1sb4 = true,
+				//r3l0 = false,
+				r3lb1 = false,
+				r3lbv11 = false,
+				r3lbv21 = false,
+				r3lServiced = true
+				=}
+			}
+			else{ {= r3lServiced = false =}
+			}
+		}
+		else{ //local empty
+			{= r3lServiced = true =}
+		}
+	}
+	else{
+		if(r3l3 == true){ //local sends west
+			if(r2eb4 == false){  //r3 west buffer not full
+				{=
+				r2eb4 = true,
+				r2ebv4 = r3lbv11 && r3lbv21,
+				//r3l3 = false,
+				r3lb1 = false,
+				r3lbv11 = false,
+				r3lbv21 = false,
+				r3lServiced = true
+				=}
+			}
+			else{ {= r3lServiced = false =}
+			}
+		}
+		else if(r3l0 == true){ //local sends south
+			if(r3w0 == false){
+				if(r1sb4 == false){  //r3 west buffer not full
+					{=
+					r1sb4 = true,
+					//r3l0 = false,
+					r3lb1 = false,
+					r3lbv11 = false,
+					r3lbv21 = false,
+					r3lServiced = true
+					=}
+				}
+				else{ {= r3lServiced = false =}
+				}
+			}
+			else{ {= r3lServiced = false =}
+			}
+		}
+		else{ //local empty
+			{= r3lServiced = true =}
+		}
+	}
+}
+process r3west(bool a1, bool a2, bool a3){
+	if((a2 && a3) || (a1 && a3)){	//south and local buffer has priority over east
+		if(r3w0 == true){ //east sends south
+			if(r3l0 == false){
+				if(r1sb4 == false){	//r1 north buffer not full
+					{=
+					r1sb4 = true,
+					//r3w2 = false,
+					r3wb1 = false,
+					r3wbv1 = false,
+					r3wServiced = true
+					=}
+				}
+				else{
+					{= r3wServiced = false =}
+				}
+			}
+			else{ {= r3wServiced = false =}
+			}
+		}
+		else if(r3w4 == true){ //east sends local
+			if(r3n4 == false){
+				{=
+				//r3w4 = false,
+				r3wb1 = false,
+				r3wbv1 = false,
+				r3wServiced = true
+				=}
+			}
+			else{ {= r2eServiced = false =}
+			}
+		}
+		else{ //west is empty
+			{= r3wServiced = true =}
+		}
+	}
+	else if(!a1 && !a2 && a3){ //south buffer has priority over east
+		if(r3w0 == true){ //east sends south
+			if(r1sb4 == false){	//r1 north buffer not full
+				{=
+				r1sb4 = true,
+				//r3w2 = false,
+				r3wb1 = false,
+				r3wbv1 = false,
+				r3wServiced = true
+				=}
+			}
+			else{
+				{= r3wServiced = false =}
+			}
+		}
+		else if(r3w4 == true){ //east sends local
+			if(r3n4 == false){
+				{=
+				//r3w4 = false,
+				r3wb1 = false,
+				r3wbv1 = false,
+				r3wServiced = true
+				=}
+			}
+			else { {= r3wServiced = false =}
+			}
+		}
+		else{ //west is empty
+			{= r3wServiced = true =}
+		}
+	}
+	else if(a1 && a2 && !a3){	//local buffer has priority over east
+		if(r3w0 == true){ //east sends south
+			if(r3l0 == false){
+				if(r1sb4 == false){	//r1 north buffer not full
+					{=
+					r1sb4 = true,
+					//r3w2 = false,
+					r3wb1 = false,
+					r3wbv1 = false,
+					r3wServiced = true
+					=}
+				}
+				else{
+					{= r3wServiced = false =}
+				}
+			}
+			else{ {= r3wServiced = false =}
+			}
+		}
+		else if(r3w4 == true){ //east sends local
+			{=
+			//r3w4 = false,
+			r3wb1 = false,
+			r3wbv1 = false,
+			r3wServiced = true
+			=}
+		}
+		else{ //east is empty
+			{= r3wServiced = true =}
+		}
+	}
+	else{	//east has priority
+		if(r3w0 == true){ //east sends south
+			if(r1sb4 == false){	//r1 north buffer not full
+				{=
+				r1sb4 = true,
+				//r3w2 = false,
+				r3wb1 = false,
+				r3wbv1 = false,
+				r3wServiced = true
+				=}
+			}
+			else{
+				{= r3wServiced = false =}
+			}
+		}
+		else if(r3w4 == true){ //east sends local
+			{=
+			//r3w4 = false,
+			r3wb1 = false,
+			r3wbv1 = false,
+			r3wServiced = true
+			=}
+		}
+		else{ //west is empty
+			{= r3wServiced = true =}
+		}
+	}
+}
+process r3north(bool a1, bool a2, bool a3){
+	if(a3 == true){ //south has priority over east
+		if(r3n4 == true){ //south sends local
+			{=
+			//r3n4 = false,
+			r3nb1 = false,
+			r3nServiced = true
+			=}
+		}
+		else{ {=r3nServiced = true =} }//south is empty
+	}
+	else{
+		if(r3n4 == true){ //south sends local
+			if(r3w4 == false){	//south and east don't conflict
+				{=
+				//r3n4 = false,
+				r3nb1 = false,
+				r3nServiced = true
+				=}
+			}
+			else{
+				{=
+				r3nServiced = false
+				=}
+			}
+		}
+		else{ {=r3nServiced = true =} }//south is empty
+	}
+}
+// ---- End process definitions ----
+
+par{
+:: Clock()
+:: Top()
+}
