@@ -1,6 +1,21 @@
+/*
+ * This is a test for sending a flit from one router to another. A flit will be placed on the local buffer of router 0, and
+ * then it will be sent south to the northern buffer of router 1.
+ *
+ * NoC router ID map:
+ *	0
+ *	|
+ *	1
+ *
+ * Editors: Jonah Boe
+ * Date: Jun 09, 2021
+ */
+
 option "dtmc";
 
-// ------------------------------------------------------- Datatypes --------------------------------------------------------
+
+
+// ------------------------------------------------------- Datatypes -------------------------------------------------------
 
 datatype buffer = {int(0..NOC_MAX_ID) hd, buffer option tl};
 datatype channel = {buffer option buffer, int(0..4) priority};
@@ -8,7 +23,7 @@ datatype router = {channel[] channels, int(-1..NOC_MAX_ID)[] ids};
 
 
 
-// --------------------------------------------------- Top level varables ---------------------------------------------------
+// --------------------------------------------------- Top level varables --------------------------------------------------
 
 // #MODULARIZE by setting NOC_MAX_ID to 1 less than the total number of routers and allocating spaces for more routers
 const int NOC_MAX_ID = 1;
@@ -23,16 +38,18 @@ const int SOUTH = 3;
 const int LOCAL = 4;
 
 int (0..1) packetSent;
+int (0..1) packetRemoved;
 
 
 
-// ------------------------------------------------------- Properties -------------------------------------------------------
+// ------------------------------------------------------- Properties ------------------------------------------------------
 
-property Test1 = Pmax(<> (packetSent == 1));
+property Test_PacketSent = Pmax(<> (packetSent == 1));
+property Test_PacketRemoved = Pmax(<> (packetSent == 1));
 
 
 
-// ------------------------------------------------------- Functions --------------------------------------------------------
+// ------------------------------------------------------- Functions -------------------------------------------------------
 
 // Calculate length of list
 function int len(buffer option ls) = if ls == none then 0 else 1 + len(ls!.tl);
@@ -45,24 +62,14 @@ function int getDestinationDirection(int dir) =
 	else if dir == SOUTH then NORTH
 	else -1;
 
-// Get the id of the first router in this row
-function int firstInRow(int id) =
-	if noc[id].ids[WEST] == -1 then id
-	else firstInRow(noc[id].ids[WEST]);
-
-// Get the id of the last router in this row
-function int lastInRow(int id) =
-	if noc[id].ids[EAST] == -1 then id
-	else lastInRow(noc[id].ids[EAST]);
-
 // Tell if the buffer is full
 function bool isBufferFull(int id, int dir) = len(noc[id].channels[dir].buffer) >= BUFFER_LENGTH;
 
 // Return the front of the queue
 function int peekFront(buffer option ls) =
-	if ls == none then -1
-	else if ls!.tl == none then ls!.hd
-	else peekFront(ls!.tl);
+	 if ls == none then -1
+	 else if ls!.tl == none then ls!.hd
+	      else peekFront(ls!.tl);
 
 // Add a flit to the buffer
 function buffer option enqueue(int n, buffer option ls) =
@@ -83,7 +90,7 @@ function buffer option dequeue(buffer option ls) =
 
 
 
-// ------------------------------------------------------- Processes --------------------------------------------------------
+// ------------------------------------------------------- Processes -------------------------------------------------------
 
 // Send flit to northern router. src and dst are channels (ie NORTH, WEST, EAST, SOUTH, LOCAL), NOT the actual router ids!
 process Send(int id, int src, int dir){
@@ -108,39 +115,11 @@ process Send(int id, int src, int dir){
 	}
 }
 
-// Advance flits to respective buffers
-process AdvanceFlits(int id){
-	// If flit needs to stay on this row
-	if(peekFront(noc[id].channels[LOCAL].buffer) >= firstInRow(id)){//} && peekFront(noc[id].channels[LOCAL].buffer) <= lastInRow(id)){
-		// Send it west
-		tau
-/*		if(peekFront(noc[id].channel_local.buffer) < id){
-			SendWest(id)
-		}
-		// Or send it east
-		else{
-			SendEast(id)
-		}
-*/	}
-	// If flit needs to go north
-/*	else if(peekFront(noc[id].channels[LOCAL].buffer) < id){
-		tau//SendNorth(id)
-	}
-	// Else flit needs to go south
-*/	else{
-		// Send the flit
-		Send(id, LOCAL, SOUTH)
-	}
-}
-
-// Process for Arbiter 1
+// Process for Arbiter 0
 process Arbiter(int id, int id_north, int id_west, int id_east, int id_south){
-	// Initialize
 
-	// 0
-	// |
-	// 1
-	channel temp;
+	// Initialize
+	channel[] temp;
 	{=
 		noc[id] = router {ids: [id_north, id_west, id_east, id_south]},
 		noc[id].channels =
@@ -148,8 +127,7 @@ process Arbiter(int id, int id_north, int id_west, int id_east, int id_south){
 
 		// TEST: Create the router we're sending to
 		noc[1] = router {ids: [0, -1, -1, -1]},
-		noc[1].channels =
-			[channel {priority: 0}, channel {priority: 0}, channel {priority: 0}, channel {priority: 0}, channel {priority: 0}],
+		noc[1].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
 
 		// TEST: Create a flit with destination of north router id
 		noc[id].channels[LOCAL].buffer = enqueue(1, none)
@@ -157,12 +135,21 @@ process Arbiter(int id, int id_north, int id_west, int id_east, int id_south){
 
 	// Run
 	do{
-		// Advance the flit
-		AdvanceFlits(id);
+		// Send the flit
+		Send(id, LOCAL, SOUTH);
 
 		if(peekFront(noc[1].channels[NORTH].buffer) != -1){
 			{=
 				packetSent = 1
+			=}
+		}
+		else{
+			tau
+		};
+
+		if(peekFront(noc[id].channels[LOCAL].buffer) == -1){
+			{=
+				packetRemoved = 1
 			=}
 		}
 		else{
@@ -176,6 +163,6 @@ process Arbiter(int id, int id_north, int id_west, int id_east, int id_south){
 
 
 
-// ------------------------------------------------------- Execution --------------------------------------------------------
+// ------------------------------------------------------- Execution -------------------------------------------------------
 
 Arbiter(0, -1, -1, -1, 1)
