@@ -1,6 +1,5 @@
 /*
- * This is a test for sending a flit from one router to another. A flit will be placed on the local buffer of router 0, and
- * then it will be sent south to the northern buffer of router 1.
+ * This is a test for sending a flit from the local buffer of a router across multiple other routers and to its destination.
  *
  * NoC router ID map:
  *	0 - 1 - 2
@@ -128,34 +127,35 @@ process Send(int id, int src, int dir){
 // Advance flits to respective buffers
 process AdvanceFlits(int id){
 	// If flit needs to stay on this row
-	if(//peekFront(noc[id].channels[LOCAL].buffer) >= firstInRow(id)){//&&
-		false){//peekFront(noc[id].channels[LOCAL].buffer) <= lastInRow(id)){
+	// TODO: test using local variable here
+	int flit;
+	{=
+		flit = peekFront(noc[id].channels[LOCAL].buffer)
+	=};
+
+	if(flit >= firstInRow(id) && flit <= lastInRow(id)){
 		// Send it west
-		tau
-/*		if(peekFront(noc[id].channel_local.buffer) < id){
-			SendWest(id)
+		if(flit < id){
+			Send(id, LOCAL, WEST)
 		}
 		// Or send it east
 		else{
-			SendEast(id)
+			Send(id, LOCAL, EAST)
 		}
-*/	}
-	// If flit needs to go north
-/*	else if(peekFront(noc[id].channels[LOCAL].buffer) < id){
-		tau//SendNorth(id)
 	}
-	// Else flit needs to go south
-*/	else{
-		// Send the flit
+	// Else, if flit needs to go north
+	else if(flit < id){
+		Send(id, LOCAL, NORTH)
+	}
+	// Else, flit needs to go south
+	else{
 		Send(id, LOCAL, SOUTH)
-		//tau
 	}
 }
 
 // Process for Arbiter 1
 process Arbiter(int id, int id_north, int id_west, int id_east, int id_south){
 	// Initialize
-	channel temp;
 	{=
 		noc[id] = router {ids: [id_north, id_west, id_east, id_south]},
 		noc[id].channels =
