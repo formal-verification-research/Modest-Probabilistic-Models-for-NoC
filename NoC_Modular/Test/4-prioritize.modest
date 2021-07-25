@@ -18,9 +18,9 @@ option "dtmc";
 
 // ------------------------------------------------------- Datatypes --------------------------------------------------------
 
-datatype buffer = {int(0..NOC_MAX_ID) hd, buffer option tl};
+datatype buffer = {int hd, buffer option tl};
 datatype channel = {buffer option buffer, int(0..4) priority};
-datatype router = {channel[] channels, int(-1..NOC_MAX_ID)[] ids};
+datatype router = {channel[] channels, int(-1..NOC_MAX_ID)[] ids, buffer option priorities};
 
 
 
@@ -38,13 +38,13 @@ const int EAST = 2;
 const int SOUTH = 3;
 const int LOCAL = 4;
 
-int (0..1) test1;
+int (0..1) packetSent;
 
 
 
 // ------------------------------------------------------- Properties -------------------------------------------------------
 
-property Packet_sent_local_to_south = Pmax(<> (test1 == 1));
+property Test1 = Pmax(<> (packetSent == 1));
 
 
 
@@ -124,32 +124,55 @@ process Send(int id, int src, int dir){
 	}
 }
 
-// Advance flits to respective buffers
-process AdvanceFlits(int id){
-	// If flit needs to stay on this row
-	// TODO: test using local variable here
-	int flit;
-	{=
-		flit = peekFront(noc[id].channels[LOCAL].buffer)
-	=};
+// Prioritize the channels and add them to the priorities buffer
+process PrioritizeChannels(id){
+	// TODO: advance priorities
 
-	if(flit >= firstInRow(id) && flit <= lastInRow(id)){
-		// Send it west
-		if(flit < id){
-			Send(id, LOCAL, WEST)
+	if(peekFront(noc[id].channels[NORTH].buffer) != -1){
+		noc[id].
+	}
+}
+
+// Advance flits to respective buffers
+// TODO: Make sure not to add more flits that allowed.
+process AdvanceFlits(int id, buffer channels){
+	do{
+		// Take the first channel in the buffer
+		{=
+			int index = peekFront(noc[id].priorities)
+		=};
+
+		// If there are no flits on the channel then exit process
+		if(index == -1){
+			break
 		}
-		// Or send it east
 		else{
-			Send(id, LOCAL, EAST)
-		}
-	}
-	// Else, if flit needs to go north
-	else if(flit < id){
-		Send(id, LOCAL, NORTH)
-	}
-	// Else, flit needs to go south
-	else{
-		Send(id, LOCAL, SOUTH)
+			// If flit needs to stay on this row
+			if(peekFront(noc[id].channels[index].buffer) >= firstInRow(id)) &&
+				peekFront(noc[id].channels[index].buffer) <= lastInRow(id)){
+				// Send it west
+				if(peekFront(noc[id].channel_local.buffer) < id){
+					Send(id, index, WEST)
+				}
+				// Or send it east
+				else{
+					Send(id, index, EAST)
+				}
+			}
+			// Else, if flit needs to go north
+			else if(peekFront(noc[id].channels[index].buffer) < id){
+				Send(id, index, NORTH)
+			}
+			// Else, flit needs to go south
+			else{
+				Send(id, index, SOUTH)
+			}
+		};
+
+		// Remove the last channel from the buffer
+		{=
+			noc[id].priorities = dequeue(noc[id].priorities)
+		=}
 	}
 }
 
@@ -159,7 +182,7 @@ process Arbiter(int id, int id_north, int id_west, int id_east, int id_south){
 	{=
 		noc[id] = router {ids: [id_north, id_west, id_east, id_south]},
 		noc[id].channels =
-			[channel {}, channel {}, channel {}, channel {}, channel {}],
+			[channel {priority: 0}, channel {priority: 0}, channel {priority: 0}, channel {priority: 0}, channel {priority: 0}],
 
 		// TEST: Create the routers 1 - 8
 		noc[1] = router {ids: [-1,  0,  2,  4]},
@@ -179,20 +202,30 @@ process Arbiter(int id, int id_north, int id_west, int id_east, int id_south){
 		noc[8] = router {ids: [ 5,  7, -1, -1]},
 		noc[8].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
 
-		// Generate new flit
+		// TEST: Create a flit with destination of north router id
 		noc[id].channels[LOCAL].buffer = enqueue(3, none)
 	=};
 
-	// TEST 1: Moving one flit from LOCAL buffer of router 0 to NORTH buffer of router 3
-	AdvanceFlits(id);
+	// Run
+	do{
+		// Prioritize the channels
+		PrioritizeChannels(id);
 
-	if(peekFront(noc[3].channels[NORTH].buffer) != -1){
-		{=
-			test1 = 1
-		=}
-	}
-	else{
-		tau
+		// Advance the flit
+		AdvanceFlits(id);
+
+		// TEST: Check the results
+		if(peekFront(noc[3].channels[NORTH].buffer) != -1){
+			{=
+				packetSent = 1
+			=}
+		}
+		else{
+			tau
+		};
+
+		// End program
+		stop
 	}
 }
 

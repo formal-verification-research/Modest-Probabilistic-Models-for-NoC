@@ -44,8 +44,8 @@ int (0..1) packetRemoved;
 
 // ------------------------------------------------------- Properties ------------------------------------------------------
 
-property Test_PacketSent = Pmax(<> (packetSent == 1));
-property Test_PacketRemoved = Pmax(<> (packetSent == 1));
+property Validated_packet_sent = Pmax(<> (packetSent == 1));
+property Validated_packet_removed = Pmax(<> (packetRemoved == 1));
 
 
 
@@ -133,31 +133,27 @@ process Arbiter(int id, int id_north, int id_west, int id_east, int id_south){
 		noc[id].channels[LOCAL].buffer = enqueue(1, none)
 	=};
 
-	// Run
-	do{
-		// Send the flit
-		Send(id, LOCAL, SOUTH);
+	// Send the flit
+	Send(id, LOCAL, SOUTH);
 
-		if(peekFront(noc[1].channels[NORTH].buffer) != -1){
-			{=
-				packetSent = 1
-			=}
-		}
-		else{
-			tau
-		};
+	// TEST 1: Has the flit made it to its destination
+	if(peekFront(noc[1].channels[NORTH].buffer) != -1){
+		{=
+			packetSent = 1
+		=}
+	}
+	else{
+		tau
+	};
 
-		if(peekFront(noc[id].channels[LOCAL].buffer) == -1){
-			{=
-				packetRemoved = 1
-			=}
-		}
-		else{
-			tau
-		};
-
-		// End program
-		stop
+	// TEST 2: Has the flit been removed from its starting location
+	if(peekFront(noc[id].channels[LOCAL].buffer) == -1){
+		{=
+			packetRemoved = 1
+		=}
+	}
+	else{
+		tau
 	}
 }
 

@@ -39,8 +39,8 @@ int (0..NOC_MAX_ID) rightMostId;
 
 // ------------------------------------------------------- Properties ------------------------------------------------------
 
-property Test1 = Pmax(<> (leftMostId == 0));
-property Test2 = Pmax(<> (rightMostId == 4));
+property Validated_left_ID = Pmax(<> (leftMostId == 0));
+property Validated_right_ID = Pmax(<> (rightMostId == 4));
 
 
 
@@ -89,14 +89,3 @@ process Main(){
 // ------------------------------------------------------- Execution -------------------------------------------------------
 
 Main()
-
-
-
-
-
-
-
-
-
-
-
