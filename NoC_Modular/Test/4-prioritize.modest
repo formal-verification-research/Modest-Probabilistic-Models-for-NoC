@@ -148,10 +148,14 @@ process AdvanceFlits(int id, buffer channels){
 		}
 		else{
 			// If flit needs to stay on this row
-			if(peekFront(noc[id].channels[index].buffer) >= firstInRow(id)) &&
-				peekFront(noc[id].channels[index].buffer) <= lastInRow(id)){
+			int flit;
+			{=
+				flit = peekFront(noc[id].channels[index].buffer)
+			=};
+
+			if(flit >= firstInRow(id) && flit <= lastInRow(id)){
 				// Send it west
-				if(peekFront(noc[id].channel_local.buffer) < id){
+				if(flit < id){
 					Send(id, index, WEST)
 				}
 				// Or send it east
@@ -160,7 +164,7 @@ process AdvanceFlits(int id, buffer channels){
 				}
 			}
 			// Else, if flit needs to go north
-			else if(peekFront(noc[id].channels[index].buffer) < id){
+			else if(flit < id){
 				Send(id, index, NORTH)
 			}
 			// Else, flit needs to go south

@@ -14,6 +14,8 @@
 
 option "dtmc";
 
+action a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x;
+
 
 
 // ------------------------------------------------------- Datatypes --------------------------------------------------------
@@ -38,13 +40,64 @@ const int EAST = 2;
 const int SOUTH = 3;
 const int LOCAL = 4;
 
-int (0..1) test1;
+int (0..1) test_0_to_1;
+int (0..1) test_0_to_3;
+int (0..1) test_1_to_0;
+int (0..1) test_1_to_2;
+int (0..1) test_1_to_4;
+int (0..1) test_2_to_1;
+int (0..1) test_2_to_5;
+
+int (0..1) test_3_to_0;
+int (0..1) test_3_to_4;
+int (0..1) test_3_to_6;
+int (0..1) test_4_to_1;
+int (0..1) test_4_to_3;
+int (0..1) test_4_to_5;
+int (0..1) test_4_to_7;
+int (0..1) test_5_to_2;
+int (0..1) test_5_to_4;
+int (0..1) test_5_to_8;
+
+int (0..1) test_6_to_3;
+int (0..1) test_6_to_7;
+int (0..1) test_7_to_4;
+int (0..1) test_7_to_6;
+int (0..1) test_7_to_8;
+int (0..1) test_8_to_5;
+int (0..1) test_8_to_7;
+
 
 
 
 // ------------------------------------------------------- Properties -------------------------------------------------------
 
-property Packet_sent_local_to_south = Pmax(<> (test1 == 1));
+property Send_0_to_1 = Pmax(<> (test_0_to_1 == 1));
+property Send_0_to_3 = Pmax(<> (test_0_to_3 == 1));
+property Send_1_to_0 = Pmax(<> (test_1_to_0 == 1));
+property Send_1_to_2 = Pmax(<> (test_1_to_2 == 1));
+property Send_1_to_4 = Pmax(<> (test_1_to_4 == 1));
+property Send_2_to_1 = Pmax(<> (test_2_to_1 == 1));
+property Send_2_to_5 = Pmax(<> (test_2_to_5 == 1));
+
+property Send_3_to_0 = Pmax(<> (test_3_to_0 == 1));
+property Send_3_to_4 = Pmax(<> (test_3_to_4 == 1));
+property Send_3_to_6 = Pmax(<> (test_3_to_6 == 1));
+property Send_4_to_1 = Pmax(<> (test_4_to_1 == 1));
+property Send_4_to_3 = Pmax(<> (test_4_to_3 == 1));
+property Send_4_to_5 = Pmax(<> (test_4_to_5 == 1));
+property Send_4_to_7 = Pmax(<> (test_4_to_7 == 1));
+property Send_5_to_2 = Pmax(<> (test_5_to_2 == 1));
+property Send_5_to_4 = Pmax(<> (test_5_to_4 == 1));
+property Send_5_to_8 = Pmax(<> (test_5_to_8 == 1));
+
+property Send_6_to_3 = Pmax(<> (test_6_to_3 == 1));
+property Send_6_to_7 = Pmax(<> (test_6_to_7 == 1));
+property Send_7_to_4 = Pmax(<> (test_7_to_4 == 1));
+property Send_7_to_6 = Pmax(<> (test_7_to_6 == 1));
+property Send_7_to_8 = Pmax(<> (test_7_to_8 == 1));
+property Send_8_to_5 = Pmax(<> (test_8_to_5 == 1));
+property Send_8_to_7 = Pmax(<> (test_8_to_7 == 1));
 
 
 
@@ -54,22 +107,16 @@ property Packet_sent_local_to_south = Pmax(<> (test1 == 1));
 function int len(buffer option ls) = if ls == none then 0 else 1 + len(ls!.tl);
 
 // Get the mirror direction
-function int getDestinationDirection(int dir) =
+function int getDestinationChannel(int dir) =
 	if dir == NORTH then SOUTH
 	else if dir == WEST then EAST
 	else if dir == EAST then WEST
 	else if dir == SOUTH then NORTH
 	else -1;
 
-// Get the id of the first router in this row
-function int firstInRow(int id) =
-	if noc[id].ids[WEST] == -1 then id
-	else firstInRow(noc[id].ids[WEST]);
-
-// Get the id of the last router in this row
-function int lastInRow(int id) =
-	if noc[id].ids[EAST] == -1 then id
-	else lastInRow(noc[id].ids[EAST]);
+// Determine if the flits destination in the same column as the current router
+function int getColumnShift(int id, int dst) =
+   (dst % ((int)sqrt(NOC_MAX_ID + 1))) - (id % ((int)sqrt(NOC_MAX_ID + 1)));
 
 // Tell if the buffer is full
 function bool isBufferFull(int id, int dir) = len(noc[id].channels[dir].buffer) >= BUFFER_LENGTH;
@@ -91,7 +138,7 @@ function buffer option enqueue(int n, buffer option ls) =
 // Remove a flit from the buffer
 function buffer option dequeue(buffer option ls) =
 	if ls == none then none
-	else if	ls!.tl == none then none
+	else if ls!.tl == none then none
 	else some(buffer {
 		hd: ls!.hd,
 		tl: dequeue(ls!.tl)
@@ -107,16 +154,16 @@ process Send(int id, int src, int dir){
 	int(-1..3) dst;
 	{=
 		// A flit going from router 0 to router 1 leaves 0 from the SOUTH and enters 1 from the NORTH.
-		dst = getDestinationDirection(dir)
+		dst = getDestinationChannel(dir)
 	=};
 
 	if(!isBufferFull(noc[id].ids[dir], dst)){
 		{=
-			// Add flit to destination buffer
-			noc[noc[id].ids[dir]].channels[dst].buffer =
+			// First, add flit to destination buffer
+			0: noc[noc[id].ids[dir]].channels[dst].buffer =
 				enqueue(peekFront(noc[id].channels[src].buffer), noc[noc[id].ids[dir]].channels[dst].buffer),
-			// Remove it from the source buffer
-			noc[id].channels[src].buffer = dequeue(noc[id].channels[src].buffer)
+			// Then, remove it from the source buffer
+			1: noc[id].channels[src].buffer = dequeue(noc[id].channels[src].buffer)
 		=}
 	}
 	else{
@@ -126,74 +173,215 @@ process Send(int id, int src, int dir){
 
 // Advance flits to respective buffers
 process AdvanceFlits(int id){
+
 	// If flit needs to stay on this row
-	// TODO: test using local variable here
+	// TODO fix for x-y routing
 	int flit;
+	int shift;
 	{=
-		flit = peekFront(noc[id].channels[LOCAL].buffer)
+		0: flit = peekFront(noc[id].channels[LOCAL].buffer),
+		1: shift = getColumnShift(id, flit)
 	=};
 
-	if(flit >= firstInRow(id) && flit <= lastInRow(id)){
-		// Send it west
+	if(shift == 0){
+		// Send it north
 		if(flit < id){
-			Send(id, LOCAL, WEST)
+			Send(id, LOCAL, NORTH)
 		}
 		// Or send it east
 		else{
-			Send(id, LOCAL, EAST)
+			Send(id, LOCAL, SOUTH)
 		}
 	}
 	// Else, if flit needs to go north
-	else if(flit < id){
-		Send(id, LOCAL, NORTH)
+	else if(shift < 0){
+		Send(id, LOCAL, WEST)
 	}
 	// Else, flit needs to go south
 	else{
-		Send(id, LOCAL, SOUTH)
+		Send(id, LOCAL, EAST)
 	}
+}
+
+// For Test only.
+process ResetArbiter(int a, int b){
+	// Initialize
+	{=
+		// Set ids
+		noc[0] = router {ids: [-1, -1,  1,  3]},
+		noc[1] = router {ids: [-1,  0,  2,  4]},
+		noc[2] = router {ids: [-1,  1, -1,  5]},
+		noc[3] = router {ids: [ 0, -1,  4,  6]},
+		noc[4] = router {ids: [ 1,  3,  5,  7]},
+		noc[5] = router {ids: [ 2,  4, -1,  8]},
+		noc[6] = router {ids: [ 3, -1,  7, -1]},
+		noc[7] = router {ids: [ 4,  6,  8, -1]},
+		noc[8] = router {ids: [ 5,  7, -1, -1]},
+
+		// Initialize the router channels
+		1: noc[0].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
+		1: noc[1].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
+		1: noc[2].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
+		1: noc[3].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
+		1: noc[4].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
+		1: noc[5].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
+		1: noc[6].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
+		1: noc[7].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
+		1: noc[8].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
+
+		2: noc[a].channels[LOCAL].buffer = enqueue(b, none)
+	=};
+
+	AdvanceFlits(a)
 }
 
 // Process for Arbiter 1
 process Arbiter(int id, int id_north, int id_west, int id_east, int id_south){
-	// Initialize
-	{=
-		noc[id] = router {ids: [id_north, id_west, id_east, id_south]},
-		noc[id].channels =
-			[channel {}, channel {}, channel {}, channel {}, channel {}],
 
-		// TEST: Create the routers 1 - 8
-		noc[1] = router {ids: [-1,  0,  2,  4]},
-		noc[1].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
-		noc[2] = router {ids: [-1,  1, -1,  5]},
-		noc[2].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
-		noc[3] = router {ids: [ 0, -1,  4,  6]},
-		noc[3].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
-		noc[4] = router {ids: [ 1,  3,  5,  7]},
-		noc[4].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
-		noc[5] = router {ids: [ 2,  4, -1,  8]},
-		noc[5].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
-		noc[6] = router {ids: [ 3, -1,  7, -1]},
-		noc[6].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
-		noc[7] = router {ids: [ 4,  6,  8, -1]},
-		noc[7].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
-		noc[8] = router {ids: [ 5,  7, -1, -1]},
-		noc[8].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
-
-		// Generate new flit
-		noc[id].channels[LOCAL].buffer = enqueue(3, none)
+	// TEST 1:
+	ResetArbiter(0, 1);
+	a {=
+		test_0_to_1 = peekFront(noc[1].channels[WEST].buffer) != -1 ? 1 : 0
 	=};
 
-	// TEST 1: Moving one flit from LOCAL buffer of router 0 to NORTH buffer of router 3
-	AdvanceFlits(id);
+	// TEST 2:
+	ResetArbiter(0, 3);
+	b {=
+		test_0_to_3 = peekFront(noc[3].channels[NORTH].buffer) != -1 ? 1 : 0
+	=};
 
-	if(peekFront(noc[3].channels[NORTH].buffer) != -1){
-		{=
-			test1 = 1
-		=}
-	}
-	else{
-		tau
-	}
+	// TEST 3:
+	ResetArbiter(1, 0);
+	c {=
+		test_1_to_0 = peekFront(noc[0].channels[EAST].buffer) != -1 ? 1 : 0
+	=};
+
+	// TEST 4:
+	ResetArbiter(1, 2);
+	d {=
+		test_1_to_2 = peekFront(noc[2].channels[WEST].buffer) != -1 ? 1 : 0
+	=};
+
+	// TEST 5:
+	ResetArbiter(1, 4);
+	e {=
+		test_1_to_4 = peekFront(noc[4].channels[NORTH].buffer) != -1 ? 1 : 0
+	=};
+
+	// TEST 6:
+	ResetArbiter(2, 1);
+	f {=
+		test_2_to_1 = peekFront(noc[1].channels[EAST].buffer) != -1 ? 1 : 0
+	=};
+
+	// TEST 7:
+	ResetArbiter(2, 5);
+	g {=
+		test_2_to_5 = peekFront(noc[5].channels[NORTH].buffer) != -1 ? 1 : 0
+	=};
+
+	// TEST 8:
+	ResetArbiter(3, 0);
+	h {=
+		test_3_to_0 = peekFront(noc[0].channels[SOUTH].buffer) != -1 ? 1 : 0
+	=};
+
+	// TEST 9:
+	ResetArbiter(3, 4);
+	i {=
+		test_3_to_4 = peekFront(noc[4].channels[WEST].buffer) != -1 ? 1 : 0
+	=};
+
+	// TEST 10:
+	ResetArbiter(3, 6);
+	j {=
+		test_3_to_6 = peekFront(noc[6].channels[NORTH].buffer) != -1 ? 1 : 0
+	=};
+
+	// TEST 11:
+	ResetArbiter(4, 1);
+	k {=
+		test_4_to_1 = peekFront(noc[1].channels[SOUTH].buffer) != -1 ? 1 : 0
+	=};
+
+	// TEST 12:
+	ResetArbiter(4, 3);
+	l {=
+		test_4_to_3 = peekFront(noc[3].channels[EAST].buffer) != -1 ? 1 : 0
+	=};
+
+	// TEST 13:
+	ResetArbiter(4, 5);
+	m {=
+		test_4_to_5 = peekFront(noc[5].channels[WEST].buffer) != -1 ? 1 : 0
+	=};
+
+	// TEST 14:
+	ResetArbiter(4, 7);
+	n {=
+		test_4_to_7 = peekFront(noc[7].channels[NORTH].buffer) != -1 ? 1 : 0
+	=};
+
+	// TEST 15:
+	ResetArbiter(5, 2);
+	o {=
+		test_5_to_2 = peekFront(noc[2].channels[SOUTH].buffer) != -1 ? 1 : 0
+	=};
+
+	// TEST 16:
+	ResetArbiter(5, 4);
+	p {=
+		test_5_to_4 = peekFront(noc[4].channels[EAST].buffer) != -1 ? 1 : 0
+	=};
+
+	// TEST 17:
+	ResetArbiter(5, 8);
+	q {=
+		test_5_to_8 = peekFront(noc[8].channels[NORTH].buffer) != -1 ? 1 : 0
+	=};
+
+	// TEST 18:
+	ResetArbiter(6, 3);
+	r {=
+		test_6_to_3 = peekFront(noc[3].channels[SOUTH].buffer) != -1 ? 1 : 0
+	=};
+
+	// TEST 19:
+	ResetArbiter(6, 7);
+	s {=
+		test_6_to_7 = peekFront(noc[7].channels[WEST].buffer) != -1 ? 1 : 0
+	=};
+
+	// TEST 20:
+	ResetArbiter(7, 4);
+	t {=
+		test_7_to_4 = peekFront(noc[4].channels[SOUTH].buffer) != -1 ? 1 : 0
+	=};
+
+	// TEST 21:
+	ResetArbiter(7, 6);
+	u {=
+		test_7_to_6 = peekFront(noc[6].channels[EAST].buffer) != -1 ? 1 : 0
+	=};
+
+	// TEST 22:
+	ResetArbiter(7, 8);
+	v {=
+		test_7_to_8 = peekFront(noc[8].channels[WEST].buffer) != -1 ? 1 : 0
+	=};
+
+	// TEST 23:
+	ResetArbiter(8, 5);
+	w {=
+		test_8_to_5 = peekFront(noc[5].channels[SOUTH].buffer) != -1 ? 1 : 0
+	=};
+
+	// TEST 24:
+	ResetArbiter(8, 7);
+	x {=
+		test_8_to_7 = peekFront(noc[7].channels[EAST].buffer) != -1 ? 1 : 0
+	=}
+
 }
 
 

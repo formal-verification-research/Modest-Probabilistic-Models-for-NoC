@@ -22,24 +22,9 @@ parse()
 
 
 
-# Run test 1
-printf "\nStarting test 1...\n"
-input=$(modest check 1-is-in-row.modest)
-parse "$input"
-
-# Run test 2
-printf "\nStarting test 2...\n"
-input=$(modest check 2-send.modest)
-parse "$input"
-
-# Run test 3
-printf "\nStarting test 3...\n"
-input=$(modest check 3-receive-send.modest)
-parse "$input"
-
-# Run test 4
-printf "\nStarting test 4...\n"
-input=$(modest check 4-prioritize.modest)
+# Run test
+printf "\nStarting test...\n"
+input=$(modest check $1)
 parse "$input"
 
 

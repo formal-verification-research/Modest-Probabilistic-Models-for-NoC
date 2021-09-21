@@ -2,7 +2,11 @@
  * This is a test for checking the functions that determine the western and eastern most ids in a row of routers.
  *
  * NoC router ID map:
- *	0 - 1 - 2 - 3 - 4
+ *	0 - 1 - 2
+ *	|   |   |
+ *	3 - 4 - 5
+ * |   |   |
+ * 6 - 7 - 8
  *
  * Editors: Jonah Boe
  * Date: Jun 09, 2021
@@ -22,8 +26,8 @@ datatype router = {channel[] channels, int(-1..NOC_MAX_ID)[] ids};
 
 // --------------------------------------------------- Top level varables --------------------------------------------------
 
-const int NOC_MAX_ID = 4;
-router[] noc = [router {}, router {}, router {}, router {}, router {}];
+const int NOC_MAX_ID = 8;
+router[] noc = [router {}, router {}, router {}, router {}, router {}, router {}, router {}, router {}, router {}];
 
 const int BUFFER_LENGTH = 3;
 
@@ -32,29 +36,23 @@ const int WEST = 1;
 const int EAST = 2;
 const int SOUTH = 3;
 
-int (0..NOC_MAX_ID) leftMostId;
-int (0..NOC_MAX_ID) rightMostId;
+int (0..1) passedTrue;
+int (0..1) passedFalse;
 
 
 
 // ------------------------------------------------------- Properties ------------------------------------------------------
 
-property Validated_left_ID = Pmax(<> (leftMostId == 0));
-property Validated_right_ID = Pmax(<> (rightMostId == 4));
+property Validated_is_in_same_row = Pmax(<> (passedTrue == 1));
+property Validated_is_not_in_same_row = Pmax(<> (passedFalse == 1));
 
 
 
 // ------------------------------------------------------- Functions -------------------------------------------------------
 
-// Get the id of the first router in this row
-function int firstInRow(int id) =
-	if noc[id].ids[WEST] == -1 then id
-	else firstInRow(noc[id].ids[WEST]);
-
-// Get the id of the last router in this row
-function int lastInRow(int id) =
-	if noc[id].ids[EAST] == -1 then id
-	else lastInRow(noc[id].ids[EAST]);
+// Determine if the flits destination in the same column as the current router
+function bool isInSameColumn(int id, int dst) =
+   id % ((int)sqrt(NOC_MAX_ID + 1)) == dst % ((int)sqrt(NOC_MAX_ID + 1));
 
 
 
@@ -64,19 +62,23 @@ process Main(){
 	// Initialize
 	channel[] temp;
 	{=
-		noc[0] = router {channels: temp, ids: [-1, -1,  1, -1]},
-		noc[1] = router {channels: temp, ids: [-1,  0,  2, -1]},
-		noc[2] = router {channels: temp, ids: [-1,  1,  3, -1]},
-		noc[3] = router {channels: temp, ids: [-1,  2,  4, -1]},
-		noc[4] = router {channels: temp, ids: [-1,  3, -1, -1]}
+		noc[0] = router {channels: temp, ids: [-1, -1,  1,  3]},
+		noc[1] = router {channels: temp, ids: [-1,  0,  2,  4]},
+		noc[2] = router {channels: temp, ids: [-1,  1, -1,  5]},
+		noc[3] = router {channels: temp, ids: [ 0, -1,  4,  6]},
+		noc[4] = router {channels: temp, ids: [ 1,  3,  5,  7]},
+      noc[5] = router {channels: temp, ids: [ 2,  4, -1,  8]},
+		noc[6] = router {channels: temp, ids: [ 3, -1,  7, -1]},
+		noc[7] = router {channels: temp, ids: [ 4,  6,  8, -1]},
+		noc[8] = router {channels: temp, ids: [ 5,  7, -1, -1]}
 	=};
 
 	// Run
 	do{
 		// Assign test values
 		{=
-			leftMostId = firstInRow(2),
-			rightMostId = lastInRow(2)
+			passedTrue = isInSameColumn(0, 6) ? 1:0,
+         passedFalse = isInSameColumn(4, 8) ? 0:1
 		=};
 
 		// End program
