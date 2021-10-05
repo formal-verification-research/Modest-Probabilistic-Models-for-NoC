@@ -1,5 +1,7 @@
 /*
- * This is a test for sending a flit from the local buffer of a router across multiple other routers and to its destination.
+ * This is a test for the prioritizing of flits that arive at one router and are headed in the same direction. A flit will be
+ *	placed on router 0 with the destination of router 4. Another flit will be placed on router 2 with the destination of
+ *	router 7. These two flits will conflict at router 1. and one will be prioritized.
  *
  * NoC router ID map:
  *	0 - 1 - 2
@@ -18,9 +20,9 @@ option "dtmc";
 
 // ------------------------------------------------------- Datatypes --------------------------------------------------------
 
-datatype buffer = {int hd, buffer option tl};
+datatype buffer = {int(0..NOC_MAX_ID) hd, buffer option tl};
 datatype channel = {buffer option buffer, int(0..4) priority};
-datatype router = {channel[] channels, int(-1..NOC_MAX_ID)[] ids, buffer option priorities};
+datatype router = {channel[] channels, int(-1..NOC_MAX_ID)[] ids};
 
 
 
@@ -38,13 +40,19 @@ const int EAST = 2;
 const int SOUTH = 3;
 const int LOCAL = 4;
 
-int (0..1) packetSent;
+int (0..1) test_1_to_7;
+int (0..1) test_3_to_5;
+int (0..1) test_5_to_3;
+int (0..1) test_7_to_1;
 
 
 
 // ------------------------------------------------------- Properties -------------------------------------------------------
 
-property Test1 = Pmax(<> (packetSent == 1));
+property Send_1_to_7 = Pmax(<> (test_1_to_7 == 1));
+property Send_3_to_5 = Pmax(<> (test_3_to_5 == 1));
+property Send_5_to_3 = Pmax(<> (test_5_to_3 == 1));
+property Send_7_to_1 = Pmax(<> (test_7_to_1 == 1));
 
 
 
@@ -54,22 +62,16 @@ property Test1 = Pmax(<> (packetSent == 1));
 function int len(buffer option ls) = if ls == none then 0 else 1 + len(ls!.tl);
 
 // Get the mirror direction
-function int getDestinationDirection(int dir) =
+function int getDestinationChannel(int dir) =
 	if dir == NORTH then SOUTH
 	else if dir == WEST then EAST
 	else if dir == EAST then WEST
 	else if dir == SOUTH then NORTH
 	else -1;
 
-// Get the id of the first router in this row
-function int firstInRow(int id) =
-	if noc[id].ids[WEST] == -1 then id
-	else firstInRow(noc[id].ids[WEST]);
-
-// Get the id of the last router in this row
-function int lastInRow(int id) =
-	if noc[id].ids[EAST] == -1 then id
-	else lastInRow(noc[id].ids[EAST]);
+// Determine if the flits destination is in the same column as the current router
+function int getColumnShift(int id, int dst) =
+   (dst % ((int)sqrt(NOC_MAX_ID + 1))) - (id % ((int)sqrt(NOC_MAX_ID + 1)));
 
 // Tell if the buffer is full
 function bool isBufferFull(int id, int dir) = len(noc[id].channels[dir].buffer) >= BUFFER_LENGTH;
@@ -91,7 +93,7 @@ function buffer option enqueue(int n, buffer option ls) =
 // Remove a flit from the buffer
 function buffer option dequeue(buffer option ls) =
 	if ls == none then none
-	else if	ls!.tl == none then none
+	else if ls!.tl == none then none
 	else some(buffer {
 		hd: ls!.hd,
 		tl: dequeue(ls!.tl)
@@ -107,16 +109,16 @@ process Send(int id, int src, int dir){
 	int(-1..3) dst;
 	{=
 		// A flit going from router 0 to router 1 leaves 0 from the SOUTH and enters 1 from the NORTH.
-		dst = getDestinationDirection(dir)
+		dst = getDestinationChannel(dir)
 	=};
 
 	if(!isBufferFull(noc[id].ids[dir], dst)){
 		{=
-			// Add flit to destination buffer
-			noc[noc[id].ids[dir]].channels[dst].buffer =
+			// First, add flit to destination buffer
+			0: noc[noc[id].ids[dir]].channels[dst].buffer =
 				enqueue(peekFront(noc[id].channels[src].buffer), noc[noc[id].ids[dir]].channels[dst].buffer),
-			// Remove it from the source buffer
-			noc[id].channels[src].buffer = dequeue(noc[id].channels[src].buffer)
+			// Then, remove it from the source buffer
+			1: noc[id].channels[src].buffer = dequeue(noc[id].channels[src].buffer)
 		=}
 	}
 	else{
@@ -124,59 +126,33 @@ process Send(int id, int src, int dir){
 	}
 }
 
-// Prioritize the channels and add them to the priorities buffer
-process PrioritizeChannels(id){
-	// TODO: advance priorities
-
-	if(peekFront(noc[id].channels[NORTH].buffer) != -1){
-		noc[id].
-	}
-}
-
 // Advance flits to respective buffers
-// TODO: Make sure not to add more flits that allowed.
-process AdvanceFlits(int id, buffer channels){
-	do{
-		// Take the first channel in the buffer
-		{=
-			int index = peekFront(noc[id].priorities)
-		=};
+process AdvanceFlits(int id, int buf){
+	// If flit needs to stay on this row
+	int flit;
+	int shift;
+	{=
+		0: flit = peekFront(noc[id].channels[buf].buffer),
+		1: shift = getColumnShift(id, flit)
+	=};
 
-		// If there are no flits on the channel then exit process
-		if(index == -1){
-			break
+	if(shift == 0){
+		// Send it north
+		if(flit < id){
+			Send(id, buf, NORTH)
 		}
+		// Or send it south
 		else{
-			// If flit needs to stay on this row
-			int flit;
-			{=
-				flit = peekFront(noc[id].channels[index].buffer)
-			=};
-
-			if(flit >= firstInRow(id) && flit <= lastInRow(id)){
-				// Send it west
-				if(flit < id){
-					Send(id, index, WEST)
-				}
-				// Or send it east
-				else{
-					Send(id, index, EAST)
-				}
-			}
-			// Else, if flit needs to go north
-			else if(flit < id){
-				Send(id, index, NORTH)
-			}
-			// Else, flit needs to go south
-			else{
-				Send(id, index, SOUTH)
-			}
-		};
-
-		// Remove the last channel from the buffer
-		{=
-			noc[id].priorities = dequeue(noc[id].priorities)
-		=}
+			Send(id, buf, SOUTH)
+		}
+	}
+	// Else, if flit needs to go west
+	else if(shift < 0){
+		Send(id, buf, WEST)
+	}
+	// Else, flit needs to go east
+	else{
+		Send(id, buf, EAST)
 	}
 }
 
@@ -184,53 +160,50 @@ process AdvanceFlits(int id, buffer channels){
 process Arbiter(int id, int id_north, int id_west, int id_east, int id_south){
 	// Initialize
 	{=
-		noc[id] = router {ids: [id_north, id_west, id_east, id_south]},
-		noc[id].channels =
-			[channel {priority: 0}, channel {priority: 0}, channel {priority: 0}, channel {priority: 0}, channel {priority: 0}],
-
-		// TEST: Create the routers 1 - 8
+		// Set ids
+		noc[0] = router {ids: [-1, -1,  1,  3]},
 		noc[1] = router {ids: [-1,  0,  2,  4]},
-		noc[1].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
 		noc[2] = router {ids: [-1,  1, -1,  5]},
-		noc[2].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
 		noc[3] = router {ids: [ 0, -1,  4,  6]},
-		noc[3].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
 		noc[4] = router {ids: [ 1,  3,  5,  7]},
-		noc[4].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
 		noc[5] = router {ids: [ 2,  4, -1,  8]},
-		noc[5].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
 		noc[6] = router {ids: [ 3, -1,  7, -1]},
-		noc[6].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
 		noc[7] = router {ids: [ 4,  6,  8, -1]},
-		noc[7].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
 		noc[8] = router {ids: [ 5,  7, -1, -1]},
-		noc[8].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
 
-		// TEST: Create a flit with destination of north router id
-		noc[id].channels[LOCAL].buffer = enqueue(3, none)
+		// Initialize the router channels
+		1: noc[0].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
+		1: noc[1].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
+		1: noc[2].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
+		1: noc[3].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
+		1: noc[4].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
+		1: noc[5].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
+		1: noc[6].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
+		1: noc[7].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
+		1: noc[8].channels = [channel {}, channel {}, channel {}, channel {}, channel {}],
+
+		// Everything is going to pass through router 4.
+		2: noc[1].channels[LOCAL].buffer = enqueue(7, none),
+		2: noc[3].channels[LOCAL].buffer = enqueue(5, none),
+		2: noc[5].channels[LOCAL].buffer = enqueue(3, none),
+		2: noc[7].channels[LOCAL].buffer = enqueue(1, none)
 	=};
 
-	// Run
-	do{
-		// Prioritize the channels
-		PrioritizeChannels(id);
+	AdvanceFlits(1, LOCAL);
+	AdvanceFlits(3, LOCAL);
+	AdvanceFlits(5, LOCAL);
+	AdvanceFlits(7, LOCAL);
 
-		// Advance the flit
-		AdvanceFlits(id);
+	
 
-		// TEST: Check the results
-		if(peekFront(noc[3].channels[NORTH].buffer) != -1){
-			{=
-				packetSent = 1
-			=}
-		}
-		else{
-			tau
-		};
+	// TEST 1:
+	{=
+		test_1_to_7 = peekFront(noc[7].channels[NORTH].buffer) != -1 ? 1 : 0,
+		test_3_to_5 = peekFront(noc[5].channels[WEST].buffer) != -1 ? 1 : 0,
+		test_5_to_3 = peekFront(noc[3].channels[EAST].buffer) != -1 ? 1 : 0,
+		test_7_to_1 = peekFront(noc[1].channels[SOUTH].buffer) != -1 ? 1 : 0
+	=}
 
-		// End program
-		stop
-	}
 }
 
 

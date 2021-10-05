@@ -30,4 +30,4 @@ parse "$input"
 
 
 # Give some extra space
-printf "\n\n\n"
+printf "\n"
