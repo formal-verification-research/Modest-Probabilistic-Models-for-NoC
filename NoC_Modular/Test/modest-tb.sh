@@ -7,10 +7,10 @@ parse()
    results=$(echo "$@" | grep 'Property\|Probability' | tr ' ' '_' | tr '\n' ' ')
    for line in $results
    do
-      if [ "$line" == "__Probability:_0" ];
+      if [ "$line" == "__Probability:_0_" ];
       then
          echo -e "    ${RED}Failed${NONE}"
-      elif [ "$line" == "__Probability:_1" ];
+      elif [ "$line" == "__Probability:_1_" ];
       then
          echo -e "    ${GREEN}Passed${NONE}"
       else

@@ -19,7 +19,7 @@
 // ------------------------------------------------------- Datatypes -------------------------------------------------------
 
 datatype buffer = {int(0..NOC_MAX_ID) hd, buffer option tl};
-datatype channel = {buffer option buffer, int(0..4) priority};
+datatype channel = {buffer option buffer};
 datatype router = {channel[] channels, int(-1..NOC_MAX_ID)[] ids};
 
 
