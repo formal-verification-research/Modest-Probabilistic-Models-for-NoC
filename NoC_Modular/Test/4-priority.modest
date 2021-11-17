@@ -11,7 +11,7 @@
  * 6 - 7 - 8
  *
  * Editors: Jonah Boe
- * Date: Jul 08, 2021
+ * Date: Nov 16, 2021
  */
 
 option "dtmc";
@@ -145,7 +145,7 @@ process Send(int id, int buf, int dir){
 	else{
 		// Incrament total unserviced buffers
 		{=
-			noc[id].total_unserviced = noc[id].total_unserviced + 1
+			noc[id].total_unserviced++
 		=}
 	}
 }
@@ -207,13 +207,13 @@ process UpdatePriorityList(int id, int i){
 	if(noc[id].channels[noc[id].priority_list[i]].serviced){
 		{=
 			0: noc[id].priority_list_temp[noc[id].total_unserviced + noc[id].serviced_index] = noc[id].priority_list[i],
-			1: noc[id].serviced_index = noc[id].serviced_index + 1
+			1: noc[id].serviced_index++
 		=}
 	}
 	else{
 		{=
 			0: noc[id].priority_list_temp[noc[id].unserviced_index] = noc[id].priority_list[i],
-			1: noc[id].unserviced_index = noc[id].unserviced_index + 1
+			1: noc[id].unserviced_index++
 		=}
 	}
 }
