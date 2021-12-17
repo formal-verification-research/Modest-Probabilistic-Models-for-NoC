@@ -11,7 +11,7 @@
  * In order to add routers to the NoC visit all coments labled with #MODULARIZE
  *
  * Editors: Jonah Boe
- * Date: Nov 16, 2021
+ * Date: Dec 14, 2021
  ***************************************************************************************************************************/
 
 option "dtmc";
@@ -285,19 +285,6 @@ process GenerateFlits(int id){
 	}
 }
 */
-// For syncing parallell processes
-process Clock(){
-	tick
-	{=
-		clk++
-	=};
-	if (clk <= CLK_UPPER) {
-	   Clock()
-	}
-	else {
-	   stop
-	}
-}
 
 // Process for Arbiter 1
 process RouterBehavior(int id, int id_north, int id_west, int id_east, int id_south){
@@ -346,6 +333,20 @@ process RouterBehavior(int id, int id_north, int id_west, int id_east, int id_so
 	}
 }
 
+// For syncing parallell processes
+process Clock(){
+	tick
+	{=
+		clk++
+	=};
+	if (clk <= CLK_UPPER) {
+	   Clock()
+	}
+	else {
+	   stop
+	}
+}
+
 
 
 // ------------------------------------------------------- Execution --------------------------------------------------------
@@ -362,10 +363,10 @@ par{
 	:: RouterBehavior(0, -1, -1,  1,  3)
 	:: RouterBehavior(1, -1,  0,  2,  4)
 	:: RouterBehavior(2, -1,  1, -1,  5)
-	//:: RouterBehavior(3,  0, -1,  4,  6)
-	//:: RouterBehavior(4,  1,  3,  5,  7)
-	//:: RouterBehavior(5,  2,  4, -1,  8)
-	//:: RouterBehavior(6,  3, -1,  7, -1)
-	//:: RouterBehavior(7,  4,  6,  8, -1)
-	//:: RouterBehavior(8,  5,  7, -1, -1)
+	:: RouterBehavior(3,  0, -1,  4,  6)
+	:: RouterBehavior(4,  1,  3,  5,  7)
+	:: RouterBehavior(5,  2,  4, -1,  8)
+	:: RouterBehavior(6,  3, -1,  7, -1)
+	:: RouterBehavior(7,  4,  6,  8, -1)
+	:: RouterBehavior(8,  5,  7, -1, -1)
 }
