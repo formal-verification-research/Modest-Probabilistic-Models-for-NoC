@@ -36,8 +36,7 @@ bool c30, c31; //if c30==true dir=north, if c31==true dir=east, if both true dir
 
 bool c0Serviced, c1Serviced, c2Serviced, c3Serviced = false;
 
-bool ca1, ca2, ca3, ca4 =  false;       //priority positions of the arbiter
-//add at least one more variable for the arbiter
+bool ca0, ca1, ca2, ca3, ca4 =  false;       //priority positions of the arbiter
 
 //-----End Predicates-----
 
@@ -377,77 +376,162 @@ process Arbiter(){                      //need to figure out how to work the pri
     eastbuf(ca1, ca2, ca3, ca4);
     westbuf(ca1, ca2, ca3, ca4);
 
-    if(ca1==false&&ca2==false&&ca3==false&&ca4==false){ //priority north, east, south, west
+    if(ca0==false&&ca1==false&&ca2==false&&ca3==false&&ca4==false){ //priority north, east, south, west
         {=
             
         =}
     }
-    else if(ca1==false&&ca2==false&&ca3==false&&ca4==true){ //priority...
+    else if(ca0==false&&ca1==false&&ca2==false&&ca3==false&&ca4==true){ //priority...
         {=
 
         =}
     }
-    else if(ca1==false&&ca2==false&&ca3==true&&ca4==false){ //priority...
+    else if(ca0==false&&ca1==false&&ca2==false&&ca3==true&&ca4==false){ //priority...
         {=
             
         =}
     }
-    else if(ca1==false&&ca2==false&&ca3==true&&ca4==true){ //priority...
+    else if(ca0==false&&ca1==false&&ca2==false&&ca3==true&&ca4==true){ //priority...
         {=
             
         =}
     }
-    else if(ca1==false&&ca2==true&&ca3==false&&ca4==false){ //priority...
+    else if(ca0==false&&ca1==false&&ca2==true&&ca3==false&&ca4==false){ //priority...
         {=
             
         =}
     }
-    else if(ca1==false&&ca2==true&&ca3==false&&ca4==true){ //priority...
+    else if(ca0==false&&ca1==false&&ca2==true&&ca3==false&&ca4==true){ //priority...
         {=
             
         =}
     }
-    else if(ca1==false&&ca2==true&&ca3==true&&ca4==false){ //priority...
+    else if(ca0==false&&ca1==false&&ca2==true&&ca3==true&&ca4==false){ //priority...
         {=
             
         =}
     }
-    else if(ca1==false&&ca2==true&&ca3==true&&ca4==true){ //priority...
+    else if(ca0==false&&ca1==false&&ca2==true&&ca3==true&&ca4==true){ //priority...
         {=
             
         =}
     }
-    else if(ca1==true&&ca2==false&&ca3==false&&ca4==false){ //priority...
+    else if(ca0==false&&ca1==true&&ca2==false&&ca3==false&&ca4==false){ //priority...
         {=
             
         =}
     }
-    else if(ca1==true&&ca2==false&&ca3==false&&ca4==true){ //priority...
+    else if(ca0==false&&ca1==true&&ca2==false&&ca3==false&&ca4==true){ //priority...
         {=
             
         =}
     }
-    else if(ca1==true&&ca2==false&&ca3==true&&ca4==false){ //priority...
+    else if(ca0==false&&ca1==true&&ca2==false&&ca3==true&&ca4==false){ //priority...
         {=
             
         =}
     }
-    else if(ca1==true&&ca2==false&&ca3==true&&ca4==true){ //priority...
+    else if(ca0==false&&ca1==true&&ca2==false&&ca3==true&&ca4==true){ //priority...
         {=
             
         =}
     }
-    else if(ca1==true&&ca2==true&&ca3==false&&ca4==false){ //priority...
+    else if(ca0==false&&ca1==true&&ca2==true&&ca3==false&&ca4==false){ //priority...
         {=
             
         =}
     }
-    else if(ca1==true&&ca2==true&&ca3==false&&ca4==true){ //priority...
+    else if(ca0==false&&ca1==true&&ca2==true&&ca3==false&&ca4==true){ //priority...
         {=
             
         =}
     }
-    else if(ca1==true&&ca2==true&&ca3==true&&ca4==false){ //priority...
+    else if(ca0==false&&ca1==true&&ca2==true&&ca3==true&&ca4==false){ //priority...
+        {=
+            
+        =}
+    }
+    else if(ca0==false&&ca1==true&&ca2==true&&ca3==true&&ca4==true){ //priority...
+        {=
+            
+        =}
+    }
+    else if(ca0==true&&ca1==false&&ca2==false&&ca3==false&&ca4==false){ //priority...
+        {=
+            
+        =}
+    }
+    else if(ca0==true&&ca1==false&&ca2==false&&ca3==false&&ca4==true){ //priority...
+        {=
+            
+        =}
+    }
+    else if(ca0==true&&ca1==false&&ca2==false&&ca3==true&&ca4==false){ //priority...
+        {=
+            
+        =}
+    }
+    else if(ca0==true&&ca1==false&&ca2==false&&ca3==true&&ca4==true){ //priority...
+        {=
+            
+        =}
+    }
+    else if(ca0==true&&ca1==false&&ca2==true&&ca3==false&&ca4==false){ //priority...
+        {=
+            
+        =}
+    }
+    else if(ca0==true&&ca1==false&&ca2==true&&ca3==false&&ca4==true){ //priority...
+        {=
+            
+        =}
+    }
+    else if(ca0==true&&ca1==false&&ca2==true&&ca3==true&&ca4==false){ //priority...
+        {=
+            
+        =}
+    }
+    else if(ca0==true&&ca1==false&&ca2==true&&ca3==true&&ca4==true){ //priority...
+        {=
+            
+        =}
+    }
+    else if(ca0==true&&ca1==true&&ca2==false&&ca3==false&&ca4==false){ //priority...
+        {=
+            
+        =}
+    }
+    else if(ca0==true&&ca1==true&&ca2==false&&ca3==false&&ca4==true){ //priority...
+        {=
+            
+        =}
+    }
+    else if(ca0==true&&ca1==true&&ca2==false&&ca3==true&&ca4==false){ //priority...
+        {=
+            
+        =}
+    }
+    else if(ca0==true&&ca1==true&&ca2==false&&ca3==true&&ca4==true){ //priority...
+        {=
+            
+        =}
+    }
+    else if(ca0==true&&ca1==true&&ca2==true&&ca3==false&&ca4==false){ //priority...
+        {=
+            
+        =}
+    }
+    else if(ca0==true&&ca1==true&&ca2==true&&ca3==false&&ca4==true){ //priority...
+        {=
+            
+        =}
+    }
+    else if(ca0==true&&ca1==true&&ca2==true&&ca3==true&&ca4==false){ //priority...
+        {=
+            
+        =}
+    }
+    else if(ca0==true&&ca1==true&&ca2==true&&ca3==true&&ca4==true){ //priority...
         {=
             
         =}
@@ -467,22 +551,22 @@ process Arbiter(){                      //need to figure out how to work the pri
 
 }
 
-process northbuf(bool a1, bool a2, bool a3, bool a4){
+process northbuf(bool a0, bool a1, bool a2, bool a3, bool a4){
 
 
 }
 
-process southbuf(bool a1, bool a2, bool a3, bool a4){
+process southbuf(bool a0, bool a1, bool a2, bool a3, bool a4){
 
 
 }
 
-process eastbuf(bool a1, bool a2, bool a3, bool a4){
+process eastbuf(bool a0, bool a1, bool a2, bool a3, bool a4){
 
 
 }
 
-process westbuf(bool a1, bool a2, bool a3, bool a4){
+process westbuf(bool a0, bool a1, bool a2, bool a3, bool a4){
 
 
 }
