@@ -371,6 +371,7 @@ process shiftBuffers(){
 
 
 process Arbiter(){                      //need to figure out how to work the priority
+    direction();
     northbuf(ca0, ca1, ca2, ca3, ca4); 
     southbuf(ca0, ca1, ca2, ca3, ca4);
     eastbuf(ca0, ca1, ca2, ca3, ca4);
@@ -523,7 +524,7 @@ process Arbiter(){                      //need to figure out how to work the pri
     }
     else{tau};
 
-    if(c0Serviced&&c1Serviced&&c2Serviced&&c3Serviced){  //this part needs work
+    if(!c0Unserviced&&!c1Unserviced&&!c2Unserviced&&!c3Unserviced){  //this part needs work
         {=
            optimalRuns++
         =}
@@ -536,22 +537,62 @@ process Arbiter(){                      //need to figure out how to work the pri
 
 }
 
-process northbuf(bool a0, bool a1, bool a2, bool a3, bool a4){
+process direction(){
+    if(c0b1==true){
+        palt{
+            :(1/4): {= c01 = false, c02 = false =}  //dir=local
+            :(1/4): {= c01 = true, c02 = false =}   //dir=east
+            :(1/4): {= c01 = false, c02 = true =}   //dir=south
+            :(1/4): {= c01 = true, c02 = true =}    //dir=west
+        } 
+    }
+    else{tau};
+    if(c1b1==true){
+        palt{
+            :(1/4): {= c10 = false, c12 = false =}  //dir=local
+            :(1/4): {= c10 = true, c12 = false =}   //dir=north
+            :(1/4): {= c10 = false, c12 = true =}   //dir=south
+            :(1/4): {= c10 = true, c12 = true =}    //dir=west
+        }
+    }
+    else{tau};
+    if(c2b1==true){
+        palt{
+            :(1/4): {= c20 = false, c21 = false =}  //dir=local
+            :(1/4): {= c20 = true, c21 = false =}   //dir=north
+            :(1/4): {= c20 = false, c21 = true =}   //dir=east
+            :(1/4): {= c20 = true, c21 = true =}    //dir=west
+        }
+    }
+    else{tau};
+    if(c3b1==true){
+        palt{
+            :(1/4): {= c30 = false, c31 = false =}  //dir=local
+            :(1/4): {= c30 = true, c31 = false =}   //dir=north
+            :(1/4): {= c30 = false, c31 = true =}   //dir=east
+            :(1/4): {= c30 = true, c31 = true =}    //dir=south
+        }
+    }
+    else{tau}
+
+}
+
+process northbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
 
 
 }
 
-process southbuf(bool a0, bool a1, bool a2, bool a3, bool a4){
+process southbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
 
 
 }
 
-process eastbuf(bool a0, bool a1, bool a2, bool a3, bool a4){
+process eastbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
 
 
 }
 
-process westbuf(bool a0, bool a1, bool a2, bool a3, bool a4){
+process westbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
 
 
 }
