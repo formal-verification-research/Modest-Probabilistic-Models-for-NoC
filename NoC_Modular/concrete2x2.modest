@@ -27,12 +27,16 @@ router[] noc = [router {}, router {}, router {}, router {}];
 const int BUFFER_LENGTH = 4;
 
 // #MODULARIZE these values change the frequency with witch flits are injected.
-const int INJECTION_RATE_NUMERATOR = 1;
-const int INJECTION_RATE_DENOMINATOR = 5;
+const int INJECTION_RATE_NUMERATOR = 3;
+const int INJECTION_RATE_DENOMINATOR = 10;
 
-// #MODULARIZE clkUpper changes the upper bound of cycles run before quiting
-const int CLK_UPPER = 3;
+// #MODULARIZE this is the upper bound of cycles run before quiting
+const int CLK_UPPER = 1;
 int clk = 0;
+
+// #MODULARIZE this is the upper threshoold for noise detected in the system
+const int RESISTIVE_NOISE_THRESH = 1;
+const int INDUCTIVE_NOISE_THRESH = 1;
 
 // These are for tracking resistive and inductive noise and must be initialized to 0.
 int resistiveNoise = 0;
@@ -78,8 +82,8 @@ datatype router = {
 
 // ------------------------------------------------------- Properties -------------------------------------------------------
 
-property resistiveNoiseProbability = Pmax(<> (resistiveNoise >= 1));
-property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= 1));
+property resistiveNoiseProbability = Pmax(<> (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
 
 
 
@@ -152,12 +156,12 @@ process GenerateFlits(int id){
 		// Make sure it is not this router and add it to the local buffer.
 		if(destination == id){
 			{=
-				noc[id].channels[LOCAL].buffer = enqueue(destination + 1, none)
+				noc[id].channels[LOCAL].buffer = enqueue(destination + 1, noc[id].channels[LOCAL].buffer)
 			=}
 		}
 		else{
 			{=
-				noc[id].channels[LOCAL].buffer = enqueue(destination, none)
+				noc[id].channels[LOCAL].buffer = enqueue(destination, noc[id].channels[LOCAL].buffer)
 			=}
 		}
 	}
@@ -221,39 +225,41 @@ process AdvanceFlits(int id, int buf){
 // Update a specific channel
 process AdvanceChannel(int id, int buf){
 	// If this channel was not assigned a neighbor...
-	if (buf != 4 && noc[id].ids[buf] == -1){
+	if(buf != 4 && noc[id].ids[buf] == -1){
 		{=
 			// Mark the channel as serviced
 			noc[id].channels[buf].serviced = true
 		=}
 	}
-	// If this channel was not assigned a neighbor, but it is empty...
+	// If this channel was assigned a neighbor, but it is empty...
 	else if(peekFront(noc[id].channels[buf].buffer) == -1){
 		{=
 			// Mark the channel as serviced
 			noc[id].channels[buf].serviced = true,
 
-			// A channel without a flit means no resistive noise for this router this cycle
+			// A channel without a flit means no resistive noise for this cycle
 			noc[id].isResistive = false
 		=}
 	}
+	// If the flit at this channel has the same ID as this router...
 	else if(peekFront(noc[id].channels[buf].buffer) == id){
 		{=
 			// Mark the channel as serviced
 			noc[id].channels[buf].serviced = true,
 
-			// Remove this flit, because it has reached its destination
+			// Remove this flit. It has reached its destination
 			noc[id].channels[buf].buffer = dequeue(noc[id].channels[buf].buffer),
 
-			// A channel that is has any amount of communication acnnot be inductive
+			// A channel that has any amount of communication cannot be inductive
 			noc[id].isInductive = false
 		=}
 	}
+	// Otherwise, the flit must be for another router
 	else{
 		AdvanceFlits(id, buf);
 
+		// A channel that has any amount of communication cannot be inductive
 		{=
-			// A channel that is has any amount of communication acnnot be inductive
 			noc[id].isInductive = false
 		=}
 	}
@@ -344,7 +350,7 @@ process UpdateNoiseTracking(int id){
 	=}
 }
 
-// Process for Arbiter 1
+// Process for behavior
 process RouterBehavior(int id, int id_north, int id_west, int id_east, int id_south){
 	// Initialize the router
 	{=
@@ -356,7 +362,7 @@ process RouterBehavior(int id, int id_north, int id_west, int id_east, int id_so
 				channel {serviced: false},
 				channel {serviced: false}],
 			ids: [id_north, id_west, id_east, id_south],
-			priority_list: [NORTH, WEST, EAST, SOUTH, LOCAL],
+			priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
 			total_unserviced: 0,
 			used: [false, false, false, false],
 			wasResistive: false,
