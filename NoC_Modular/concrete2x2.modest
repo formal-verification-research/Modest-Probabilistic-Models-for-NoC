@@ -192,9 +192,10 @@ process Send(int id, int buf, int dir){
 		=}
 	}
 	else{
-		// Incrament total unserviced buffers
+		// Increment total unserviced buffers and set resistive noise to false
 		{=
-			noc[id].total_unserviced++
+			noc[id].total_unserviced++,
+			noc[id].isResistive = false
 		=}
 	}
 }
@@ -231,7 +232,7 @@ process AdvanceChannel(int id, int buf){
 			noc[id].channels[buf].serviced = true
 		=}
 	}
-	// If this channel was assigned a neighbor, but it is empty...
+	// If this channel was assigned a neighbor or is local, but it is empty...
 	else if(peekFront(noc[id].channels[buf].buffer) == -1){
 		{=
 			// Mark the channel as serviced
@@ -387,7 +388,7 @@ process RouterBehavior(int id, int id_north, int id_west, int id_east, int id_so
 		// Update resistive and inductive values
 		UpdateNoiseTracking(id);
 
-		if(clk >= CLK_UPPER){
+		if(clk > CLK_UPPER){
 			stop
 		}
 		else{

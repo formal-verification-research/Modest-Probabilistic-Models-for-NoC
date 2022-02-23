@@ -47,7 +47,7 @@ datatype router = {
 
 // #MODULARIZE by setting NOC_MAX_ID to 1 less than the total number of routers and allocating spaces for more routers
 const int NOC_MAX_ID = 8;
-router[] noc = [router {}, router {}, router {}, router {}];
+router[] noc = [router {}, router {}, router {}, router {}, router {}, router {}, router {}, router {}, router {}];
 
 // #MODULARIZE this value changes the buffer length of all buffers.
 const int BUFFER_LENGTH = 3;
@@ -292,7 +292,7 @@ process RouterBehavior(int id, int id_north, int id_west, int id_east, int id_so
 	{=
 		noc[id] = router {
 			ids: [id_north, id_west, id_east, id_south],
-			priority_list: [NORTH, WEST, EAST, SOUTH, LOCAL],
+			priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
 			used: [false, false, false, false],
 			total_unserviced: 0,
 			channels: [
