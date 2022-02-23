@@ -1,0 +1,598 @@
+option "dtmc";
+
+
+//-------Begin Varibales-------
+const int DUR;
+const int clkLower = 100;
+const int clkUpper = clkLower + DUR;
+int(clkLower..clkUpper) clk;
+
+//transient int(0..1) clk;
+
+//const int INJECTIONRATENUMERATOR = 1;
+//const int INJECTIONRATEDENOMINATOR = 2;
+
+// int totalFlitsDelivered = 0;
+// int totalFlits = 0;
+// int totalLatency = 0;
+
+int(0..10) optimalRuns = 0;
+
+action tick;
+
+//--------End Varibales
+
+// -----Predicates-----
+
+bool c0b1, c0b2, c0b3, c0b4 = false;    //length of buffer 0, false when empty 
+bool c1b1, c1b2, c1b3, c1b4 = false;    //length of buffer 1
+bool c2b1, c2b2, c2b3, c2b4 = false;    //length of buffer 2
+bool c3b1, c3b2, c3b3, c4b4 = false;    //length of buffer 3
+
+bool c01, c02; //if c01==true dir=east, if c02==true dir=south, if both true dir=west, if both false dir=local
+bool c10, c12; //if c10==true dir=north, if c12==true dir=south, if both true dir=west, if both false dir=local
+bool c20, c21; //if c20==true dir=north, if c21==true dir=east, if both true dir=west, if both false dir=local
+bool c30, c31; //if c30==true dir=north, if c31==true dir=east, if both true dir=south, if both false dir=local
+
+bool c0Unserviced, c1Unserviced, c2Unserviced, c3Unserviced = true;   //c0Unserviced = northbuffer, c1Unserviced = eastbuffer, c2Unserviced = southbuffer, c3Unserviced = westbuffer
+
+bool ca0, ca1, ca2, ca3, ca4 =  false;       //priority positions of the arbiter
+
+//-----End Predicates-----
+
+
+// ------ Begin: properties ---------
+property optimalR = Pmax(<> (optimalRuns >= 1));
+property Pr1 = Pmax(<> (clk >= clkUpper));
+//property averageLatency = Pmax(<> ((clk >= clkUpper) && ((totalLatency/totalFlits) <= 1.75)));
+//property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 1));
+// ------ End: properties ---------
+
+
+
+// ------ Begin: process definitions ------
+//---- Paralell Processes ----
+process Clock(){	
+	tick {= clk++ =};
+	if (clk <= clkUpper) {
+	   Clock()
+	}
+	else {
+	   stop
+	} 
+	//tick{= clk = 1 =};
+	//Clock()
+}
+
+process Top(){
+	do{
+		Populate();
+		shiftBuffers();
+		
+		Arbiter();	
+		
+		tick;
+
+		if(clk>=clkUpper){
+			stop
+		}
+		else{tau} 	
+	}
+}
+
+//Sub Processes
+
+process Populate(){
+    if((clk % INJECTIONRATEDENOMINATOR) < INJECTIONRATENUMERATOR){
+        //populate buffers
+        if(c0b4 == true){           //if buffer 0's last spot is full, do nothing
+            tau
+        }
+        else{                       //else inject a flit
+            {= c0b4 = true =}
+        };
+        if(c1b4 == true){           //if buffer 0's last spot is full, do nothing
+            tau
+        }
+        else{                       //else inject a flit
+            {= c1b4 = true =}
+        };
+        if(c2b4 == true){           //if buffer 2's last spot is full, do nothing
+            tau
+        }
+        else{                       //else inject a flit
+            {= c2b4 = true =}
+        };
+        if(c3b4 == true){           //if buffer 3's last spot is full, do nothing
+            tau
+        }
+        else{                       //else inject a flit
+            {= c3b4 = true =}
+        }
+    }
+    else {tau}
+}
+
+process shiftBuffers(){
+    if(c0b1==false){                //shift buffer 0
+        if(c0b2==false){
+            if(c0b3==false){
+                {=
+                c0b1=c0b4,
+                c0b4=false
+                =}
+            }
+            else{
+                {=
+                c0b1=c0b3,
+                c0b2=c0b4,
+                c0b3=false,
+                c0b4=false
+                =}
+            }
+        }
+        else{
+            if(c0b3==false){
+                {=
+                c0b1=c0b2,
+                c0b2=c0b4,
+                c0b4=false
+                =}
+            }
+            else{
+                {=
+                c0b1=c0b2,
+                c0b2=c0b3,
+                c0b3=c0b4,
+                c0b4=false
+                =}
+            }
+        }
+    }
+    else{
+        if(c0b2==false){
+            if(c0b3==false){
+                {=
+                c0b2=c0b4,
+                c0b4=false    
+                =}
+            }
+            else{
+                {=
+                c0b2=c0b3,
+                c0b3=c0b4,
+                c0b4=false
+                =}
+            }
+        }
+        else{
+            if(c0b3==false){
+                {=
+                c0b3=c0b4,
+                c0b4=false
+                =}
+            }
+            else{
+                tau
+            }
+        }
+    };
+    if(c1b1==false){                //shift buffer 1
+        if(c1b2==false){
+            if(c1b3==false){
+                {=
+                c1b1=c1b4,
+                c1b4=false
+                =}
+            }
+            else{
+                {=
+                c1b1=c1b3,
+                c1b2=c1b4,
+                c1b3=false,
+                c1b4=false
+                =}
+            }
+        }
+        else{
+            if(c1b3==false){
+                {=
+                c1b1=c1b2,
+                c1b2=c1b4,
+                c1b4=false
+                =}
+            }
+            else{
+                {=
+                c1b1=c1b2,
+                c1b2=c1b3,
+                c1b3=c1b4,
+                c1b4=false
+                =}
+            }
+        }
+    }
+    else{
+        if(c1b2==false){
+            if(c1b3==false){
+                {=
+                c1b2=c1b4,
+                c1b4=false    
+                =}
+            }
+            else{
+                {=
+                c1b2=c1b3,
+                c1b3=c1b4,
+                c1b4=false
+                =}
+            }
+        }
+        else{
+            if(c1b3==false){
+                {=
+                c1b3=c1b4,
+                c1b4=false
+                =}
+            }
+            else{
+                tau
+            }
+        }
+    };
+    if(c2b1==false){                //shift buffer 2
+        if(c2b2==false){
+            if(c2b3==false){
+                {=
+                c2b1=c2b4,
+                c2b4=false
+                =}
+            }
+            else{
+                {=
+                c2b1=c2b3,
+                c2b2=c2b4,
+                c2b3=false,
+                c2b4=false
+                =}
+            }
+        }
+        else{
+            if(c2b3==false){
+                {=
+                c2b1=c2b2,
+                c2b2=c2b4,
+                c2b4=false
+                =}
+            }
+            else{
+                {=
+                c2b1=c2b2,
+                c2b2=c2b3,
+                c2b3=c2b4,
+                c2b4=false
+                =}
+            }
+        }
+    }
+    else{
+        if(c2b2==false){
+            if(c2b3==false){
+                {=
+                c2b2=c2b4,
+                c2b4=false    
+                =}
+            }
+            else{
+                {=
+                c2b2=c2b3,
+                c2b3=c2b4,
+                c2b4=false
+                =}
+            }
+        }
+        else{
+            if(c2b3==false){
+                {=
+                c2b3=c2b4,
+                c2b4=false
+                =}
+            }
+            else{
+                tau
+            }
+        }
+    };
+
+    if(c3b1==false){                //shift buffer 3
+        if(c3b2==false){
+            if(c3b3==false){
+                {=
+                c3b1=c3b4,
+                c3b4=false
+                =}
+            }
+            else{
+                {=
+                c3b1=c3b3,
+                c3b2=c3b4,
+                c3b3=false,
+                c3b4=false
+                =}
+            }
+        }
+        else{
+            if(c3b3==false){
+                {=
+                c3b1=c3b2,
+                c3b2=c3b4,
+                c3b4=false
+                =}
+            }
+            else{
+                {=
+                c3b1=c3b2,
+                c3b2=c3b3,
+                c3b3=c3b4,
+                c3b4=false
+                =}
+            }
+        }
+    }
+    else{
+        if(c3b2==false){
+            if(c3b3==false){
+                {=
+                c3b2=c3b4,
+                c3b4=false    
+                =}
+            }
+            else{
+                {=
+                c3b2=c3b3,
+                c3b3=c3b4,
+                c3b4=false
+                =}
+            }
+        }
+        else{
+            if(c3b3==false){
+                {=
+                c3b3=c3b4,
+                c3b4=false
+                =}
+            }
+            else{
+                tau
+            }
+        }
+    }
+} 
+
+
+process Arbiter(){                      //need to figure out how to work the priority
+    direction();
+    northbuf(ca0, ca1, ca2, ca3, ca4); 
+    southbuf(ca0, ca1, ca2, ca3, ca4);
+    eastbuf(ca0, ca1, ca2, ca3, ca4);
+    westbuf(ca0, ca1, ca2, ca3, ca4);
+
+    if(ca4==false&&ca3==false&&ca2==false&&ca1==false&&ca0==false){ //priority north, east, south, west
+        {=
+            
+        =}
+    }
+    else if(ca4==false&&ca3==false&&ca2==false&&ca1==false&&ca0==true){ //priority east, north, south, west
+        {=
+
+        =}
+    }
+    else if(ca4==false&&ca3==false&&ca2==false&&ca1==true&&ca0==false){ //priority nsew
+        {=
+            
+        =}
+    }
+    else if(ca4==false&&ca3==false&&ca2==false&&ca1==true&&ca0==true){ //priority esnw
+        {=
+            
+        =}
+    }
+    else if(ca4==false&&ca3==false&&ca2==true&&ca1==false&&ca0==false){ //priority snew
+        {=
+            
+        =}
+    }
+    else if(ca4==false&&ca3==false&&ca2==true&&ca1==false&&ca0==true){ //priority senw
+        {=
+            
+        =}
+    }
+    else if(ca4==false&&ca3==false&&ca2==true&&ca1==true&&ca0==false){ //priority news
+        {=
+            
+        =}
+    }
+    else if(ca4==false&&ca3==false&&ca2==true&&ca1==true&&ca0==true){ //priority enws
+        {=
+            
+        =}
+    }
+    else if(ca4==false&&ca3==true&&ca2==false&&ca1==false&&ca0==false){ //priority nswe
+        {=
+            
+        =}
+    }
+    else if(ca4==false&&ca3==true&&ca2==false&&ca1==false&&ca0==true){ //priority eswn
+        {=
+            
+        =}
+    }
+    else if(ca4==false&&ca3==true&&ca2==false&&ca1==true&&ca0==false){ //priority snwe
+        {=
+            
+        =}
+    }
+    else if(ca4==false&&ca3==true&&ca2==false&&ca1==true&&ca0==true){ //priority sewn
+        {=
+            
+        =}
+    }
+    else if(ca4==false&&ca3==true&&ca2==true&&ca1==false&&ca0==false){ //priority nwes
+        {=
+            ca4 = (c3Unserviced)||(!c1Unserviced&&!c0Unserviced),
+            ca3 = (!c3Unserviced&&!c1Unserviced&&c0Unserviced)||(!c3Unserviced&&c1Unserviced&&!c0Unserviced),
+            ca2 = (!c3Unserviced&&!c2Unserviced)||(c3Unserviced&&c2Unserviced)||(c3Unserviced&&!c1Unserviced&&!c0Unserviced)||(c3Unserviced&&c1Unserviced&&!c0Unserviced),
+            ca1 = (!c3Unserviced&&!c2Unserviced&&c1Unserviced)||(!c3Unserviced&&c2Unserviced&&c0Unserviced)||(c3Unserviced&&c2Unserviced&&!c1Unserviced)||(c3Unserviced&&!c2Unserviced&&c0Unserviced),
+            ca0 = (c1Unserviced)||(!c0Unserviced)
+        =}
+    }
+    else if(ca4==false&&ca3==true&&ca2==true&&ca1==false&&ca0==true){ //priority ewns
+        {=
+            ca4 = (c3Unserviced)||(!c1Unserviced&&!c0Unserviced),
+            ca3 = (!c3Unserviced&&!c1Unserviced&&c0Unserviced)||(!c3Unserviced&&c1Unserviced&&!c0Unserviced),
+            ca2 = (!c3Unserviced&&!c2Unserviced)||(c3Unserviced&&c2Unserviced)||(c3Unserviced&&!c1Unserviced),
+            ca1 = (!c3Unserviced&&!c2Unserviced&&c0Unserviced)||(!c3Unserviced&&c2Unserviced&&c1Unserviced)||(c3Unserviced&&c2Unserviced&&!c0Unserviced)||(c3Unserviced&&!c2Unserviced&&c1Unserviced),
+            ca0 = (c1Unserviced&&!c0Unserviced)
+            
+        =}
+    }
+    else if(ca4==false&&ca3==true&&ca2==true&&ca1==true&&ca0==false){ //priority nwse
+        {=
+            ca4 = (c3Unserviced)||(!c1Unserviced&&!c0Unserviced),
+            ca3 = (!c3Unserviced&&!c1Unserviced&&c0Unserviced)||(!c3Unserviced&&c1Unserviced&&!c0Unserviced),
+            ca2 = (!c3Unserviced&&!c2Unserviced)||(c3Unserviced&&!c1Unserviced)||(c2Unserviced&&c1Unserviced&&c0Unserviced)||(c3Unserviced&&c1Unserviced&&!c0Unserviced),
+            ca1 = (!c3Unserviced&&!c2Unserviced)||(c3Unserviced&&c2Unserviced)||(c3Unserviced&&!c1Unserviced&&!c0Unserviced)||(c2Unserviced&&!c1Unserviced&&c0Unserviced)||(c3Unserviced&&c1Unserviced&&c0Unserviced)||(c2Unserviced&&c1Unserviced&&!c0Unserviced),
+            ca0 = (c1Unserviced)||(!c0Unserviced)
+        =}
+    }
+    else if(ca4==false&&ca3==true&&ca2==true&&ca1==true&&ca0==true){ //priority ewsn
+        {=
+            ca4 = (c3Unserviced)||(!c1Unserviced&&!c0Unserviced),
+            ca3 = (!c3Unserviced&&!c1Unserviced&&c0Unserviced)||(!c3Unserviced&&c1Unserviced&&!c0Unserviced),
+            ca2 = (!c3Unserviced&&!c2Unserviced)||(c3Unserviced&&!c1Unserviced)||(c2Unserviced&&c1Unserviced&&c0Unserviced)||(c3Unserviced&&c1Unserviced&&!c0Unserviced),
+            ca1 = (!c3Unserviced&&!c2Unserviced)||(c3Unserviced&&c2Unserviced)||(c3Unserviced&&!c1Unserviced&&!c0Unserviced)||(c2Unserviced&&!c1Unserviced&&c0Unserviced)||(c3Unserviced&&c1Unserviced&&c0Unserviced)||(c2Unserviced&&c1Unserviced&&!c0Unserviced),
+            ca0 = (c1Unserviced&&!c0Unserviced)
+        =}
+    }
+    else if(ca4==true&&ca3==false&&ca2==false&&ca1==false&&ca0==false){ //priority swne
+        {=
+            ca4 = (c3Unserviced)||(!c1Unserviced&&!c0Unserviced),
+            ca3 = (!c3Unserviced&&!c1Unserviced&&c0Unserviced)||(!c3Unserviced&&c1Unserviced&&!c0Unserviced),
+            ca2 = (!c3Unserviced&&!c2Unserviced&&c0Unserviced)||(!c3Unserviced&&!c2Unserviced&&c1Unserviced)||(c3Unserviced&&c2Unserviced&&!c0Unserviced)||(c3Unserviced&&c2Unserviced&&!c1Unserviced),
+            ca1 = (c3Unserviced&&!c2Unserviced)||(c3Unserviced&&!c1Unserviced&&!c0Unserviced)||(c3Unserviced&&c1Unserviced&&c0Unserviced)||(!c2Unserviced&&!c1Unserviced&&!c0Unserviced)||(!c2Unserviced&&c1Unserviced&&c0Unserviced),
+            ca0 = (c1Unserviced&&!c0Unserviced)
+        =}
+    }
+    else if(ca4==true&&ca3==false&&ca2==false&&ca1==false&&ca0==true){ //priority swen
+        {=
+            ca4 = (c3Unserviced)||(!c1Unserviced&&!c0Unserviced),
+            ca3 = (!c3Unserviced&&!c1Unserviced&&c0Unserviced)||(!c3Unserviced&&c1Unserviced&&!c0Unserviced),
+            ca2 = (!c3Unserviced&&!c2Unserviced&&c0Unserviced)||(!c3Unserviced&&!c2Unserviced&&c1Unserviced)||(c3Unserviced&&c2Unserviced&&!c0Unserviced)||(c3Unserviced&&c2Unserviced&&!c1Unserviced),
+            ca1 = (c3Unserviced&&!c2Unserviced)||(c3Unserviced&&!c1Unserviced&&!c0Unserviced)||(c3Unserviced&&c1Unserviced&&c0Unserviced)||(!c2Unserviced&&!c1Unserviced&&!c0Unserviced)||(!c2Unserviced&&c1Unserviced&&c0Unserviced),
+            ca0 = (c1Unserviced)||(!c0Unserviced) 
+        =}
+    }
+    else if(ca4==true&&ca3==false&&ca2==false&&ca1==true&&ca0==false){ //priority wnes
+        {=
+            
+        =}
+    }
+    else if(ca4==true&&ca3==false&&ca2==false&&ca1==true&&ca0==true){ //priority wens
+        {=
+            
+        =}
+    }
+    else if(ca4==true&&ca3==false&&ca2==true&&ca1==false&&ca0==false){ //priority wnse
+        {=
+            
+        =}
+    }
+    else if(ca4==true&&ca3==false&&ca2==true&&ca1==false&&ca0==true){ //priority wesn
+        {=
+            
+        =}
+    }
+    else if(ca4==true&&ca3==false&&ca2==true&&ca1==true&&ca0==false){ //priority wsne
+        {=
+            
+        =}
+    }
+    else if(ca4==true&&ca3==false&&ca2==true&&ca1==true&&ca0==true){ //priority wsen
+        {=
+            
+        =}
+    }
+    else{tau};
+
+    if(!c0Unserviced&&!c1Unserviced&&!c2Unserviced&&!c3Unserviced){  //this part needs work
+        {=
+           optimalRuns++
+        =}
+    }
+    else{
+        {=
+            
+        =}
+    }
+
+}
+
+process direction(){
+    if(c0b1==true){
+        palt{
+            :(1/4): {= c01 = false, c02 = false =}  //dir=local
+            :(1/4): {= c01 = true, c02 = false =}   //dir=east
+            :(1/4): {= c01 = false, c02 = true =}   //dir=south
+            :(1/4): {= c01 = true, c02 = true =}    //dir=west
+        } 
+    }
+    else{tau};
+    if(c1b1==true){
+        palt{
+            :(1/4): {= c10 = false, c12 = false =}  //dir=local
+            :(1/4): {= c10 = true, c12 = false =}   //dir=north
+            :(1/4): {= c10 = false, c12 = true =}   //dir=south
+            :(1/4): {= c10 = true, c12 = true =}    //dir=west
+        }
+    }
+    else{tau};
+    if(c2b1==true){
+        palt{
+            :(1/4): {= c20 = false, c21 = false =}  //dir=local
+            :(1/4): {= c20 = true, c21 = false =}   //dir=north
+            :(1/4): {= c20 = false, c21 = true =}   //dir=east
+            :(1/4): {= c20 = true, c21 = true =}    //dir=west
+        }
+    }
+    else{tau};
+    if(c3b1==true){
+        palt{
+            :(1/4): {= c30 = false, c31 = false =}  //dir=local
+            :(1/4): {= c30 = true, c31 = false =}   //dir=north
+            :(1/4): {= c30 = false, c31 = true =}   //dir=east
+            :(1/4): {= c30 = true, c31 = true =}    //dir=south
+        }
+    }
+    else{tau}
+
+}
+
+process northbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
+
+
+}
+
+process southbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
+
+
+}
+
+process eastbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
+
+
+}
+
+process westbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
+
+
+}
