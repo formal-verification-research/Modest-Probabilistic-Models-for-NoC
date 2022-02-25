@@ -370,7 +370,7 @@ process shiftBuffers(){
 } 
 
 
-process Arbiter(){                      //need to figure out how to work the priority
+process Arbiter(){                      
     direction();
     northbuf(ca0, ca1, ca2, ca3, ca4); 
     southbuf(ca0, ca1, ca2, ca3, ca4);
@@ -578,21 +578,63 @@ process direction(){
 }
 
 process northbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
-
+    if(c0b1==true){                 //if there is a flit at the front of the buffer
+        if((c01==false)&&(c02==false)){         //if the flits destination is local
+            {= c0b1 = false, c0Unserviced = 0 =} //flit is absorbed
+        }
+        else if((!ca4&&ca3&&!ca1&&!ca0)||(!ca4&&ca2&&ca1&&!ca0)||(!ca4&&!ca3&&!ca2&&!ca0)){                      //if north is the first priority
+            {= c0b1 = false, c0Unserviced = 0 =}        //flit is forwarded
+        }
+        else{
+              tau          //check if there is conflict
+        }
+    }
+    else{tau}
 
 }
 
-process southbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
-
-
+process eastbuff(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
+    if(c1b1==true){                 //if there is a flit at the front of the buffer
+        if((c10==false)&&(c12==false)){         //if the flits destination is local
+            {= c1b1 = false, c1Unserviced = 0 =} //flit is absorbed
+        }
+        else if((!ca4&&!ca3&&ca1&&ca0)||(!ca4&&ca3&&ca2&&ca0)||(!ca4&&!ca2&&!ca1&&ca0)){    //if east is the first priority
+            {= c1b1 = false, c1Unserviced = 0 =}        //flit is forwarded
+        }
+        else{
+              tau          //check if there is conflict
+        }
+    }
+    else{tau}
 }
 
-process eastbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
-
-
+process southbuff(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
+    if(c2b1==true){                 //if there is a flit at the front of the buffer
+        if((c20==false)&&(c21==false)){         //if the flits destination is local
+            {= c2b1 = false, c2Unserviced = 0 =} //flit is absorbed
+        }
+        else if((!ca4&&!ca3&&ca2&&!ca1)||(!ca4&&ca3&&!ca2&&ca1)||(ca4&&!ca3&&!ca2&&!ca1)){  //if south is the first priority
+            {= c2b1 = false, c2Unserviced = 0 =}        //flit is forwarded
+        }
+        else{
+            tau            //check if there is conflict
+        }
+    }
+    else{tau}
 }
 
 process westbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
-
+    if(c3b1==true){                 //if there is a flit at the front of the buffer
+        if((c30==false)&&(c31==false)){         //if the flits destination is local
+            {= c3b1 = false, c3Unserviced = 0 =} //flit is absorbed
+        }
+        else if((ca4&&!ca3&&ca2)||(ca4&&!ca3&&ca1)){  //if south is the first priority
+            {= c3b1 = false, c3Unserviced = 0 =}        //flit is forwarded
+        }
+        else{
+             tau           //check if there is conflict
+        }
+    }
+    else{tau}
 
 }
