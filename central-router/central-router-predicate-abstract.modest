@@ -9,8 +9,8 @@ int(clkLower..clkUpper) clk;
 
 //transient int(0..1) clk;
 
-//const int INJECTIONRATENUMERATOR = 1;
-//const int INJECTIONRATEDENOMINATOR = 2;
+const int INJECTIONRATENUMERATOR = 1;
+const int INJECTIONRATEDENOMINATOR = 2;
 
 // int totalFlitsDelivered = 0;
 // int totalFlits = 0;
@@ -27,7 +27,7 @@ action tick;
 bool c0b1, c0b2, c0b3, c0b4 = false;    //length of buffer 0, false when empty 
 bool c1b1, c1b2, c1b3, c1b4 = false;    //length of buffer 1
 bool c2b1, c2b2, c2b3, c2b4 = false;    //length of buffer 2
-bool c3b1, c3b2, c3b3, c4b4 = false;    //length of buffer 3
+bool c3b1, c3b2, c3b3, c3b4 = false;    //length of buffer 3
 
 bool c01, c02; //if c01==true dir=east, if c02==true dir=south, if both true dir=west, if both false dir=local
 bool c10, c12; //if c10==true dir=north, if c12==true dir=south, if both true dir=west, if both false dir=local
@@ -370,7 +370,7 @@ process shiftBuffers(){
 } 
 
 
-process Arbiter(){                      //need to figure out how to work the priority
+process Arbiter(){                      
     direction();
     northbuf(ca0, ca1, ca2, ca3, ca4); 
     southbuf(ca0, ca1, ca2, ca3, ca4);
@@ -494,32 +494,56 @@ process Arbiter(){                      //need to figure out how to work the pri
     }
     else if(ca4==true&&ca3==false&&ca2==false&&ca1==true&&ca0==false){ //priority wnes
         {=
-            
+            ca4 = (!c2Unserviced)||(!c1Unserviced&&c0Unserviced),
+	    ca3 = (c2Unserviced&&!c1Unserviced&&c0Unserviced)||(!c2Unserviced&&c1Unserviced&&c0Unserviced),
+	    ca2 = (!c3Unsercived&&c1Unserviced&&c0Unserviced)||(!c3Unserviced&&c2Unserviced&&c0Unserviced)||(c3Unserviced&&!c2Unserviced&&!c1Unserviced&&!c0Unserviced),
+	    ca1 = (!c3Unserviced&&!c2Unserviced&&!c1Unserviced&&c0Unserviced)||(!c3Unserviced&&c2Unserviced&&c1Unserviced&&c0Unserviced)||(c3Unserviced&&c2Unserviced&&!c1Unserviced&&!c0Unserviced)||(c3Unserviced&&!c2Unserviced&&c1Unserviced&&!c0Unserviced),
+	    ca0 = (c2Unserviced&&!c1Unserviced)
         =}
     }
     else if(ca4==true&&ca3==false&&ca2==false&&ca1==true&&ca0==true){ //priority wens
         {=
-            
-        =}
+            ca4 = (!c3Unserviced&&!c1Unserviced&&c0Unserviced),
+	    ca3 = (c2Unserviced&&!c1Unserviced&&c0Unserviced)||(~c2Unserviced&&c1Unserviced&&c0Unserviced),
+	    ca2 = (!c3Unserviced&&c1Unserviced&&c0Unserviced)||(!c3Unserviced&&c2Unserviced&&c0Unserviced)||(c3Unserviced&&!c2Unserviced&&!c1Unserviced&&!c0Unserviced),
+	    ca1 = (!c3Unserviced&&!c2Unserviced&&!c1Unserviced&&c0Unserviced)||(!c3Unserviced&&c2Unserviced&&c1Unserviced&&c0Unserviced)||(c3Unserviced&&c2Unserviced&&!c1Unserviced&&!c0Unserviced)||(c3Unserviced&&!c2Unserviced&&c1Unserviced&&~c0Unserviced),
+	    ca0 = (c1Unserviced)||(!c2Unserviced2)
+	=}
     }
     else if(ca4==true&&ca3==false&&ca2==true&&ca1==false&&ca0==false){ //priority wnse
         {=
-            
+            ca4 = (c3Unserviced&&~c1Unserviced),
+	    ca3 = (c3Unserviced&&c0Unserviced)||(c1Unserviced&&c0Unserviced)||(!c3Unserviced&&!c2Unserviced&&!c0Unserviced),
+	    ca2 = (!c3Unserviced**!c2Unserviced&&c0Unserviced)||(c2Unserviced&&!c1Unserviced&&!c0Unserviced)||(c3Unserviced&&!c1Unserviced&&c0Unserviced),
+	    ca1 = (!c3Unserviced&&c1Unserviced&&c0Unserviced)||(c3Unserviced&&!c1Unserviced&&c0Unserviced),
+	    ca0 = (!c3Unserviced&&!c1Unserviced&&c0Unserviced)
         =}
     }
     else if(ca4==true&&ca3==false&&ca2==true&&ca1==false&&ca0==true){ //priority wesn
         {=
-            
+            ca4 = (!c3Unserviced)||(c1Unserviced),
+	    ca3 = (!c3Unserviced&&!c2Unserviced&&!c0Unserviced)||(!c3Unserviced&&!c2Unserviced&&c1Unserviced)||(c2Unserviced&&c1Unserviced&&!c0Unserviced)||(c3Unserviced&&c2Unserviced&&c0Unserviced)||(c3Unserviced&&c1Unserviced&&c0Unserviced),
+	    ca2 = (!c2Unserviced&&c0Unserviced)||(c2Unserviced&&c1Unserviced&&~c0Unserviced),
+	    ca1 = (!c3Unserviced&&c1Unserviced&&c0Unserviced)||(c3Unserviced&&!c1Unserviced&&c0Unserviced),
+	    ca0 = (!c3Unserviced&&!c1Unserviced&&c0Unserviced)
         =}
     }
     else if(ca4==true&&ca3==false&&ca2==true&&ca1==true&&ca0==false){ //priority wsne
         {=
-            
+            ca4 = (c3Unserviced&&!c2Unserviced),
+	    ca3 = (!c1Unserviced&&c0Unserviced)||(!c3Unserviced&&c2Unserviced&&!c1Unserviced)||(!c3Unserviced&&c2Unserviced&&c0Unserviced)||(c3Unserviced&&!c2Unserviced&&!c1Unserviced)||(c3Unserviced&&~c2Unserviced&&c0Unserviced),
+	    ca2 = (!c3Unserviced&&!c2Unserviced&&!c1Unserviced)||(!c1Unserviced&&c0Unserviced)||(c3Unserviced&&c3Unserviced&&c0Unserviced)||(c1Unserviced&&!c0Unserviced),
+	    ca1 = (!c3Unserviced&&c2Unserviced&&c0Unserviced)||(c3Unserviced&&!c2Unserviced&&c0Unserviced),
+	    ca0 = (!c3Unserviced&&!c2Unserviced&&c0Unserviced)
         =}
     }
     else if(ca4==true&&ca3==false&&ca2==true&&ca1==true&&ca0==true){ //priority wsen
         {=
-            
+            ca4 = (!c3Unserviced)||(c3Unserviced),
+	    ca3 = (!c3Unserviced&&c1Unserviced)||(!c3Unserviced&&c2Unserviced&&c0Unserviced)||(c3Unserviced&&!c2Unserviced&&!c1Unserviced)||(c3Unserviced&&!c2Unserviced&&c0Unserviced),
+	    ca2 = (!c3Unserviced&&!c2Unserviced&&c1Unserviced)||(!c1Unserviced&&!c0Unserviced)||(c1Unserviced&&!c0Unserviced)||(c3Unserviced&&c2Unserviced&&c0Unserviced),
+	    ca1 = (!c3Unserviced&&c2Unserviced&&!c1Unserviced)||(!c3Unserviced&&c2Unserviced&&c0Unserviced)||(c3Unserviced&&!c2Unserviced&&c0Unserviced),
+	    ca0 = (!c3Unserviced&&!c2Unserviced&&c0Unserviced)
         =}
     }
     else{tau};
@@ -578,21 +602,108 @@ process direction(){
 }
 
 process northbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
-
-
-}
-
-process southbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
-
+    if(c0b1==true){                 //if there is a flit at the front of the buffer
+        if((c01==false)&&(c02==false)){         //if the flits destination is local
+            {= c0b1 = false, c0Unserviced = false =} //flit is absorbed
+        }
+        else if((!ca4&&ca3&&!ca1&&!ca0)||(!ca4&&ca2&&ca1&&!ca0)||(!ca4&&!ca3&&!ca2&&!ca0)){                      //if north is the first priority
+            {= c0b1 = false, c0Unserviced = false =}        //flit is forwarded
+        }
+        else if((c1b1)&&(ca0)&&((!c01&&c02&&!c10&&c12)||(c01&&c02&&c10&&c12))){ //if east is ahead of north in priority and they are going the same direction
+            {= c0Unserviced = true =}
+        }
+        else if((c2b1)&&((!ca4&&!ca3&&ca2&&!ca1)||(!ca4&&!ca2&&ca1&&ca0)||(!ca4&&ca3&&!ca2&&ca0)||(!ca4&&ca3&&!ca2&&ca1)||  //if south is ahead of north in priority and they are going the same direction
+        (!ca4&&ca3&&ca1&&ca0)||(ca4&&!ca3&&!ca2&&!ca1)||(ca4&&ca2&&ca0)||(ca4&&ca2&&ca1))&&((!c20&&c21&&c01&&!c02)||(c20&&c21&&c01&&c02))){ 
+            {= c0Unserviced = true =}
+        }
+        else if((c3b1)&&((!ca4&&ca3&&ca0)||(ca4))&&((c30&&c31&&!c01&&c02)||(!c30&&c31&&c01&&!c02))){    //if west is ahead of north in priority and they are going the same direction
+            {= c0Unserviced = true =}
+        }
+        else {
+            {= c0b1 = false, c0Unserviced = false =}           //flit is forwarded
+        }
+    }
+    else{tau}
 
 }
 
 process eastbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
+    if(c1b1==true){                 //if there is a flit at the front of the buffer
+        if((c10==false)&&(c12==false)){         //if the flits destination is local
+            {= c1b1 = false, c1Unserviced = false =} //flit is absorbed
+        }
+        else if((!ca4&&!ca3&&ca1&&ca0)||(!ca4&&ca3&&ca2&&ca0)||(!ca4&&!ca2&&!ca1&&ca0)){    //if east is the first priority
+            {= c1b1 = false, c1Unserviced = false =}        //flit is forwarded
+        }
+        else if((c0b1)&&(!ca0)&&((!c01&&c02&&!c10&&c12)||(c01&&c02&&c10&&c12))){    //if east and north conflict and north is ahead of east in priority
+            {= c1Unserviced = true =}
+        }
+        else if((c2b1)&&((!ca4&&!ca3&&ca2&&!ca1)||(!ca4&&!ca2&&ca1&&!ca0)||(!ca4&&ca3&&ca1&&!ca0)||(!ca4&&ca3&&!ca2&&ca1)|| //if east and south conflict and south is ahead of east in priority
+        (!ca4&&ca3&&!ca2&&!ca0)||(ca4&&!ca1&&!ca0)||(ca4&&!ca3&&!ca2&&!ca1)||(ca4&&ca2&&ca1))&&((c20&&c21&&c10&&c12)||(c20&&!c21&&c10&&!c12))){
+            {= c1Unserviced = true =}
+        }
+        else if((c3b1)&&((ca4)||(!ca4&&ca3&&!ca0))&&((c30&&c31&&!c10&&c12)||(c30&&!c31&&c10&&!c12))){   //if east and west conflict and west is ahead of east in priority
+            {= c1Unserviced = true =}
+        }
+        else{
+            {= c1b1 = false, c1Unserviced = false =}    //flit is forwarded
+        }
+    }
+    else{tau}
+}
 
-
+process southbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
+    if(c2b1==true){                 //if there is a flit at the front of the buffer
+        if((c20==false)&&(c21==false)){         //if the flits destination is local
+            {= c2b1 = false, c2Unserviced = false =} //flit is absorbed
+        }
+        else if((!ca4&&!ca3&&ca2&&!ca1)||(!ca4&&ca3&&!ca2&&ca1)||(ca4&&!ca3&&!ca2&&!ca1)){  //if south is the first priority
+            {= c2b1 = false, c2Unserviced = false =}        //flit is forwarded
+        }
+        else if((c0b1)&&((!ca4&&!ca3&&!ca2&&!ca1)||(!ca4&&!ca3&&ca1&&!ca0)||(!ca4&&!ca3&&ca2&&ca1)||(!ca4&&ca2&&ca1&&!ca0)||(!ca4&&ca3&&ca2&&!ca1)||
+        (!ca4&&ca3&&!ca1&&!ca0)||(ca4&&!ca3&&!ca2&&ca1)||(ca4&&!ca3&&ca2&&!ca1&&!ca0))&&((!c20&&c21&&c01&&!c02)||(c20&&c21&&c01&&c02))){    //if south and north conflict and north is ahead of south in priority
+            {= c2Unserviced = true =}            
+        }
+        else if((c1b1)&&((!ca4&&!ca3&&!ca2&&!ca1)||(!ca4&&!ca3&&ca1&&ca0)||(!ca4&&!ca3&&ca2&&ca1)||(!ca4&&ca3&&ca2&&!ca1)||
+        (!ca4&&ca3&&ca2&&ca0)||(!ca4&&ca3&&!ca1&&ca0)||(ca4&&ca2&&!ca1&&ca0)||(ca4&&!ca3&&!ca2&&ca1))&&((c20&&c21&&c10&&c12)||(c20&&!c21&&c10&&!c12))){ //if south and east conflict and east is ahead of south in priority
+            {= c2Unserviced = true =}  
+        }
+        else if((c3b1)&&((!ca4&&ca3&&ca2)||(!ca4&&ca2&&ca1)||(ca4&&ca2)||(ca4&&ca1))&&((!c30&&c31&&!c20&&c21)||(c30&&!c31&&c20&&!c21))){    //if south and west conflict and west is ahead of south in priority
+            {= c2Unserviced = true =} 
+        }
+        else{
+            {= c2b1 = false, c2Unserviced = false =}        //flit is forwarded
+        }
+    }
+    else{tau}
 }
 
 process westbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
+    if(c3b1==true){                 //if there is a flit at the front of the buffer
+        if((c30==false)&&(c31==false)){         //if the flits destination is local
+            {= c3b1 = false, c3Unserviced = false =} //flit is absorbed
+        }
+        else if((ca4&&!ca3&&ca2)||(ca4&&!ca3&&ca1)){  //if south is the first priority
+            {= c3b1 = false, c3Unserviced = false =}        //flit is forwarded
+        }
+        else if((c0b1)&&((!ca4&&!ca0)||(!ca4&&!ca3))&&((c30&&c31&&!c01&&c02)||(!c30&&c31&&c01&&!c02))){ //if west and north conflict and north is ahead of west in priority
+            {= c3Unserviced = true =}
+        }
+        else if((c1b1)&&((!ca4&&!ca3)||(!ca4&&ca0))&&((c30&&c31&&!c10&&c12)||(c30&&!c31&&c10&&!c12))){  //if west and east conflict and east is ahead of west in priority
+            {= c3Unserviced = true =}
+        }
+        else if((c2b1)&&((!ca4&&!ca2)||(!ca4&&!ca3&&!ca1)||(ca4&&!ca3&&!ca2&&!ca1))&&((!c30&&c31&&!c20&&c21)||(c30&&!c31&&c20&&!c21))){ //if west and south conflict and south is ahead of west in priority
+            {= c3Unserviced = true =}
+        }
+        else{
+            {= c3b1 = false, c3Unserviced = false =}        //flit is forwarded
+        }
+    }
+    else{tau}
+}
 
 
+par{
+:: Clock()
+:: Top()
 }
