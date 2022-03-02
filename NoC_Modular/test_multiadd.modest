@@ -13,23 +13,21 @@ option "dtmc";
 // --------------------------------------------------- Top level varables ---------------------------------------------------
 
 // This is the upper bound of cycles run before quiting
-const int CLK_UPPER = 100;
+const int CLK_UPPER = 3;
 int clk = 0;
 
 // These are the variables for tracking task advancment
 int track = 0;
-int track1 = 0;
 bool areSync = true;
 
 
 
 // ------------------------------------------------------- Properties -------------------------------------------------------
 
-property trackIs1 = Pmax(<> (track == 1));
-property trackIs2 = Pmax(<> (track == 2));
-property trackIs3 = Pmax(<> (track == 3));
-property trackIs4 = Pmax(<> (track == 4));
-property tracking1 = Pmax(<> (track1 == 10));
+property t1 = Pmax(<> (track == 1));
+property t2 = Pmax(<> (track == 2));
+property t3 = Pmax(<> (track == 3));
+property t4 = Pmax(<> (track == 4));
 property addWrong = Pmax(<> (areSync == false));
 
 
@@ -46,11 +44,11 @@ action tock;
 
 // For syncing parallell processes
 process Clock(){
-	tick;
+	tick
 	{=
 		clk++
 	=};
-	if (clk <= CLK_UPPER) {
+	if (clk < CLK_UPPER) {
 	   Clock()
 	}
 	else {
@@ -60,34 +58,43 @@ process Clock(){
 
 // For advancing the variables
 process Task(int id){
-   tick
-   {=
-      track = track + 1
-   =};
-   tock;
+	do {
+	   tick
+	   {=
+	      track++
+	   =};
+	   tock;
 
-   if (id == 0) {
-      {=
-         track1 = track1 + 1
-      =}
-   }
-   else {
-      tau
-   }
+		if (clk >= CLK_UPPER) {
+		   stop
+		}
+		else {
+		   tau
+		}
+	}
 }
 
 // For monitoring Processes
 process Monitor(){
-   tick;
-   tock;
-   if (track % 4 != 0) {
-      {=
-         areSync = false
-      =}
-   }
-   else {
-      tau
-   }
+	do {
+	   tick;
+	   tock;
+	   if (track % 4 != 0) {
+	      {=
+	         areSync = false
+	      =}
+	   }
+	   else {
+	      tau
+	   };
+
+		if (clk >= CLK_UPPER) {
+		   stop
+		}
+		else {
+		   tau
+		}
+	}
 }
 
 
