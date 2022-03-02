@@ -389,8 +389,7 @@ process Arbiter(){
     else if(ca4==false&&ca3==false&&ca2==false&&ca1==false&&ca0==true){ //priority east, north, south, west
         {=
 		ca0 = !c0Unserviced && c1Unserviced;
-		ca1 = (!c0Unserviced && !c1Unserviced && c2Unserviced && !c3Unserviced) || (c0Unserviced && c1Unserviced && c2Unserviced && !c3Unserviced) ||
-			(c0Unserviced && !c1Unserviced && !c2Unserviced && c3Unserviced) || (!c0Unserviced && c1Unserviced && !c2Unserviced && c3Unserviced);
+		ca1 = (!c0Unserviced && !c1Unserviced && c2Unserviced && !c3Unserviced) || (c0Unserviced && c1Unserviced && c2Unserviced && !c3Unserviced) || (c0Unserviced && !c1Unserviced && !c2Unserviced && c3Unserviced) || (!c0Unserviced && c1Unserviced && !c2Unserviced && c3Unserviced);
 		ca2 = (!c0Unserviced && c1Unserviced && c2Unserviced && !c3Unserviced) || (!c1Unserviced && !c2Unserviced && c3Unserviced) || (c0Unserviced && !c2Unserviced && c3Unserviced);
 		ca3 = (!c1Unserviced && !c3Unserviced) || (c0Unserviced && c3Unserviced);
 		ca4 = !c0Unserviced && c3Unserviced;
@@ -400,8 +399,7 @@ process Arbiter(){
     else if(ca4==false&&ca3==false&&ca2==false&&ca1==true&&ca0==false){ //priority nsew
         {=
         	ca0 = !c0Unserviced || c1Unserviced;
-		ca1 = (!c1Unserviced && !c2Unserviced && !c3Unserviced) || (!c0Unserviced && c2Unserviced && !c3Unserviced) ||
-			(c1Unserviced && c2Unserviced && c3Unserviced) || (!c0Unserviced && !c2Unserviced && c3Unserviced);
+		ca1 = (!c1Unserviced && !c2Unserviced && !c3Unserviced) || (!c0Unserviced && c2Unserviced && !c3Unserviced) || (c1Unserviced && c2Unserviced && c3Unserviced) || (!c0Unserviced && !c2Unserviced && c3Unserviced);
 		ca2 = (!c2Unserviced && c3Unserviced) || (c0Unserviced && c2Unserviced && !c3Unserviced);
 		ca3 = (!c0Unserviced && !c3Unserviced) || (c1Unserviced && c3Unserviced);
 		ca4 = !c1Unserviced && c3Unserviced;
