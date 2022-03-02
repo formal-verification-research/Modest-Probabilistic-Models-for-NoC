@@ -494,32 +494,56 @@ process Arbiter(){
     }
     else if(ca4==true&&ca3==false&&ca2==false&&ca1==true&&ca0==false){ //priority wnes
         {=
-            
+            ca4 = (!c2Unserviced)||(!c1Unserviced&&c0Unserviced),
+	    ca3 = (c2Unserviced&&!c1Unserviced&&c0Unserviced)||(!c2Unserviced&&c1Unserviced&&c0Unserviced),
+	    ca2 = (!c3Unsercived&&c1Unserviced&&c0Unserviced)||(!c3Unserviced&&c2Unserviced&&c0Unserviced)||(c3Unserviced&&!c2Unserviced&&!c1Unserviced&&!c0Unserviced),
+	    ca1 = (!c3Unserviced&&!c2Unserviced&&!c1Unserviced&&c0Unserviced)||(!c3Unserviced&&c2Unserviced&&c1Unserviced&&c0Unserviced)||(c3Unserviced&&c2Unserviced&&!c1Unserviced&&!c0Unserviced)||(c3Unserviced&&!c2Unserviced&&c1Unserviced&&!c0Unserviced),
+	    ca0 = (c2Unserviced&&!c1Unserviced)
         =}
     }
     else if(ca4==true&&ca3==false&&ca2==false&&ca1==true&&ca0==true){ //priority wens
         {=
-            
-        =}
+            ca4 =
+	    ca3 =
+	    ca2 =
+	    ca1 =
+	    ca0 =
+	=}
     }
     else if(ca4==true&&ca3==false&&ca2==true&&ca1==false&&ca0==false){ //priority wnse
         {=
-            
+            ca4 =
+	    ca3 =
+	    ca2 =
+	    ca1 =
+	    ca0 =
         =}
     }
     else if(ca4==true&&ca3==false&&ca2==true&&ca1==false&&ca0==true){ //priority wesn
         {=
-            
+            ca4 =
+	    ca3 =
+	    ca2 =
+	    ca1 =
+	    ca0 =
         =}
     }
     else if(ca4==true&&ca3==false&&ca2==true&&ca1==true&&ca0==false){ //priority wsne
         {=
-            
+            ca4 =
+	    ca3 =
+	    ca2 =
+	    ca1 =
+	    ca0 =
         =}
     }
     else if(ca4==true&&ca3==false&&ca2==true&&ca1==true&&ca0==true){ //priority wsen
         {=
-            
+            ca4 =
+	    ca3 =
+	    ca2 =
+	    ca1 =
+	    ca0 =
         =}
     }
     else{tau};
