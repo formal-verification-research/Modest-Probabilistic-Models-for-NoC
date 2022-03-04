@@ -1,0 +1,112 @@
+/****************************************************************************************************************************
+ * This is a test for determaning how modest handles adding to the same variable with parallell processes
+ *
+ * Editors: Jonah Boe
+ * Date: Feb 28, 2022
+ * Designed using: The Modest Toolset (www.modestchecker.net), version v3.1.182-g3d5d3ecdf.
+ ***************************************************************************************************************************/
+
+option "dtmc";
+
+
+
+// --------------------------------------------------- Top level varables ---------------------------------------------------
+
+// This is the upper bound of cycles run before quiting
+const int CLK_UPPER = 3;
+int clk = 0;
+
+// These are the variables for tracking task advancment
+int track = 0;
+bool areSync = true;
+
+
+
+// ------------------------------------------------------- Properties -------------------------------------------------------
+
+property t1 = Pmax(<> (track == 1));
+property t2 = Pmax(<> (track == 2));
+property t3 = Pmax(<> (track == 3));
+property t4 = Pmax(<> (track == 4));
+property addWrong = Pmax(<> (areSync == false));
+
+
+
+// -------------------------------------------------------- Actions ---------------------------------------------------------
+
+// For keeping parallel processes synced
+action tick;
+action tock;
+
+
+
+// ------------------------------------------------------- Processes --------------------------------------------------------
+
+// For syncing parallell processes
+process Clock(){
+	tick
+	{=
+		clk++
+	=};
+	if (clk < CLK_UPPER) {
+	   Clock()
+	}
+	else {
+	   stop
+	}
+}
+
+// For advancing the variables
+process Task(int id){
+	do {
+	   tick
+	   {=
+	      track++
+	   =};
+	   tock;
+
+		if (clk >= CLK_UPPER) {
+		   stop
+		}
+		else {
+		   tau
+		}
+	}
+}
+
+// For monitoring Processes
+process Monitor(){
+	do {
+	   tick;
+	   tock;
+	   if (track % 4 != 0) {
+	      {=
+	         areSync = false
+	      =}
+	   }
+	   else {
+	      tau
+	   };
+
+		if (clk >= CLK_UPPER) {
+		   stop
+		}
+		else {
+		   tau
+		}
+	}
+}
+
+
+
+// ------------------------------------------------------- Execution --------------------------------------------------------
+
+// These processes are run concurrently and kept in sync by tick and tock.
+par{
+	::	Clock()
+	:: Task(0)
+   :: Task(1)
+   :: Task(2)
+   :: Task(3)
+   :: Monitor()
+}

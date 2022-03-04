@@ -1,0 +1,95 @@
+/****************************************************************************************************************************
+ * This is a test for determaning how modest handles parallell syncs with >2 processes
+ *
+ * Editors: Jonah Boe
+ * Date: Feb 28, 2022
+ * Designed using: The Modest Toolset (www.modestchecker.net), version v3.1.182-g3d5d3ecdf.
+ ***************************************************************************************************************************/
+
+option "dtmc";
+
+
+
+// --------------------------------------------------- Top level varables ---------------------------------------------------
+
+// This is the upper bound of cycles run before quiting
+const int CLK_UPPER = 100;
+int clk = 0;
+
+// These are the variables for tracking task advancment
+int[] track = [0,0,0,0];
+bool areSync = true;
+
+
+
+// ------------------------------------------------------- Properties -------------------------------------------------------
+
+property t0 = Pmax(<> (track[0] == 1));
+property t1 = Pmax(<> (track[1] == 1));
+property t2 = Pmax(<> (track[2] == 1));
+property t3 = Pmax(<> (track[3] == 3));
+//property doesAdvance = Pmax(<> (track[0] >= 5));
+//property areNotSync = Pmax(<> (areSync == false));
+
+
+
+// -------------------------------------------------------- Actions ---------------------------------------------------------
+
+// For keeping parallel processes synced
+action tick;
+action tock;
+
+
+
+// ------------------------------------------------------- Processes --------------------------------------------------------
+
+// For syncing parallell processes
+process Clock(){
+	tick;
+	{=
+		clk++
+	=};
+	if (clk <= CLK_UPPER) {
+	   Clock()
+	}
+	else {
+	   stop
+	}
+}
+
+// For advancing the variables
+process Task(int id){
+   tick;
+   {=
+      track[id]++
+   =};
+   tock
+}
+
+// For monitoring Processes
+process Monitor(){
+   tick;
+   tock;
+   if (track[0] != track[1] || track[0] != track[2] || track[0] != track[3] || track[1] != track[2] || track[1] != track[3] || track[2] != track[3]) {
+      {=
+         areSync = false
+      =}
+   }
+   else {
+      tau
+   }
+}
+
+
+
+// ------------------------------------------------------- Execution --------------------------------------------------------
+
+// These processes are run concurrently and kept in sync by tick and tock.
+par{
+	::	Clock()
+	:: Task(0)
+   :: Task(1)
+   :: Task(2)
+   :: Task(3)
+   :: Monitor()
+}
