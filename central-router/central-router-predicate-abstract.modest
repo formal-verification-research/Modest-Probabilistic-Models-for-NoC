@@ -524,7 +524,7 @@ process Arbiter(){
     }
     else{tau};
 
-    if(!c0Unserviced&&!c1Unserviced&&!c2Unserviced&&!c3Unserviced){  //this part needs work
+    if(!c0Unserviced&&!c1Unserviced&&!c2Unserviced&&!c3Unserviced){  //this part needs work (check if each buffer forwarded a flit)
         {=
            optimalRuns++
         =}
@@ -581,7 +581,7 @@ process northbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
     if(c0b1==true){                 //if there is a flit at the front of the buffer
         if((c01==false)&&(c02==false)){         //if the flits destination is local
             {= c0b1 = false, c0Unserviced = false =} //flit is absorbed
-        }
+        }                                           //these first two if statements can be removed
         else if((!ca4&&ca3&&!ca1&&!ca0)||(!ca4&&ca2&&ca1&&!ca0)||(!ca4&&!ca3&&!ca2&&!ca0)){                      //if north is the first priority
             {= c0b1 = false, c0Unserviced = false =}        //flit is forwarded
         }
