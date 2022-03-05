@@ -602,13 +602,7 @@ process direction(){
 
 process northbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
     if(c0b1==true){                 //if there is a flit at the front of the buffer
-        /*if((c01==false)&&(c02==false)){         //if the flits destination is local
-            {= c0b1 = false, c0Unserviced = false =} //flit is absorbed
-        }                                           //these first two if statements can be removed
-        else if((!ca4&&ca3&&!ca1&&!ca0)||(!ca4&&ca2&&ca1&&!ca0)||(!ca4&&!ca3&&!ca2&&!ca0)){                      //if north is the first priority
-            {= c0b1 = false, c0Unserviced = false =}        //flit is forwarded
-        }
-        else */if((c1b1)&&(ca0)&&((!c01&&c02&&!c10&&c12)||(c01&&c02&&c10&&c12))){ //if east is ahead of north in priority and they are going the same direction
+        if((c1b1)&&(ca0)&&((!c01&&c02&&!c10&&c12)||(c01&&c02&&c10&&c12))){ //if east is ahead of north in priority and they are going the same direction
             {= c0Unserviced = true, c0b1_prev = true =}
         }
         else if((c2b1)&&((!ca4&&!ca3&&ca2&&!ca1)||(!ca4&&!ca2&&ca1&&ca0)||(!ca4&&ca3&&!ca2&&ca0)||(!ca4&&ca3&&!ca2&&ca1)||  //if south is ahead of north in priority and they are going the same direction
@@ -632,13 +626,7 @@ process northbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
 
 process eastbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
     if(c1b1==true){                 //if there is a flit at the front of the buffer
-        /*if((c10==false)&&(c12==false)){         //if the flits destination is local
-            {= c1b1 = false, c1Unserviced = false =} //flit is absorbed
-        }
-        else if((!ca4&&!ca3&&ca1&&ca0)||(!ca4&&ca3&&ca2&&ca0)||(!ca4&&!ca2&&!ca1&&ca0)){    //if east is the first priority
-            {= c1b1 = false, c1Unserviced = false =}        //flit is forwarded
-        }
-        else*/ if((c0b1)&&(!ca0)&&((!c01&&c02&&!c10&&c12)||(c01&&c02&&c10&&c12))){    //if east and north conflict and north is ahead of east in priority
+        if((c0b1)&&(!ca0)&&((!c01&&c02&&!c10&&c12)||(c01&&c02&&c10&&c12))){    //if east and north conflict and north is ahead of east in priority
             {= c1Unserviced = true, c1b1_prev = true =}
         }
         else if((c2b1)&&((!ca4&&!ca3&&ca2&&!ca1)||(!ca4&&!ca2&&ca1&&!ca0)||(!ca4&&ca3&&ca1&&!ca0)||(!ca4&&ca3&&!ca2&&ca1)|| //if east and south conflict and south is ahead of east in priority
@@ -661,13 +649,7 @@ process eastbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
 
 process southbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
     if(c2b1==true){                 //if there is a flit at the front of the buffer
-        /*if((c20==false)&&(c21==false)){         //if the flits destination is local
-            {= c2b1 = false, c2Unserviced = false =} //flit is absorbed
-        }
-        else if((!ca4&&!ca3&&ca2&&!ca1)||(!ca4&&ca3&&!ca2&&ca1)||(ca4&&!ca3&&!ca2&&!ca1)){  //if south is the first priority
-            {= c2b1 = false, c2Unserviced = false =}        //flit is forwarded
-        }
-        else*/ if((c0b1)&&((!ca4&&!ca3&&!ca2&&!ca1)||(!ca4&&!ca3&&ca1&&!ca0)||(!ca4&&!ca3&&ca2&&ca1)||(!ca4&&ca2&&ca1&&!ca0)||(!ca4&&ca3&&ca2&&!ca1)||
+        if((c0b1)&&((!ca4&&!ca3&&!ca2&&!ca1)||(!ca4&&!ca3&&ca1&&!ca0)||(!ca4&&!ca3&&ca2&&ca1)||(!ca4&&ca2&&ca1&&!ca0)||(!ca4&&ca3&&ca2&&!ca1)||
         (!ca4&&ca3&&!ca1&&!ca0)||(ca4&&!ca3&&!ca2&&ca1)||(ca4&&!ca3&&ca2&&!ca1&&!ca0))&&((!c20&&c21&&c01&&!c02)||(c20&&c21&&c01&&c02))){    //if south and north conflict and north is ahead of south in priority
             {= c2Unserviced = true, c2b1_prev = true =}            
         }
@@ -691,13 +673,7 @@ process southbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
 
 process westbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
     if(c3b1==true){                 //if there is a flit at the front of the buffer
-        /*if((c30==false)&&(c31==false)){         //if the flits destination is local
-            {= c3b1 = false, c3Unserviced = false =} //flit is absorbed
-        }
-        else if((ca4&&!ca3&&ca2)||(ca4&&!ca3&&ca1)){  //if south is the first priority
-            {= c3b1 = false, c3Unserviced = false =}        //flit is forwarded
-        }
-        else*/ if((c0b1)&&((!ca4&&!ca0)||(!ca4&&!ca3))&&((c30&&c31&&!c01&&c02)||(!c30&&c31&&c01&&!c02))){ //if west and north conflict and north is ahead of west in priority
+        if((c0b1)&&((!ca4&&!ca0)||(!ca4&&!ca3))&&((c30&&c31&&!c01&&c02)||(!c30&&c31&&c01&&!c02))){ //if west and north conflict and north is ahead of west in priority
             {= c3Unserviced = true, c3b1_prev = true =}
         }
         else if((c1b1)&&((!ca4&&!ca3)||(!ca4&&ca0))&&((c30&&c31&&!c10&&c12)||(c30&&!c31&&c10&&!c12))){  //if west and east conflict and east is ahead of west in priority
