@@ -1,4 +1,4 @@
-option "dtmc";
+gption "dtmc";
 
 
 //-------Begin Varibales-------
@@ -380,111 +380,111 @@ process Arbiter(){
 
     if(ca4==false&&ca3==false&&ca2==false&&ca1==false&&ca0==false){ //priority north, east, south, west
         {=
-	        ca0 = c1Unserviced || !c0Unserviced;
-		ca1 = (!c3Unserviced&&!c1Unserviced&&!c0Unserviced&&c2Unserviced) ||(c3Unserviced&&!c1Unserviced&&c0Unserviced&&!c2Unserviced) || (!c3Unserviced&&c1Unserviced&&c0Unserviced&&c2Unserviced) || (c3Unserviced&&c1Unserviced&&!c0Unserviced&&!c2Unserviced);	
-		ca2 = (c1Unserviced&&c3Unserviced&&!c2Unserviced) || (!c0Unserviced&&c3Unserviced&&!c2Unserviced) || (!c1Unserviced&&c0Unserviced&&!c3Unserviced&&c2Unserviced);		
-		ca3 = (!c0Unserviced&&!c3Unserviced) || (c1Unserviced&&c3Unserviced);
-		ca4 = c3Unserviced&&!c1Unserviced;  
+	        ca0 = c1Unserviced || !c0Unserviced,
+		ca1 = (!c3Unserviced&&!c1Unserviced&&!c0Unserviced&&c2Unserviced) ||(c3Unserviced&&!c1Unserviced&&c0Unserviced&&!c2Unserviced) || (!c3Unserviced&&c1Unserviced&&c0Unserviced&&c2Unserviced) || (c3Unserviced&&c1Unserviced&&!c0Unserviced&&!c2Unserviced),	
+		ca2 = (c1Unserviced&&c3Unserviced&&!c2Unserviced) || (!c0Unserviced&&c3Unserviced&&!c2Unserviced) || (!c1Unserviced&&c0Unserviced&&!c3Unserviced&&c2Unserviced),		
+		ca3 = (!c0Unserviced&&!c3Unserviced) || (c1Unserviced&&c3Unserviced),
+		ca4 = c3Unserviced&&!c1Unserviced  
         =}
     }
     else if(ca4==false&&ca3==false&&ca2==false&&ca1==false&&ca0==true){ //priority east, north, south, west
         {=
-		ca0 = !c0Unserviced && c1Unserviced;
-		ca1 = (!c0Unserviced && !c1Unserviced && c2Unserviced && !c3Unserviced) || (c0Unserviced && c1Unserviced && c2Unserviced && !c3Unserviced) || (c0Unserviced && !c1Unserviced && !c2Unserviced && c3Unserviced) || (!c0Unserviced && c1Unserviced && !c2Unserviced && c3Unserviced);
-		ca2 = (!c0Unserviced && c1Unserviced && c2Unserviced && !c3Unserviced) || (!c1Unserviced && !c2Unserviced && c3Unserviced) || (c0Unserviced && !c2Unserviced && c3Unserviced);
-		ca3 = (!c1Unserviced && !c3Unserviced) || (c0Unserviced && c3Unserviced);
-		ca4 = !c0Unserviced && c3Unserviced;
+		ca0 = !c0Unserviced && c1Unserviced,
+		ca1 = (!c0Unserviced && !c1Unserviced && c2Unserviced && !c3Unserviced) || (c0Unserviced && c1Unserviced && c2Unserviced && !c3Unserviced) || (c0Unserviced && !c1Unserviced && !c2Unserviced && c3Unserviced) || (!c0Unserviced && c1Unserviced && !c2Unserviced && c3Unserviced),
+		ca2 = (!c0Unserviced && c1Unserviced && c2Unserviced && !c3Unserviced) || (!c1Unserviced && !c2Unserviced && c3Unserviced) || (c0Unserviced && !c2Unserviced && c3Unserviced),
+		ca3 = (!c1Unserviced && !c3Unserviced) || (c0Unserviced && c3Unserviced),
+		ca4 = !c0Unserviced && c3Unserviced
 		
         =}
     }
     else if(ca4==false&&ca3==false&&ca2==false&&ca1==true&&ca0==false){ //priority nsew
         {=
-        	ca0 = !c0Unserviced || c1Unserviced;
-		ca1 = (!c1Unserviced && !c2Unserviced && !c3Unserviced) || (!c0Unserviced && c2Unserviced && !c3Unserviced) || (c1Unserviced && c2Unserviced && c3Unserviced) || (!c0Unserviced && !c2Unserviced && c3Unserviced);
-		ca2 = (!c2Unserviced && c3Unserviced) || (c0Unserviced && c2Unserviced && !c3Unserviced);
-		ca3 = (!c0Unserviced && !c3Unserviced) || (c1Unserviced && c3Unserviced);
-		ca4 = !c1Unserviced && c3Unserviced;
+        	ca0 = !c0Unserviced || c1Unserviced,
+		ca1 = (!c1Unserviced && !c2Unserviced && !c3Unserviced) || (!c0Unserviced && c2Unserviced && !c3Unserviced) || (c1Unserviced && c2Unserviced && c3Unserviced) || (!c0Unserviced && !c2Unserviced && c3Unserviced),
+		ca2 = (!c2Unserviced && c3Unserviced) || (c0Unserviced && c2Unserviced && !c3Unserviced),
+		ca3 = (!c0Unserviced && !c3Unserviced) || (c1Unserviced && c3Unserviced),
+		ca4 = !c1Unserviced && c3Unserviced
         =}
     }
     else if(ca4==false&&ca3==false&&ca2==false&&ca1==true&&ca0==true){ //priority esnw
         {=
-	        ca0 = !c0Unserviced && c1Unserviced;
-		ca1 = (!c0Unserviced && !c2Unserviced && !c3Unserviced) || (!c1Unserviced && c2Unserviced && !c3Unserviced) || (c0Unserviced && c2Unserviced && c3Unserviced) || (!c1Unserviced && !c2Unserviced && c3Unserviced);
-		ca2 = (c1Unserviced && c2Unserviced && !c3Unserviced) || (!c2Unserviced && c3Unserviced);
-		ca3 = (!c1Unserviced && !c3Unserviced) || (c0Unserviced && c3Unserviced);
-		ca4 = !c0Unserviced && c3Unserviced;    
+	        ca0 = !c0Unserviced && c1Unserviced,
+		ca1 = (!c0Unserviced && !c2Unserviced && !c3Unserviced) || (!c1Unserviced && c2Unserviced && !c3Unserviced) || (c0Unserviced && c2Unserviced && c3Unserviced) || (!c1Unserviced && !c2Unserviced && c3Unserviced),
+		ca2 = (c1Unserviced && c2Unserviced && !c3Unserviced) || (!c2Unserviced && c3Unserviced),
+		ca3 = (!c1Unserviced && !c3Unserviced) || (c0Unserviced && c3Unserviced),
+		ca4 = !c0Unserviced && c3Unserviced    
         =}
     }
     else if(ca4==false&&ca3==false&&ca2==true&&ca1==false&&ca0==false){ //priority snew
         {=
-        	ca0 = !c0Unserviced && c1Unserviced;
-		ca1 = (!c0Unserviced && !c1Unserviced && !c2Unserviced) || (c0Unserviced && !c1Unserviced && !c3Unserviced) || (c0Unserviced && c1Unserviced && !c2Unserviced) || (!c0Unserviced && c1Unserviced && c2Unserviced) || (c2Unserviced && c3Unserviced);
-		ca2 = (!c2Unserviced && !c3Unserviced) || (c0Unserviced && c3Unserviced) || (c1Unserviced && c3Unserviced) || (!c0Unserviced && !c1Unserviced && c2Unserviced);
-		ca3 = (c0Unserviced && !c1Unserviced && c3Unserviced) || (!c0Unserviced && c1Unserviced && c3Unserviced);
-		ca4 = !c0Unserviced && !c1Unserviced && c3Unserviced;    
+        	ca0 = !c0Unserviced && c1Unserviced,
+		ca1 = (!c0Unserviced && !c1Unserviced && !c2Unserviced) || (c0Unserviced && !c1Unserviced && !c3Unserviced) || (c0Unserviced && c1Unserviced && !c2Unserviced) || (!c0Unserviced && c1Unserviced && c2Unserviced) || (c2Unserviced && c3Unserviced),
+		ca2 = (!c2Unserviced && !c3Unserviced) || (c0Unserviced && c3Unserviced) || (c1Unserviced && c3Unserviced) || (!c0Unserviced && !c1Unserviced && c2Unserviced),
+		ca3 = (c0Unserviced && !c1Unserviced && c3Unserviced) || (!c0Unserviced && c1Unserviced && c3Unserviced),
+		ca4 = !c0Unserviced && !c1Unserviced && c3Unserviced    
         =}
     }
     else if(ca4==false&&ca3==false&&ca2==true&&ca1==false&&ca0==true){ //priority senw
         {=
-	        ca0 = c1Unserviced || (!c0Unserviced && !c2Unserviced) || (!c0Unserviced && !c3Unserviced);
-		ca1 = (!c2Unserviced && !c3Unserviced) || (!c0Unserviced && !c1Unserviced && c3Unserviced) || (c0Unserviced && c1Unserviced && c3Unserviced) || (c0Unserviced && !c1Unserviced && c2Unserviced) || (!c0Unserviced && c1Unserviced && c2Unserviced);
-		ca2 = (!c2Unserviced && !c3Unserviced) || (c2Unserviced && c3Unserviced) || (c0Unserviced && c3Unserviced) || (c1Unserviced && c3Unserviced) || (!c0Unserviced && !c1Unserviced && c2Unserviced);
-		ca3 = (c0Unserviced && !c1Unserviced && c3Unserviced) || (!c0Unserviced && c1Unserviced && c3Unserviced);
-		ca4 = (!c0Unserviced && !c1Unserviced && c3Unserviced);    
+	        ca0 = c1Unserviced || (!c0Unserviced && !c2Unserviced) || (!c0Unserviced && !c3Unserviced),
+		ca1 = (!c2Unserviced && !c3Unserviced) || (!c0Unserviced && !c1Unserviced && c3Unserviced) || (c0Unserviced && c1Unserviced && c3Unserviced) || (c0Unserviced && !c1Unserviced && c2Unserviced) || (!c0Unserviced && c1Unserviced && c2Unserviced),
+		ca2 = (!c2Unserviced && !c3Unserviced) || (c2Unserviced && c3Unserviced) || (c0Unserviced && c3Unserviced) || (c1Unserviced && c3Unserviced) || (!c0Unserviced && !c1Unserviced && c2Unserviced),
+		ca3 = (c0Unserviced && !c1Unserviced && c3Unserviced) || (!c0Unserviced && c1Unserviced && c3Unserviced),
+		ca4 = (!c0Unserviced && !c1Unserviced && c3Unserviced)    
         =}
     }
     else if(ca4==false&&ca3==false&&ca2==true&&ca1==true&&ca0==false){ //priority news
         {=
-        	ca0 = !c0Unserviced || c1Unserviced;
-		ca1 = (!c3Unserviced && !c2Unserviced) || (!c0Unserviced && !c1Unserviced && c2Unserviced) || (c0Unserviced && c1Unserviced && c2Unserviced) || (c0Unserviced && !c1Unserviced && c3Unserviced) || (!c0Unserviced && c1Unserviced && c3Unserviced);
-		ca2 = (!c2Unserviced && !c3Unserviced) || (!c0Unserviced && c3Unserviced) || (c1Unserviced && c3Unserviced) || (c0Unserviced && !c1Unserviced && c2Unserviced);
-		ca3 = (!c0Unserviced && !c3Unserviced) || (c1Unserviced && c3Unserviced);
-		ca4 = (!c1Unserviced && c3Unserviced);    
+        	ca0 = !c0Unserviced || c1Unserviced,
+		ca1 = (!c3Unserviced && !c2Unserviced) || (!c0Unserviced && !c1Unserviced && c2Unserviced) || (c0Unserviced && c1Unserviced && c2Unserviced) || (c0Unserviced && !c1Unserviced && c3Unserviced) || (!c0Unserviced && c1Unserviced && c3Unserviced),
+		ca2 = (!c2Unserviced && !c3Unserviced) || (!c0Unserviced && c3Unserviced) || (c1Unserviced && c3Unserviced) || (c0Unserviced && !c1Unserviced && c2Unserviced),
+		ca3 = (!c0Unserviced && !c3Unserviced) || (c1Unserviced && c3Unserviced),
+		ca4 = (!c1Unserviced && c3Unserviced)    
         =}
     }
     else if(ca4==false&&ca3==false&&ca2==true&&ca1==true&&ca0==true){ //priority enws
         {=
-		ca0 = (!c0Unserviced && c1Unserviced);
-		ca1 = (!c3Unserviced && !c2Unserviced) || (!c0Unserviced && !c1Unserviced && c2Unserviced) || (c0Unserviced && !c1Unserviced && c3Unserviced) || (!c0Unserviced && c1Unserviced && c3Unserviced) || (c2Unserviced && c3Unserviced);
-		ca2 = (!c2Unserviced && !c3Unserviced) || (!c1Unserviced && c3Unserviced) || (c0Unserviced && c3Unserviced) || (c1Unserviced && c2Unserviced);
-		ca3 = (!c1Unserviced && !c3Unserviced) || (c0Unserviced && c3Unserviced);
-		ca4 = (!c0Unserviced && c3Unserviced);
+		ca0 = (!c0Unserviced && c1Unserviced),
+		ca1 = (!c3Unserviced && !c2Unserviced) || (!c0Unserviced && !c1Unserviced && c2Unserviced) || (c0Unserviced && !c1Unserviced && c3Unserviced) || (!c0Unserviced && c1Unserviced && c3Unserviced) || (c2Unserviced && c3Unserviced),
+		ca2 = (!c2Unserviced && !c3Unserviced) || (!c1Unserviced && c3Unserviced) || (c0Unserviced && c3Unserviced) || (c1Unserviced && c2Unserviced),
+		ca3 = (!c1Unserviced && !c3Unserviced) || (c0Unserviced && c3Unserviced),
+		ca4 = (!c0Unserviced && c3Unserviced)
         =}
     }
     else if(ca4==false&&ca3==true&&ca2==false&&ca1==false&&ca0==false){ //priority nswe
         {=
-	        ca0 = (!c0Unserviced || c1Unserviced) || (c1Unserviced && c2Unserviced && !c3Unserviced);
-		ca1 = (!c0Unserviced && !c1Unserviced && !c2Unserviced && c3Unserviced) || (c0Unserviced && c1Unserviced && !c2Unserviced && c3Unserviced) || (c0Unserviced && !c1Unserviced && c2Unserviced && !c3Unserviced) || (!c0Unserviced && c1Unserviced && c2Unserviced && !c3Unserviced);
-		ca2 = (!c1Unserviced && !c2Unserviced && c3Unserviced) || (!c0Unserviced && !c2Unserviced && c3Unserviced) || (c0Unserviced && c1Unserviced && c2Unserviced && !c3Unserviced);
-		ca3 = (c0Unserviced && !c1Unserviced && !c3Unserviced) || (!c0Unserviced && c1Unserviced && !c3Unserviced);
-		ca4 = c3Unserviced || (!c0Unserviced && !c1Unserviced);    
+	        ca0 = (!c0Unserviced || c1Unserviced) || (c1Unserviced && c2Unserviced && !c3Unserviced),
+		ca1 = (!c0Unserviced && !c1Unserviced && !c2Unserviced && c3Unserviced) || (c0Unserviced && c1Unserviced && !c2Unserviced && c3Unserviced) || (c0Unserviced && !c1Unserviced && c2Unserviced && !c3Unserviced) || (!c0Unserviced && c1Unserviced && c2Unserviced && !c3Unserviced),
+		ca2 = (!c1Unserviced && !c2Unserviced && c3Unserviced) || (!c0Unserviced && !c2Unserviced && c3Unserviced) || (c0Unserviced && c1Unserviced && c2Unserviced && !c3Unserviced),
+		ca3 = (c0Unserviced && !c1Unserviced && !c3Unserviced) || (!c0Unserviced && c1Unserviced && !c3Unserviced),
+		ca4 = c3Unserviced || (!c0Unserviced && !c1Unserviced)    
         =}
     }
     else if(ca4==false&&ca3==true&&ca2==false&&ca1==false&&ca0==true){ //priority eswn
         {=
-        	ca0 = (!c0Unserviced && c1Unserviced);
-		ca1 = (!c0Unserviced && !c1Unserviced && !c2Unserviced && c3Unserviced) || (c0Unserviced && c1Unserviced && !c2Unserviced && c3Unserviced) || (c0Unserviced && !c1Unserviced && c2Unserviced && !c3Unserviced) || (!c0Unserviced && c1Unserviced && !c3Unserviced);
-		ca2 = (!c1Unserviced && !c2Unserviced && c3Unserviced) || (!c0Unserviced && !c2Unserviced && c3Unserviced) || (c0Unserviced && c1Unserviced && c2Unserviced && !c3Unserviced);
-		ca3 = (c0Unserviced && !c1Unserviced && !c3Unserviced) || (!c0Unserviced && c1Unserviced && c2Unserviced && !c3Unserviced);
-		ca4 = (!c0Unserviced && !c1Unserviced) || c3Unserviced;    
+        	ca0 = (!c0Unserviced && c1Unserviced),
+		ca1 = (!c0Unserviced && !c1Unserviced && !c2Unserviced && c3Unserviced) || (c0Unserviced && c1Unserviced && !c2Unserviced && c3Unserviced) || (c0Unserviced && !c1Unserviced && c2Unserviced && !c3Unserviced) || (!c0Unserviced && c1Unserviced && !c3Unserviced),
+		ca2 = (!c1Unserviced && !c2Unserviced && c3Unserviced) || (!c0Unserviced && !c2Unserviced && c3Unserviced) || (c0Unserviced && c1Unserviced && c2Unserviced && !c3Unserviced),
+		ca3 = (c0Unserviced && !c1Unserviced && !c3Unserviced) || (!c0Unserviced && c1Unserviced && c2Unserviced && !c3Unserviced),
+		ca4 = (!c0Unserviced && !c1Unserviced) || c3Unserviced    
         =}
     }
     else if(ca4==false&&ca3==true&&ca2==false&&ca1==true&&ca0==false){ //priority snwe
         {=
-	        ca0 = !c0Unserviced && c1Unserviced;
-		ca1 = (c1Unserviced && !c2Unserviced && !c3Unserviced) || (!c0Unserviced && c2Unserviced && !c3Unserviced) || (!c1Unserviced && c2Unserviced && c3Unserviced) || (!c0Unserviced && !c2Unserviced && c3Unserviced);
-		ca2 = (!c2Unserviced && !c3Unserviced) || (c2Unserviced && c3Unserviced) || (c0Unserviced && c3Unserviced);
-		ca3 = (!c1Unserviced && !c3Unserviced) || (c0Unserviced && c3Unserviced);
-		ca4 = !c0Unserviced && c3Unserviced;    
+	        ca0 = !c0Unserviced && c1Unserviced,
+		ca1 = (c1Unserviced && !c2Unserviced && !c3Unserviced) || (!c0Unserviced && c2Unserviced && !c3Unserviced) || (!c1Unserviced && c2Unserviced && c3Unserviced) || (!c0Unserviced && !c2Unserviced && c3Unserviced),
+		ca2 = (!c2Unserviced && !c3Unserviced) || (c2Unserviced && c3Unserviced) || (c0Unserviced && c3Unserviced),
+		ca3 = (!c1Unserviced && !c3Unserviced) || (c0Unserviced && c3Unserviced),
+		ca4 = !c0Unserviced && c3Unserviced    
         =}
     }
     else if(ca4==false&&ca3==true&&ca2==false&&ca1==true&&ca0==true){ //priority sewn
         {=
-		ca0 = !c0Unserviced || c1Unserviced;
-		ca1 = (c0Unserviced && !c2Unserviced && !c3Unserviced) || (!c1Unserviced && c2Unserviced && !c3Unserviced) || (!c0Unserviced && c2Unserviced && c3Unserviced) || (!c1Unserviced && !c2Unserviced && c3Unserviced);
-		ca2 = (!c2Unserviced && !c3Unserviced) || (c2Unserviced && c3Unserviced) || (c1Unserviced && c3Unserviced);
-		ca3 = (!c0Unserviced && !c3Unserviced) || (c1Unserviced && c3Unserviced);
-		ca4 = !c1Unserviced && c3Unserviced;
+		ca0 = !c0Unserviced || c1Unserviced,
+		ca1 = (c0Unserviced && !c2Unserviced && !c3Unserviced) || (!c1Unserviced && c2Unserviced && !c3Unserviced) || (!c0Unserviced && c2Unserviced && c3Unserviced) || (!c1Unserviced && !c2Unserviced && c3Unserviced),
+		ca2 = (!c2Unserviced && !c3Unserviced) || (c2Unserviced && c3Unserviced) || (c1Unserviced && c3Unserviced),
+		ca3 = (!c0Unserviced && !c3Unserviced) || (c1Unserviced && c3Unserviced),
+		ca4 = !c1Unserviced && c3Unserviced
         =}
     }
     else if(ca4==false&&ca3==true&&ca2==true&&ca1==false&&ca0==false){ //priority nwes
