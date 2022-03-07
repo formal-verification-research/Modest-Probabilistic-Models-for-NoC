@@ -2,7 +2,7 @@ option "dtmc";
 
 
 //-------Begin Varibales-------
-const int DUR;
+const int DUR;      //add value when running simulation
 const int clkLower = 100;
 const int clkUpper = clkLower + DUR;
 int(clkLower..clkUpper) clk;
