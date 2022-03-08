@@ -682,10 +682,10 @@ process eastbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
         }
         else if((c2b1)&&((!ca4&&!ca3&&ca2&&!ca1)||(!ca4&&!ca2&&ca1&&!ca0)||(!ca4&&ca3&&ca1&&!ca0)||(!ca4&&ca3&&!ca2&&ca1)|| //if east and south conflict and south is ahead of east in priority
         (!ca4&&ca3&&!ca2&&!ca0)||(ca4&&!ca1&&!ca0)||(ca4&&!ca3&&!ca2&&!ca1)||(ca4&&ca2&&ca1))&&((c20&&c21&&c10&&c12)||(c20&&!c21&&c10&&!c12))){
-            {= c1Unserviced = true, c1b1_prev = true  =}
+            {= c1Unserviced = true, c1b1_prev = true, eastbuffershifted++   =}
         }
         else if((c3b1)&&((ca4)||(!ca4&&ca3&&!ca0))&&((c30&&c31&&!c10&&c12)||(c30&&!c31&&c10&&!c12))){   //if east and west conflict and west is ahead of east in priority
-            {= c1Unserviced = true, c1b1_prev = true =}
+            {= c1Unserviced = true, c1b1_prev = true, eastbuffershifted++  =}
         }
         else{
             {= c1b1 = false, c1Unserviced = false, c1b1_prev = true  =}    //flit is forwarded
