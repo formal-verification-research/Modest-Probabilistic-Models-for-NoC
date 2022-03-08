@@ -46,7 +46,7 @@ bool ca0, ca1, ca2, ca3, ca4 =  false;       //priority positions of the arbiter
 // ------ Begin: properties ---------
 property optimalR = Pmax(<> (optimalRuns >= 1));
 property Pr1 = Pmax(<> (clk >= clkUpper));
-property ebufshift = Pmax(<> (eastbuffershifted>=1)); 
+property eastunservericed = Pmax(<> (eastbuffershifted>=1)); 
 //property averageLatency = Pmax(<> ((clk >= clkUpper) && ((totalLatency/totalFlits) <= 1.75)));
 //property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 1));
 // ------ End: properties ---------
