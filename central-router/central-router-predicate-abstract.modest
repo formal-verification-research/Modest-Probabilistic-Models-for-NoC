@@ -702,6 +702,10 @@ process eastbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
 
 process southbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
     if(c2b1==true){                 //if there is a flit at the front of the buffer
+        if(c1b1){
+            {=conflictdir++=}
+        }
+        else{tau};
         if((c0b1_prev)&&((!ca4&&!ca3&&!ca2&&!ca1)||(!ca4&&!ca3&&ca1&&!ca0)||(!ca4&&!ca3&&ca2&&ca1)||(!ca4&&ca2&&ca1&&!ca0)||(!ca4&&ca3&&ca2&&!ca1)||
         (!ca4&&ca3&&!ca1&&!ca0)||(ca4&&!ca3&&!ca2&&ca1)||(ca4&&!ca3&&ca2&&!ca1&&!ca0))&&((!c20&&c21&&c01&&!c02)||(c20&&c21&&c01&&c02))){    //if south and north conflict and north is ahead of south in priority
             {= c2Unserviced = true, c2b1_prev = true =}            
