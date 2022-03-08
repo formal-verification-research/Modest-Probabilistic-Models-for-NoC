@@ -634,19 +634,19 @@ process direction(){
     else{tau};
     if(c2b1==true){
         palt{
-            :(1/4): {= c20 = false, c21 = false =}  //dir=local
-            :(1/4): {= c20 = true, c21 = false =}   //dir=north
-            :(1/4): {= c20 = false, c21 = true =}   //dir=east
-            :(1/4): {= c20 = true, c21 = true =}    //dir=west
+            :(1/1): {= c20 = false, c21 = false =}  //dir=local
+            //:(1/4): {= c20 = true, c21 = false =}   //dir=north
+            //:(1/4): {= c20 = false, c21 = true =}   //dir=east
+            //:(1/4): {= c20 = true, c21 = true =}    //dir=west
         }
     }
     else{tau};
     if(c3b1==true){
         palt{
-            :(1/1): {= c30 = false, c31 = false =}  //dir=local
-            //:(1/4): {= c30 = true, c31 = false =}   //dir=north
-            //:(1/4): {= c30 = false, c31 = true =}   //dir=east
-            //:(1/4): {= c30 = true, c31 = true =}    //dir=south
+            :(1/4): {= c30 = false, c31 = false =}  //dir=local
+            :(1/4): {= c30 = true, c31 = false =}   //dir=north
+            :(1/4): {= c30 = false, c31 = true =}   //dir=east
+            :(1/4): {= c30 = true, c31 = true =}    //dir=south
         }
     }
     else{tau}
