@@ -614,10 +614,10 @@ process Arbiter(){
 process direction(){
     if(c0b1==true){
         palt{
-            :(1/4): {= c01 = false, c02 = false =}  //dir=local
-            :(1/4): {= c01 = true, c02 = false =}   //dir=east
-            :(1/4): {= c01 = false, c02 = true =}   //dir=south
-            :(1/4): {= c01 = true, c02 = true =}    //dir=west
+            :(1/1): {= c01 = false, c02 = false =}  //dir=local
+            //:(1/4): {= c01 = true, c02 = false =}   //dir=east
+            //:(1/4): {= c01 = false, c02 = true =}   //dir=south
+            //:(1/4): {= c01 = true, c02 = true =}    //dir=west
         } 
     }
     else{tau};
@@ -641,10 +641,10 @@ process direction(){
     else{tau};
     if(c3b1==true){
         palt{
-            :(1/4): {= c30 = false, c31 = false =}  //dir=local
-            :(1/4): {= c30 = true, c31 = false =}   //dir=north
-            :(1/4): {= c30 = false, c31 = true =}   //dir=east
-            :(1/4): {= c30 = true, c31 = true =}    //dir=south
+            :(1/1): {= c30 = false, c31 = false =}  //dir=local
+            //:(1/4): {= c30 = true, c31 = false =}   //dir=north
+            //:(1/4): {= c30 = false, c31 = true =}   //dir=east
+            //:(1/4): {= c30 = true, c31 = true =}    //dir=south
         }
     }
     else{tau}
