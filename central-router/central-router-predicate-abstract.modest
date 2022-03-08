@@ -2,7 +2,7 @@ option "dtmc";
 
 
 //-------Begin Varibales-------
-const int DUR=10;      //add value when running simulation
+const int DUR=1;      //add value when running simulation
 const int clkLower = 0;
 const int clkUpper = clkLower + DUR;
 int(clkLower..clkUpper) clk;
@@ -45,7 +45,7 @@ bool ca0, ca1, ca2, ca3, ca4 =  false;       //priority positions of the arbiter
 
 
 // ------ Begin: properties ---------
-property optimalR = Pmax(<> (optimalRuns >= 5));
+property optimalR = Pmax(<> (optimalRuns >= 1));
 property Pr1 = Pmax(<> (clk >= clkUpper));
 //property southunservericed = Pmax(<> (eastbuffershifted>=1)); 
 //property conflict = Pmax(<> (conflictdir>=1));
