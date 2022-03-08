@@ -655,11 +655,6 @@ process direction(){
 
 process northbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
     if(c0b1==true){                 //if there is a flit at the front of the buffer
-        /*if(((!c01&&c02&&!c10&&c12)||(c01&&c02&&c10&&c12))){
-            {=conflictdir++=}
-        }
-        else{tau};*/
-        {= conflictdir++=};
         if((c1b1)&&(ca0)&&((!c01&&c02&&!c10&&c12)||(c01&&c02&&c10&&c12))){ //if east is ahead of north in priority and they are going the same direction
             {= c0Unserviced = true, c0b1_prev = true=}
         }
@@ -684,10 +679,6 @@ process northbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
 
 process eastbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
     if(c1b1==true){                 //if there is a flit at the front of the buffer
-        if((c0b1_prev)&&(!ca0)&&((!c01&&c02&&!c10&&c12)||(c01&&c02&&c10&&c12))){
-            {=conflictdir++=}
-        }
-        else{tau};
         if((c0b1_prev)&&(!ca0)&&((!c01&&c02&&!c10&&c12)||(c01&&c02&&c10&&c12))){    //if east and north conflict and north is ahead of east in priority
             {= c1Unserviced = true, c1b1_prev = true  =}
         }
@@ -711,11 +702,11 @@ process eastbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
 
 process southbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
     if(c2b1==true){                 //if there is a flit at the front of the buffer
-        if((c0b1)&&((!ca4&&!ca3&&!ca2&&!ca1)||(!ca4&&!ca3&&ca1&&!ca0)||(!ca4&&!ca3&&ca2&&ca1)||(!ca4&&ca2&&ca1&&!ca0)||(!ca4&&ca3&&ca2&&!ca1)||
+        if((c0b1_prev)&&((!ca4&&!ca3&&!ca2&&!ca1)||(!ca4&&!ca3&&ca1&&!ca0)||(!ca4&&!ca3&&ca2&&ca1)||(!ca4&&ca2&&ca1&&!ca0)||(!ca4&&ca3&&ca2&&!ca1)||
         (!ca4&&ca3&&!ca1&&!ca0)||(ca4&&!ca3&&!ca2&&ca1)||(ca4&&!ca3&&ca2&&!ca1&&!ca0))&&((!c20&&c21&&c01&&!c02)||(c20&&c21&&c01&&c02))){    //if south and north conflict and north is ahead of south in priority
             {= c2Unserviced = true, c2b1_prev = true =}            
         }
-        else if((c1b1)&&((!ca4&&!ca3&&!ca2&&!ca1)||(!ca4&&!ca3&&ca1&&ca0)||(!ca4&&!ca3&&ca2&&ca1)||(!ca4&&ca3&&ca2&&!ca1)||
+        else if((c1b1_prev)&&((!ca4&&!ca3&&!ca2&&!ca1)||(!ca4&&!ca3&&ca1&&ca0)||(!ca4&&!ca3&&ca2&&ca1)||(!ca4&&ca3&&ca2&&!ca1)||
         (!ca4&&ca3&&ca2&&ca0)||(!ca4&&ca3&&!ca1&&ca0)||(ca4&&ca2&&!ca1&&ca0)||(ca4&&!ca3&&!ca2&&ca1))&&((c20&&c21&&c10&&c12)||(c20&&!c21&&c10&&!c12))){ //if south and east conflict and east is ahead of south in priority
             {= c2Unserviced = true, c2b1_prev = true =}  
         }
@@ -735,13 +726,13 @@ process southbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
 
 process westbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
     if(c3b1==true){                 //if there is a flit at the front of the buffer
-        if((c0b1)&&((!ca4&&!ca0)||(!ca4&&!ca3))&&((c30&&c31&&!c01&&c02)||(!c30&&c31&&c01&&!c02))){ //if west and north conflict and north is ahead of west in priority
+        if((c0b1_prev)&&((!ca4&&!ca0)||(!ca4&&!ca3))&&((c30&&c31&&!c01&&c02)||(!c30&&c31&&c01&&!c02))){ //if west and north conflict and north is ahead of west in priority
             {= c3Unserviced = true, c3b1_prev = true =}
         }
-        else if((c1b1)&&((!ca4&&!ca3)||(!ca4&&ca0))&&((c30&&c31&&!c10&&c12)||(c30&&!c31&&c10&&!c12))){  //if west and east conflict and east is ahead of west in priority
+        else if((c1b1_prev)&&((!ca4&&!ca3)||(!ca4&&ca0))&&((c30&&c31&&!c10&&c12)||(c30&&!c31&&c10&&!c12))){  //if west and east conflict and east is ahead of west in priority
             {= c3Unserviced = true, c3b1_prev = true =}
         }
-        else if((c2b1)&&((!ca4&&!ca2)||(!ca4&&!ca3&&!ca1)||(ca4&&!ca3&&!ca2&&!ca1))&&((!c30&&c31&&!c20&&c21)||(c30&&!c31&&c20&&!c21))){ //if west and south conflict and south is ahead of west in priority
+        else if((c2b1_prev)&&((!ca4&&!ca2)||(!ca4&&!ca3&&!ca1)||(ca4&&!ca3&&!ca2&&!ca1))&&((!c30&&c31&&!c20&&c21)||(c30&&!c31&&c20&&!c21))){ //if west and south conflict and south is ahead of west in priority
             {= c3Unserviced = true, c3b1_prev = true =}
         }
         else{
