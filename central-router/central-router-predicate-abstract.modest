@@ -6,8 +6,8 @@ const int DUR=1;      //add value when running simulation
 const int clkLower = 0;
 const int clkUpper = clkLower + DUR;
 int(clkLower..clkUpper) clk;
-int(0..10) eastbuffershifted = 0;
-int(0..10) conflictdir = 0;
+//int(0..10) eastbuffershifted = 0;
+//int(0..10) conflictdir = 0;
 
 //transient int(0..1) clk;
 
@@ -47,8 +47,8 @@ bool ca0, ca1, ca2, ca3, ca4 =  false;       //priority positions of the arbiter
 // ------ Begin: properties ---------
 property optimalR = Pmax(<> (optimalRuns >= 1));
 property Pr1 = Pmax(<> (clk >= clkUpper));
-property southunservericed = Pmax(<> (eastbuffershifted>=1)); 
-property conflict = Pmax(<> (conflictdir>=1));
+//property southunservericed = Pmax(<> (eastbuffershifted>=1)); 
+//property conflict = Pmax(<> (conflictdir>=1));
 //property averageLatency = Pmax(<> ((clk >= clkUpper) && ((totalLatency/totalFlits) <= 1.75)));
 //property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 1));
 // ------ End: properties ---------
