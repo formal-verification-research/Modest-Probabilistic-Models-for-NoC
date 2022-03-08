@@ -7,6 +7,7 @@ const int clkLower = 0;
 const int clkUpper = clkLower + DUR;
 int(clkLower..clkUpper) clk;
 int(0..10) eastbuffershifted = 0;
+int(0..10) conflictdir = 0;
 
 //transient int(0..1) clk;
 
@@ -47,6 +48,7 @@ bool ca0, ca1, ca2, ca3, ca4 =  false;       //priority positions of the arbiter
 property optimalR = Pmax(<> (optimalRuns >= 1));
 property Pr1 = Pmax(<> (clk >= clkUpper));
 property southunservericed = Pmax(<> (eastbuffershifted>=1)); 
+property conflict = Pmax(<> (conflictdir>=1));
 //property averageLatency = Pmax(<> ((clk >= clkUpper) && ((totalLatency/totalFlits) <= 1.75)));
 //property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 1));
 // ------ End: properties ---------
@@ -614,10 +616,10 @@ process Arbiter(){
 process direction(){
     if(c0b1==true){
         palt{
-            :(1/1): {= c01 = false, c02 = false =}  //dir=local
-            //:(1/4): {= c01 = true, c02 = false =}   //dir=east
-            //:(1/4): {= c01 = false, c02 = true =}   //dir=south
-            //:(1/4): {= c01 = true, c02 = true =}    //dir=west
+            :(1/4): {= c01 = false, c02 = false =}  //dir=local
+            :(1/4): {= c01 = true, c02 = false =}   //dir=east
+            :(1/4): {= c01 = false, c02 = true =}   //dir=south
+            :(1/4): {= c01 = true, c02 = true =}    //dir=west
         } 
     }
     else{tau};
@@ -632,10 +634,10 @@ process direction(){
     else{tau};
     if(c2b1==true){
         palt{
-            :(1/4): {= c20 = false, c21 = false =}  //dir=local
-            :(1/4): {= c20 = true, c21 = false =}   //dir=north
-            :(1/4): {= c20 = false, c21 = true =}   //dir=east
-            :(1/4): {= c20 = true, c21 = true =}    //dir=west
+            :(1/1): {= c20 = false, c21 = false =}  //dir=local
+            //:(1/4): {= c20 = true, c21 = false =}   //dir=north
+            //:(1/4): {= c20 = false, c21 = true =}   //dir=east
+            //:(1/4): {= c20 = true, c21 = true =}    //dir=west
         }
     }
     else{tau};
@@ -653,6 +655,10 @@ process direction(){
 
 process northbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
     if(c0b1==true){                 //if there is a flit at the front of the buffer
+        if(ca0&&((!c01&&c02&&!c10&&c12)||(c01&&c02&&c10&&c12))){
+            {=conflictdir++=}
+        }
+        else{tau};
         if((c1b1)&&(ca0)&&((!c01&&c02&&!c10&&c12)||(c01&&c02&&c10&&c12))){ //if east is ahead of north in priority and they are going the same direction
             {= c0Unserviced = true, c0b1_prev = true=}
         }
