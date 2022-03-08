@@ -377,9 +377,9 @@ process shiftBuffers(){
 
 process Arbiter(){                      
     direction();
-    northbuf(ca0, ca1, ca2, ca3, ca4); 
-    southbuf(ca0, ca1, ca2, ca3, ca4);
-    eastbuf(ca0, ca1, ca2, ca3, ca4);
+    northbuf(ca0, ca1, ca2, ca3, ca4);
+    eastbuf(ca0, ca1, ca2, ca3, ca4); 
+    southbuf(ca0, ca1, ca2, ca3, ca4); 
     westbuf(ca0, ca1, ca2, ca3, ca4);
 
     if(ca4==false&&ca3==false&&ca2==false&&ca1==false&&ca0==false){ //priority north, east, south, west
@@ -702,10 +702,10 @@ process eastbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
 
 process southbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
     if(c2b1==true){                 //if there is a flit at the front of the buffer
-        if(c1b1){
+        /*if(c1b1){
             {=conflictdir++=}
         }
-        else{tau};
+        else{tau};*/
         if((c0b1_prev)&&((!ca4&&!ca3&&!ca2&&!ca1)||(!ca4&&!ca3&&ca1&&!ca0)||(!ca4&&!ca3&&ca2&&ca1)||(!ca4&&ca2&&ca1&&!ca0)||(!ca4&&ca3&&ca2&&!ca1)||
         (!ca4&&ca3&&!ca1&&!ca0)||(ca4&&!ca3&&!ca2&&ca1)||(ca4&&!ca3&&ca2&&!ca1&&!ca0))&&((!c20&&c21&&c01&&!c02)||(c20&&c21&&c01&&c02))){    //if south and north conflict and north is ahead of south in priority
             {= c2Unserviced = true, c2b1_prev = true =}            
