@@ -688,7 +688,7 @@ process eastbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
             {=conflictdir++=}
         }
         else{tau};
-        if((c0b1)&&(!ca0)&&((!c01&&c02&&!c10&&c12)||(c01&&c02&&c10&&c12))){    //if east and north conflict and north is ahead of east in priority
+        if((c0b1_prev)&&(!ca0)&&((!c01&&c02&&!c10&&c12)||(c01&&c02&&c10&&c12))){    //if east and north conflict and north is ahead of east in priority
             {= c1Unserviced = true, c1b1_prev = true  =}
         }
         else if((c2b1)&&((!ca4&&!ca3&&ca2&&!ca1)||(!ca4&&!ca2&&ca1&&!ca0)||(!ca4&&ca3&&ca1&&!ca0)||(!ca4&&ca3&&!ca2&&ca1)|| //if east and south conflict and south is ahead of east in priority
