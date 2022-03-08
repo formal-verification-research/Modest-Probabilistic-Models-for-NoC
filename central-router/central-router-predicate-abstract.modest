@@ -6,7 +6,7 @@ const int DUR=1;      //add value when running simulation
 const int clkLower = 0;
 const int clkUpper = clkLower + DUR;
 int(clkLower..clkUpper) clk;
-int(0..10) northbuffershifted = 0;
+int(0..10) eastbuffershifted = 0;
 
 //transient int(0..1) clk;
 
@@ -46,7 +46,7 @@ bool ca0, ca1, ca2, ca3, ca4 =  false;       //priority positions of the arbiter
 // ------ Begin: properties ---------
 property optimalR = Pmax(<> (optimalRuns >= 1));
 property Pr1 = Pmax(<> (clk >= clkUpper));
-property nbufshift = Pmax(<> (northbuffershifted>=1)); 
+property nbufshift = Pmax(<> (eastbuffershifted>=1)); 
 //property averageLatency = Pmax(<> ((clk >= clkUpper) && ((totalLatency/totalFlits) <= 1.75)));
 //property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (totalFlitsDelivered >= 1));
 // ------ End: properties ---------
@@ -654,17 +654,17 @@ process direction(){
 process northbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
     if(c0b1==true){                 //if there is a flit at the front of the buffer
         if((c1b1)&&(ca0)&&((!c01&&c02&&!c10&&c12)||(c01&&c02&&c10&&c12))){ //if east is ahead of north in priority and they are going the same direction
-            {= c0Unserviced = true, c0b1_prev = true, northbuffershifted++ =}
+            {= c0Unserviced = true, c0b1_prev = true=}
         }
         else if((c2b1)&&((!ca4&&!ca3&&ca2&&!ca1)||(!ca4&&!ca2&&ca1&&ca0)||(!ca4&&ca3&&!ca2&&ca0)||(!ca4&&ca3&&!ca2&&ca1)||  //if south is ahead of north in priority and they are going the same direction
         (!ca4&&ca3&&ca1&&ca0)||(ca4&&!ca3&&!ca2&&!ca1)||(ca4&&ca2&&ca0)||(ca4&&ca2&&ca1))&&((!c20&&c21&&c01&&!c02)||(c20&&c21&&c01&&c02))){ 
-            {= c0Unserviced = true, c0b1_prev = true, northbuffershifted++ =}
+            {= c0Unserviced = true, c0b1_prev = true =}
         }
         else if((c3b1)&&((!ca4&&ca3&&ca0)||(ca4))&&((c30&&c31&&!c01&&c02)||(!c30&&c31&&c01&&!c02))){    //if west is ahead of north in priority and they are going the same direction
-            {= c0Unserviced = true, c0b1_prev = true, northbuffershifted++ =}
+            {= c0Unserviced = true, c0b1_prev = true =}
         }
         else {
-            {= c0b1 = false, c0Unserviced = false, c0b1_prev = true, northbuffershifted++ =}           //flit is forwarded
+            {= c0b1 = false, c0Unserviced = false, c0b1_prev = true =}           //flit is forwarded
         }
     }
     else{
@@ -678,17 +678,17 @@ process northbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
 process eastbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
     if(c1b1==true){                 //if there is a flit at the front of the buffer
         if((c0b1)&&(!ca0)&&((!c01&&c02&&!c10&&c12)||(c01&&c02&&c10&&c12))){    //if east and north conflict and north is ahead of east in priority
-            {= c1Unserviced = true, c1b1_prev = true =}
+            {= c1Unserviced = true, c1b1_prev = true, eastbuffershifted++  =}
         }
         else if((c2b1)&&((!ca4&&!ca3&&ca2&&!ca1)||(!ca4&&!ca2&&ca1&&!ca0)||(!ca4&&ca3&&ca1&&!ca0)||(!ca4&&ca3&&!ca2&&ca1)|| //if east and south conflict and south is ahead of east in priority
         (!ca4&&ca3&&!ca2&&!ca0)||(ca4&&!ca1&&!ca0)||(ca4&&!ca3&&!ca2&&!ca1)||(ca4&&ca2&&ca1))&&((c20&&c21&&c10&&c12)||(c20&&!c21&&c10&&!c12))){
-            {= c1Unserviced = true, c1b1_prev = true =}
+            {= c1Unserviced = true, c1b1_prev = true, eastbuffershifted++  =}
         }
         else if((c3b1)&&((ca4)||(!ca4&&ca3&&!ca0))&&((c30&&c31&&!c10&&c12)||(c30&&!c31&&c10&&!c12))){   //if east and west conflict and west is ahead of east in priority
-            {= c1Unserviced = true, c1b1_prev = true =}
+            {= c1Unserviced = true, c1b1_prev = true, eastbuffershifted++  =}
         }
         else{
-            {= c1b1 = false, c1Unserviced = false, c1b1_prev = true =}    //flit is forwarded
+            {= c1b1 = false, c1Unserviced = false, c1b1_prev = true, eastbuffershifted++  =}    //flit is forwarded
         }
     }
     else{
