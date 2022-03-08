@@ -655,7 +655,7 @@ process direction(){
 
 process northbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
     if(c0b1==true){                 //if there is a flit at the front of the buffer
-        if(ca0&&((!c01&&c02&&!c10&&c12)||(c01&&c02&&c10&&c12))){
+        if(((!c01&&c02&&!c10&&c12)||(c01&&c02&&c10&&c12))){
             {=conflictdir++=}
         }
         else{tau};
