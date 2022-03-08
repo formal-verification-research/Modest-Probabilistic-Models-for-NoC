@@ -659,6 +659,7 @@ process northbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
             {=conflictdir++=}
         }
         else{tau};*/
+        {= conflictdir++=};
         if((c1b1)&&(ca0)&&((!c01&&c02&&!c10&&c12)||(c01&&c02&&c10&&c12))){ //if east is ahead of north in priority and they are going the same direction
             {= c0Unserviced = true, c0b1_prev = true=}
         }
@@ -684,7 +685,7 @@ process northbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
 process eastbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
     if(c1b1==true){                 //if there is a flit at the front of the buffer
         if((c0b1==true)/*&&(!ca0)&&((!c01&&c02&&!c10&&c12)||(c01&&c02&&c10&&c12))*/){
-            {=conflictdir++=}
+            tau//{=conflictdir++=}
         }
         else{tau};
         if((c0b1)&&(!ca0)&&((!c01&&c02&&!c10&&c12)||(c01&&c02&&c10&&c12))){    //if east and north conflict and north is ahead of east in priority
