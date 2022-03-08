@@ -124,6 +124,7 @@ process shiftBuffers(){
             if(c0b3==false){
                 {=
                 c0b1=c0b4,
+                eastbuffershifted++,
                 c0b4=false
                 =}
             }
@@ -716,7 +717,7 @@ process southbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
         }
         else if((c1b1)&&((!ca4&&!ca3&&!ca2&&!ca1)||(!ca4&&!ca3&&ca1&&ca0)||(!ca4&&!ca3&&ca2&&ca1)||(!ca4&&ca3&&ca2&&!ca1)||
         (!ca4&&ca3&&ca2&&ca0)||(!ca4&&ca3&&!ca1&&ca0)||(ca4&&ca2&&!ca1&&ca0)||(ca4&&!ca3&&!ca2&&ca1))&&((c20&&c21&&c10&&c12)||(c20&&!c21&&c10&&!c12))){ //if south and east conflict and east is ahead of south in priority
-            {= c2Unserviced = true, c2b1_prev = true, eastbuffershifted++ =}  
+            {= c2Unserviced = true, c2b1_prev = true =}  
         }
         else if((c3b1)&&((!ca4&&ca3&&ca2)||(!ca4&&ca2&&ca1)||(ca4&&ca2)||(ca4&&ca1))&&((!c30&&c31&&!c20&&c21)||(c30&&!c31&&c20&&!c21))){    //if south and west conflict and west is ahead of south in priority
             {= c2Unserviced = true, c2b1_prev = true =} 
