@@ -702,14 +702,14 @@ process southbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
     if(c2b1==true){                 //if there is a flit at the front of the buffer
         if((c0b1)&&((!ca4&&!ca3&&!ca2&&!ca1)||(!ca4&&!ca3&&ca1&&!ca0)||(!ca4&&!ca3&&ca2&&ca1)||(!ca4&&ca2&&ca1&&!ca0)||(!ca4&&ca3&&ca2&&!ca1)||
         (!ca4&&ca3&&!ca1&&!ca0)||(ca4&&!ca3&&!ca2&&ca1)||(ca4&&!ca3&&ca2&&!ca1&&!ca0))&&((!c20&&c21&&c01&&!c02)||(c20&&c21&&c01&&c02))){    //if south and north conflict and north is ahead of south in priority
-            {= c2Unserviced = true, c2b1_prev = true, eastbuffershifted++ =}            
+            {= c2Unserviced = true, c2b1_prev = true =}            
         }
         else if((c1b1)&&((!ca4&&!ca3&&!ca2&&!ca1)||(!ca4&&!ca3&&ca1&&ca0)||(!ca4&&!ca3&&ca2&&ca1)||(!ca4&&ca3&&ca2&&!ca1)||
         (!ca4&&ca3&&ca2&&ca0)||(!ca4&&ca3&&!ca1&&ca0)||(ca4&&ca2&&!ca1&&ca0)||(ca4&&!ca3&&!ca2&&ca1))&&((c20&&c21&&c10&&c12)||(c20&&!c21&&c10&&!c12))){ //if south and east conflict and east is ahead of south in priority
             {= c2Unserviced = true, c2b1_prev = true, eastbuffershifted++ =}  
         }
         else if((c3b1)&&((!ca4&&ca3&&ca2)||(!ca4&&ca2&&ca1)||(ca4&&ca2)||(ca4&&ca1))&&((!c30&&c31&&!c20&&c21)||(c30&&!c31&&c20&&!c21))){    //if south and west conflict and west is ahead of south in priority
-            {= c2Unserviced = true, c2b1_prev = true, eastbuffershifted++ =} 
+            {= c2Unserviced = true, c2b1_prev = true =} 
         }
         else{
             {= c2b1 = false, c2Unserviced = false, c2b1_prev = true =}        //flit is forwarded
