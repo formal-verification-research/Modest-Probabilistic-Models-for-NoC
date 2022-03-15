@@ -2,7 +2,7 @@ option "dtmc";
 
 
 //-------Begin Varibales-------
-const int DUR=1;      //add value when running simulation
+const int DUR=5;      //add value when running simulation
 const int clkLower = 0;
 const int clkUpper = clkLower + DUR;
 int(clkLower..clkUpper) clk;
@@ -14,7 +14,7 @@ int(clkLower..clkUpper) clk;
 const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
-// int totalFlitsDelivered = 0;
+int totalFlitsDelivered = 0;
 // int totalFlits = 0;
 // int totalLatency = 0;
 
@@ -47,6 +47,7 @@ bool ca0, ca1, ca2, ca3, ca4 =  false;       //priority positions of the arbiter
 // ------ Begin: properties ---------
 property optimalR = Pmax(<> (optimalRuns >= 1));
 property Pr1 = Pmax(<> (clk >= clkUpper));
+property Deliveredflits = Pmax(<> (totalFlitsDelivered >= 20));
 //property southunservericed = Pmax(<> (eastbuffershifted>=1)); 
 //property conflict = Pmax(<> (conflictdir>=1));
 //property averageLatency = Pmax(<> ((clk >= clkUpper) && ((totalLatency/totalFlits) <= 1.75)));
@@ -666,7 +667,7 @@ process northbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
             {= c0Unserviced = true, c0b1_prev = true =}
         }
         else {
-            {= c0b1 = false, c0Unserviced = false, c0b1_prev = true =}           //flit is forwarded
+            {= c0b1 = false, c0Unserviced = false, c0b1_prev = true, totalFlitsDelivered++ =}           //flit is forwarded
         }
     }
     else{
@@ -690,7 +691,7 @@ process eastbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
             {= c1Unserviced = true, c1b1_prev = true  =}
         }
         else{
-            {= c1b1 = false, c1Unserviced = false, c1b1_prev = true  =}    //flit is forwarded
+            {= c1b1 = false, c1Unserviced = false, c1b1_prev = true, totalFlitsDelivered++  =}    //flit is forwarded
         }
     }
     else{
@@ -714,7 +715,7 @@ process southbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
             {= c2Unserviced = true, c2b1_prev = true =} 
         }
         else{
-            {= c2b1 = false, c2Unserviced = false, c2b1_prev = true =}        //flit is forwarded
+            {= c2b1 = false, c2Unserviced = false, c2b1_prev = true, totalFlitsDelivered++ =}        //flit is forwarded
         }
     }
     else{
@@ -736,7 +737,7 @@ process westbuf(bool ca0, bool ca1, bool ca2, bool ca3, bool ca4){
             {= c3Unserviced = true, c3b1_prev = true =}
         }
         else{
-            {= c3b1 = false, c3Unserviced = false, c3b1_prev = true =}        //flit is forwarded
+            {= c3b1 = false, c3Unserviced = false, c3b1_prev = true, totalFlitsDelivered++ =}        //flit is forwarded
         }
     }
     else{
