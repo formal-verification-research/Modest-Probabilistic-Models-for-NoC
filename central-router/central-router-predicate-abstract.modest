@@ -14,7 +14,7 @@ int(clkLower..clkUpper) clk;
 const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
-int totalFlitsDelivered = 0;
+int(0..20) totalFlitsDelivered = 0;
 // int totalFlits = 0;
 // int totalLatency = 0;
 
@@ -47,7 +47,7 @@ bool ca0, ca1, ca2, ca3, ca4 =  false;       //priority positions of the arbiter
 // ------ Begin: properties ---------
 property optimalR = Pmax(<> (optimalRuns >= 1));
 property Pr1 = Pmax(<> (clk >= clkUpper));
-property Deliveredflits = Pmax(<> (totalFlitsDelivered >= 20));
+property Deliveredflits = Pmax(<> (totalFlitsDelivered >= 15));
 //property southunservericed = Pmax(<> (eastbuffershifted>=1)); 
 //property conflict = Pmax(<> (conflictdir>=1));
 //property averageLatency = Pmax(<> ((clk >= clkUpper) && ((totalLatency/totalFlits) <= 1.75)));
