@@ -1,5 +1,5 @@
 /****************************************************************************************************************************
- * This is a test for determaning how modest handles parallell syncs with >2 processes
+ * This is a test for determaning how modest handles adding to the same variable with parallell processes
  *
  * Editors: Jonah Boe
  * Date: Feb 28, 2022
@@ -13,23 +13,19 @@ option "dtmc";
 // --------------------------------------------------- Top level varables ---------------------------------------------------
 
 // This is the upper bound of cycles run before quiting
-const int CLK_UPPER = 100;
+const int CLK_UPPER = 1;
 int clk = 0;
 
 // These are the variables for tracking task advancment
-int[] track = [0,0,0,0];
+int track = 0;
 bool areSync = true;
 
 
 
 // ------------------------------------------------------- Properties -------------------------------------------------------
 
-property t0 = Pmax(<> (track[0] == 1));
-property t1 = Pmax(<> (track[1] == 1));
-property t2 = Pmax(<> (track[2] == 1));
-property t3 = Pmax(<> (track[3] == 3));
-//property doesAdvance = Pmax(<> (track[0] >= 5));
-//property areNotSync = Pmax(<> (areSync == false));
+property addWrong = Pmax(<> (areSync == false));
+property isAdvancing = Pmax(<> (track == 1));
 
 
 
@@ -45,11 +41,11 @@ action tock;
 
 // For syncing parallell processes
 process Clock(){
-	tick;
+	tick
 	{=
 		clk++
 	=};
-	if (clk <= CLK_UPPER) {
+	if (clk < CLK_UPPER) {
 	   Clock()
 	}
 	else {
@@ -59,25 +55,43 @@ process Clock(){
 
 // For advancing the variables
 process Task(int id){
-   tick;
-   {=
-      track[id]++
-   =};
-   tock
+	do {
+		tick;
+	   {=
+	   	track++
+   	=};
+	   tock;
+
+		if (clk >= CLK_UPPER) {
+		   stop
+		}
+		else {
+		   tau
+		}
+	}
 }
 
 // For monitoring Processes
 process Monitor(){
-   tick;
-   tock;
-   if (track[0] != track[1] || track[0] != track[2] || track[0] != track[3] || track[1] != track[2] || track[1] != track[3] || track[2] != track[3]) {
-      {=
-         areSync = false
-      =}
-   }
-   else {
-      tau
-   }
+	do {
+	   tick;
+	   tock;
+	   if (track % 4 != 0) {
+	      {=
+	         areSync = false
+	      =}
+	   }
+	   else {
+	      tau
+	   };
+
+		if (clk >= CLK_UPPER) {
+		   stop
+		}
+		else {
+		   tau
+		}
+	}
 }
 
 

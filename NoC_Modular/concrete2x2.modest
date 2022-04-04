@@ -31,11 +31,11 @@ const int INJECTION_RATE_NUMERATOR = 3;
 const int INJECTION_RATE_DENOMINATOR = 10;
 
 // #MODULARIZE this is the upper bound of cycles run before quiting
-const int CLK_UPPER = 1;
+const int CLK_UPPER = 20;
 int clk = 0;
 
 // #MODULARIZE this is the upper threshoold for noise detected in the system
-const int RESISTIVE_NOISE_THRESH = 1;
+const int RESISTIVE_NOISE_THRESH = 5;
 const int INDUCTIVE_NOISE_THRESH = 1;
 
 // These are for tracking resistive and inductive noise and must be initialized to 0.
@@ -83,7 +83,7 @@ datatype router = {
 // ------------------------------------------------------- Properties -------------------------------------------------------
 
 property resistiveNoiseProbability = Pmax(<> (resistiveNoise >= RESISTIVE_NOISE_THRESH));
-property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+//property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
 
 
 
