@@ -60,7 +60,8 @@ datatype buffer = {
 
 datatype channel = {
 	buffer option buffer,
-	bool serviced
+	bool serviced,
+	bool isEmpty
 };
 
 datatype router = {
@@ -91,6 +92,7 @@ property resistiveNoiseProbability = Pmax(<> (resistiveNoise >= RESISTIVE_NOISE_
 
 // For keeping parallel processes synced
 action tick;
+action tack;
 action tock;
 
 
@@ -170,6 +172,27 @@ process GenerateFlits(int id){
 	}
 }
 
+process PrepChannel(int id, int ch){
+	if(peekFront(noc[id].channels[ch].buffer) == -1){
+		{=
+			noc[id].channels[ch].isEmpty = true
+		=}
+	}
+	else{
+		{=
+			noc[id].channels[ch].isEmpty = false
+		=}
+	}
+}
+
+process PrepRouter(int id){
+	PrepChannel(id, 0);
+	PrepChannel(id, 1);
+	PrepChannel(id, 2);
+	PrepChannel(id, 3);
+	PrepChannel(id, 4)
+}
+
 // Send flit to northern router. src and dst are channels (ie NORTH, WEST, EAST, SOUTH, LOCAL), NOT the actual router ids!
 process Send(int id, int buf, int dir){
 	// We want to chech the final destination buffer of the router we are headed into, to see if it is full
@@ -233,7 +256,7 @@ process AdvanceChannel(int id, int buf){
 		=}
 	}
 	// If this channel was assigned a neighbor or is local, but it is empty...
-	else if(peekFront(noc[id].channels[buf].buffer) == -1){
+	else if(noc[id].channels[buf].isEmpty == true){
 		{=
 			// Mark the channel as serviced
 			noc[id].channels[buf].serviced = true,
@@ -357,11 +380,11 @@ process RouterBehavior(int id, int id_north, int id_west, int id_east, int id_so
 	{=
 		noc[id] = router {
 			channels: [
-				channel {serviced: false},
-				channel {serviced: false},
-				channel {serviced: false},
-				channel {serviced: false},
-				channel {serviced: false}],
+				channel {serviced: false, isEmpty: false},
+				channel {serviced: false, isEmpty: false},
+				channel {serviced: false, isEmpty: false},
+				channel {serviced: false, isEmpty: false},
+				channel {serviced: false, isEmpty: false}],
 			ids: [id_north, id_west, id_east, id_south],
 			priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
 			total_unserviced: 0,
@@ -379,10 +402,14 @@ process RouterBehavior(int id, int id_north, int id_west, int id_east, int id_so
 		tick;
 		// Generate new flits
 		GenerateFlits(id);
-		// Send the flits
-		AdvanceRouter(id);
+
+		tack;
+		// Determine what channels will send this cycle
+		PrepRouter(id);
 
 		tock;
+		// Send the flits
+		AdvanceRouter(id);
 		// Update the priority list
 		UpdatePiority(id);
 		// Update resistive and inductive values
