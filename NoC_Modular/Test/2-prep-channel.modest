@@ -24,7 +24,7 @@
  router[] noc = [router {}, router {}, router {}, router {}];
  
  // #MODULARIZE this value changes the buffer length of all buffers.
- const int BUFFER_LENGTH = 3;
+ const int BUFFER_LENGTH = 4;
  
  // #MODULARIZE these values change the frequency with witch flits are injected.
  const int INJECTION_RATE_NUMERATOR = 3;
@@ -83,11 +83,8 @@
  
  // ------------------------------------------------------- Properties -------------------------------------------------------
  
- property Router_0_Flits_ID = Pmax(<> (!(peekFront(noc[0].channels[LOCAL].buffer) == 0)));
- property Router_0_No_Overflow = Pmax(<> (!(len(noc[0].channels[LOCAL].buffer) > BUFFER_LENGTH)));
- property Router_0_Flits_Contain_1 = Pmax(<> (peekFront(noc[0].channels[LOCAL].buffer) == 1));
- property Router_0_Flits_Contain_2 = Pmax(<> (peekFront(noc[0].channels[LOCAL].buffer) == 2));
- property Router_0_Flits_Contain_3 = Pmax(<> (peekFront(noc[0].channels[LOCAL].buffer) == 3));
+ property resistiveNoiseProbability = Pmax(<> (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+ //property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
  
  
  
@@ -175,6 +172,27 @@
 	 }
  }
  
+ process PrepChannel(int id, int ch){
+	 if(peekFront(noc[id].channels[ch].buffer) == -1){
+		 {=
+			 noc[id].channels[ch].isEmpty = true
+		 =}
+	 }
+	 else{
+		 {=
+			 noc[id].channels[ch].isEmpty = false
+		 =}
+	 }
+ }
+ 
+ process PrepRouter(int id){
+	 PrepChannel(id, 0);
+	 PrepChannel(id, 1);
+	 PrepChannel(id, 2);
+	 PrepChannel(id, 3);
+	 PrepChannel(id, 4)
+ }
+ 
  // Process for behavior
  process RouterBehavior(int id, int id_north, int id_west, int id_east, int id_south){
 	 // Initialize the router
@@ -205,6 +223,8 @@
 		 GenerateFlits(id);
  
 		 tack;
+		 // Determine what channels will send this cycle
+		 PrepRouter(id);
  
 		 tock;
  

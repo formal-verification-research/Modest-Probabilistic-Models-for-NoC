@@ -24,7 +24,7 @@
  router[] noc = [router {}, router {}, router {}, router {}];
  
  // #MODULARIZE this value changes the buffer length of all buffers.
- const int BUFFER_LENGTH = 3;
+ const int BUFFER_LENGTH = 4;
  
  // #MODULARIZE these values change the frequency with witch flits are injected.
  const int INJECTION_RATE_NUMERATOR = 3;
@@ -83,11 +83,8 @@
  
  // ------------------------------------------------------- Properties -------------------------------------------------------
  
- property Router_0_Flits_ID = Pmax(<> (!(peekFront(noc[0].channels[LOCAL].buffer) == 0)));
- property Router_0_No_Overflow = Pmax(<> (!(len(noc[0].channels[LOCAL].buffer) > BUFFER_LENGTH)));
- property Router_0_Flits_Contain_1 = Pmax(<> (peekFront(noc[0].channels[LOCAL].buffer) == 1));
- property Router_0_Flits_Contain_2 = Pmax(<> (peekFront(noc[0].channels[LOCAL].buffer) == 2));
- property Router_0_Flits_Contain_3 = Pmax(<> (peekFront(noc[0].channels[LOCAL].buffer) == 3));
+ property resistiveNoiseProbability = Pmax(<> (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+ //property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
  
  
  
@@ -175,6 +172,132 @@
 	 }
  }
  
+ process PrepChannel(int id, int ch){
+	 if(peekFront(noc[id].channels[ch].buffer) == -1){
+		 {=
+			 noc[id].channels[ch].isEmpty = true
+		 =}
+	 }
+	 else{
+		 {=
+			 noc[id].channels[ch].isEmpty = false
+		 =}
+	 }
+ }
+ 
+ process PrepRouter(int id){
+	 PrepChannel(id, 0);
+	 PrepChannel(id, 1);
+	 PrepChannel(id, 2);
+	 PrepChannel(id, 3);
+	 PrepChannel(id, 4)
+ }
+ 
+ // Send flit to northern router. src and dst are channels (ie NORTH, WEST, EAST, SOUTH, LOCAL), NOT the actual router ids!
+ process Send(int id, int buf, int dir){
+	 // We want to chech the final destination buffer of the router we are headed into, to see if it is full
+	 int(-1..3) dst;
+	 {=
+		 // A flit going from router 0 to router 1 leaves 0 from the SOUTH and enters 1 from the NORTH.
+		 dst = getDestinationChannel(dir)
+	 =};
+ 
+	 if(!isBufferFull(noc[id].ids[dir], dst) && !noc[id].used[dir]){
+		 {=
+			 // First, add flit to destination buffer
+			 0: noc[noc[id].ids[dir]].channels[dst].buffer =
+				 enqueue(peekFront(noc[id].channels[buf].buffer), noc[noc[id].ids[dir]].channels[dst].buffer),
+			 // Then, remove it from the source buffer
+			 1: noc[id].channels[buf].buffer = dequeue(noc[id].channels[buf].buffer),
+			 // Mark that output as used and that channel as serviced
+			 2: noc[id].used[dir] = true,
+			 2: noc[id].channels[buf].serviced = true
+		 =}
+	 }
+	 else{
+		 // Increment total unserviced buffers and set resistive noise to false
+		 {=
+			 noc[id].total_unserviced++,
+			 noc[id].isResistive = false
+		 =}
+	 }
+ }
+ 
+ // Advance flits to respective buffers
+ process AdvanceFlits(int id, int buf){
+	 // If flit needs to stay on this row
+	 if(getColumnShift(id, peekFront(noc[id].channels[buf].buffer)) == 0){
+		 // Send it north
+		 if(peekFront(noc[id].channels[buf].buffer) < id){
+			 Send(id, buf, NORTH)
+		 }
+		 // Or send it south
+		 else{
+			 Send(id, buf, SOUTH)
+		 }
+	 }
+	 // Else, if flit needs to go west
+	 else if(getColumnShift(id, peekFront(noc[id].channels[buf].buffer)) < 0){
+		 Send(id, buf, WEST)
+	 }
+	 // Else, flit needs to go east
+	 else{
+		 Send(id, buf, EAST)
+	 }
+ }
+ 
+ // Update a specific channel
+ process AdvanceChannel(int id, int buf){
+	 // If this channel was not assigned a neighbor...
+	 if(buf != 4 && noc[id].ids[buf] == -1){
+		 {=
+			 // Mark the channel as serviced
+			 noc[id].channels[buf].serviced = true
+		 =}
+	 }
+	 // If this channel was assigned a neighbor or is local, but it is empty...
+	 else if(noc[id].channels[buf].isEmpty == true){
+		 {=
+			 // Mark the channel as serviced
+			 noc[id].channels[buf].serviced = true,
+ 
+			 // A channel without a flit means no resistive noise for this cycle
+			 noc[id].isResistive = false
+		 =}
+	 }
+	 // If the flit at this channel has the same ID as this router...
+	 else if(peekFront(noc[id].channels[buf].buffer) == id){
+		 {=
+			 // Mark the channel as serviced
+			 noc[id].channels[buf].serviced = true,
+ 
+			 // Remove this flit. It has reached its destination
+			 noc[id].channels[buf].buffer = dequeue(noc[id].channels[buf].buffer),
+ 
+			 // A channel that has any amount of communication cannot be inductive
+			 noc[id].isInductive = false
+		 =}
+	 }
+	 // Otherwise, the flit must be for another router
+	 else{
+		 AdvanceFlits(id, buf);
+ 
+		 // A channel that has any amount of communication cannot be inductive
+		 {=
+			 noc[id].isInductive = false
+		 =}
+	 }
+ }
+ 
+ // Update the directions of the next flits in the buffers
+ process AdvanceRouter(int id){
+	 AdvanceChannel(id, noc[id].priority_list[0]);
+	 AdvanceChannel(id, noc[id].priority_list[1]);
+	 AdvanceChannel(id, noc[id].priority_list[2]);
+	 AdvanceChannel(id, noc[id].priority_list[3]);
+	 AdvanceChannel(id, noc[id].priority_list[4])
+ }
+ 
  // Process for behavior
  process RouterBehavior(int id, int id_north, int id_west, int id_east, int id_south){
 	 // Initialize the router
@@ -205,8 +328,12 @@
 		 GenerateFlits(id);
  
 		 tack;
+		 // Determine what channels will send this cycle
+		 PrepRouter(id);
  
 		 tock;
+		 // Send the flits
+		 AdvanceRouter(id);
  
 		 if(clk > CLK_UPPER){
 			 stop
