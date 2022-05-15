@@ -83,8 +83,7 @@
  
  // ------------------------------------------------------- Properties -------------------------------------------------------
  
- property resistiveNoiseProbability = Pmax(<> (resistiveNoise >= RESISTIVE_NOISE_THRESH));
- //property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+ property router0NotStuck = Pmax(<>(!(!noc[0].channels[0].isEmpty))) == 1;
  
  
  
@@ -92,7 +91,6 @@
  
  // For keeping parallel processes synced
  action tick;
- action tack;
  action tock;
  
  
@@ -173,7 +171,7 @@
  }
  
  process PrepChannel(int id, int ch){
-	 if(peekFront(noc[id].channels[ch].buffer) == -1){
+	 if(len(noc[id].channels[ch].buffer) == 0){
 		 {=
 			 noc[id].channels[ch].isEmpty = true
 		 =}
@@ -221,8 +219,6 @@
 		 tick;
 		 // Generate new flits
 		 GenerateFlits(id);
- 
-		 tack;
 		 // Determine what channels will send this cycle
 		 PrepRouter(id);
  
