@@ -38,7 +38,7 @@ const int CLK_UPPER = 100;
 int clk = 0;
 
 // #MODULARIZE this is the upper threshoold for noise detected in the system
-const int RESISTIVE_NOISE_THRESH = 10;
+const int RESISTIVE_NOISE_THRESH = 20;
 const int INDUCTIVE_NOISE_THRESH = 1;
 
 // These are for tracking resistive and inductive noise and must be initialized to 0.
@@ -118,33 +118,45 @@ property Router3DoesNotSelfGenerate = Pmax(<>(peekFront(noc[3].channels[LOCAL].b
 
 // Test 2: Prep channel
 // Buffers can be empty
+property Router0LocalCanBeEmpty = Pmax(<>(noc[0].channels[LOCAL].isEmpty)) > 0;
 property Router0SouhtCanBeEmpty = Pmax(<>(noc[0].channels[SOUTH].isEmpty)) > 0;
 property Router0EastCanBeEmpty = Pmax(<>(noc[0].channels[EAST].isEmpty)) > 0;
+property Router1LocalCanBeEmpty = Pmax(<>(noc[1].channels[LOCAL].isEmpty)) > 0;
 property Router1SouhtCanBeEmpty = Pmax(<>(noc[1].channels[SOUTH].isEmpty)) > 0;
 property Router1WestCanBeEmpty = Pmax(<>(noc[1].channels[WEST].isEmpty)) > 0;
+property Router2LocalCanBeEmpty = Pmax(<>(noc[2].channels[LOCAL].isEmpty)) > 0;
 property Router2NorthCanBeEmpty = Pmax(<>(noc[2].channels[NORTH].isEmpty)) > 0;
 property Router2EastCanBeEmpty = Pmax(<>(noc[2].channels[EAST].isEmpty)) > 0;
+property Router3LocalCanBeEmpty = Pmax(<>(noc[3].channels[LOCAL].isEmpty)) > 0;
 property Router3NorthCanBeEmpty = Pmax(<>(noc[3].channels[NORTH].isEmpty)) > 0;
 property Router3WestCanBeEmpty = Pmax(<>(noc[3].channels[WEST].isEmpty)) > 0;
 // Buffers can be not empty (can have contents, full or less than full, but not empty)
+property Router0LocalCanBeNotEmpty = Pmax(<>(!noc[0].channels[LOCAL].isEmpty)) > 0;
 property Router0SouhtCanBeNotEmpty = Pmax(<>(!noc[0].channels[SOUTH].isEmpty)) > 0;
 property Router0EastCanBeNotEmpty = Pmax(<>(!noc[0].channels[EAST].isEmpty)) > 0;
+property Router1LocalCanBeNotEmpty = Pmax(<>(!noc[1].channels[LOCAL].isEmpty)) > 0;
 property Router1SouhtCanBeNotEmpty = Pmax(<>(!noc[1].channels[SOUTH].isEmpty)) > 0;
 property Router1WestCanBeNotEmpty = Pmax(<>(!noc[1].channels[WEST].isEmpty)) > 0;
+property Router2LocalCanBeNotEmpty = Pmax(<>(!noc[2].channels[LOCAL].isEmpty)) > 0;
 property Router2NorthCanBeNotEmpty = Pmax(<>(!noc[2].channels[NORTH].isEmpty)) > 0;
 property Router2EastCanBeNotEmpty = Pmax(<>(!noc[2].channels[EAST].isEmpty)) > 0;
+property Router3LocalCanBeNotEmpty = Pmax(<>(!noc[3].channels[LOCAL].isEmpty)) > 0;
 property Router3NorthCanBeNotEmpty = Pmax(<>(!noc[3].channels[NORTH].isEmpty)) > 0;
 property Router3WestCanBeNotEmpty = Pmax(<>(!noc[3].channels[WEST].isEmpty)) > 0;
 // Buffers can be full
+property Router0LocalCanBeFull = Pmax(<>(noc[0].channels[LOCAL].isFull)) > 0;
 property Router0SouhtCanBeFull = Pmax(<>(noc[0].channels[SOUTH].isFull)) > 0;
 property Router0EastCanBeFull = Pmax(<>(noc[0].channels[EAST].isFull)) > 0;
+property Router1LocalCanBeFull = Pmax(<>(noc[1].channels[LOCAL].isFull)) > 0;
 property Router1SouhtCanBeFull = Pmax(<>(noc[1].channels[SOUTH].isFull)) > 0;
 property Router1WestCanBeFull = Pmax(<>(noc[1].channels[WEST].isFull)) > 0;
+property Router2LocalCanBeFull = Pmax(<>(noc[2].channels[LOCAL].isFull)) > 0;
 property Router2NorthCanBeFull = Pmax(<>(noc[2].channels[NORTH].isFull)) > 0;
 property Router2EastCanBeFull = Pmax(<>(noc[2].channels[EAST].isFull)) > 0;
+property Router3LocalCanBeFull = Pmax(<>(noc[3].channels[LOCAL].isFull)) > 0;
 property Router3NorthCanBeFull = Pmax(<>(noc[3].channels[NORTH].isFull)) > 0;
 property Router3WestCanBeFull = Pmax(<>(noc[3].channels[WEST].isFull)) > 0;
-/*
+
 // TEST 3: Advance Router
 // A flit can only be routed when its source buffer is not empty and its destination buffer is not full.
 // Example: [](isRouting[0].routing[SOUTH] => (!noc[0].channels[SOUTH].isEmpty && !noc[2].channels[NORTH].isFull))
@@ -296,6 +308,33 @@ function buffer option dequeue(buffer option ls) =
 
 // ------------------------------------------------------- Processes --------------------------------------------------------
 
+/*
+process GenerateFlits(int id){
+	if((clk % INJECTION_RATE_DENOMINATOR) < INJECTION_RATE_NUMERATOR){
+		if(id == 0){
+			{=
+				noc[id].channels[LOCAL].buffer = enqueue(1, noc[id].channels[LOCAL].buffer)
+			=}
+		}
+		else if(id == 1){
+			{=
+				noc[id].channels[LOCAL].buffer = enqueue(0, noc[id].channels[LOCAL].buffer)
+			=}
+		}
+		else if(id == 3){
+			{=
+				noc[id].channels[LOCAL].buffer = enqueue(1, noc[id].channels[LOCAL].buffer)
+			=}
+		}
+		else{
+			tau
+		}
+	}
+	else{
+		tau
+	}
+}
+*/
 process GenerateFlits(int id){
 	int(0..NOC_MAX_ID) destination;
 	if((clk % INJECTION_RATE_DENOMINATOR) < INJECTION_RATE_NUMERATOR){
@@ -522,6 +561,7 @@ process UpdateNoiseTracking(int id){
 		tau
 	};
 	// Update resistive noise
+	//if(noc[id].isResistive && id == 0){
 	if(noc[id].isResistive){
 		{=
 			resistiveNoise++
@@ -579,7 +619,7 @@ process RouterBehavior(int id, int id_north, int id_west, int id_east, int id_so
 		// Update resistive and inductive values
 		UpdateNoiseTracking(id);
 
-		if(clk > CLK_UPPER){
+		if(clk >= CLK_UPPER){
 			stop
 		}
 		else{
