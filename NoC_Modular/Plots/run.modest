@@ -34,11 +34,11 @@ const int INJECTION_RATE_NUMERATOR = 3;
 const int INJECTION_RATE_DENOMINATOR = 10;
 
 // #MODULARIZE this is the upper bound of cycles run before quiting
-const int CLK_UPPER = 147;
+const int CLK_UPPER = 84;
 int clk = 0;
 
 // #MODULARIZE this is the upper threshoold for noise detected in the system
-const int RESISTIVE_NOISE_THRESH = 20;
+const int RESISTIVE_NOISE_THRESH = 10;
 const int INDUCTIVE_NOISE_THRESH = 1;
 
 // These are for tracking resistive and inductive noise and must be initialized to 0.
@@ -308,33 +308,6 @@ function buffer option dequeue(buffer option ls) =
 
 // ------------------------------------------------------- Processes --------------------------------------------------------
 
-/*
-process GenerateFlits(int id){
-	if((clk % INJECTION_RATE_DENOMINATOR) < INJECTION_RATE_NUMERATOR){
-		if(id == 0){
-			{=
-				noc[id].channels[LOCAL].buffer = enqueue(1, noc[id].channels[LOCAL].buffer)
-			=}
-		}
-		else if(id == 1){
-			{=
-				noc[id].channels[LOCAL].buffer = enqueue(0, noc[id].channels[LOCAL].buffer)
-			=}
-		}
-		else if(id == 3){
-			{=
-				noc[id].channels[LOCAL].buffer = enqueue(1, noc[id].channels[LOCAL].buffer)
-			=}
-		}
-		else{
-			tau
-		}
-	}
-	else{
-		tau
-	}
-}
-*/
 process GenerateFlits(int id){
 	int(0..NOC_MAX_ID) destination;
 	if((clk % INJECTION_RATE_DENOMINATOR) < INJECTION_RATE_NUMERATOR){
@@ -403,6 +376,7 @@ process Send(int id, int buf, int dir){
 		dst = getDestinationChannel(dir)
 	=};
 
+	// If the destination is not full, and the channel has not been used in this cycle, then service the buffer
 	if(!noc[noc[id].ids[dir]].channels[dst].isFull && !noc[id].used[dir]){
 		{=
 			// First set that a transaction is being made
@@ -415,12 +389,14 @@ process Send(int id, int buf, int dir){
 			// Mark that output as used and that channel as serviced
 			3: noc[id].used[dir] = true,
 			3: noc[id].channels[buf].serviced = true,
+			// Routers with any amount of traffic cannot be inductive
+			3: noc[id].isInductive = false,
 			// Remove the inditactor
 			4: isRouting[id].routing[buf] = false
 		=}
 	}
+	// Otherwise, increment total unserviced buffers and set resistive noise to false
 	else{
-		// Increment total unserviced buffers and set resistive noise to false
 		{=
 			noc[id].total_unserviced++,
 			noc[id].isResistive = false
@@ -476,21 +452,16 @@ process AdvanceChannel(int id, int buf){
 			// Mark the channel as serviced
 			noc[id].channels[buf].serviced = true,
 
-			// Remove this flit. It has reached its destination
-			noc[id].channels[buf].buffer = dequeue(noc[id].channels[buf].buffer),
-
 			// A channel that has any amount of communication cannot be inductive
-			noc[id].isInductive = false
+			noc[id].isInductive = false,
+
+			// Remove this flit. It has reached its destination
+			noc[id].channels[buf].buffer = dequeue(noc[id].channels[buf].buffer)
 		=}
 	}
 	// Otherwise, the flit must be for another router
 	else{
-		AdvanceFlits(id, buf);
-
-		// A channel that has any amount of communication cannot be inductive
-		{=
-			noc[id].isInductive = false
-		=}
+		AdvanceFlits(id, buf)
 	}
 }
 
