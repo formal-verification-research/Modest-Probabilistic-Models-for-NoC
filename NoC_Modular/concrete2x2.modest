@@ -34,7 +34,7 @@ const int INJECTION_RATE_NUMERATOR = 3;
 const int INJECTION_RATE_DENOMINATOR = 10;
 
 // #MODULARIZE this is the upper bound of cycles run before quiting
-const int CLK_UPPER = 100;
+const int CLK_UPPER = 2;
 int clk = 0;
 
 // #MODULARIZE this is the upper threshoold for noise detected in the system
@@ -77,6 +77,7 @@ datatype router = {
 	int(0..4) unserviced_index,
 	int(0..5) total_unserviced,
 	bool[] used,
+	bool receivedFlit,
 	bool wasResistive,
 	bool isResistive,
 	bool wasInductive,
@@ -448,17 +449,31 @@ process AdvanceChannel(int id, int buf){
 	}
 	// If the flit at this channel has the same ID as this router...
 	else if(peekFront(noc[id].channels[buf].buffer) == id){
-		{=
-			// Mark the channel as serviced
-			noc[id].channels[buf].serviced = true,
+		// If this router has already consumed a flit, then mark the buffer as unserviced
+		if(noc[id].receivedFlit){
+			{=
+				noc[id].total_unserviced++,
+				noc[id].isResistive = false
+			=}
+		}
+		// Otherwise, service the buffer
+		else{
+			{=
+				// Mark the router as having received a flit
+				noc[id].receivedFlit = true,
 
-			// A channel that has any amount of communication cannot be inductive
-			noc[id].isInductive = false,
+				// Mark the channel as serviced
+				noc[id].channels[buf].serviced = true,
 
-			// Remove this flit. It has reached its destination
-			noc[id].channels[buf].buffer = dequeue(noc[id].channels[buf].buffer)
-		=}
+				// A channel that has any amount of communication cannot be inductive
+				noc[id].isInductive = false,
+
+				// Remove this flit. It has reached its destination
+				noc[id].channels[buf].buffer = dequeue(noc[id].channels[buf].buffer)
+			=}
+		}
 	}
+
 	// Otherwise, the flit must be for another router
 	else{
 		AdvanceFlits(id, buf)
@@ -544,6 +559,7 @@ process UpdateNoiseTracking(int id){
 
 	// Update for next round
 	{=
+		0: noc[id].receivedFlit = false,
 		0: noc[id].wasResistive = noc[id].isResistive,
 		0: noc[id].wasInductive = noc[id].isInductive,
 		1: noc[id].isResistive = true,
@@ -566,6 +582,7 @@ process RouterBehavior(int id, int id_north, int id_west, int id_east, int id_so
 			priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
 			total_unserviced: 0,
 			used: [false, false, false, false],
+			receivedFlit: false,
 			wasResistive: false,
 			wasInductive: false,
 			// These start true every cycle until proven false
