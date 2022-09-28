@@ -2,111 +2,99 @@
  * This is a modularized version of the concrete model for NoC model verification.
  *
  * Current NoC router IDs
- *	0 - 1 - 2
- *	|   |   |
- *	3 - 4 - 5
- *  |   |   |
- *  6 - 7 - 8
+ *	0 - 1
+ *	|   |
+ *	2 - 3
  *
  * In order to add routers to the NoC visit all coments labled with #MODULARIZE
  *
  * Editors: Jonah Boe
- * Date: Dec 14, 2021
+ * Date: Dec 16, 2021
+ * Designed using: The Modest Toolset (www.modestchecker.net), version v3.1.182-g3d5d3ecdf.
  ***************************************************************************************************************************/
 
- option "dtmc";
+option "dtmc";
 
 
 
- // --------------------------------------------------- Top level varables --------------------------------------------------
- 
- // #MODULARIZE by setting NOC_MAX_ID to 1 less than the total number of routers and allocating spaces for more routers
- const int NOC_MAX_ID = 8;
- router[] noc = [router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
-				 router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]}, 
-				 router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]}, 
-				 router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
-				 router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
-				 router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
-				 router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
-				 router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
-				 router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]}];
- 
- // #MODULARIZE this value changes the buffer length of all buffers.
- const int BUFFER_LENGTH = 4;
- 
- // #MODULARIZE these values change the frequency with witch flits are injected.
- const int INJECTION_RATE_NUMERATOR = 3;
- const int INJECTION_RATE_DENOMINATOR = 10;
- 
- // #MODULARIZE this is the upper bound of cycles run before quiting
- const int CLK_UPPER = 100;
- int clk = 0;
- 
- // #MODULARIZE this is the upper threshoold for noise detected in the system
- const int RESISTIVE_NOISE_THRESH = 1;
- const int INDUCTIVE_NOISE_THRESH = 1;
- 
- // These are for tracking resistive and inductive noise and must be initialized to 0.
- int resistiveNoise = 0;
- int inductiveNoise = 0;
- 
- // These values are enumerations and are NOT to be changed
- const int NORTH = 0;
- const int WEST = 1;
- const int EAST = 2;
- const int SOUTH = 3;
- const int LOCAL = 4;
- 
- 
- 
- // ------------------------------------------------------- Datatypes -------------------------------------------------------
- 
- datatype buffer = {
-	 int(0..NOC_MAX_ID) hd,
-	 buffer option tl
- };
- 
- datatype channel = {
-	 buffer option buffer,
-	 bool serviced,
-	 bool isEmpty,
-	 bool isFull
- };
- 
- datatype router = {
-	 channel[] channels,
-	 int(-1..NOC_MAX_ID)[] ids,
-	 int(0..4)[] priority_list,
-	 int(0..4)[] priority_list_temp,
-	 int(0..4) serviced_index,
-	 int(0..4) unserviced_index,
-	 int(0..5) total_unserviced,
-	 bool[] used,
-	 bool wasResistive,
-	 bool isResistive,
-	 bool wasInductive,
-	 bool isInductive
- };
- 
- // TEST: These are for testing
- datatype checker = {bool[] routing};
- // #MODULARIZE this by adding enough checkers and states for all routers
- checker[] isRouting = [
-	 checker{routing:[false, false, false, false, false]},
-	 checker{routing:[false, false, false, false, false]}, 
-	 checker{routing:[false, false, false, false, false]},
-	 checker{routing:[false, false, false, false, false]},
-	 checker{routing:[false, false, false, false, false]},
-	 checker{routing:[false, false, false, false, false]},
-	 checker{routing:[false, false, false, false, false]},
-	 checker{routing:[false, false, false, false, false]},
-	 checker{routing:[false, false, false, false, false]}];
- int[] states = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+// --------------------------------------------------- Top level varables ---------------------------------------------------
+
+// #MODULARIZE by setting NOC_MAX_ID to 1 less than the total number of routers and allocating spaces for more routers
+const int NOC_MAX_ID = 3;
+router[] noc = [router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
+				router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]}, 
+				router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]}, 
+				router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]}];
+
+// #MODULARIZE this value changes the buffer length of all buffers.
+const int BUFFER_LENGTH = 4;
+
+// #MODULARIZE these values change the frequency with witch flits are injected.
+const int INJECTION_RATE_NUMERATOR = 3;
+const int INJECTION_RATE_DENOMINATOR = 10;
+
+// #MODULARIZE this is the upper bound of cycles run before quiting
+const int CLK_UPPER = 2;
+int clk = 0;
+
+// #MODULARIZE this is the upper threshoold for noise detected in the system
+const int RESISTIVE_NOISE_THRESH = 1;
+const int INDUCTIVE_NOISE_THRESH = 1;
+
+// These are for tracking resistive and inductive noise and must be initialized to 0.
+int resistiveNoise = 0;
+int inductiveNoise = 0;
+
+// These values are enumerations and are NOT to be changed
+const int NORTH = 0;
+const int WEST = 1;
+const int EAST = 2;
+const int SOUTH = 3;
+const int LOCAL = 4;
 
 
 
-// ------------------------------------------------------ Properties -------------------------------------------------------
+// ------------------------------------------------------- Datatypes --------------------------------------------------------
+
+datatype buffer = {
+	int(0..NOC_MAX_ID) hd,
+	buffer option tl
+};
+
+datatype channel = {
+	buffer option buffer,
+	bool serviced,
+	bool isEmpty,
+	bool isFull
+};
+
+datatype router = {
+	channel[] channels,
+	int(-1..NOC_MAX_ID)[] ids,
+	int(0..4)[] priority_list,
+	int(0..4)[] priority_list_temp,
+	int(0..4) serviced_index,
+	int(0..4) unserviced_index,
+	int(0..5) total_unserviced,
+	bool[] used,
+	bool wasResistive,
+	bool isResistive,
+	bool wasInductive,
+	bool isInductive
+};
+
+// TEST: These are for testing
+datatype checker = {bool[] routing};
+checker[] isRouting = [
+	checker{routing:[false, false, false, false, false]},
+	checker{routing:[false, false, false, false, false]}, 
+	checker{routing:[false, false, false, false, false]},
+	checker{routing:[false, false, false, false, false]}];
+int[] states = [0, 0, 0, 0];
+
+
+
+// ------------------------------------------------------- Properties -------------------------------------------------------
 
 property resistiveNoiseProbability = Pmax(<> (resistiveNoise >= RESISTIVE_NOISE_THRESH));
 //property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
@@ -174,14 +162,9 @@ process GenerateFlits(int id){
 		// Determine a destiantion
 		palt{
 			// #MODULARIZE by adding a probability for (NOC_MAX_ID - 1) destinations.
-			:(1/8): {= destination = 0 =}
-			:(1/8): {= destination = 1 =}
-			:(1/8): {= destination = 2 =}
-			:(1/8): {= destination = 3 =}
-			:(1/8): {= destination = 4 =}
-			:(1/8): {= destination = 5 =}
-			:(1/8): {= destination = 6 =}
-			:(1/8): {= destination = 7 =}
+			:(1/3): {= destination = 0 =}
+			:(1/3): {= destination = 1 =}
+			:(1/3): {= destination = 2 =}
 		};
 
 		// Make sure it is not this router and add it to the local buffer.
@@ -486,18 +469,11 @@ process Clock(){
 par{
 	::	Clock()
 	// #MODULARIZE by adding new arbiter processes for any additional routers.
-	//	0 - 1 - 2
-	//	|   |   |
-	//	3 - 4 - 5
-	//  |   |   |
-	//  6 - 7 - 8
-	:: RouterBehavior(0, -1, -1,  1,  3)
-	:: RouterBehavior(1, -1,  0,  2,  4)
-	:: RouterBehavior(2, -1,  1, -1,  5)
-	:: RouterBehavior(3,  0, -1,  4,  6)
-	:: RouterBehavior(4,  1,  3,  5,  7)
-	:: RouterBehavior(5,  2,  4, -1,  8)
-	:: RouterBehavior(6,  3, -1,  7, -1)
-	:: RouterBehavior(7,  4,  6,  8, -1)
-	:: RouterBehavior(8,  5,  7, -1, -1)
+	//	0 - 1
+	//	|   |
+	//	2 - 3
+	:: RouterBehavior(0, -1, -1,  1,  2)
+	:: RouterBehavior(1, -1,  0, -1,  3)
+	:: RouterBehavior(2,  0, -1,  3, -1)
+	:: RouterBehavior(3,  1,  2, -1, -1)
 }
