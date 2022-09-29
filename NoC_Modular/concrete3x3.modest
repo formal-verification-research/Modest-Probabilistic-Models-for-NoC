@@ -12,97 +12,84 @@
  *
  * Editors: Jonah Boe
  * Date: Dec 14, 2021
+ * Designed using: The Modest Toolset (www.modestchecker.net), version v3.1.182-g3d5d3ecdf.
  ***************************************************************************************************************************/
 
- option "dtmc";
+option "dtmc";
 
 
 
- // --------------------------------------------------- Top level varables --------------------------------------------------
- 
- // #MODULARIZE by setting NOC_MAX_ID to 1 less than the total number of routers and allocating spaces for more routers
- const int NOC_MAX_ID = 8;
- router[] noc = [router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
-				 router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]}, 
-				 router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]}, 
-				 router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
-				 router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
-				 router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
-				 router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
-				 router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
-				 router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]}];
- 
- // #MODULARIZE this value changes the buffer length of all buffers.
- const int BUFFER_LENGTH = 4;
- 
- // #MODULARIZE these values change the frequency with witch flits are injected.
- const int INJECTION_RATE_NUMERATOR = 3;
- const int INJECTION_RATE_DENOMINATOR = 10;
- 
- // #MODULARIZE this is the upper bound of cycles run before quiting
- const int CLK_UPPER = 100;
- int clk = 0;
- 
- // #MODULARIZE this is the upper threshoold for noise detected in the system
- const int RESISTIVE_NOISE_THRESH = 1;
- const int INDUCTIVE_NOISE_THRESH = 1;
- 
- // These are for tracking resistive and inductive noise and must be initialized to 0.
- int resistiveNoise = 0;
- int inductiveNoise = 0;
- 
- // These values are enumerations and are NOT to be changed
- const int NORTH = 0;
- const int WEST = 1;
- const int EAST = 2;
- const int SOUTH = 3;
- const int LOCAL = 4;
- 
- 
- 
- // ------------------------------------------------------- Datatypes -------------------------------------------------------
- 
- datatype buffer = {
-	 int(0..NOC_MAX_ID) hd,
-	 buffer option tl
- };
- 
- datatype channel = {
-	 buffer option buffer,
-	 bool serviced,
-	 bool isEmpty,
-	 bool isFull
- };
- 
- datatype router = {
-	 channel[] channels,
-	 int(-1..NOC_MAX_ID)[] ids,
-	 int(0..4)[] priority_list,
-	 int(0..4)[] priority_list_temp,
-	 int(0..4) serviced_index,
-	 int(0..4) unserviced_index,
-	 int(0..5) total_unserviced,
-	 bool[] used,
-	 bool wasResistive,
-	 bool isResistive,
-	 bool wasInductive,
-	 bool isInductive
- };
- 
- // TEST: These are for testing
- datatype checker = {bool[] routing};
- // #MODULARIZE this by adding enough checkers and states for all routers
- checker[] isRouting = [
-	 checker{routing:[false, false, false, false, false]},
-	 checker{routing:[false, false, false, false, false]}, 
-	 checker{routing:[false, false, false, false, false]},
-	 checker{routing:[false, false, false, false, false]},
-	 checker{routing:[false, false, false, false, false]},
-	 checker{routing:[false, false, false, false, false]},
-	 checker{routing:[false, false, false, false, false]},
-	 checker{routing:[false, false, false, false, false]},
-	 checker{routing:[false, false, false, false, false]}];
- int[] states = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+// --------------------------------------------------- Top level varables --------------------------------------------------
+
+// #MODULARIZE by setting NOC_MAX_ID to 1 less than the total number of routers and allocating spaces for more routers
+const int NOC_MAX_ID = 8;
+router[] noc = [router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
+				router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]}, 
+				router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]}, 
+				router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
+				router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
+				router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
+				router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
+				router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
+				router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]}];
+
+// #MODULARIZE this value changes the buffer length of all buffers.
+const int BUFFER_LENGTH = 4;
+
+// #MODULARIZE the number of buffers a router must service before noise will be incramented.
+const int ACTIVITY_THRESH = 3;
+
+// #MODULARIZE these values change the frequency with witch flits are injected.
+const int INJECTION_RATE_NUMERATOR = 3;
+const int INJECTION_RATE_DENOMINATOR = 10;
+
+// #MODULARIZE this is the upper bound of cycles run before quiting
+const int CLK_UPPER = 100;
+int clk = 0;
+
+// #MODULARIZE this is the upper threshoold for noise detected in the system
+const int RESISTIVE_NOISE_THRESH = 1;
+const int INDUCTIVE_NOISE_THRESH = 1;
+
+// These are for tracking resistive and inductive noise and must be initialized to 0.
+int resistiveNoise = 0;
+int inductiveNoise = 0;
+
+// These values are enumerations and are NOT to be changed
+const int NORTH = 0;
+const int WEST = 1;
+const int EAST = 2;
+const int SOUTH = 3;
+const int LOCAL = 4;
+
+
+
+// ------------------------------------------------------- Datatypes -------------------------------------------------------
+
+datatype buffer = {
+	int(0..NOC_MAX_ID) hd,
+	buffer option tl
+};
+
+datatype channel = {
+	buffer option buffer,
+	bool serviced,
+	bool isEmpty,
+	bool isFull
+};
+
+datatype router = {
+	channel[] channels,
+	int(-1..NOC_MAX_ID)[] ids,
+	int(0..4)[] priority_list,
+	int(0..4)[] priority_list_temp,
+	int(0..4) serviced_index,
+	int(0..4) unserviced_index,
+	int(0..5) total_unserviced,
+	int thisActivity,
+	int lastActivity,
+	bool[] used
+};
 
 
 
@@ -244,27 +231,25 @@ process Send(int id, int buf, int dir){
 	// If the destination is not full, and the channel has not been used in this cycle, then service the buffer
 	if(!noc[noc[id].ids[dir]].channels[dst].isFull && !noc[id].used[dir]){
 		{=
-			// First set that a transaction is being made
-			0: isRouting[id].routing[buf] = true,
 			// First, add flit to destination buffer
-			1: noc[noc[id].ids[dir]].channels[dst].buffer =
+			0: noc[noc[id].ids[dir]].channels[dst].buffer =
 				enqueue(peekFront(noc[id].channels[buf].buffer), noc[noc[id].ids[dir]].channels[dst].buffer),
+			
 			// Then, remove it from the source buffer
-			2: noc[id].channels[buf].buffer = dequeue(noc[id].channels[buf].buffer),
+			1: noc[id].channels[buf].buffer = dequeue(noc[id].channels[buf].buffer),
+			
 			// Mark that output as used and that channel as serviced
-			3: noc[id].used[dir] = true,
-			3: noc[id].channels[buf].serviced = true,
-			// Routers with any amount of traffic cannot be inductive
-			3: noc[id].isInductive = false,
-			// Remove the inditactor
-			4: isRouting[id].routing[buf] = false
+			1: noc[id].used[dir] = true,
+			1: noc[id].channels[buf].serviced = true,
+			
+			// Incrament the count for buffers serviced in this cycle
+			1: noc[id].thisActivity++
 		=}
 	}
 	// Otherwise, increment total unserviced buffers and set resistive noise to false
 	else{
 		{=
-			noc[id].total_unserviced++,
-			noc[id].isResistive = false
+			noc[id].total_unserviced++
 		=}
 	}
 }
@@ -305,10 +290,7 @@ process AdvanceChannel(int id, int buf){
 	else if(noc[id].channels[buf].isEmpty == true){
 		{=
 			// Mark the channel as serviced
-			noc[id].channels[buf].serviced = true,
-
-			// A channel without a flit means no resistive noise for this cycle
-			noc[id].isResistive = false
+			noc[id].channels[buf].serviced = true
 		=}
 	}
 	// If the flit at this channel has the same ID as this router...
@@ -317,13 +299,14 @@ process AdvanceChannel(int id, int buf){
 			// Mark the channel as serviced
 			noc[id].channels[buf].serviced = true,
 
-			// A channel that has any amount of communication cannot be inductive
-			noc[id].isInductive = false,
+			// Incrament the count for buffers serviced in this cycle
+			noc[id].thisActivity++,
 
 			// Remove this flit. It has reached its destination
 			noc[id].channels[buf].buffer = dequeue(noc[id].channels[buf].buffer)
 		=}
 	}
+
 	// Otherwise, the flit must be for another router
 	else{
 		AdvanceFlits(id, buf)
@@ -387,8 +370,7 @@ process UpdatePiority(int id){
 // Update the noise tracking variables for this router.
 process UpdateNoiseTracking(int id){
 	// Update inductive noise
-	if ((noc[id].wasResistive && noc[id].isInductive) ||
-		(noc[id].wasInductive && noc[id].isResistive)) {
+	if (abs(noc[id].lastActivity - noc[id].thisActivity) >= ACTIVITY_THRESH) {
 		{=
 			inductiveNoise++
 		=}
@@ -397,8 +379,7 @@ process UpdateNoiseTracking(int id){
 		tau
 	};
 	// Update resistive noise
-	//if(noc[id].isResistive && id == 0){
-	if(noc[id].isResistive){
+	if(noc[id].thisActivity >= ACTIVITY_THRESH){
 		{=
 			resistiveNoise++
 		=}
@@ -407,12 +388,10 @@ process UpdateNoiseTracking(int id){
 		tau
 	};
 
-	// Update for next round
+	// Update trackers for next round
 	{=
-		0: noc[id].wasResistive = noc[id].isResistive,
-		0: noc[id].wasInductive = noc[id].isInductive,
-		1: noc[id].isResistive = true,
-		1: noc[id].isInductive = true
+		0: noc[id].lastActivity = noc[id].thisActivity,
+		1: noc[id].thisActivity = 0
 	=}
 }
 
@@ -431,23 +410,20 @@ process RouterBehavior(int id, int id_north, int id_west, int id_east, int id_so
 			priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
 			total_unserviced: 0,
 			used: [false, false, false, false],
-			wasResistive: false,
-			wasInductive: false,
-			// These start true every cycle until proven false
-			isResistive: true,
-			isInductive: true
+			thisActivity: 0,
+			lastActivity: 0
 		}
 	=};
 
 	// Run
 	do{
-		tick{= states[id] = 1 =};
+		tick;
 		// Generate new flits
 		GenerateFlits(id);
 		// Determine what channels will send this cycle
 		PrepRouter(id);
 
-		tock{= states[id] = 2 =};
+		tock;
 		// Send the flits
 		AdvanceRouter(id);
 		// Update the priority list

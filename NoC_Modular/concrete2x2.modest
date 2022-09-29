@@ -37,11 +37,11 @@ const int INJECTION_RATE_NUMERATOR = 3;
 const int INJECTION_RATE_DENOMINATOR = 10;
 
 // #MODULARIZE this is the upper bound of cycles run before quiting.
-const int CLK_UPPER = 300;
+const int CLK_UPPER = 2;
 int clk = 0;
 
 // #MODULARIZE this is the upper threshoold for noise detected in the system.
-const int RESISTIVE_NOISE_THRESH = 5;
+const int RESISTIVE_NOISE_THRESH = 1;
 const int INDUCTIVE_NOISE_THRESH = 1;
 
 // These are for tracking resistive and inductive noise and must be initialized to 0.
@@ -81,8 +81,7 @@ datatype router = {
 	int(0..5) total_unserviced,
 	int thisActivity,
 	int lastActivity,
-	bool[] used,
-	bool receivedFlit
+	bool[] used
 };
 
 // TEST: These are for testing
@@ -250,8 +249,8 @@ property Router3PriorityAlwaysContainsLocal = Pmax(<>(!(
 //property AllRoutersAreInSync = Pmax(<>(!(states[0] == states[1] && states[1] == states[2] && states[2] == states[3]))) == 0;
 
 // Final Results
-//property resistiveNoiseProbability = Pmax(<> (resistiveNoise >= RESISTIVE_NOISE_THRESH));
-property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property resistiveNoiseProbability = Pmax(<> (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+//property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
 
 
 
@@ -381,6 +380,9 @@ process Send(int id, int buf, int dir){
 	// If the destination is not full, and the channel has not been used in this cycle, then service the buffer
 	if(!noc[noc[id].ids[dir]].channels[dst].isFull && !noc[id].used[dir]){
 		{=
+			// First set that a transaction is being made
+			0: isRouting[id].routing[buf] = true,
+
 			// First, add flit to destination buffer
 			1: noc[noc[id].ids[dir]].channels[dst].buffer =
 				enqueue(peekFront(noc[id].channels[buf].buffer), noc[noc[id].ids[dir]].channels[dst].buffer),
@@ -388,12 +390,15 @@ process Send(int id, int buf, int dir){
 			// Then, remove it from the source buffer
 			2: noc[id].channels[buf].buffer = dequeue(noc[id].channels[buf].buffer),
 
+			// Remove the inditactor
+			3: isRouting[id].routing[buf] = false,
+
 			// Mark that output as used and that channel as serviced
-			2: noc[id].used[dir] = true,
-			2: noc[id].channels[buf].serviced = true,
+			4: noc[id].used[dir] = true,
+			4: noc[id].channels[buf].serviced = true,
 
 			// Incrament the count for buffers serviced in this cycle
-			2: noc[id].thisActivity++
+			4: noc[id].thisActivity++
 		=}
 	}
 	// Otherwise, increment total unserviced buffers and set resistive noise to false
@@ -445,18 +450,7 @@ process AdvanceChannel(int id, int buf){
 	}
 	// If the flit at this channel has the same ID as this router...
 	else if(peekFront(noc[id].channels[buf].buffer) == id){
-		// If this router has already consumed a flit, then mark the buffer as unserviced
-		if(noc[id].receivedFlit){
-			{=
-				noc[id].total_unserviced++
-			=}
-		}
-		// Otherwise, service the buffer
-		else{
-			{=
-			// Mark the router as having received a flit
-			noc[id].receivedFlit = true,
-
+		{=
 			// Mark the channel as serviced
 			noc[id].channels[buf].serviced = true,
 
@@ -465,8 +459,7 @@ process AdvanceChannel(int id, int buf){
 
 			// Remove this flit. It has reached its destination
 			noc[id].channels[buf].buffer = dequeue(noc[id].channels[buf].buffer)
-			=}
-		}
+		=}
 	}
 
 	// Otherwise, the flit must be for another router
@@ -552,7 +545,6 @@ process UpdateNoiseTracking(int id){
 
 	// Update trackers for next round
 	{=
-		0: noc[id].receivedFlit = false,
 		0: noc[id].lastActivity = noc[id].thisActivity,
 		1: noc[id].thisActivity = 0
 	=}
@@ -574,8 +566,7 @@ process RouterBehavior(int id, int id_north, int id_west, int id_east, int id_so
 			total_unserviced: 0,
 			used: [false, false, false, false],
 			thisActivity: 0,
-			lastActivity: 0,
-			receivedFlit: false
+			lastActivity: 0
 		}
 	=};
 
