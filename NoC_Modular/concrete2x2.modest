@@ -30,17 +30,17 @@ router[] noc = [router {channels: [channel{}, channel{}, channel{}, channel{}, c
 const int BUFFER_LENGTH = 4;
 
 // #MODULARIZE the number of buffers a router must service before noise will be incramented.
-const int NOISE_THRESH = 3;
+const int ACTIVITY_THRESH = 3;
 
 // #MODULARIZE these values change the frequency with witch flits are injected.
 const int INJECTION_RATE_NUMERATOR = 3;
 const int INJECTION_RATE_DENOMINATOR = 10;
 
-// #MODULARIZE this is the upper bound of cycles run before quiting
-const int CLK_UPPER = 100;
+// #MODULARIZE this is the upper bound of cycles run before quiting.
+const int CLK_UPPER = 300;
 int clk = 0;
 
-// #MODULARIZE this is the upper threshoold for noise detected in the system
+// #MODULARIZE this is the upper threshoold for noise detected in the system.
 const int RESISTIVE_NOISE_THRESH = 5;
 const int INDUCTIVE_NOISE_THRESH = 1;
 
@@ -79,8 +79,8 @@ datatype router = {
 	int(0..4) serviced_index,
 	int(0..4) unserviced_index,
 	int(0..5) total_unserviced,
-	int thisCount,
-	int lastCount,
+	int thisActivity,
+	int lastActivity,
 	bool[] used,
 	bool receivedFlit
 };
@@ -250,8 +250,8 @@ property Router3PriorityAlwaysContainsLocal = Pmax(<>(!(
 //property AllRoutersAreInSync = Pmax(<>(!(states[0] == states[1] && states[1] == states[2] && states[2] == states[3]))) == 0;
 
 // Final Results
-property resistiveNoiseProbability = Pmax(<> (resistiveNoise >= RESISTIVE_NOISE_THRESH));
-//property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+//property resistiveNoiseProbability = Pmax(<> (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
 
 
 
@@ -393,7 +393,7 @@ process Send(int id, int buf, int dir){
 			2: noc[id].channels[buf].serviced = true,
 
 			// Incrament the count for buffers serviced in this cycle
-			2: noc[id].thisCount++
+			2: noc[id].thisActivity++
 		=}
 	}
 	// Otherwise, increment total unserviced buffers and set resistive noise to false
@@ -461,7 +461,7 @@ process AdvanceChannel(int id, int buf){
 			noc[id].channels[buf].serviced = true,
 
 			// Incrament the count for buffers serviced in this cycle
-			noc[id].thisCount++,
+			noc[id].thisActivity++,
 
 			// Remove this flit. It has reached its destination
 			noc[id].channels[buf].buffer = dequeue(noc[id].channels[buf].buffer)
@@ -532,7 +532,7 @@ process UpdatePiority(int id){
 // Update the noise tracking variables for this router.
 process UpdateNoiseTracking(int id){
 	// Update inductive noise
-	if (abs(noc[id].lastCount - noc[id].thisCount) >= NOISE_THRESH) {
+	if (abs(noc[id].lastActivity - noc[id].thisActivity) >= ACTIVITY_THRESH) {
 		{=
 			inductiveNoise++
 		=}
@@ -541,7 +541,7 @@ process UpdateNoiseTracking(int id){
 		tau
 	};
 	// Update resistive noise
-	if((noc[id].thisCount - noc[id].lastCount) >= NOISE_THRESH){
+	if(noc[id].thisActivity >= ACTIVITY_THRESH){
 		{=
 			resistiveNoise++
 		=}
@@ -550,11 +550,11 @@ process UpdateNoiseTracking(int id){
 		tau
 	};
 
-	// Update for next round
+	// Update trackers for next round
 	{=
 		0: noc[id].receivedFlit = false,
-		0: noc[id].lastCount = noc[id].thisCount,
-		1: noc[id].thisCount = 0
+		0: noc[id].lastActivity = noc[id].thisActivity,
+		1: noc[id].thisActivity = 0
 	=}
 }
 
@@ -573,8 +573,8 @@ process RouterBehavior(int id, int id_north, int id_west, int id_east, int id_so
 			priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
 			total_unserviced: 0,
 			used: [false, false, false, false],
-			thisCount: 0,
-			lastCount: 0,
+			thisActivity: 0,
+			lastActivity: 0,
 			receivedFlit: false
 		}
 	=};
