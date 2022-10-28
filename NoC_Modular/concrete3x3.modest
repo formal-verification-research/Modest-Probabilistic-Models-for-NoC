@@ -23,31 +23,23 @@ option "dtmc";
 
 // #MODULARIZE by setting NOC_MAX_ID to 1 less than the total number of routers and allocating spaces for more routers
 const int NOC_MAX_ID = 8;
-router[] noc = [router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
-				router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]}, 
-				router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]}, 
-				router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
-				router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
-				router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
-				router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
-				router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]},
-				router {channels: [channel{}, channel{}, channel{}, channel{}, channel{}], priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL]}];
+router[] noc = [router {}, router {}, router {}, router {}, router {}, router {}, router {}, router {}, router {}];
 
-// #MODULARIZE this value changes the buffer length of all buffers.
+// #CUSTOMIZE this value changes the buffer length of all buffers.
 const int BUFFER_LENGTH = 4;
 
-// #MODULARIZE the number of buffers a router must service before noise will be incramented.
+// #CUSTOMIZE the number of buffers a router must service before noise will be incramented.
 const int ACTIVITY_THRESH = 3;
 
-// #MODULARIZE these values change the frequency with witch flits are injected.
+// #CUSTOMIZE these values change the frequency with witch flits are injected.
 const int INJECTION_RATE_NUMERATOR = 3;
 const int INJECTION_RATE_DENOMINATOR = 10;
 
-// #MODULARIZE this is the upper bound of cycles run before quiting
+// #CUSTOMIZE this is the upper bound of cycles run before quiting
 const int CLK_UPPER = 100;
 int clk = 0;
 
-// #MODULARIZE this is the upper threshoold for noise detected in the system
+// #CUSTOMIZE this is the upper threshoold for noise detected in the system
 const int RESISTIVE_NOISE_THRESH = 1;
 const int INDUCTIVE_NOISE_THRESH = 1;
 
@@ -161,6 +153,7 @@ process GenerateFlits(int id){
 		// Determine a destiantion
 		palt{
 			// #MODULARIZE by adding a probability for (NOC_MAX_ID - 1) destinations.
+			// #CUSTOMIZE by changing the flit injection pattern. Check router IDs with if-else blocks to make more router specific changes.
 			:(1/8): {= destination = 0 =}
 			:(1/8): {= destination = 1 =}
 			:(1/8): {= destination = 2 =}
