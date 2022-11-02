@@ -213,7 +213,7 @@ process PrepRouter(int id){
 }
 
 // Send flit to northern router. src and dst are channels (ie NORTH, WEST, EAST, SOUTH, LOCAL), NOT the actual router ids!
-process Send(int id, int buf, int dir){
+process Send(int id, int ch, int dir){
 	// We want to chech the final destination buffer of the router we are headed into, to see if it is full
 	int(-1..3) dst;
 	{=
@@ -226,14 +226,14 @@ process Send(int id, int buf, int dir){
 		{=
 			// First, add flit to destination buffer
 			0: noc[noc[id].ids[dir]].channels[dst].buffer =
-				enqueue(peekFront(noc[id].channels[buf].buffer), noc[noc[id].ids[dir]].channels[dst].buffer),
+				enqueue(peekFront(noc[id].channels[ch].buffer), noc[noc[id].ids[dir]].channels[dst].buffer),
 			
 			// Then, remove it from the source buffer
-			1: noc[id].channels[buf].buffer = dequeue(noc[id].channels[buf].buffer),
+			1: noc[id].channels[ch].buffer = dequeue(noc[id].channels[ch].buffer),
 			
 			// Mark that output as used and that channel as serviced
 			1: noc[id].used[dir] = true,
-			1: noc[id].channels[buf].serviced = true,
+			1: noc[id].channels[ch].serviced = true,
 			
 			// Incrament the count for buffers serviced in this cycle
 			1: noc[id].thisActivity++
@@ -248,61 +248,61 @@ process Send(int id, int buf, int dir){
 }
 
 // Advance flits to respective buffers
-process AdvanceFlits(int id, int buf){
+process AdvanceFlits(int id, int ch){
 	// If flit needs to stay on this row
-	if(getColumnShift(id, peekFront(noc[id].channels[buf].buffer)) == 0){
+	if(getColumnShift(id, peekFront(noc[id].channels[ch].buffer)) == 0){
 		// Send it north
-		if(peekFront(noc[id].channels[buf].buffer) < id){
-			Send(id, buf, NORTH)
+		if(peekFront(noc[id].channels[ch].buffer) < id){
+			Send(id, ch, NORTH)
 		}
 		// Or send it south
 		else{
-			Send(id, buf, SOUTH)
+			Send(id, ch, SOUTH)
 		}
 	}
 	// Else, if flit needs to go west
-	else if(getColumnShift(id, peekFront(noc[id].channels[buf].buffer)) < 0){
-		Send(id, buf, WEST)
+	else if(getColumnShift(id, peekFront(noc[id].channels[ch].buffer)) < 0){
+		Send(id, ch, WEST)
 	}
 	// Else, flit needs to go east
 	else{
-		Send(id, buf, EAST)
+		Send(id, ch, EAST)
 	}
 }
 
 // Update a specific channel
-process AdvanceChannel(int id, int buf){
+process AdvanceChannel(int id, int ch){
 	// If this channel was not assigned a neighbor...
-	if(buf != 4 && noc[id].ids[buf] == -1){
+	if(ch != 4 && noc[id].ids[ch] == -1){
 		{=
 			// Mark the channel as serviced
-			noc[id].channels[buf].serviced = true
+			noc[id].channels[ch].serviced = true
 		=}
 	}
 	// If this channel was assigned a neighbor or is local, but it is empty...
-	else if(noc[id].channels[buf].isEmpty == true){
+	else if(noc[id].channels[ch].isEmpty == true){
 		{=
 			// Mark the channel as serviced
-			noc[id].channels[buf].serviced = true
+			noc[id].channels[ch].serviced = true
 		=}
 	}
 	// If the flit at this channel has the same ID as this router...
-	else if(peekFront(noc[id].channels[buf].buffer) == id){
+	else if(peekFront(noc[id].channels[ch].buffer) == id){
 		{=
 			// Mark the channel as serviced
-			noc[id].channels[buf].serviced = true,
+			noc[id].channels[ch].serviced = true,
 
 			// Incrament the count for buffers serviced in this cycle
 			noc[id].thisActivity++,
 
 			// Remove this flit. It has reached its destination
-			noc[id].channels[buf].buffer = dequeue(noc[id].channels[buf].buffer)
+			noc[id].channels[ch].buffer = dequeue(noc[id].channels[ch].buffer)
 		=}
 	}
 
 	// Otherwise, the flit must be for another router
 	else{
-		AdvanceFlits(id, buf)
+		AdvanceFlits(id, ch)
 	}
 }
 
