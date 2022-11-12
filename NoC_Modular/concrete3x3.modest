@@ -435,10 +435,7 @@ process RouterBehavior(int id, int id_north, int id_west, int id_east, int id_so
 
 // For syncing parallell processes
 process Clock(){
-	tick
-	{=
-		clk++
-	=};
+	tick {= clk++ =};
 	if (clk <= CLK_UPPER) {
 	   Clock()
 	}
