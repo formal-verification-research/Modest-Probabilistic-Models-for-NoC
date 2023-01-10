@@ -22,7 +22,7 @@ option "dtmc";
 
 // #MODULARIZE by setting NOC_MAX_ID to 1 less than the total number of routers and allocating spaces for more routers
 const int NOC_MAX_ID = 3;
-router[] noc = [router {}, router {}, router {}, router {}];
+router[] noc = array(i, NOC_MAX_ID + 1, router {});
 
 // #CUSTOMIZE this value changes the buffer length of all buffers.
 const int BUFFER_LENGTH = 4;
@@ -311,13 +311,16 @@ process GenerateFlits(int id){
 	int(0..NOC_MAX_ID) destination;
 	if((clk % INJECTION_RATE_DENOMINATOR) < INJECTION_RATE_NUMERATOR){
 		// Determine a destiantion
-		palt{
+		//palt{
 			// #MODULARIZE by adding a probability for (NOC_MAX_ID - 1) destinations.
 			// #CUSTOMIZE by changing the flit injection pattern. Check router IDs with if-else blocks to make more router specific changes.
-			:(1/3): {= destination = 0 =}
-			:(1/3): {= destination = 1 =}
-			:(1/3): {= destination = 2 =}
-		};
+		//	:(1/3): {= destination = 0 =}
+		//	:(1/3): {= destination = 1 =}
+		//	:(1/3): {= destination = 2 =}
+		//};
+		{= 
+			destination = DiscreteUniform(0, NOC_MAX_ID - 1) 
+		=};
 
 		// Make sure it is not this router and add it to the local buffer.
 		if(destination >= id){
