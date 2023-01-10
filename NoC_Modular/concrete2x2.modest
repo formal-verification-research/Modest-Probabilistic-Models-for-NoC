@@ -22,7 +22,7 @@ option "dtmc";
 
 // #MODULARIZE by setting NOC_MAX_ID to 1 less than the total number of routers and allocating spaces for more routers
 const int NOC_MAX_ID = 3;
-router[] noc = array(i, NOC_MAX_ID + 1, router {});
+router[] noc = array(i, NOC_MAX_ID + 1, router{});
 
 // #CUSTOMIZE this value changes the buffer length of all buffers.
 const int BUFFER_LENGTH = 4;
