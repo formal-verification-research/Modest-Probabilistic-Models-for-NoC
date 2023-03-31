@@ -574,13 +574,13 @@ process RouterBehavior(int id, int id_north, int id_west, int id_east, int id_so
 
 	// Run
 	do{
-		tick{= states[id] = 1 =};
+		tick{= states[id] = 0 =};
 		// Generate new flits
 		GenerateFlits(id);
 		// Determine what channels will send this cycle
 		PrepRouter(id);
 
-		tock{= states[id] = 2 =};
+		tock{= states[id] = 1 =};
 		// Send the flits
 		AdvanceRouter(id);
 		// Update the priority list
