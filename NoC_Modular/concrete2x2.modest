@@ -248,7 +248,7 @@ property Router3PriorityAlwaysContainsLocal = Pmax(<>(!(
 
 // Final Results
 property resistiveNoiseProbability = Pmax(<> (resistiveNoise >= RESISTIVE_NOISE_THRESH));
-//property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
 
 
 
