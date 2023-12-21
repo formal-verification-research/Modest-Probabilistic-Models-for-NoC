@@ -11,7 +11,7 @@ hundreds of DTMC Modest simulations that iterate over a variable, typically the 
 `CLK_UPPER`, `DUR`, etc.) variable and then capturing the probability of some property after the simulation
 was run. This process was previously automated before but the automation script failed to meet the
 needs for truly massive simulations, as only one variable could be iterated over at a time and only
-one modest file could be run at a time.
+one simulation set could be run at a time.
 
 I had the desire to separate the simulation specification (parameters) into a separate file that could be
 consumed by a script that would run all the simulations. Thus this tool was born, and now you can specify
@@ -43,7 +43,7 @@ Then the script should be able to be run whenever the virtual environment is act
 
 ### Without a Virtual Environment
 
-This is not recommended as a requirements.txt file was used, which will possibly install older versions of
+This is not recommended as a requirements.txt file is used by this project, which will possibly install older versions of
 packages which could cause issues for other projects on your machine. To avoid this follow the instructions
 [here](https://docs.python.org/3/library/venv.html) to set up a virtual environment on your machine.
 
@@ -85,13 +85,25 @@ VAR_N = "2:2:16"
 
 Here is a general breakdown of what each part does
 
-### Title: `[Name_of_Specification]`
+### Title:
+
+```toml
+[Name_of_Specification]
+```
 
 This is where the title of the simulation specification goes. There can be as many specification as
 desired, but within one TOML file **each individual must have a unique name**. These names will be displayed
 while the simulation is running, so it may be helpful to use a useful name here.
 
 ### Simulation Tool Variables
+
+```toml
+# ...
+_model_ = "Path to .modest model file" # Required var
+_output_ = "Path to .csv or .txt output file" # Required var
+_command_ = "simulate --max-run-length 10" # Optional var
+# ...
+```
 
 These variables are used in actually running the simulation, and do not represent Modest variables
 to be iterated over. Note that because these variables are used for simulation options it means that
@@ -113,6 +125,13 @@ These variables are used during simulation, but are not required.
 1. `_command_` - changes the modest command to be used. The default command is `simulate --max-run-length 0` but could be changed to something else. For example, to do model checking it could be changed to `check`. This command should not include the `modest` executable name or the path to the .modest model file.
 
 ### Iteration Variables
+
+```toml
+VAR_1 = "1:1"
+VAR_2 = "1:1:100"
+# ...
+VAR_N = "2:2:16"
+```
 
 These are variables that are within your Modest model and you want to iterate over. Make sure the name
 of the variable in the TOML file matches the name of the variable in the Modest model *exactly*. The script will attempt to automatically locate all of the variables you ask it to in the model file you give it, and if it does not find a match it will not run the simulations.
