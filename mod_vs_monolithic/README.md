@@ -152,15 +152,23 @@ Where `var_name` is the variable to be iterated over in the model, and `range` i
 #### Examples of Iteration Variables
 
 ```toml
-CLK_UPPER = "1:1:2" # will simulate the model twice
+CLK_UPPER = "1:1:2" # will simulate the model twice for this var
 # CLK_UPPER == [1, 2]
 
-DUR = "1:10" # will simulate the model 10 times
+DUR = "1:10" # will simulate the model 10 times for this var
 # DUR == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 BUFFER_DEPTH = "3:3" # This is a way to set a const value, instead of a range
 # BUFFER_DEPTH == 3
 ```
+
+As you add more iteration variables, the number of simulations to run increases exponentially. In the previous example
+we have three variables, `CLK_UPPER`, `DUR`, and `BUFFER_DEPTH`. The total number of simulations run is the length of
+each of these variables multiplied by each other.
+
+For the previous example, `num_simulations = len(CLK_UPPER) * len(DUR) * len(BUFFER_DEPTH) = 2 * 10 * 1 = 20`. Twenty Modest
+simulations could take hours or longer depending on the model that you are using, so take care to only iterate over variables
+when you need to.
 
 ## Examples
 
