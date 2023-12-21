@@ -17,6 +17,8 @@ I had the desire to separate the simulation specification (parameters) into a se
 consumed by a script that would run all the simulations. Thus this tool was born, and now you can specify
 simulation specifications in a TOML file, and run all the simulations using this script.
 
+Contact me at [nick.waddoups@usu.edu](mailto:nick.waddoups@usu.edu) if you have questions!
+
 ## Requirements
 
 1. `python3` is installed, and
@@ -140,6 +142,11 @@ DUR = "1:10" # will simulate the model 10 times
 BUFFER_DEPTH = "3:3" # This is a way to set a const value, instead of a range
 # BUFFER_DEPTH == 3
 ```
+
+## Examples
+
+There is an example TOML file and modular NoC model given in this repository. Use these as a starting point if
+you need.
 
 ## TODOs
 
