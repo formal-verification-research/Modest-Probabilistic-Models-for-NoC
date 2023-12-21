@@ -141,7 +141,7 @@ These variables should be in the format:
 ```toml
 [Spec_name]
 # ...
-var_name = range
+var_name = "range"
 ```
 
 Where `var_name` is the variable to be iterated over in the model, and `range` is the range which it should be iterated over. Acceptable formats for range are:
