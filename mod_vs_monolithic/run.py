@@ -20,11 +20,16 @@ from tqdm import tqdm
 # Global variables
 verbose: bool = False
 
+SCRIPT_VERSION: str = "1.0.0"
+SCRIPT_AUTHOR: str = "Nick Waddoups"
+SCRIPT_AUTHOR_EMAIL: str = "nick.waddoups@usu.edu"
+
 LINE_MATCH_RE = re.compile(r"\s*const\s+int\s+([_A-za-z0-9\-]+)[\s=0-9]*;\s*")
 RANGE_MATCH_RE = re.compile(r"^(\d+):(\d+):?(\d*)")
 MODEST_PROPERTY_NAME_RE = re.compile(r"\s*\+\s+Property\s+([A-Za-z_\-]+)\s*")
 MODEST_PROBABILITY_RE = re.compile(r"\s+Estimated\s+probability:\s+([0-9\.]+)\s+")
 
+ERR = f"{Fore.RED}ERROR:{Style.RESET_ALL}"
 
 # Classes
 class SimSpec:
@@ -38,6 +43,16 @@ class SimSpec:
         *,
         command: str = "simulate --max-run-length 0",
     ) -> None:
+        """Creates a new simulation specification
+
+        Required inputs:
+        - name: The name of the specification
+        - model: A file path to the .modest model
+        - output: A file path to the output file
+
+        Optional inputs
+        - command: The command to run with modest. Do not include the model file name or the modest executable path."""
+
         self.name: str = name
         self.model: Path = model
         self.output: Path = output
@@ -45,7 +60,7 @@ class SimSpec:
         self.iter_vars: Dict[int, tuple] = {}
 
     def __str__(self) -> str:
-        """Returns information about this simulation specification"""
+        """Returns a string detailing the information about this simulation specification"""
         # Add simulation name
         ret: str = f"Simulation: {self.name}\n"
 
@@ -73,7 +88,11 @@ class SimSpec:
         return ret
 
     def add_iter_var(self, line_num: int, iter_range: str) -> None:
-        """Adds a variable to be iterated through during sequential simulation runs"""
+        """Adds a variable to be iterated through during sequential simulation runs
+        
+        Required inputs:
+        - line_num: the line number that the variable is found on in the self.model file
+        - iter_range: the range which to iterate over in the format <start>[:<step>]:<end>"""
         # check if range is valid
         range_match = RANGE_MATCH_RE.match(iter_range)
 
@@ -97,10 +116,13 @@ class SimSpec:
                 step_r = range_match.group(2)
                 end_r = range_match.group(3)
 
+            # convert the values to integers
             start_r = parse_int(start_r)
             step_r = parse_int(step_r)
+            # add one step to the end because of 0-based indexing
             end_r = parse_int(end_r) + step_r
 
+        # set the iteration variables in the simspec class
         self.iter_vars[line_num] = (start_r, step_r, end_r)
 
     def vars_to_list(self) -> List[tuple]:
@@ -118,29 +140,69 @@ class SimSpec:
 
 # Functions
 def printv(*values: object, sep: str | None = " ", end: str | None = "\n") -> None:
+    """Verbose wrapper around print. Adds (v) signifier and prints whatever is entered"""
     if verbose:
         print(f"{Fore.CYAN}(v){Style.RESET_ALL} ", end="")
         print(*values, sep=sep, end=end)
 
 
 def parse_int(n: str | int) -> int | None:
+    """Integer parser that doesn't throw an exception"""
     try:
         return int(n)
     except:
         return None
 
 
-def permute_ranges(*args) -> (List[tuple], int):
-    """Permutes n ranges into a tagged list of ranges"""
+def permute_ranges(*args) -> (product, int):
+    """Permutes n ranges into a tagged cartesion product of ranges
+    
+    Inputs:
+    - args: each arg should be a tuple in the form of (<line number>, <start>, <step>, <stop>)
+
+    Returns:
+    - product: an iterator to each of values of the cartesian product
+    - int: the total size of the iterator. itertools.product does not calculate this, so I do instead
+        so that we can have progess bars
+    
+    Example:
+    ```
+    range_a = (37, 1, 1, 3)
+    range_b = (45, 2, 2, 5)
+
+    (p, n) = permute_ranges(range_a, range_b)
+    # list(p) == [((37,1), (45,2),
+    #              (37,1), (45,4),
+    #              (37,2), (45,2),
+    #              (37,2), (45,4))]
+    # n == 4
+    ```
+    Here is how `list(p)[0]` would be intrepreted:
+    
+    list(p)[0] == ((37,1), (45,2))
+
+    For simulation iteration 0, the const integer on line 37 of the modest model file
+    will be set to 1, and the const integer on line 45 of the modest model file will be
+    set to 2."""
     ranges: List[tuple] = []
     num_ranges: int = 1
 
-    for name, start, step, end in args:
+    for line_num, start, step, end in args:
+        # get the range of the value
         var_range = range(start, end, step)
+        
+        # calculate the number of ranges by doing a Reduction Multiplication over
+        # all of the lengths of the ranges. Symbollically, this would look like
+        # this:
+        #   n_ranges = PI from 0 to n of len(range[n])
+        # where PI is the reduction multiplication operator
         num_ranges *= len(var_range)
         ranges.append(var_range)
-        ranges[-1] = [(name, n) for n in ranges[-1]]
 
+        # Tag the range with the line number
+        ranges[-1] = [(line_num, n) for n in ranges[-1]]
+
+    # product is the cartesian product defined in itertools
     return (product(*ranges), num_ranges)
 
 
@@ -163,25 +225,28 @@ def check_specfile_path(specfile: str) -> Path | None:
 
     # check if it exists
     if not specfile.exists():
-        print(f"Could not find simulation specification file at")
+        print(f"{ERR} Could not find simulation specification file at")
         print(f"{specfile}")
-        print()
-        print(f"Use --help for information on running this script")
         return None
 
     # check if it's a toml file
     if not specfile.suffix.lower() == ".toml":
-        print(f"Simulation specification file {specfile} is not ", end="")
+        print(f"{ERR} Simulation specification file {specfile} is not ", end="")
         print(f"a .toml file")
-        print()
-        print(f"Use --help for information on running this script")
         return None
 
     return specfile
 
 
 def get_specs(path: Path) -> List[SimSpec] | None:
-    """Checks if the contents of the spec file are valid"""
+    """Checks if the contents of the spec file are valid and returns a list of specs
+    
+    Inputs:
+    - path: path to the spec .toml file
+    
+    Outputs:
+    - List[SimSpec] | None: List of specs if .toml is valid, None otherwise"""
+
     printv(f"Reading .toml file {path} as string")
     with path.open() as f:
         specfile_as_str: str = f.read()
@@ -208,69 +273,74 @@ def get_specs(path: Path) -> List[SimSpec] | None:
         for var, val in specfile[spec].items():
             printv(f"\t{var} = {val}")
 
-            # check if this is a file argument
+            # check if this is a model file variable
             if var == "_model_" and model_file is None:
                 # check if it's a valid file
                 model_file = Path(val)
                 if not model_file.exists():
                     print(
-                        f"{Fore.RED}Error:{Style.RESET_ALL} Model file {val} does not exist."
+                        f"{ERR} Model file {val} does not exist."
                     )
                     print(f"\tTo fix update the filepath for {spec} in {path.name}.")
                     return None
 
                 if not model_file.suffix == ".modest":
                     print(
-                        f"{Fore.RED}Error:{Style.RESET_ALL} Model file {val} is not a Modest file."
+                        f"{ERR} Model file {val} is not a Modest file."
                     )
                     print(
                         f"\tTo fix update the filepath for {spec} in {path.name} to include a modest file."
                     )
                     return None
 
-            # get the output file
+            # check if this is an output file variable
             if var == "_output_" and output_file is None:
                 output_file = Path(val)
                 if not (output_file.suffix == ".csv" or output_file.suffix == ".txt"):
                     print(
-                        f"{Fore.RED}Error:{Style.RESET_ALL} Output file {val} is not a .txt or .csv file."
+                        f"{ERR} Output file {val} is not a .txt or .csv file."
                     )
                     print(
                         f"\tTo fix update the filepath for {spec} in {path.name} to include a .txt or .csv file."
                     )
                     return None
 
-            # check if this is a command argument
+            # check if this is a command variable
             if var == "_command_" and command is None:
-                print(
-                    f"{Fore.RED}Currently setting custom commands is not implemented.{Style.RESET_ALL}"
-                )
+                printv(f"Found command variable for {spec} in {path.name}:")
+                printv(f"\t_command_ = {val}")
+                printv(f"Please note that commands are not checked for validity and may cause unexpected errors")
                 command = val
 
         # after iterating over the details check if a model was passed in
         if model_file is None:
             print(
-                f"{Fore.RED}Error:{Style.RESET_ALL} Spec {spec} does not contain a '_model_' member."
+                f"{ERR} Spec {spec} does not contain a '_model_' member."
             )
             print(f'\tTo fix add \'_model_ = "<path to modest file>" to {path.name}')
             return None
         else:
+            # remove it from the list so we only have iteration variables left
             specfile[spec].pop("_model_")
 
         # after iterating over the details check if a output file was passed in
         if output_file is None:
             print(
-                f"{Fore.RED}Error:{Style.RESET_ALL} Spec {spec} does not contain a '_output_' member."
+                f"{ERR} Spec {spec} does not contain a '_output_' member."
             )
             print(
                 f'\tTo fix add \'_output_ = "<path to output file><.csv | .txt>" to {path.name}'
             )
             return None
         else:
+            # remove it from the list so we only have iteration variables left
             specfile[spec].pop("_output_")
 
         # check if we have a command or not
-        if not command is None:
+        if command is None:
+            command = "simulate --max-run-length 0"
+        else:
+            # remove it from the list so we only have iteration variables left
             specfile[spec].pop("_command_")
 
         # Then check if all of the requested iteration variables are in the modest file
@@ -286,7 +356,7 @@ def get_specs(path: Path) -> List[SimSpec] | None:
                     # check to make sure the line has correct syntax
                     if LINE_MATCH_RE.match(line) is None:
                         print(
-                            f"{Fore.RED}Error:{Style.RESET_ALL} Line {index + 1} in {model_file.name} is not in the correct format:"
+                            f"{ERR} Line {index + 1} in {model_file.name} is not in the correct format:"
                         )
                         print(f"\t{line.strip()}")
                         print(f"\tFormat should be:")
@@ -300,10 +370,13 @@ def get_specs(path: Path) -> List[SimSpec] | None:
                     line_nums[var] = index
                     break
 
-        _spec = SimSpec(spec, model_file, output_file)
+        _spec = SimSpec(spec, model_file, output_file, command=command)
+
+        # add the variables to the spec
         for var, val in specfile[spec].items():
             _spec.add_iter_var(line_nums[var], val)
 
+        # append the current spec to the list of specs
         specs.append(_spec)
     return specs
 
@@ -311,7 +384,16 @@ def get_specs(path: Path) -> List[SimSpec] | None:
 def run_simulation(
     spec: SimSpec, *, tmp_file: Path = Path("./_tmp_model_.modest")
 ) -> pd.DataFrame | None:
-    """Runs the simulation specified"""
+    """Runs the simulation specified
+    
+    Required inputs:
+    - spec: a simualtion spec in the form of a SimSpec class instance
+    
+    Optional inputs:
+    - tmp_file: the path to the temporary .modest file created for simulation
+    
+    Returns:
+    - pd.DataFrame | None: A dataframe with the simulation data if successful, or None if not"""
 
     printv(f"{Fore.GREEN}Starting simulation for {spec.name}{Style.RESET_ALL}")
 
@@ -322,8 +404,12 @@ def run_simulation(
     var_permutation = None
     len_range: int = 0
 
+    # Get the iterator to the permutations of the inputs as well as the total number
+    # of iterations
     (var_permutation, len_range) = permute_ranges(*(spec.vars_to_list()))
 
+    # tqdm bar messes up when other output is enabled, so if verbose mode is on
+    # the progess bar needs to be turned off
     if verbose:
         printv(f"Verbose mode is enabled, disabling tqdm status bar")
     else:
@@ -331,11 +417,12 @@ def run_simulation(
 
     if var_permutation is None:
         print(
-            f"{Fore.RED}ERROR:{Style.RESET_ALL} Variable permutation failed for {spec.name}"
+            f"{ERR} Variable permutation failed for {spec.name}"
         )
         return None
 
     # create the pandas dataframe to hold all the needed information
+    # starts as None because we have no data
     sim_data: pd.DataFrame | None = None
 
     for range_vars in var_permutation:
@@ -343,9 +430,6 @@ def run_simulation(
 
         # create a temporary DataFrame to store this iterations data
         single_iter_data = {}
-
-        # create a tracker to track if all probabilities are 1
-        prob_tracker: float = 1.0
 
         # Extract all the const variable information
         for var in range_vars:
@@ -360,7 +444,7 @@ def run_simulation(
             # check if there was actually a match
             if line_match is None:
                 print(
-                    f"{Fore.RED}ERROR:{Style.RESET_ALL} Failed to find a const variable on line {line_num + 1} of {spec.model.name} while simulating {spec.name}"
+                    f"{ERR} Failed to find a const variable on line {line_num + 1} of {spec.model.name} while simulating {spec.name}"
                 )
                 return None
 
@@ -404,46 +488,64 @@ def run_simulation(
         printv(f"Modest output:{Style.DIM}\n{"\n".join(out).rstrip()}{Style.RESET_ALL}")
         printv(f"Finished simulation, finding properties")
 
-        prob = None
-        prop = None
+        # capture probabilities and properties by name
+        prob: float | None = None
+        prop: str | None = None
+
+        # create a tracker to track if all probabilities are 1
+        prob_tracker: float = 1.0
 
         for line in out:
+            # match each line with the property and probability regex
             prop_name = MODEST_PROPERTY_NAME_RE.match(line)
             prob_val = MODEST_PROBABILITY_RE.match(line)
 
+            # if we get a match for property or probability store the value
             if not prop_name is None:
                 prop = prop_name.group(1)
 
             if not prob_val is None:
                 prob = prob_val.group(1)
 
+            # since the property name and probability should be one line after the other
+            # we can keep track if both of them are set. If they both are then we must
+            # be reading in a new property, so we can save that to our data.
             if not (prop is None or prob is None):
                 printv(f"\tFound {prop} = {prob}")
                 single_iter_data[prop] = prob
 
+                # used to check if all probabilities are 1. If all are 1, 1*1*1*1 == 1, so we can
+                # check that to save simulation time
                 prob_tracker *= float(prob)
 
+                # reset the property name and probability trackers so that we can find another one (if there is one)
                 prop = None
                 prob = None
 
+        # put all the information from this iteration of the permuted inputs into a dataframe
         single_iter_df = pd.DataFrame(single_iter_data, index=[1])
 
+        # save the data into the overall dataframe
         if sim_data is None:
             sim_data = single_iter_df
         else:
             sim_data = pd.concat([sim_data, single_iter_df])
 
+        # check if all probabilities are 1
         if prob_tracker >= 1.0:
-            printv(f"All probabilities are 1, ending simualtion for {spec.name}")
+            printv(f"All probabilities are 1.0, ending simualtion for {spec.name}")
             break
 
+    # remove the temporary simulation file
     printv(f"Removing temporary file {tmp_file}")
     if tmp_file.exists():
         os.remove(tmp_file)
 
+    # write the data to the output file in csv format
     printv(f"Writing simulation data to {spec.output}")
     sim_data.to_csv(spec.output, index=False)
 
+    # return the data as well, in case it is to be used
     return sim_data
 
 
@@ -453,27 +555,37 @@ if __name__ == "__main__":
 
     print(f"{Fore.YELLOW}--- MODEST Simulation Runner ---{Style.RESET_ALL}")
 
+    # Usage and credits
+    print()
+    print(f"  Usage: See README.md for instructions and examples")
+    print(f"Version: {SCRIPT_VERSION}")
+    print(f" Author: {SCRIPT_AUTHOR}")
+    print(f"  Email: {SCRIPT_AUTHOR_EMAIL}")
+
     # check if verbose mode is enabled
     if args.verbose:
         verbose = True
+        print()
         print(f"{Fore.CYAN}--- Verbose mode enabled ---{Style.RESET_ALL}")
         print(
             f"All verbose outputs will be annotated with a {Fore.CYAN}(v){Style.RESET_ALL}"
         )
-        print()
 
     # check if modest is installed
     if shutil.which("modest") is None:
-        print(f"{Fore.RED}ERROR:{Style.RESET_ALL} could not find modest installation. Please add modest to the path")
+        print(f"{ERR} Could not find modest installation. Please add modest to the path")
 
     # check the spec file
     specfile_path = check_specfile_path(args.specfile)
     if specfile_path is None:
         print(
-            f"{Fore.RED}Simulation specification .toml file is not valid. Looked for file at:{Style.RESET_ALL}"
+            f"{ERR} Simulation specification .toml file is not valid. Looked for file at:"
         )
         print(f"{args.specfile}")
         sys.exit()
+    else:
+        print()
+        print(f"{Fore.GREEN}Successfully located specification file at {specfile_path}{Style.RESET_ALL}")
 
     # parse the spec file
     specs = get_specs(specfile_path)
@@ -482,14 +594,15 @@ if __name__ == "__main__":
             f"{Fore.RED}Simulation specifications could not be parsed{Style.RESET_ALL}"
         )
         sys.exit()
-
+    else:
+        print(f"{Fore.GREEN}Successfully parsed specifications from {specfile_path.name}{Style.RESET_ALL}")
     # run the simulations
     print()
     print(f"{Fore.YELLOW}--- Starting Simulations ---{Style.RESET_ALL}")
 
     for spec in specs:
-        print(run_simulation(spec))
-        break
+        sim_output = run_simulation(spec)
+        printv(f"Run simulation output:\n{Style.DIM}{sim_output}{Style.RESET_ALL}")
 
     print(f"{Fore.YELLOW}--- Finished Simulations ---{Style.RESET_ALL}")
 
