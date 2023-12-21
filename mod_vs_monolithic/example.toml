@@ -1,3 +1,10 @@
 [Modular_Original]
-file = "./models/modular2x2.modest"
+_model_ = "./models/modular2x2.modest"
+_output_ = "./tmp.txt"
 CLK_UPPER = "1:1:100"
+
+[Modular_Error]
+_output_ = "./tmp.csv"
+_model_ = "./models/modular2x2.modest"
+CLK_UPPER = "1:1:100"
+BUFFER_LENGTH = "1:4"
