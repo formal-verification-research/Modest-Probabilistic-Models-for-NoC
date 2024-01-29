@@ -485,7 +485,8 @@ def run_simulation(
 
         # split the output into individual lines
         out = out.decode("utf-8", "ignore").split("\r\n")
-        printv(f"Modest output:{Style.DIM}\n{'\n'.join(out).rstrip()}{Style.RESET_ALL}")
+        out = '\n'.join(out).rstrip();
+        printv(f"Modest output:{Style.DIM}\n{out}{Style.RESET_ALL}")
         printv(f"Finished simulation, finding properties")
 
         # capture probabilities and properties by name
