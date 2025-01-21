@@ -95,21 +95,38 @@ int[] states = [0, 0, 0, 0];
 
 // ------------------------------------------------------- Properties -------------------------------------------------------
 
-property resistiveNoiseProbability1RewardBounded0 = Pmax(<>[S(clk_indicator)<=0] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
-property resistiveNoiseProbability1RewardBounded1 = Pmax(<>[S(clk_indicator)<=1] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
-property resistiveNoiseProbability1RewardBounded2 = Pmax(<>[S(clk_indicator)<=2] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
-property resistiveNoiseProbability1RewardBounded3 = Pmax(<>[S(clk_indicator)<=3] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
-property resistiveNoiseProbability1RewardBounded4 = Pmax(<>[S(clk_indicator)<=4] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
-property resistiveNoiseProbability1RewardBounded5 = Pmax(<>[S(clk_indicator)<=5] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
-property resistiveNoiseProbability1RewardBounded6 = Pmax(<>[S(clk_indicator)<=6] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
-property resistiveNoiseProbability1RewardBounded7 = Pmax(<>[S(clk_indicator)<=7] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
-property resistiveNoiseProbability1RewardBounded8 = Pmax(<>[S(clk_indicator)<=8] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
-property resistiveNoiseProbability1RewardBounded9 = Pmax(<>[S(clk_indicator)<=9] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded0  = Pmax(<>[S(clk_indicator)<=0] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded1  = Pmax(<>[S(clk_indicator)<=1] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded2  = Pmax(<>[S(clk_indicator)<=2] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded3  = Pmax(<>[S(clk_indicator)<=3] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded4  = Pmax(<>[S(clk_indicator)<=4] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded5  = Pmax(<>[S(clk_indicator)<=5] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded6  = Pmax(<>[S(clk_indicator)<=6] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded7  = Pmax(<>[S(clk_indicator)<=7] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded8  = Pmax(<>[S(clk_indicator)<=8] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded9  = Pmax(<>[S(clk_indicator)<=9] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
 property resistiveNoiseProbability1RewardBounded10 = Pmax(<>[S(clk_indicator)<=10] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
 property resistiveNoiseProbability1RewardBounded11 = Pmax(<>[S(clk_indicator)<=11] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
 property resistiveNoiseProbability1RewardBounded12 = Pmax(<>[S(clk_indicator)<=12] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
 property resistiveNoiseProbability1RewardBounded13 = Pmax(<>[S(clk_indicator)<=13] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
 property resistiveNoiseProbability1RewardBounded14 = Pmax(<>[S(clk_indicator)<=14] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+
+property inductiveNoiseProbability1RewardBounded0  = Pmax(<>[S(clk_indicator)<=0]  (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property inductiveNoiseProbability1RewardBounded1  = Pmax(<>[S(clk_indicator)<=1]  (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property inductiveNoiseProbability1RewardBounded2  = Pmax(<>[S(clk_indicator)<=2]  (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property inductiveNoiseProbability1RewardBounded3  = Pmax(<>[S(clk_indicator)<=3]  (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property inductiveNoiseProbability1RewardBounded4  = Pmax(<>[S(clk_indicator)<=4]  (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property inductiveNoiseProbability1RewardBounded5  = Pmax(<>[S(clk_indicator)<=5]  (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property inductiveNoiseProbability1RewardBounded6  = Pmax(<>[S(clk_indicator)<=6]  (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property inductiveNoiseProbability1RewardBounded7  = Pmax(<>[S(clk_indicator)<=7]  (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property inductiveNoiseProbability1RewardBounded8  = Pmax(<>[S(clk_indicator)<=8]  (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property inductiveNoiseProbability1RewardBounded9  = Pmax(<>[S(clk_indicator)<=9]  (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property inductiveNoiseProbability1RewardBounded10 = Pmax(<>[S(clk_indicator)<=10] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property inductiveNoiseProbability1RewardBounded11 = Pmax(<>[S(clk_indicator)<=11] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property inductiveNoiseProbability1RewardBounded12 = Pmax(<>[S(clk_indicator)<=12] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property inductiveNoiseProbability1RewardBounded13 = Pmax(<>[S(clk_indicator)<=13] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property inductiveNoiseProbability1RewardBounded14 = Pmax(<>[S(clk_indicator)<=14] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+
 //property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
 
 // -------------------------------------------------------- Actions ---------------------------------------------------------
