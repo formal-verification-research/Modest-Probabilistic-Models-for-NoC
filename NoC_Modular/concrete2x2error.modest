@@ -94,10 +94,11 @@ int[] states = [0, 0, 0, 0];
 
 
 // ------------------------------------------------------- Properties -------------------------------------------------------
-/*
+
 // TEST 1: Generate flits
 // Each router must eventualy generate a flit for every other router.
 property Router0GeneratesFlitsFor1 = Pmax(<>(peekFront(noc[0].channels[LOCAL].buffer) == 1)) > 0;
+/*
 property Router0GeneratesFlitsFor2 = Pmax(<>(peekFront(noc[0].channels[LOCAL].buffer) == 2)) > 0;
 property Router0GeneratesFlitsFor3 = Pmax(<>(peekFront(noc[0].channels[LOCAL].buffer) == 3)) > 0;
 property Router1GeneratesFlitsFor0 = Pmax(<>(peekFront(noc[1].channels[LOCAL].buffer) == 0)) > 0;
@@ -581,7 +582,7 @@ process RouterBehavior(int id, int id_north, int id_west, int id_east, int id_so
 			lastActivity: 0
 		}
 	=};
-
+	
 	// Run
 	GenerateFlits(id);
 	// Determine what channels will send this cycle
