@@ -86,6 +86,8 @@ int[] states = [0, 0, 0, 0];
 // ------------------------------------------------------- Properties -------------------------------------------------------
 
 // --- Flit Generation Properties ---
+// Requires that this is checked for every router, currently it's just checked for router 0
+property neverGeneratesFlitsForSelf = Pmax([](contains(0, noc[0].channels[LOCAL].buffer)));
 
 // Final Results
 property resistiveNoiseProbability = Pmax(<> (resistiveNoise >= RESISTIVE_NOISE_THRESH));
@@ -142,7 +144,7 @@ function buffer option dequeue(buffer option ls) =
 		tl: dequeue(ls!.tl)
 	});
 
-// Returns True if the buffer contains id, otherwise returns false 
+// Returns True if the buffer `ls` contains `id`, otherwise returns false 
 function bool contains(int id, buffer option ls) =
 	if ls == none then false 
 	else contains(id, ls!.tl);
