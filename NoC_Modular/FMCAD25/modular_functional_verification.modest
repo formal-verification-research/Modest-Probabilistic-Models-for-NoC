@@ -154,21 +154,96 @@ property neverGeneratesFlitsForSelf2 = Pmax(<>(contains(2, noc[2].channels[LOCAL
 property neverGeneratesFlitsForSelf3 = Pmax(<>(contains(3, noc[3].channels[LOCAL].buffer))) == 0;
 
 // --- Priority List Validation --- 
-property alwaysContainsNorth0 = Pmax(<>(!(noc[0].priority_list[0] == NORTH || noc[0].priority_list[1] == NORTH || noc[0].priority_list[2] == NORTH || noc[0].priority_list[3] == NORTH || noc[0].priority_list[4] == NORTH))) == 0;
-property alwaysContainsEast0 = Pmax(<>(!(noc[0].priority_list[0] == EAST || noc[0].priority_list[1] == EAST || noc[0].priority_list[2] == EAST || noc[0].priority_list[3] == EAST || noc[0].priority_list[4] == EAST))) == 0;
-property alwaysContainsSouth0 = Pmax(<>(!(noc[0].priority_list[0] == SOUTH || noc[0].priority_list[1] == SOUTH || noc[0].priority_list[2] == SOUTH || noc[0].priority_list[3] == SOUTH || noc[0].priority_list[4] == SOUTH))) == 0;
-property alwaysContainsWest0 = Pmax(<>(!(noc[0].priority_list[0] == WEST || noc[0].priority_list[1] == WEST || noc[0].priority_list[2] == WEST || noc[0].priority_list[3] == WEST || noc[0].priority_list[4] == WEST))) == 0;
-property alwaysContainsLocal0 = Pmax(<>(!(noc[0].priority_list[0] == LOCAL || noc[0].priority_list[1] == LOCAL || noc[0].priority_list[2] == LOCAL || noc[0].priority_list[3] == LOCAL || noc[0].priority_list[4] == LOCAL))) == 0;
-property allPrioritiesAreUnique0 = Pmax(<>(!((noc[0].priority_list[0] != noc[0].priority_list[1]) &&
-											 (noc[0].priority_list[0] != noc[0].priority_list[2]) && 
-											 (noc[0].priority_list[0] != noc[0].priority_list[3]) && 
-											 (noc[0].priority_list[0] != noc[0].priority_list[4]) && 
-											 (noc[0].priority_list[1] != noc[0].priority_list[2]) && 
-											 (noc[0].priority_list[1] != noc[0].priority_list[3]) && 
-											 (noc[0].priority_list[1] != noc[0].priority_list[4]) && 
-											 (noc[0].priority_list[2] != noc[0].priority_list[3]) && 
-											 (noc[0].priority_list[2] != noc[0].priority_list[4]) && 
-											 (noc[0].priority_list[3] != noc[0].priority_list[4])))) == 0;
+property alwaysContainsNorth___0  = Pmax(<>(!(noc[0].priority_list[0] == NORTH || noc[0].priority_list[1] == NORTH || noc[0].priority_list[2] == NORTH || noc[0].priority_list[3] == NORTH || noc[0].priority_list[4] == NORTH))) == 0;
+property alwaysContainsEast____0  = Pmax(<>(!(noc[0].priority_list[0] == EAST  || noc[0].priority_list[1] == EAST  || noc[0].priority_list[2] == EAST  || noc[0].priority_list[3] == EAST  || noc[0].priority_list[4] == EAST))) == 0;
+property alwaysContainsSouth___0  = Pmax(<>(!(noc[0].priority_list[0] == SOUTH || noc[0].priority_list[1] == SOUTH || noc[0].priority_list[2] == SOUTH || noc[0].priority_list[3] == SOUTH || noc[0].priority_list[4] == SOUTH))) == 0;
+property alwaysContainsWest____0  = Pmax(<>(!(noc[0].priority_list[0] == WEST  || noc[0].priority_list[1] == WEST  || noc[0].priority_list[2] == WEST  || noc[0].priority_list[3] == WEST  || noc[0].priority_list[4] == WEST))) == 0;
+property alwaysContainsLocal___0  = Pmax(<>(!(noc[0].priority_list[0] == LOCAL || noc[0].priority_list[1] == LOCAL || noc[0].priority_list[2] == LOCAL || noc[0].priority_list[3] == LOCAL || noc[0].priority_list[4] == LOCAL))) == 0;
+property allPrioritiesAreUnique0  = Pmax(<>(!((noc[0].priority_list[0] != noc[0].priority_list[1]) &&
+											  (noc[0].priority_list[0] != noc[0].priority_list[2]) && 
+											  (noc[0].priority_list[0] != noc[0].priority_list[3]) && 
+											  (noc[0].priority_list[0] != noc[0].priority_list[4]) && 
+											  (noc[0].priority_list[1] != noc[0].priority_list[2]) && 
+											  (noc[0].priority_list[1] != noc[0].priority_list[3]) && 
+											  (noc[0].priority_list[1] != noc[0].priority_list[4]) && 
+											  (noc[0].priority_list[2] != noc[0].priority_list[3]) && 
+											  (noc[0].priority_list[2] != noc[0].priority_list[4]) && 
+											  (noc[0].priority_list[3] != noc[0].priority_list[4])))) == 0;
+
+property alwaysContainsNorth___1  = Pmax(<>(!(noc[1].priority_list[0] == NORTH || noc[1].priority_list[1] == NORTH || noc[1].priority_list[2] == NORTH || noc[1].priority_list[3] == NORTH || noc[1].priority_list[4] == NORTH))) == 0;
+property alwaysContainsEast____1  = Pmax(<>(!(noc[1].priority_list[0] == EAST  || noc[1].priority_list[1] == EAST  || noc[1].priority_list[2] == EAST  || noc[1].priority_list[3] == EAST  || noc[1].priority_list[4] == EAST))) == 0;
+property alwaysContainsSouth___1  = Pmax(<>(!(noc[1].priority_list[0] == SOUTH || noc[1].priority_list[1] == SOUTH || noc[1].priority_list[2] == SOUTH || noc[1].priority_list[3] == SOUTH || noc[1].priority_list[4] == SOUTH))) == 0;
+property alwaysContainsWest____1  = Pmax(<>(!(noc[1].priority_list[0] == WEST  || noc[1].priority_list[1] == WEST  || noc[1].priority_list[2] == WEST  || noc[1].priority_list[3] == WEST  || noc[1].priority_list[4] == WEST))) == 0;
+property alwaysContainsLocal___1  = Pmax(<>(!(noc[1].priority_list[0] == LOCAL || noc[1].priority_list[1] == LOCAL || noc[1].priority_list[2] == LOCAL || noc[1].priority_list[3] == LOCAL || noc[1].priority_list[4] == LOCAL))) == 0;
+property allPrioritiesAreUnique1  = Pmax(<>(!((noc[1].priority_list[0] != noc[1].priority_list[1]) &&
+											  (noc[1].priority_list[0] != noc[1].priority_list[2]) && 
+											  (noc[1].priority_list[0] != noc[1].priority_list[3]) && 
+											  (noc[1].priority_list[0] != noc[1].priority_list[4]) && 
+											  (noc[1].priority_list[1] != noc[1].priority_list[2]) && 
+											  (noc[1].priority_list[1] != noc[1].priority_list[3]) && 
+											  (noc[1].priority_list[1] != noc[1].priority_list[4]) && 
+											  (noc[1].priority_list[2] != noc[1].priority_list[3]) && 
+											  (noc[1].priority_list[2] != noc[1].priority_list[4]) && 
+											  (noc[1].priority_list[3] != noc[1].priority_list[4])))) == 0;
+
+property alwaysContainsNorth___2  = Pmax(<>(!(noc[2].priority_list[0] == NORTH || noc[2].priority_list[1] == NORTH || noc[2].priority_list[2] == NORTH || noc[2].priority_list[3] == NORTH || noc[2].priority_list[4] == NORTH))) == 0;
+property alwaysContainsEast____2  = Pmax(<>(!(noc[2].priority_list[0] == EAST  || noc[2].priority_list[1] == EAST  || noc[2].priority_list[2] == EAST  || noc[2].priority_list[3] == EAST  || noc[2].priority_list[4] == EAST))) == 0;
+property alwaysContainsSouth___2  = Pmax(<>(!(noc[2].priority_list[0] == SOUTH || noc[2].priority_list[1] == SOUTH || noc[2].priority_list[2] == SOUTH || noc[2].priority_list[3] == SOUTH || noc[2].priority_list[4] == SOUTH))) == 0;
+property alwaysContainsWest____2  = Pmax(<>(!(noc[2].priority_list[0] == WEST  || noc[2].priority_list[1] == WEST  || noc[2].priority_list[2] == WEST  || noc[2].priority_list[3] == WEST  || noc[2].priority_list[4] == WEST))) == 0;
+property alwaysContainsLocal___2  = Pmax(<>(!(noc[2].priority_list[0] == LOCAL || noc[2].priority_list[1] == LOCAL || noc[2].priority_list[2] == LOCAL || noc[2].priority_list[3] == LOCAL || noc[2].priority_list[4] == LOCAL))) == 0;
+property allPrioritiesAreUnique2  = Pmax(<>(!((noc[2].priority_list[0] != noc[2].priority_list[1]) &&
+											  (noc[2].priority_list[0] != noc[2].priority_list[2]) && 
+											  (noc[2].priority_list[0] != noc[2].priority_list[3]) && 
+											  (noc[2].priority_list[0] != noc[2].priority_list[4]) && 
+											  (noc[2].priority_list[1] != noc[2].priority_list[2]) && 
+											  (noc[2].priority_list[1] != noc[2].priority_list[3]) && 
+											  (noc[2].priority_list[1] != noc[2].priority_list[4]) && 
+											  (noc[2].priority_list[2] != noc[2].priority_list[3]) && 
+											  (noc[2].priority_list[2] != noc[2].priority_list[4]) && 
+											  (noc[2].priority_list[3] != noc[2].priority_list[4])))) == 0;
+
+property alwaysContainsNorth___3  = Pmax(<>(!(noc[3].priority_list[0] == NORTH || noc[3].priority_list[1] == NORTH || noc[3].priority_list[2] == NORTH || noc[3].priority_list[3] == NORTH || noc[3].priority_list[4] == NORTH))) == 0;
+property alwaysContainsEast____3  = Pmax(<>(!(noc[3].priority_list[0] == EAST  || noc[3].priority_list[1] == EAST  || noc[3].priority_list[2] == EAST  || noc[3].priority_list[3] == EAST  || noc[3].priority_list[4] == EAST))) == 0;
+property alwaysContainsSouth___3  = Pmax(<>(!(noc[3].priority_list[0] == SOUTH || noc[3].priority_list[1] == SOUTH || noc[3].priority_list[2] == SOUTH || noc[3].priority_list[3] == SOUTH || noc[3].priority_list[4] == SOUTH))) == 0;
+property alwaysContainsWest____3  = Pmax(<>(!(noc[3].priority_list[0] == WEST  || noc[3].priority_list[1] == WEST  || noc[3].priority_list[2] == WEST  || noc[3].priority_list[3] == WEST  || noc[3].priority_list[4] == WEST))) == 0;
+property alwaysContainsLocal___3  = Pmax(<>(!(noc[3].priority_list[0] == LOCAL || noc[3].priority_list[1] == LOCAL || noc[3].priority_list[2] == LOCAL || noc[3].priority_list[3] == LOCAL || noc[3].priority_list[4] == LOCAL))) == 0;
+property allPrioritiesAreUnique3  = Pmax(<>(!((noc[3].priority_list[0] != noc[3].priority_list[1]) &&
+											  (noc[3].priority_list[0] != noc[3].priority_list[2]) && 
+											  (noc[3].priority_list[0] != noc[3].priority_list[3]) && 
+											  (noc[3].priority_list[0] != noc[3].priority_list[4]) && 
+											  (noc[3].priority_list[1] != noc[3].priority_list[2]) && 
+											  (noc[3].priority_list[1] != noc[3].priority_list[3]) && 
+											  (noc[3].priority_list[1] != noc[3].priority_list[4]) && 
+											  (noc[3].priority_list[2] != noc[3].priority_list[3]) && 
+											  (noc[3].priority_list[2] != noc[3].priority_list[4]) && 
+											  (noc[3].priority_list[3] != noc[3].priority_list[4])))) == 0;
+// --- Forward Progress Verification ---
+/**
+We can't use [] yet in Modest, but here's the idea of what we want to check:
+forall buffers in all router, if a buffer gets a flit eventually that flit will leave the buffer
+*/
+
+//  --- IsRouting Verificaiton ---
+property RoutingVertSync0 = Pmax(<>(!(!isRouting[0].routing[SOUTH] || (!noc[0].channels[SOUTH].isEmpty && !noc[2].channels[NORTH].isFull)))) == 0;
+property RoutingHorzSync0 = Pmax(<>(!(!isRouting[0].routing[EAST]  || (!noc[0].channels[EAST].isEmpty  && !noc[1].channels[WEST].isFull)))) == 0;
+property RoutingVertSync1 = Pmax(<>(!(!isRouting[1].routing[SOUTH] || (!noc[1].channels[SOUTH].isEmpty && !noc[3].channels[NORTH].isFull)))) == 0;
+property RoutingHorzSync1 = Pmax(<>(!(!isRouting[1].routing[WEST]  || (!noc[1].channels[WEST].isEmpty  && !noc[0].channels[EAST].isFull)))) == 0;
+property RoutingVertSync2 = Pmax(<>(!(!isRouting[2].routing[NORTH] || (!noc[2].channels[NORTH].isEmpty && !noc[0].channels[SOUTH].isFull)))) == 0;
+property RoutingHorzSync2 = Pmax(<>(!(!isRouting[2].routing[EAST]  || (!noc[2].channels[EAST].isEmpty  && !noc[3].channels[WEST].isFull)))) == 0;
+property RoutingVertSync3 = Pmax(<>(!(!isRouting[3].routing[NORTH] || (!noc[3].channels[NORTH].isEmpty && !noc[1].channels[SOUTH].isFull)))) == 0;
+property RoutingHorzSync3 = Pmax(<>(!(!isRouting[3].routing[WEST]  || (!noc[3].channels[WEST].isEmpty  && !noc[2].channels[EAST].isFull)))) == 0;
+
+property RoutsSouthWhenNotUsed0 = Pmax(<>(!(!isRouting[0].routing[SOUTH] || !noc[0].used[SOUTH]))) == 0;
+property RoutsEastWhenNotUsed0  = Pmax(<>(!(!isRouting[0].routing[EAST]  || !noc[0].used[EAST]))) == 0;
+property RoutsSouthWhenNotUsed1 = Pmax(<>(!(!isRouting[1].routing[SOUTH] || !noc[1].used[SOUTH]))) == 0;
+property RoutsWestWhenNotUsed1  = Pmax(<>(!(!isRouting[1].routing[WEST]  || !noc[1].used[WEST]))) == 0;
+property RoutsNorthWhenNotUsed2 = Pmax(<>(!(!isRouting[2].routing[NORTH] || !noc[2].used[NORTH]))) == 0;
+property RoutsEastWhenNotUsed2  = Pmax(<>(!(!isRouting[2].routing[EAST]  || !noc[2].used[EAST]))) == 0;
+property RoutsNorthWhenNotUsed3 = Pmax(<>(!(!isRouting[3].routing[NORTH] || !noc[3].used[NORTH]))) == 0;
+property RoutsWestWhenNotUsed3  = Pmax(<>(!(!isRouting[3].routing[WEST]  || !noc[3].used[WEST]))) == 0;
+
+// --- System Verification ---
+property statesAreSynced = Pmax(<>(!(states[0] == states[1] && states[1] == states[2] && states[2] == states[3]))) == 0;
 
 // Final Results
 // property resistiveNoiseProbability = Pmax(<> (resistiveNoise >= RESISTIVE_NOISE_THRESH));
