@@ -59,6 +59,11 @@ datatype channel = {
 	bool isFull
 };
 
+datatype location = {
+	int(-1..NOC_MAX_ID) x,
+	int(-1..NOC_MAX_ID) y
+};
+
 datatype router = {
 	channel[] channels,
 	int(-1..NOC_MAX_ID)[] ids,
@@ -147,6 +152,23 @@ property neverGeneratesFlitsForSelf0 = Pmax(<>(contains(0, noc[0].channels[LOCAL
 property neverGeneratesFlitsForSelf1 = Pmax(<>(contains(1, noc[1].channels[LOCAL].buffer))) == 0;
 property neverGeneratesFlitsForSelf2 = Pmax(<>(contains(2, noc[2].channels[LOCAL].buffer))) == 0;
 property neverGeneratesFlitsForSelf3 = Pmax(<>(contains(3, noc[3].channels[LOCAL].buffer))) == 0;
+
+// --- Priority List Validation --- 
+property alwaysContainsNorth0 = Pmax(<>(!(noc[0].priority_list[0] == NORTH || noc[0].priority_list[1] == NORTH || noc[0].priority_list[2] == NORTH || noc[0].priority_list[3] == NORTH || noc[0].priority_list[4] == NORTH))) == 0;
+property alwaysContainsEast0 = Pmax(<>(!(noc[0].priority_list[0] == EAST || noc[0].priority_list[1] == EAST || noc[0].priority_list[2] == EAST || noc[0].priority_list[3] == EAST || noc[0].priority_list[4] == EAST))) == 0;
+property alwaysContainsSouth0 = Pmax(<>(!(noc[0].priority_list[0] == SOUTH || noc[0].priority_list[1] == SOUTH || noc[0].priority_list[2] == SOUTH || noc[0].priority_list[3] == SOUTH || noc[0].priority_list[4] == SOUTH))) == 0;
+property alwaysContainsWest0 = Pmax(<>(!(noc[0].priority_list[0] == WEST || noc[0].priority_list[1] == WEST || noc[0].priority_list[2] == WEST || noc[0].priority_list[3] == WEST || noc[0].priority_list[4] == WEST))) == 0;
+property alwaysContainsLocal0 = Pmax(<>(!(noc[0].priority_list[0] == LOCAL || noc[0].priority_list[1] == LOCAL || noc[0].priority_list[2] == LOCAL || noc[0].priority_list[3] == LOCAL || noc[0].priority_list[4] == LOCAL))) == 0;
+property allPrioritiesAreUnique0 = Pmax(<>(!((noc[0].priority_list[0] != noc[0].priority_list[1]) &&
+											 (noc[0].priority_list[0] != noc[0].priority_list[2]) && 
+											 (noc[0].priority_list[0] != noc[0].priority_list[3]) && 
+											 (noc[0].priority_list[0] != noc[0].priority_list[4]) && 
+											 (noc[0].priority_list[1] != noc[0].priority_list[2]) && 
+											 (noc[0].priority_list[1] != noc[0].priority_list[3]) && 
+											 (noc[0].priority_list[1] != noc[0].priority_list[4]) && 
+											 (noc[0].priority_list[2] != noc[0].priority_list[3]) && 
+											 (noc[0].priority_list[2] != noc[0].priority_list[4]) && 
+											 (noc[0].priority_list[3] != noc[0].priority_list[4])))) == 0;
 
 // Final Results
 // property resistiveNoiseProbability = Pmax(<> (resistiveNoise >= RESISTIVE_NOISE_THRESH));
