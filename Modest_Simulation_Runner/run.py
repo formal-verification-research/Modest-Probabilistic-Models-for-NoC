@@ -26,7 +26,8 @@ SCRIPT_AUTHOR_EMAIL: str = "nick.waddoups@usu.edu"
 
 LINE_MATCH_RE = re.compile(r"\s*const\s+int\s+([_A-za-z0-9\-]+)[\s=0-9]*;\s*")
 RANGE_MATCH_RE = re.compile(r"^(\d+):(\d+):?(\d*)")
-MODEST_PROPERTY_NAME_RE = re.compile(r"\s*\+\s+Property\s+([A-Za-z_\-]+)\s*")
+CONST_MATCH_RE = re.compile(r"(\d+)")
+MODEST_PROPERTY_NAME_RE = re.compile(r"\s*\+\s+Property\s+([A-Za-z_\-0-9]+)\s*")
 MODEST_PROBABILITY_RE = re.compile(r"\s+Estimated\s+probability:\s+([0-9\.]+)\s+")
 
 ERR = f"{Fore.RED}ERROR:{Style.RESET_ALL}"

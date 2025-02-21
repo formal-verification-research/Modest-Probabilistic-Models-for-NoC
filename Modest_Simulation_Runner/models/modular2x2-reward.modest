@@ -16,8 +16,6 @@
 
 option "dtmc";
 
-
-
 // --------------------------------------------------- Top level varables ---------------------------------------------------
 
 // #MODULARIZE by setting NOC_MAX_ID to 1 less than the total number of routers and allocating spaces for more routers
@@ -35,8 +33,9 @@ const int INJECTION_RATE_NUMERATOR = 3;
 const int INJECTION_RATE_DENOMINATOR = 10;
 
 // #CUSTOMIZE this is the upper bound of cycles run before quiting.
-const int CLK_UPPER = 14;
-int clk = 0;
+const int CLK_UPPER = 12;
+int(0..CLK_UPPER-1) clk = 0;
+transient int(0..1) clk_indicator;
 
 // #CUSTOMIZE this is the upper threshoold for noise detected in the system.
 const int RESISTIVE_NOISE_THRESH = 5;
@@ -95,8 +94,22 @@ int[] states = [0, 0, 0, 0];
 
 // ------------------------------------------------------- Properties -------------------------------------------------------
 
-property resistiveNoiseProbability1 = Pmax(<> (resistiveNoise >= RESISTIVE_NOISE_THRESH));
-// property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded0 = Pmax(<>[S(clk_indicator)<=0] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded1 = Pmax(<>[S(clk_indicator)<=1] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded2 = Pmax(<>[S(clk_indicator)<=2] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded3 = Pmax(<>[S(clk_indicator)<=3] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded4 = Pmax(<>[S(clk_indicator)<=4] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded5 = Pmax(<>[S(clk_indicator)<=5] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded6 = Pmax(<>[S(clk_indicator)<=6] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded7 = Pmax(<>[S(clk_indicator)<=7] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded8 = Pmax(<>[S(clk_indicator)<=8] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded9 = Pmax(<>[S(clk_indicator)<=9] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded10 = Pmax(<>[S(clk_indicator)<=10] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded11 = Pmax(<>[S(clk_indicator)<=11] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded12 = Pmax(<>[S(clk_indicator)<=12] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded13 = Pmax(<>[S(clk_indicator)<=13] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+property resistiveNoiseProbability1RewardBounded14 = Pmax(<>[S(clk_indicator)<=14] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+//property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
 
 // -------------------------------------------------------- Actions ---------------------------------------------------------
 
@@ -153,7 +166,7 @@ function buffer option dequeue(buffer option ls) =
 
 process GenerateFlits(int id){
     int(0..NOC_MAX_ID) destination;
-    if((clk % INJECTION_RATE_DENOMINATOR) < INJECTION_RATE_NUMERATOR){
+    if(clk < INJECTION_RATE_NUMERATOR){
         // Determine a destiantion
         //palt{
             // #MODULARIZE by adding a probability for (NOC_MAX_ID - 1) destinations.
@@ -443,26 +456,14 @@ process RouterBehavior(int id, int id_north, int id_west, int id_east, int id_so
         // Generate new flits
         GenerateFlits(id);
         // Determine what channels will send this cycle
-        PrepRouter(id);
-
-        if(clk >= CLK_UPPER){
-            stop
-        }
-        else{
-            tau
-        }
+        PrepRouter(id)
     }
 }
 
 // For syncing parallell processes
 process Clock(){
-    tick {= clk++ =};
-    if (clk <= CLK_UPPER) {
+    tick {= clk = (clk + 1) % INJECTION_RATE_DENOMINATOR, clk_indicator = 1 =};
     Clock()
-    }
-    else {
-    stop
-    }
 }
 
 

@@ -33,7 +33,7 @@ const int INJECTION_RATE_NUMERATOR = 3;
 const int INJECTION_RATE_DENOMINATOR = 10;
 
 // #CUSTOMIZE this is the upper bound of cycles run before quiting.
-int(0..INJECTION_RATE_DENOMINATOR-1) clk = 0;
+int(0..12-1) clk = 0;
 transient int(0..1) clk_indicator;
 
 // #CUSTOMIZE this is the upper threshoold for noise detected in the system.

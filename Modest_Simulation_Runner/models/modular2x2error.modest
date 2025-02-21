@@ -39,8 +39,8 @@ const int CLK_UPPER = 1;
 int clk = 0;
 
 // #CUSTOMIZE this is the upper threshoold for noise detected in the system.
-const int RESISTIVE_NOISE_THRESH = 20;
-const int INDUCTIVE_NOISE_THRESH = 8;
+const int RESISTIVE_NOISE_THRESH = 5;
+const int INDUCTIVE_NOISE_THRESH = 5;
 
 // These are for tracking resistive and inductive noise and must be initialized to 0.
 int resistiveNoise = 0;
@@ -246,7 +246,7 @@ property Router3PriorityAlwaysContainsLocal = Pmax(<>(!(
 
 // Final Results
 property resistiveNoiseProbability = Pmax(<> (resistiveNoise >= RESISTIVE_NOISE_THRESH));
-property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+// property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
 
 
 

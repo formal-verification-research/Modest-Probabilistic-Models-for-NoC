@@ -35,7 +35,7 @@ const int INJECTION_RATE_NUMERATOR = 3;
 const int INJECTION_RATE_DENOMINATOR = 10;
 
 // #CUSTOMIZE this is the upper bound of cycles run before quiting.
-const int CLK_UPPER = 12;
+const int CLK_UPPER = 2;
 int clk = 0;
 
 // #CUSTOMIZE this is the upper threshoold for noise detected in the system.
@@ -248,7 +248,7 @@ property Router3PriorityAlwaysContainsLocal = Pmax(<>(!(
 
 // Final Results
 property resistiveNoiseProbability = Pmax(<> (resistiveNoise >= RESISTIVE_NOISE_THRESH));
-//property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
 
 
 
