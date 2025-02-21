@@ -26,7 +26,6 @@ const int INJECTION_RATE_NUMERATOR = 3;
 const int INJECTION_RATE_DENOMINATOR = 10;
 
 // #CUSTOMIZE this is the upper bound of cycles run before quiting.
-const int CLK_UPPER = 20;
 int clk = 0;
 
 // #CUSTOMIZE this is the upper threshoold for noise detected in the system.
@@ -571,26 +570,14 @@ process RouterBehavior(int id){
 		// Generate new flits
 		GenerateFlits(id);
 		// Determine what channels will send this cycle
-		PrepRouter(id);
-
-		if(clk >= CLK_UPPER){
-			stop
-		}
-		else{
-			tau
-		}
+		PrepRouter(id)
 	}
 }
 
 // For syncing parallell processes
 process Clock(){
 	tick {= clk++ =};
-	if (clk <= CLK_UPPER) {
-	   Clock()
-	}
-	else {
-	   stop
-	}
+	Clock()
 }
 
 // ------------------------------------------------------- Execution --------------------------------------------------------
