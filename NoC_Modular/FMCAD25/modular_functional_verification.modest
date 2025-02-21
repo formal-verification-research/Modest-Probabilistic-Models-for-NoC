@@ -86,14 +86,14 @@ int[] states = [0, 0, 0, 0];
 // ------------------------------------------------------- Properties -------------------------------------------------------
 
 // --- Flit Generation Properties ---
-// Requires that this is checked for every router, currently it's just checked for router 0
-property neverGeneratesFlitsForSelf = Pmax([](contains(0, noc[0].channels[LOCAL].buffer)));
+property neverGeneratesFlitsForSelf0 = Pmax([](!contains(0, noc[0].channels[LOCAL].buffer))) == 1;
+property neverGeneratesFlitsForSelf1 = Pmax([](!contains(1, noc[1].channels[LOCAL].buffer))) == 1;
+property neverGeneratesFlitsForSelf2 = Pmax([](!contains(2, noc[2].channels[LOCAL].buffer))) == 1;
+property neverGeneratesFlitsForSelf3 = Pmax([](!contains(3, noc[3].channels[LOCAL].buffer))) == 1;
 
 // Final Results
-property resistiveNoiseProbability = Pmax(<> (resistiveNoise >= RESISTIVE_NOISE_THRESH));
-property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
-
-
+// property resistiveNoiseProbability = Pmax(<> (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+// property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
 
 // -------------------------------------------------------- Actions ---------------------------------------------------------
 
@@ -456,8 +456,6 @@ process Clock(){
 	   stop
 	}
 }
-
-
 
 // ------------------------------------------------------- Execution --------------------------------------------------------
 
