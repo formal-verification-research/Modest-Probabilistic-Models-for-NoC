@@ -86,10 +86,10 @@ int[] states = [0, 0, 0, 0];
 // ------------------------------------------------------- Properties -------------------------------------------------------
 
 // --- Flit Generation Properties ---
-property neverGeneratesFlitsForSelf0 = Pmax([](!contains(0, noc[0].channels[LOCAL].buffer))) == 1;
-property neverGeneratesFlitsForSelf1 = Pmax([](!contains(1, noc[1].channels[LOCAL].buffer))) == 1;
-property neverGeneratesFlitsForSelf2 = Pmax([](!contains(2, noc[2].channels[LOCAL].buffer))) == 1;
-property neverGeneratesFlitsForSelf3 = Pmax([](!contains(3, noc[3].channels[LOCAL].buffer))) == 1;
+property neverGeneratesFlitsForSelf0 = Pmax(<>(contains(0, noc[0].channels[LOCAL].buffer))) == 0;
+property neverGeneratesFlitsForSelf1 = Pmax(<>(contains(1, noc[1].channels[LOCAL].buffer))) == 0;
+property neverGeneratesFlitsForSelf2 = Pmax(<>(contains(2, noc[2].channels[LOCAL].buffer))) == 0;
+property neverGeneratesFlitsForSelf3 = Pmax(<>(contains(3, noc[3].channels[LOCAL].buffer))) == 0;
 
 // Final Results
 // property resistiveNoiseProbability = Pmax(<> (resistiveNoise >= RESISTIVE_NOISE_THRESH));
