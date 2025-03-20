@@ -42,4 +42,17 @@ class Buffer {
     size := size - 1;
     tail := if tail >= capacity - 1 then 0 else tail + 1;
   }
+
+  predicate isFull()
+    reads this
+  {
+    size == capacity
+  }
+
+  predicate isEmpty()
+    reads this
+  {
+    size == 0
+  }
+
 }
