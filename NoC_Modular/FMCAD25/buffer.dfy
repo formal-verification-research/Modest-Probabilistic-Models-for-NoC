@@ -29,6 +29,7 @@ class Buffer {
     requires Valid() && size < capacity
     modifies this
     ensures Valid()
+    ensures size > old(size)
   {
     size := size + 1;
     head := if head >= capacity - 1 then 0 else head + 1;
@@ -38,6 +39,7 @@ class Buffer {
     requires Valid() && size > 0
     modifies this
     ensures Valid()
+    ensures size < old(size)
   {
     size := size - 1;
     tail := if tail >= capacity - 1 then 0 else tail + 1;
