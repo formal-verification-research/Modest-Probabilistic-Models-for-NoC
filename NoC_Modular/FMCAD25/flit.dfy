@@ -1,15 +1,2 @@
 // `T` represents the payload of the flit.
-class Flit {
-  const destination: nat
-
-  constructor(destination: nat)
-  {
-    this.destination := destination;
-  }
-
-  function getDestinationChannel(): nat
-    reads this 
-  {
-    this.destination
-  }
-}
+datatype Flit<T(0)> = Flit(destination: nat, payload: T)
