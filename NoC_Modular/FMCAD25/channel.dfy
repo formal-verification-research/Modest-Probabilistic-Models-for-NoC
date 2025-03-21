@@ -70,4 +70,13 @@ class Channel<T(0,==)> {
     this.serviced := true;
     f := this.buffers.extract();
   }
+
+  method resetServiced()
+    requires Valid()
+    modifies this
+    ensures Valid() 
+    ensures !this.isServiced()
+  {
+    this.serviced := false;
+  }
 }
