@@ -11,9 +11,38 @@ def process_line(line):
     # Insert a newline and a tab after each "&&"
     return re.sub(r'\s*&&\s*', r' &&\n\t', line)
 
-def format_document(doc: str) -> str:
+def format_document(doc: str, *, color: bool = False) -> str:
     # Process each line from the original file.
-    return '\n'.join([process_line(line) for line in doc.splitlines()])
+    formatted = '\n'.join([process_line(line) for line in doc.splitlines()])
+
+    if color:
+        # brackets (these have to come first)
+        formatted = formatted.replace("[", "\033[37m[\033[0m")
+        formatted = formatted.replace("]", "\033[37m]\033[0m")
+        formatted = formatted.replace("(", "\033[37m(\033[0m")
+        formatted = formatted.replace(")", "\033[37m)\033[0m")
+        formatted = formatted.replace("{", "\033[37m{\033[0m")
+        formatted = formatted.replace("}", "\033[37m}\033[0m")
+
+        # keywords + operators
+        formatted = formatted.replace("==", "\033[91m==\033[0m")
+        formatted = formatted.replace("<=", "\033[91m<=\033[0m")
+        formatted = formatted.replace(">=", "\033[91m>=\033[0m")
+        formatted = formatted.replace("!=", "\033[91m!=\033[0m")
+        formatted = formatted.replace("&&", "\033[91m&&\033[0m")
+        formatted = formatted.replace("||", "\033[91m||\033[0m")
+        formatted = formatted.replace(" < ", " \033[91m<\033[0m ")
+        formatted = formatted.replace(" > ", " \033[91m>\033[0m ")
+        formatted = formatted.replace("?", "\033[91m?\033[0m")
+        formatted = formatted.replace("$", "\033[91m$\033[0m")
+        formatted = formatted.replace("assume", "\033[91massume\033[0m")
+        formatted = formatted.replace("ensures", "\033[91mensures\033[0m")
+
+        # this
+        formatted = formatted.replace("this", "\033[0;33mthis\033[0m")
+
+
+    return formatted 
 
 type Filter = Callable[[str], bool]
 

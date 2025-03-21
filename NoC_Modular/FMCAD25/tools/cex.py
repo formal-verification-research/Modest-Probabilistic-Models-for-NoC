@@ -26,7 +26,7 @@ def generate_cex(dfy_file: Path):
     # Extract the counterexample from the output.
     output = (result.stdout + result.stderr)
 
-    print(process_cex.format_document(output))
+    print(process_cex.format_document(output, color=True))
 
 def main():
     parser = argparse.ArgumentParser(
