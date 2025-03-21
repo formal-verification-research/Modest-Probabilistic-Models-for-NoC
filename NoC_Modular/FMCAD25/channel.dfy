@@ -42,6 +42,19 @@ class Channel<T(0,==)> {
     serviced
   }
 
+  method insert(f: Flit<T>)
+    requires Valid()
+    requires !this.buffers.isFull()
+    modifies this
+    modifies this.buffers 
+    modifies this.buffers.flits
+    ensures Valid()
+    ensures this.buffers.size > old(this.buffers.size)
+    ensures f == this.buffers.peekFront()
+  {
+    this.buffers.insert(f);
+  }
+
   method extract() returns (f: Flit<T>)
     requires Valid()
     requires !this.isServiced()
@@ -49,9 +62,10 @@ class Channel<T(0,==)> {
     modifies this
     modifies this.buffers
     modifies this.buffers.flits
-    ensures this.buffers.size < old(this.buffers.size)
-    ensures this.isServiced()
     ensures Valid()
+    ensures this.buffers.size < old(this.buffers.size)
+    ensures f == old(this.buffers.peekBack())
+    ensures this.isServiced()
   {
     this.serviced := true;
     f := this.buffers.extract();
