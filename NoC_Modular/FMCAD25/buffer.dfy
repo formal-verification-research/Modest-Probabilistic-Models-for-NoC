@@ -30,13 +30,32 @@ class Buffer<T(0,==)> {
     this.flits := new Flit[capacity];
   }
 
+  ghost function peekFront(): Flit<T>
+    reads this 
+    reads this.flits
+    requires Valid() && size > 0
+    ensures Valid()
+  {
+    var nextFlitIndex := if head > 0 then head - 1 else capacity - 1;
+    this.flits[nextFlitIndex]
+  }
+
+  ghost function peekBack(): Flit<T>
+    reads this 
+    reads this.flits
+    requires Valid() && size > 0
+    ensures Valid()
+  {
+    this.flits[tail]
+  }
+
   method insert(payload: Flit<T>)
     requires Valid() && size < capacity
     modifies this
     modifies this.flits
     ensures Valid()
     ensures size > old(size)
-    ensures this.flits[old(head)] == payload
+    ensures payload == peekFront()
   {
     // insert the flit
     this.flits[head] := payload;
@@ -52,7 +71,7 @@ class Buffer<T(0,==)> {
     modifies this.flits
     ensures Valid()
     ensures size < old(size)
-    ensures f == this.flits[old(tail)]
+    ensures f == old(peekBack())
   {
     // extract the value
     f := this.flits[tail];
