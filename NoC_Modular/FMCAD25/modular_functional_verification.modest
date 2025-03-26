@@ -219,7 +219,7 @@ property allPrioritiesAreUnique3  = Pmax(<>(!((noc[3].priority_list[0] != noc[3]
 // --- Forward Progress Verification ---
 /**
 We can't use [] yet in Modest, but here's the idea of what we want to check:
-forall buffers in all router, if a buffer gets a flit eventually that flit will leave the buffer
+forall buffers in all routers, if a buffer gets a flit eventually that flit will leave the buffer
 */
 
 //  --- IsRouting Verificaiton ---
@@ -304,7 +304,8 @@ function bool contains(int id, buffer option ls) =
 
 // ------------------------------------------------------- Processes --------------------------------------------------------
 
-process GenerateFlits(int id){
+process GenerateFlits(int id)
+{
 	int(0..NOC_MAX_ID) destination;
 	if((clk % INJECTION_RATE_DENOMINATOR) < INJECTION_RATE_NUMERATOR){
 		{= 
@@ -576,7 +577,7 @@ process RouterBehavior(int id){
 
 // For syncing parallell processes
 process Clock(){
-	tick {= clk++ =};
+	tick {= clk++ =}; // change clk to be a counter from 0 to 9 for the flit generation
 	Clock()
 }
 
