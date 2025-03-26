@@ -35,7 +35,7 @@ const int INJECTION_RATE_NUMERATOR = 3;
 const int INJECTION_RATE_DENOMINATOR = 10;
 
 // #CUSTOMIZE this is the upper bound of cycles run before quiting.
-int(0..50) clk = 0;
+int(0..INJECTION_RATE_DENOMINATOR) clk = 0;
 transient int(0..1) clk_indicator;
 
 // #CUSTOMIZE this is the upper threshoold for noise detected in the system.
@@ -126,8 +126,6 @@ property inductiveNoiseProbability1RewardBounded11 = Pmax(<>[S(clk_indicator)<=1
 property inductiveNoiseProbability1RewardBounded12 = Pmax(<>[S(clk_indicator)<=12] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
 property inductiveNoiseProbability1RewardBounded13 = Pmax(<>[S(clk_indicator)<=13] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
 property inductiveNoiseProbability1RewardBounded14 = Pmax(<>[S(clk_indicator)<=14] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
-
-//property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
 
 // -------------------------------------------------------- Actions ---------------------------------------------------------
 
