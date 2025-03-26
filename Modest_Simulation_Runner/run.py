@@ -1,3 +1,5 @@
+#!python3
+
 # Author: Nick Waddoups
 
 import argparse
