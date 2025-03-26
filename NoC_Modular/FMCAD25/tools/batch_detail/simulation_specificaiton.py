@@ -1,6 +1,36 @@
 from pathlib import Path 
+from enum import Enum
 
 # Classes
+class SimType(Enum):
+    REWARD = 1
+    NORMAL = 2
+
+class SimVariable:
+    """A variable that is set by the batcher during simulation."""
+
+    def __init__(self, name: str, start: int, stop: int, step: int):
+        """Creates a new simulation variable
+
+        Required inputs:
+        - name: The name of the variable
+        - start: The starting value of the variable
+        - stop: The stopping value of the variable
+        - step: The step size of the variable"""
+
+        self.name: str = name
+        self.start: int = start
+        self.stop: int = stop
+        self.step: int = step
+    
+    def __str__(self) -> str:
+        """Returns a string detailing the information about this simulation variable"""
+        
+        ret: str = f"{self.name} [{self.start}:{self.step}:{self.stop}]"
+
+        return ret
+
+
 class SimSpec:
     """The specification for a modest simulation"""
 
@@ -26,7 +56,8 @@ class SimSpec:
         self.model: Path = model
         self.output: Path = output
         self.command: str = command
-        self.iter_vars: dict[int, tuple] = {}
+        self.type: SimType = SimType.NORMAL
+        self.iter_vars: list[SimVariable] = {}
 
     def __str__(self) -> str:
         """Returns a string detailing the information about this simulation specification"""
@@ -41,67 +72,8 @@ class SimSpec:
         ret += f"Command: modest {self.command} {self.file}\n"
 
         # Add iteration variables
-        ret += f"Iteration variables:"
-        for var, v_range in self.iter_vars.items():
-            # capture var name
-            with self.file.open() as f:
-                lines = f.readlines()
-            var_name = LINE_MATCH_RE.match(lines[var]).group(1)
-
-            # get pretty range
-            p_range = f"{v_range[0]} to {v_range[2]} (step size of {v_range[1]})"
-
-            # put it all together to get the information
-            ret += f"\n\t{var_name} in range {p_range} on line {var}"
-
-        return ret
-
-    def add_iter_var(self, line_num: int, iter_range: str) -> None:
-        """Adds a variable to be iterated through during sequential simulation runs
-        
-        Required inputs:
-        - line_num: the line number that the variable is found on in the self.model file
-        - iter_range: the range which to iterate over in the format <start>[:<step>]:<end>"""
-        # check if range is valid
-        range_match = RANGE_MATCH_RE.match(iter_range)
-
-        if range_match is None:
-            print(f"Range argument {iter_range} is not in the correct format")
-            print(f"\tin simspec {self.name}")
-            print(f"")
-            print(f"Correct format:")
-            print(
-                f"<start>:<step>:<end> | <start>:<end>\n\twhere the second option has an implied step of 1"
-            )
-            return None
-        else:
-            # check if the implied step is 1
-            if range_match.group(3) == "":
-                start_r = range_match.group(1)
-                end_r = range_match.group(2)
-                step_r = 1
-            else:
-                start_r = range_match.group(1)
-                step_r = range_match.group(2)
-                end_r = range_match.group(3)
-
-            # convert the values to integers
-            start_r = parse_int(start_r)
-            step_r = parse_int(step_r)
-            # add one step to the end because of 0-based indexing
-            end_r = parse_int(end_r) + step_r
-
-        # set the iteration variables in the simspec class
-        self.iter_vars[line_num] = (start_r, step_r, end_r)
-
-    def vars_to_list(self) -> List[tuple]:
-        """Returns the vars to iterate over as list of tuples, in this format:
-        [(<line num>, <start>, <step>, <end>), (<line num...<end>)...]"""
-
-        ret: List[tuple] = []
-
-        for line_num, iter_range in self.iter_vars.items():
-            tup: tuple = (line_num,) + iter_range
-            ret.append(tup)
+        ret += f"Iteration variables:\n"
+        for var in self.iter_vars:
+            ret += f"  {var}\n"
 
         return ret
