@@ -494,7 +494,8 @@ def run(activity_thresh, resistive_thresh, inductive_thresh, n):
 
         if process.returncode != 0 or "error" in err:
             print("Error!")
-            return
+        
+        return
 
         print(out2)
 
