@@ -490,6 +490,10 @@ def run(activity_thresh, resistive_thresh, inductive_thresh, n):
         out = out.decode("utf-8", "ignore").split("\n")
         out2 = '\n'.join(out).rstrip();
 
+        if process.returncode != 0:
+            print("Error!")
+            return
+
         print(out2)
 
         os.remove(file)
