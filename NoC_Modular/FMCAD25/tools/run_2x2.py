@@ -443,10 +443,10 @@ par{
 """
 
 def resist(n) -> str:
-    return "property resistiveNoiseProbability1RewardBounded{n}  = Pmax(<>[S(clk_indicator)<={n}] (resistiveNoise >= RESISTIVE_NOISE_THRESH));"
+    return f"\nproperty resistiveNoiseProbability1RewardBounded{n}  = Pmax(<>[S(clk_indicator)<={n}] (resistiveNoise >= RESISTIVE_NOISE_THRESH));"
 
 def induct(n) -> str:
-    return "property inductiveNoiseProbability1RewardBounded{n}  = Pmax(<>[S(clk_indicator)<={n}]  (inductiveNoise >= INDUCTIVE_NOISE_THRESH));"
+    return f"\nproperty inductiveNoiseProbability1RewardBounded{n}  = Pmax(<>[S(clk_indicator)<={n}]  (inductiveNoise >= INDUCTIVE_NOISE_THRESH));"
 
 def build_file(activity_thresh, resistive_thresh, inductive_thresh, n, filename):
     file = init(activity_thresh, resistive_thresh, inductive_thresh)
