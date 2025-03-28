@@ -489,6 +489,8 @@ def run(activity_thresh, resistive_thresh, inductive_thresh, n):
         # split the output into individual lines
         out = out.decode("utf-8", "ignore").split("\n")
         out2 = '\n'.join(out).rstrip();
+        err = err.decode("utf-8", "ignore").split("\n")
+        err = '\n'.join(err).rstrip();
 
         if process.returncode != 0 or "error" in err:
             print("Error!")
