@@ -14,6 +14,9 @@ class Channel<T(0,==)> {
   constructor(capacity: nat)
     requires capacity > 0
     ensures Valid()
+    ensures this.isServiced() == false
+    ensures this.isEmpty() == true
+    ensures this.isFull() == false
   {
     this.buffers := new Buffer(capacity);
     this.serviced := false;

@@ -22,6 +22,8 @@ class Buffer<T(0,==)> {
   constructor(capacity: int)
     requires capacity > 0
     ensures Valid()
+    ensures this.isEmpty() == true 
+    ensures this.isFull() == false 
   {
     this.capacity := capacity;
     this.size := 0;
