@@ -22,26 +22,33 @@ class Router<T(0,==)> {
     && priority_list.Length == 5
     && channels.Length == 5
     && used.Length == 5
+    && this.ids.Length == 4
     // Ensure every element in the priority list is always unique
     && (forall i: nat, j: nat :: 
-        && 0 < i < priority_list.Length 
-        && 0 < j < priority_list.Length 
-        && i != j 
-        && priority_list[i] != priority_list[j])
+        (&& 0 <= i < priority_list.Length
+         && 0 <= j < priority_list.Length 
+         && i != j)
+        ==> priority_list[i] != priority_list[j])
     // Ensures all destination id's are unique (or NC)
-    && (forall id1, id2 :: 
-        && id1 in ids[..]
-        && id2 in ids[..]
-        && (id1 != id2 || id1 == NoConnect || id2 == NoConnect))
+    && (forall i, j :: 
+        (&& 0 <= i < this.ids.Length
+         && 0 <= j < this.ids.Length
+         && i != j)
+        ==> (|| ids[i] != ids[j]
+             || ids[i] == NoConnect 
+             || ids[j] == NoConnect))
   }
 
   constructor (buffer_capacity: nat, ids: seq<Id>)
     requires buffer_capacity > 0
-    requires |ids| > 0
-    requires forall id1, id2 :: 
-        && id1 in ids
-        && id2 in ids
-        && (id1 != id2 || id1 == NoConnect || id2 == NoConnect)
+    requires |ids| == 4
+    requires forall i, j :: 
+        (&& 0 <= i < |ids|
+         && 0 <= j < |ids|
+         && i != j)
+        ==> (|| ids[i] != ids[j]
+             || ids[i] == NoConnect 
+             || ids[j] == NoConnect)
     ensures Valid()
   {
     this.ids := new Id[ |ids| ];
@@ -51,7 +58,7 @@ class Router<T(0,==)> {
     this.used := new bool[5](_ => false);
 
     new; // tbh not sure why I need this
-
+    
     forall i | 0 <= i < this.ids.Length { this.ids[i] := ids[i]; }
 
     this.priority_list[0] := North;
@@ -59,17 +66,6 @@ class Router<T(0,==)> {
     this.priority_list[2] := South;
     this.priority_list[3] := West;
     this.priority_list[4] := Local;
-
-    assert priority_list[0] != priority_list[1];
-    assert priority_list[0] != priority_list[2];
-    assert priority_list[0] != priority_list[3];
-    assert priority_list[0] != priority_list[4];
-    assert priority_list[1] != priority_list[2];
-    assert priority_list[1] != priority_list[3];
-    assert priority_list[1] != priority_list[4];
-    assert priority_list[2] != priority_list[3];
-    assert priority_list[2] != priority_list[4];
-    assert priority_list[3] != priority_list[4];
   }
 
 }
