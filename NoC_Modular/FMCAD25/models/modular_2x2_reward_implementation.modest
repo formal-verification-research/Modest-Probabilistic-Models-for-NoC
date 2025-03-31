@@ -413,6 +413,13 @@ process RouterBehavior(int id, int id_north, int id_west, int id_east, int id_so
     {=
         noc[id] = router {
             channels: [
+                // Bug? Why is `isEmpty` set to false. Initially
+                // it should be set to true.
+                // Double check running when set to true and when
+                // set to false to see if it's correct. 
+                // Right now, it's set to true the first time that
+                // PrepRouter is called, but we don't need
+                // that dependency.
                 channel {serviced: false, isEmpty: false},
                 channel {serviced: false, isEmpty: false},
                 channel {serviced: false, isEmpty: false},
