@@ -50,18 +50,24 @@ class Router<T(0,==)> {
              || ids[i] == NoConnect 
              || ids[j] == NoConnect)
     ensures Valid()
-    ensures this_activity == 0 
-    // add initialization from modest modesl
+    ensures this_activity == 0
+    ensures last_activity == 0
+    ensures forall i | 0 <= i < |ids| :: this.ids[i] == ids[i]
+    ensures priority_list[..] == [North, East, South, West, Local]
+    ensures used[..] == [false, false, false, false, false]
+    ensures channels.Length == 5
+    ensures forall c :: c in channels[..] ==> (c.isEmpty() && !c.isServiced())
   {
+    this.this_activity := 0;
+    this.last_activity := 0;
+
     this.ids := new Id[ |ids| ];
     var default_channel := new Channel<T>(buffer_capacity);
     this.channels := new Channel<T>[5](_ => default_channel);
     this.priority_list := new Neighbor[5][North, East, South, West, Local];
-    this.used := new bool[5](_ => false);
-    this.this_activity := 0;
-    this.last_activity := 0;
+    this.used := new bool[5][false, false, false, false, false];
 
-    new; // tbh not sure why I need this
+    new;
     
     forall i | 0 <= i < this.ids.Length { this.ids[i] := ids[i]; }
   }
