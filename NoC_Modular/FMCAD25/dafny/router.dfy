@@ -72,4 +72,25 @@ class Router<T(0,==)> {
     forall i | 0 <= i < this.ids.Length { this.ids[i] := ids[i]; }
   }
 
+  method advanceRouter()
+    requires Valid()
+    ensures Valid() 
+  {
+    for id := 0 to this.ids.Length
+    {
+      advanceChannel(id);
+    }
+  }
+
+  method advanceChannel(id: nat)
+    requires Valid()
+    requires 0 <= id < ids.Length
+    ensures Valid()
+  {
+    if (this.ids[id] == NoConnect) {
+      return;
+    }
+  }
+
+
 }
