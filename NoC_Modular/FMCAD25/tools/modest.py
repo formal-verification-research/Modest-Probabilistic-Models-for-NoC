@@ -68,4 +68,4 @@ def check(model: str | Path, output_path: Path | None = None) -> str | None:
     return __run(model, output_path, ["modest", "check"])
 
 def simulate(model: str | Path, output_path: Path | None = None) -> str | None:
-    return __run(model, output_path, command=["modest", "simulate"], opts=["--max-run-length", "0"])
+    return __run(model, output_path, command=["modest", "simulate"], opts=["--max-run-length", "0", "--unsafe"])
