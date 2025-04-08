@@ -20,3 +20,7 @@
 #   `modest.simulate(input, output)` and `modest.check(input, output)`.
 #   this class _could_ have the output parsing ability, or we could delegate
 #   that to another class.
+
+from noc import Noc, NoiseType
+import modest
+
