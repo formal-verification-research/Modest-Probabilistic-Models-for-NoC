@@ -22,23 +22,69 @@
 #   that to another class.
 
 from noc import Noc, NoiseType
+import csv
 import modest
+import time
 from probabilities import parse_probabilities
 
-noc = Noc(4)
+def simulate(*, size: int, type: NoiseType, clk_upper: int | None, threshold: int = 1, stride : int = 1, block_size : int = 50):
+    noc = Noc(size)
+    clk = 0
+    probs = []
 
-clk_upper = 10
-block_size = 2
-clk = 0
+    start_time = time.time()
 
-probs: list[tuple[int, float]] = []
+    # Simulation
+    while clk <= clk_upper or clk_upper is None:
+        lower = clk 
+        upper = clk + block_size - 1 
 
-while clk <= clk_upper:
-    sim_output = modest.simulate(noc.print(NoiseType.RESISTIVE, clk, clk + block_size - 1))
-    probs += parse_probabilities(sim_output)
-    clk += block_size
+        if clk_upper is not None and upper > clk_upper:
+            upper = clk_upper
+            
+        sim_output = modest.simulate(noc.print(type, lower, upper, stride))
+        probs += parse_probabilities(sim_output)
+        clk += block_size
 
-    if max(probs, key=lambda x: x[1])[1] >= 1.0:
-        break
+        if max(probs, key=lambda x: x[1])[1] >= threshold:
+            break
+    
+    # Timing
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    timing_file = f"noc_{noc._n}x{noc._n}_{type.name.lower()}_noise_threshold_{threshold}_stride_{stride}_block_size_{block_size}.time.txt"
 
-print(probs)
+    # Format elapsed time as HH:MM:SS
+    hours, rem = divmod(elapsed_time, 3600)
+    minutes, seconds = divmod(rem, 60)
+    time_str = "{:0>2}:{:0>2}:{:05.2f}".format(int(hours), int(minutes), seconds)
+
+    output_str = f"Simulation parameters:\n"
+    output_str += f"  Size: {noc._n}x{noc._n}\n"
+    output_str += f"  Noise Type: {type.name}\n"
+    output_str += f"  Clock Upper Bound: {clk_upper}\n"
+    output_str += f"  Threshold: {threshold}\n"
+    output_str += f"  Stride: {stride}\n"
+    output_str += f"  Block Size: {block_size}\n"
+    output_str += f"\n"
+    output_str += f"Elapsed time: {time_str}"
+
+    print(output_str)
+
+    with open(timing_file, "w") as f:
+        f.write(output_str)
+
+    # Probabilities
+    filename = f"noc_{noc._n}x{noc._n}_{type.name.lower()}_noise_threshold_{threshold}_stride_{stride}_block_size_{block_size}.csv"
+    with open(filename, "w", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(["Clock Cycle", "Probability"])
+        writer.writerows(probs)
+
+    return probs 
+            
+def main():
+    simulate(size=4, type=NoiseType.RESISTIVE, clk_upper=None, stride=2)
+
+if __name__ == "__main__":
+    main()
