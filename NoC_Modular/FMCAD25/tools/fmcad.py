@@ -36,7 +36,7 @@ def simulate(*, size: int, type: NoiseType, clk_upper: int | None, threshold: in
     start_time = time.time()
 
     # Simulation
-    while clk <= clk_upper or clk_upper is None:
+    while clk_upper is None or clk <= clk_upper:
         lower = clk 
         upper = clk + block_size - 1 
 
