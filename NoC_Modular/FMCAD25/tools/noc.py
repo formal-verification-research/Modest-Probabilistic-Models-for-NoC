@@ -156,8 +156,6 @@ action sync;
                 if y + 1 >= self._n:
                     id_south = "NO_CONNECT"
 
-                print(f"id: {id}, id_north: {id_north}, id_west: {id_west}, id_east: {id_east}, id_south: {id_south}")
-
                 init += f"""\
 router {{
 channels: [
