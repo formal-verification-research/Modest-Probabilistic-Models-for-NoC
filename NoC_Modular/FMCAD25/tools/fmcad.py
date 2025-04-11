@@ -29,6 +29,7 @@ from probabilities import parse_probabilities
 
 def simulate(*, size: int, type: NoiseType, clk_upper: int | None, threshold: int = 1, stride : int = 1, block_size : int = 50):
     noc = Noc(size)
+    print(f"Starting {noc._n}x{noc._n} {type.name} simulation...")
     clk = 0
     probs = []
 
