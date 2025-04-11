@@ -23,9 +23,22 @@
 
 from noc import Noc, NoiseType
 import modest
+from probabilities import parse_probabilities
 
 noc = Noc(4)
 
-sim_output = modest.simulate(noc.print(NoiseType.RESISTIVE, 0, 2))
+clk_upper = 10
+block_size = 2
+clk = 0
 
-print(sim_output)
+probs: list[float] = []
+
+while clk <= clk_upper:
+    sim_output = modest.simulate(noc.print(NoiseType.RESISTIVE, clk, clk + block_size - 1))
+    probs += parse_probabilities(sim_output)
+    clk += block_size
+
+    if max(probs) >= 1.0:
+        break
+
+print(probs)
