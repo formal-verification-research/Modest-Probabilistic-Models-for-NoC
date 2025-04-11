@@ -97,12 +97,12 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: NoiseType,
 
     return probs 
             
-def main():
-    # 2x2 simulations
+def noc_2x2():
+    """ 2x2 simulations """
     simulate(size=4, type=NoiseType.RESISTIVE, threshold=1, clk_upper=None, stride=1)
     simulate(size=4, type=NoiseType.RESISTIVE, threshold=5, clk_upper=None, stride=2)
     simulate(size=4, type=NoiseType.RESISTIVE, threshold=10, clk_upper=None, stride=5)
     simulate(size=4, type=NoiseType.RESISTIVE, threshold=20, clk_upper=None, stride=10)
 
 if __name__ == "__main__":
-    main()
+    noc_2x2()
