@@ -58,7 +58,7 @@ def __run(model: str | Path, output_path: Path | None = None, command: list[str]
 
     output = stdout + stderr
 
-    if tmp_model:
+    if tmp_model and not "error:" in output:
         Path(filename).unlink(missing_ok=False)
         
     if output_path is not None:

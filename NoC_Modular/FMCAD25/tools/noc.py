@@ -53,7 +53,7 @@ class Noc:
                 + self.composition()
 
     def type(self) -> str:
-        return "option: \"dtmc\";\n"
+        return "option \"dtmc\";\n"
 
     def variables(self):
         return f"""\
