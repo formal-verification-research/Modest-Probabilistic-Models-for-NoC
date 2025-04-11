@@ -27,7 +27,8 @@ class Noc:
         self.inductive_noise_threshold = inductive_noise_threshold
 
     def __str__(self):
-        return self.variables() \
+        return self.type() \
+                + self.variables() \
                 + self.datatypes() \
                 + self.noc_init() \
                 + self.functions() \
@@ -42,14 +43,18 @@ class Noc:
         if noise_type == NoiseType.INDUCTIVE or noise_type == NoiseType.BOTH:
             properties += self.inductive_range(clk_low, clk_high, stride)
         
-        return self.variables() \
+        return self.type() \
+                + self.variables() \
                 + self.datatypes() \
                 + self.noc_init() \
                 + properties \
                 + self.functions() \
                 + self.processes() \
                 + self.composition()
-            
+
+    def type(self) -> str:
+        return "option: \"dtmc\";\n"
+
     def variables(self):
         return f"""\
 //----- VARIABLES -----
