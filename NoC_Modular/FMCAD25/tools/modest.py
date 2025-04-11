@@ -64,9 +64,8 @@ def __run(model: str | Path, output_path: Path | None = None, command: list[str]
     if output_path is not None:
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(output)
-        return None
-    else:
-        return output
+
+    return output
 
 def check(model: str | Path, output_path: Path | None = None) -> str | None:
     return __run(model, output_path, ["modest", "check"])
