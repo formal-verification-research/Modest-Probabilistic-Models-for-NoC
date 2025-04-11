@@ -26,8 +26,9 @@ import csv
 import modest
 import time
 from probabilities import parse_probabilities
+from pathlib import Path
 
-def simulate(*, size: int, type: NoiseType, clk_upper: int | None, threshold: int = 1, stride : int = 1, block_size : int = 50):
+def simulate(*, result_path: Path = Path("results"), size: int, type: NoiseType, clk_upper: int | None, threshold: int = 1, stride : int = 1, block_size : int = 50):
     noc = Noc(size)
     print(f"Starting {noc._n}x{noc._n} {type.name} simulation...")
     clk = 0
@@ -53,7 +54,7 @@ def simulate(*, size: int, type: NoiseType, clk_upper: int | None, threshold: in
     # Timing
     end_time = time.time()
     elapsed_time = end_time - start_time
-    timing_file = f"noc_{noc._n}x{noc._n}_{type.name.lower()}_noise_threshold_{threshold}_stride_{stride}_block_size_{block_size}.time.txt"
+    timing_file = result_path / Path(f"noc_{noc._n}x{noc._n}_{type.name.lower()}_noise_threshold_{threshold}_stride_{stride}_block_size_{block_size}.time.txt")
 
     # Format elapsed time as HH:MM:SS
     hours, rem = divmod(elapsed_time, 3600)
@@ -68,7 +69,7 @@ def simulate(*, size: int, type: NoiseType, clk_upper: int | None, threshold: in
     output_str += f"  Stride: {stride}\n"
     output_str += f"  Block Size: {block_size}\n"
     output_str += f"\n"
-    output_str += f"Elapsed time: {time_str}"
+    output_str += f"Elapsed time: {time_str}\n"
 
     print(output_str)
 
@@ -76,7 +77,7 @@ def simulate(*, size: int, type: NoiseType, clk_upper: int | None, threshold: in
         f.write(output_str)
 
     # Probabilities
-    filename = f"noc_{noc._n}x{noc._n}_{type.name.lower()}_noise_threshold_{threshold}_stride_{stride}_block_size_{block_size}.csv"
+    filename = result_path / Path(f"noc_{noc._n}x{noc._n}_{type.name.lower()}_noise_threshold_{threshold}_stride_{stride}_block_size_{block_size}.csv")
     with open(filename, "w", newline="") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(["Clock Cycle", "Probability"])
