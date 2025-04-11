@@ -33,9 +33,13 @@ def __run(model: str | Path, output_path: Path | None = None, command: list[str]
     tmp_model = False
 
     if isinstance(model, str):
-        if Path(model).exists():
+        try:
+            if Path(model).exists():
+                filename = model
+            else:
+                raise FileNotFoundError
+        except:
             filename = model
-        else:
             filename = "__tmp_model__.modest"
             with open(filename, "w") as f:
                 f.write(model)

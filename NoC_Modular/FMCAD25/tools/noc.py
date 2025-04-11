@@ -14,6 +14,9 @@ class Noc:
                  injection_rate_denominator: int = 10,
                  resistive_noise_threshold: int = 1,
                  inductive_noise_threshold: int = 1):
+        assert size >= 4, "Size must be at least 4"
+        assert math.sqrt(size).is_integer(), "Size must be a square number"
+
         self.size = size
         self._n = int(math.sqrt(size))
         self.buffer_size = buffer_size
@@ -53,7 +56,6 @@ class Noc:
 
 // #MODULARIZE by setting NOC_MAX_ID to 1 less than the total number of routers and allocating spaces for more routers
 const int NOC_MAX_ID = {self.size - 1};
-router[] noc = array(i, NOC_MAX_ID + 1, router{{}});
 
 // #CUSTOMIZE this value changes the buffer length of all buffers.
 const int BUFFER_LENGTH = {self.buffer_size};
@@ -119,10 +121,13 @@ checker[] isRouting = [
     checker{{routing:[false, false, false, false, false]}},
     checker{{routing:[false, false, false, false, false]}}];
 int[] states = [0, 0, 0, 0];
+
+action tick;
+action sync;
 """
     
     def noc_init(self):
-        init: str = ""
+        init: str = "router[] noc = ["
 
         for y in range(self._n):
             for x in range(self._n):
@@ -145,7 +150,7 @@ int[] states = [0, 0, 0, 0];
                     id_south = -1
 
                 init += f"""\
-noc[{id}] = router {{
+router {{
 channels: [
     channel {{serviced: false, isEmpty: true}},
     channel {{serviced: false, isEmpty: true}},
@@ -160,6 +165,10 @@ thisActivity: 0,
 lastActivity: 0
 }}  
 """
+                if id < self.size - 1:
+                    init += ",\n"
+                else:
+                    init += "];\n"
                 
         return init
     

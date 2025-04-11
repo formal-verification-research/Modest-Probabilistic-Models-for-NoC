@@ -24,3 +24,6 @@
 from noc import Noc, NoiseType
 import modest
 
+noc = Noc(4)
+
+sim_output = modest.simulate(noc.print(NoiseType.RESISTIVE, 0, 2))
