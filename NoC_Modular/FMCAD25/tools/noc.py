@@ -44,8 +44,8 @@ class Noc:
         
         return self.variables() \
                 + self.datatypes() \
-                + properties \
                 + self.noc_init() \
+                + properties \
                 + self.functions() \
                 + self.processes() \
                 + self.composition()
@@ -85,6 +85,7 @@ const int WEST = 1;
 const int EAST = 2;
 const int SOUTH = 3;
 const int LOCAL = 4;
+const int NO_CONNECT = -1;
 """
     
     def datatypes(self):
@@ -236,6 +237,11 @@ function buffer option dequeue(buffer option ls) =
         hd: ls!.hd,
         tl: dequeue(ls!.tl)
     }});
+
+// Returns True if the buffer `ls` contains `id`, otherwise returns false 
+function bool contains(int id, buffer option ls) =
+	if ls == none then false 
+	else contains(id, ls!.tl);
 """
     
     def processes(self):
@@ -243,14 +249,6 @@ function buffer option dequeue(buffer option ls) =
 process GenerateFlits(int id){
     int(0..NOC_MAX_ID) destination;
     if(clk < INJECTION_RATE_NUMERATOR){
-        // Determine a destiantion
-        //palt{
-            // #MODULARIZE by adding a probability for (NOC_MAX_ID - 1) destinations.
-            // #CUSTOMIZE by changing the flit injection pattern. Check router IDs with if-else blocks to make more router specific changes.
-        //	:(1/3): {= destination = 0 =}
-        //	:(1/3): {= destination = 1 =}
-        //	:(1/3): {= destination = 2 =}
-        //};
         {= 
             destination = DiscreteUniform(0, NOC_MAX_ID - 1) 
         =};
