@@ -130,10 +130,11 @@ int[] states = [0, 0, 0, 0];
 
 action tick;
 action sync;
+
 """
     
     def noc_init(self):
-        init: str = "router[] noc = ["
+        init: str = "router[] noc = [\n"
 
         for y in range(self._n):
             for x in range(self._n):
@@ -145,15 +146,17 @@ action sync;
                 id_west = (x - 1) + y * self._n
                 id_east = (x + 1) + y * self._n
                 id_south = x + (y + 1) * self._n
-                
-                if id_north < 0 or id_north >= self.size - 1:
-                    id_north = -1
-                if id_west < 0 or id_west >= self.size - 1:
-                    id_west = -1
-                if id_east < 0 or id_east >= self.size - 1:
-                    id_east = -1
-                if id_south < 0 or id_south >= self.size - 1:
-                    id_south = -1
+
+                if y - 1 < 0:
+                    id_north = "NO_CONNECT"
+                if x - 1 < 0:
+                    id_west = "NO_CONNECT"
+                if x + 1 >= self._n:
+                    id_east = "NO_CONNECT"
+                if y + 1 >= self._n:
+                    id_south = "NO_CONNECT"
+
+                print(f"id: {id}, id_north: {id_north}, id_west: {id_west}, id_east: {id_east}, id_south: {id_south}")
 
                 init += f"""\
 router {{
@@ -169,8 +172,7 @@ total_unserviced: 0,
 used: [false, false, false, false, false],
 thisActivity: 0,
 lastActivity: 0
-}}  
-"""
+}}"""
                 if id < self.size - 1:
                     init += ",\n"
                 else:
