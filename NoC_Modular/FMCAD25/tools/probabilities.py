@@ -29,7 +29,7 @@
 
 import re
 
-def parse_probabilities(output: str) -> list[float]:
+def parse_probabilities(output: str) -> list[tuple[int, float]]:
     """Parses the output of the Modest tool to extract probabilities.
 
     Args:
@@ -45,6 +45,6 @@ def parse_probabilities(output: str) -> list[float]:
     # Sort matches by the number in the property name
     matches.sort(key=lambda x: int(x[0]))
 
-    for _, probability in matches:
-        probabilities.append(float(probability))
+    for cycle, probability in matches:
+        probabilities.append(int(cycle), float(probability))
     return probabilities

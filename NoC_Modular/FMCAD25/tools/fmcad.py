@@ -38,7 +38,7 @@ while clk <= clk_upper:
     probs += parse_probabilities(sim_output)
     clk += block_size
 
-    if max(probs) >= 1.0:
+    if max(probs, key=lambda x: x[1]) >= 1.0:
         break
 
 print(probs)
