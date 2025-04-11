@@ -31,7 +31,7 @@ clk_upper = 10
 block_size = 2
 clk = 0
 
-probs: list[float] = []
+probs: list[tuple[int, float]] = []
 
 while clk <= clk_upper:
     sim_output = modest.simulate(noc.print(NoiseType.RESISTIVE, clk, clk + block_size - 1))
