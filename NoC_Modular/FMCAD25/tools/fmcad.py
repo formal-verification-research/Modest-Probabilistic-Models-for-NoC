@@ -29,11 +29,23 @@ from probabilities import parse_probabilities
 from pathlib import Path
 
 def simulate(*, result_path: Path = Path("results"), size: int, type: NoiseType, clk_upper: int | None, threshold: int = 1, stride : int = 1, block_size : int = 50):
-    noc = Noc(size)
+    # Create result directory
+    result_path.mkdir(parents=True, exist_ok=True)
+    
+    # Initialize the NoC
+    noc = Noc(size, resistive_noise_threshold=threshold, inductive_noise_threshold=threshold)
+
+    # Print starting message
     print(f"Starting {noc._n}x{noc._n} {type.name} simulation...")
     clk = 0
     probs = []
 
+    # The block size is how many properties to count at once. If we have a stride > 1 then
+    # we need to multiply the block size by the stride to get the the correct number of 
+    # properties tested at a single time
+    block_size *= stride
+
+    # Start the sim counter
     start_time = time.time()
 
     # Simulation
@@ -86,7 +98,11 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: NoiseType,
     return probs 
             
 def main():
-    simulate(size=4, type=NoiseType.RESISTIVE, clk_upper=None, stride=2)
+    # 2x2 simulations
+    simulate(size=4, type=NoiseType.RESISTIVE, threshold=1, clk_upper=None, stride=1)
+    simulate(size=4, type=NoiseType.RESISTIVE, threshold=5, clk_upper=None, stride=2)
+    simulate(size=4, type=NoiseType.RESISTIVE, threshold=10, clk_upper=None, stride=5)
+    simulate(size=4, type=NoiseType.RESISTIVE, threshold=20, clk_upper=None, stride=10)
 
 if __name__ == "__main__":
     main()
