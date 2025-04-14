@@ -99,7 +99,7 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: NoiseType,
             
 def noc_2x2_resistive():
     """ 2x2 resistive simulations """
-    simulate(size=4, result_path=Path("results/2x2"), type=NoiseType.RESISTIVE, threshold=1, clk_upper=None, stride=1)
+    # simulate(size=4, result_path=Path("results/2x2"), type=NoiseType.RESISTIVE, threshold=1, clk_upper=None, stride=1)
     simulate(size=4, result_path=Path("results/2x2"), type=NoiseType.RESISTIVE, threshold=5, clk_upper=None, stride=2)
     simulate(size=4, result_path=Path("results/2x2"), type=NoiseType.RESISTIVE, threshold=10, clk_upper=None, stride=5)
     simulate(size=4, result_path=Path("results/2x2"), type=NoiseType.RESISTIVE, threshold=20, clk_upper=None, stride=10)
