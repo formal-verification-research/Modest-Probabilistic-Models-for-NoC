@@ -70,8 +70,7 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: NoiseType,
         probs += parse_probabilities(sim_output)
         clk += block_size
 
-        print(f"Finished block ({lower},{upper}). {probs[:5]}...")
-        print(f"Max: {max(probs, key=lambda x: x[1])[1]}")
+        print(f"  [info]: finished clock cycle block ({lower},{upper}).")
         if max(probs, key=lambda x: x[1])[1] >= 1.0:
             break
     
