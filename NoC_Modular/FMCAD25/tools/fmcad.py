@@ -118,7 +118,7 @@ def noc_2x2_resistive():
 
 def noc_2x2_inductive():
     """ 2x2 inductive simulations """
-    simulate(size=4, result_path=Path("results/2x2"), type=NoiseType.INDUCTIVE, threshold=1, clk_upper=None, stride=5)
+    # simulate(size=4, result_path=Path("results/2x2"), type=NoiseType.INDUCTIVE, threshold=1, clk_upper=None, stride=5)
     simulate(size=4, result_path=Path("results/2x2"), type=NoiseType.INDUCTIVE, threshold=5, clk_upper=None, stride=10)
     simulate(size=4, result_path=Path("results/2x2"), type=NoiseType.INDUCTIVE, threshold=10, clk_upper=None, stride=30)
 
