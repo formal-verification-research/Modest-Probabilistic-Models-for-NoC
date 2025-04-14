@@ -150,9 +150,9 @@ def noc_4x4_inductive():
 
 if __name__ == "__main__":
     # Resistive Simulations
-    noc_2x2_resistive()
-    noc_3x3_resistive()
-    noc_4x4_resistive()
+    # noc_2x2_resistive()
+    # noc_3x3_resistive()
+    # noc_4x4_resistive()
 
     # Inductive Simulations
     noc_2x2_inductive()
