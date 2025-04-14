@@ -47,6 +47,4 @@ def parse_probabilities(output: str) -> list[tuple[int, float]]:
 
     for cycle, probability in matches:
         probabilities.append((int(cycle), float(probability)))
-
-    print(probabilities)
     return probabilities
