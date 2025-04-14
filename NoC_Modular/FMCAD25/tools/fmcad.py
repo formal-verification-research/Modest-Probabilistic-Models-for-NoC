@@ -73,10 +73,10 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: NoiseType,
         pmax = max(probs, key=lambda x: x[1])[1]
 
         print(f"  [info]: finished clock cycle block ({lower},{upper}). P: [", end="")        
-        print(*[p[1] for p in probs[:3]], sep=", ", end="")
+        print(*[f"{p[1]:.3f}" for p in probs[:3]], sep=", ", end="")
         print("...", end="")        
-        print(*[p[1] for p in probs[-3:]], sep=", ", end="")
-        print(f"]. Pmax: {pmax}")
+        print(*[f"{p[1]:.3f}" for p in probs[-3:]], sep=", ", end="")
+        print(f"]. Pmax: {pmax:.3f}")
 
         if pmax >= 1.0:            
             break
