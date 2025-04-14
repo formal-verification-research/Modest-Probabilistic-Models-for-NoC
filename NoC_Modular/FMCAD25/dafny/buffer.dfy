@@ -1,11 +1,11 @@
 include "flit.dfy"
 
-class Buffer<T(0,==)> {
+class Buffer {
   const capacity: nat
   var size: nat
   var head: nat
   var tail: nat
-  var flits: array<Flit<T>>
+  var flits: array<Flit>
 
   ghost predicate Valid()
     reads this
@@ -32,7 +32,7 @@ class Buffer<T(0,==)> {
     this.flits := new Flit[capacity];
   }
 
-  ghost function peekFront(): Flit<T>
+  ghost function peekFront(): Flit
     reads this 
     reads this.flits
     requires Valid() && size > 0
@@ -42,7 +42,7 @@ class Buffer<T(0,==)> {
     this.flits[nextFlitIndex]
   }
 
-  ghost function peekBack(): Flit<T>
+  ghost function peekBack(): Flit
     reads this 
     reads this.flits
     requires Valid() && size > 0
@@ -51,7 +51,7 @@ class Buffer<T(0,==)> {
     this.flits[tail]
   }
 
-  method insert(payload: Flit<T>)
+  method insert(payload: Flit)
     requires Valid() && size < capacity
     modifies this
     modifies this.flits
@@ -67,7 +67,7 @@ class Buffer<T(0,==)> {
     head := if head >= capacity - 1 then 0 else head + 1;
   }
 
-  method extract() returns (f: Flit<T>)
+  method extract() returns (f: Flit)
     requires Valid() && size > 0
     modifies this
     modifies this.flits

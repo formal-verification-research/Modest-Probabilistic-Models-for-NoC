@@ -1,11 +1,11 @@
+include "flit_generation.dfy"
 include "channel.dfy"
 include "neighbor.dfy"
-include "flit_generation.dfy"
 
-class Router<T(0,==)> {
+class Router {
   const ids: array<Id>
   const id: Id
-  var channels: array<Channel<T>>
+  var channels: array<Channel>
   var priority_list: array<Neighbor>
   var serviced: nat 
   var unserviced: nat 
@@ -45,6 +45,7 @@ class Router<T(0,==)> {
   constructor (buffer_capacity: nat, id: Id, ids: seq<Id>)
     requires buffer_capacity > 0
     requires |ids| == 4
+    requires id.Id?
     requires forall i, j :: 
         (&& 0 <= i < |ids|
          && 0 <= j < |ids|
@@ -63,13 +64,13 @@ class Router<T(0,==)> {
     ensures forall c :: c in channels[..] ==> (c.isEmpty() && !c.isServiced())
   {
     this.id := id;
-    this.ids := new Id[ |ids| ](i requires i < |ids| => ids[i]);
+    this.ids := new Id[ |ids| ](i requires 0 <= i < |ids| => ids[i]);
 
     this.this_activity := 0;
     this.last_activity := 0;
 
-    var default_channel := new Channel<T>(buffer_capacity);
-    this.channels := new Channel<T>[5](_ => default_channel);
+    var default_channel := new Channel(buffer_capacity);
+    this.channels := new Channel[5](_ => default_channel);
 
     this.priority_list := new Neighbor[5][North, East, South, West, Local];
 
@@ -81,8 +82,7 @@ class Router<T(0,==)> {
     ensures Valid() 
   {
     if (clk % 10 < 3 && !this.channels[LOCAL].isFull()) {
-      var x: T;
-      var flit := generate_flits(this.ids.Length, this.id.id, x);
+      var flit := generate_flits(this.ids.Length, this.id.id);
       this.channels[LOCAL].insert(flit);
     }
   }

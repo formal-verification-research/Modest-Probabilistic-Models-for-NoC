@@ -1,4 +1,7 @@
 include "id.dfy"
 
-// `T` represents the payload of the flit.
-datatype Flit<T(0,==)> = Flit(destination: Id, payload: T)
+// Originally, Flit was parameterized over `T`, where 
+// `T` represents the payload of the flit. However, I ran 
+// into issues with that so I removed it for the time 
+// being
+datatype Flit = Flit(destination: Id)

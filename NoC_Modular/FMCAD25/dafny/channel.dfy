@@ -1,7 +1,7 @@
 include "buffer.dfy"
 
-class Channel<T(0,==)> {
-  var buffers: Buffer<T>
+class Channel {
+  var buffers: Buffer
   var serviced: bool
 
   ghost predicate Valid()
@@ -45,7 +45,7 @@ class Channel<T(0,==)> {
     serviced
   }
 
-  method insert(f: Flit<T>)
+  method insert(f: Flit)
     requires Valid()
     requires !this.buffers.isFull()
     modifies this
@@ -58,7 +58,7 @@ class Channel<T(0,==)> {
     this.buffers.insert(f);
   }
 
-  method extract() returns (f: Flit<T>)
+  method extract() returns (f: Flit)
     requires Valid()
     requires !this.isServiced()
     requires !this.buffers.isEmpty()
