@@ -36,7 +36,17 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: NoiseType,
     noc = Noc(size, resistive_noise_threshold=threshold, inductive_noise_threshold=threshold)
 
     # Print starting message
+    output_str = f"Simulation parameters:\n"
+    output_str += f"  Size: {noc._n}x{noc._n}\n"
+    output_str += f"  Noise Type: {type.name}\n"
+    output_str += f"  Clock Upper Bound: {clk_upper}\n"
+    output_str += f"  Threshold: {threshold}\n"
+    output_str += f"  Stride: {stride}\n"
+    output_str += f"  Block Size: {block_size}\n"
+    print(output_str, end="")
     print(f"Starting {noc._n}x{noc._n} {type.name} simulation...")
+
+    # Initialize variables
     clk = 0
     probs = []
 
@@ -60,6 +70,8 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: NoiseType,
         probs += parse_probabilities(sim_output)
         clk += block_size
 
+        print(f"Finished block ({lower},{upper}). {probs}")
+
         if max(probs, key=lambda x: x[1])[1] >= threshold:
             break
     
@@ -73,18 +85,12 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: NoiseType,
     minutes, seconds = divmod(rem, 60)
     time_str = "{:0>2}:{:0>2}:{:05.2f}".format(int(hours), int(minutes), seconds)
 
-    output_str = f"Simulation parameters:\n"
-    output_str += f"  Size: {noc._n}x{noc._n}\n"
-    output_str += f"  Noise Type: {type.name}\n"
-    output_str += f"  Clock Upper Bound: {clk_upper}\n"
-    output_str += f"  Threshold: {threshold}\n"
-    output_str += f"  Stride: {stride}\n"
-    output_str += f"  Block Size: {block_size}\n"
+    # Print out the time string
+    print(f"\nSimulation complete. Time elapsed: {time_str}")
+
+    # Write the output string to the output file
     output_str += f"\n"
     output_str += f"Elapsed time: {time_str}\n"
-
-    print(output_str)
-
     with open(timing_file, "w") as f:
         f.write(output_str)
 
@@ -99,7 +105,7 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: NoiseType,
             
 def noc_2x2_resistive():
     """ 2x2 resistive simulations """
-    # simulate(size=4, result_path=Path("results/2x2"), type=NoiseType.RESISTIVE, threshold=1, clk_upper=None, stride=1)
+    simulate(size=4, result_path=Path("results/2x2"), type=NoiseType.RESISTIVE, threshold=1, clk_upper=None, stride=1)
     simulate(size=4, result_path=Path("results/2x2"), type=NoiseType.RESISTIVE, threshold=5, clk_upper=None, stride=2)
     simulate(size=4, result_path=Path("results/2x2"), type=NoiseType.RESISTIVE, threshold=10, clk_upper=None, stride=5)
     simulate(size=4, result_path=Path("results/2x2"), type=NoiseType.RESISTIVE, threshold=20, clk_upper=None, stride=10)
