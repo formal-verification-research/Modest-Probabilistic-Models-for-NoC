@@ -1,9 +1,11 @@
+include "flit_generation.dfy"
 include "channel.dfy"
 include "neighbor.dfy"
 
-class Router<T(0,==)> {
+class Router {
   const ids: array<Id>
-  var channels: array<Channel<T>>
+  const id: Id
+  var channels: array<Channel>
   var priority_list: array<Neighbor>
   var serviced: nat 
   var unserviced: nat 
@@ -17,6 +19,7 @@ class Router<T(0,==)> {
     reads priority_list
     reads ids
   {
+    && this.id.Id?
     // ensures all "channel"-related array lengths are 5, as there are 
     // 5 channels out of the router
     && priority_list.Length == 5
@@ -39,9 +42,10 @@ class Router<T(0,==)> {
              || ids[j] == NoConnect))
   }
 
-  constructor (buffer_capacity: nat, ids: seq<Id>)
+  constructor (buffer_capacity: nat, id: Id, ids: seq<Id>)
     requires buffer_capacity > 0
     requires |ids| == 4
+    requires id.Id?
     requires forall i, j :: 
         (&& 0 <= i < |ids|
          && 0 <= j < |ids|
@@ -50,6 +54,7 @@ class Router<T(0,==)> {
              || ids[i] == NoConnect 
              || ids[j] == NoConnect)
     ensures Valid()
+    ensures this.id == id
     ensures this_activity == 0
     ensures last_activity == 0
     ensures forall i | 0 <= i < |ids| :: this.ids[i] == ids[i]
@@ -58,19 +63,30 @@ class Router<T(0,==)> {
     ensures channels.Length == 5
     ensures forall c :: c in channels[..] ==> (c.isEmpty() && !c.isServiced())
   {
+    this.id := id;
+    this.ids := new Id[ |ids| ](i requires 0 <= i < |ids| => ids[i]);
+
     this.this_activity := 0;
     this.last_activity := 0;
 
-    this.ids := new Id[ |ids| ];
-    var default_channel := new Channel<T>(buffer_capacity);
-    this.channels := new Channel<T>[5](_ => default_channel);
-    this.priority_list := new Neighbor[5][North, East, South, West, Local];
-    this.used := new bool[5][false, false, false, false, false];
+    var default_channel := new Channel(buffer_capacity);
+    this.channels := new Channel[5](_ => default_channel);
 
-    new;
-    
-    forall i | 0 <= i < this.ids.Length { this.ids[i] := ids[i]; }
+    this.priority_list := new Neighbor[5][North, East, South, West, Local];
+
+    this.used := new bool[5][false, false, false, false, false];
   }
+
+  method generateFlits(clk: nat)
+    requires Valid()
+    ensures Valid() 
+  {
+    if (clk % 10 < 3 && !this.channels[LOCAL].isFull()) {
+      var flit := generate_flits(this.ids.Length, this.id.id);
+      this.channels[LOCAL].insert(flit);
+    }
+  }
+
 
   method advanceRouter()
     requires Valid()
