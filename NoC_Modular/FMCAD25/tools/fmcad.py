@@ -70,7 +70,11 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: NoiseType,
         probs += parse_probabilities(sim_output)
         clk += block_size
 
-        print(f"  [info]: finished clock cycle block ({lower},{upper}).")
+        print(f"  [info]: finished clock cycle block ({lower},{upper}). P: [", end="")
+        print(*probs[:3], sep=", ", end="")
+        print("...")
+        print(*probs[-3:], sep=", ", end="")
+        print("]")
         if max(probs, key=lambda x: x[1])[1] >= 1.0:
             break
     
@@ -118,9 +122,9 @@ def noc_2x2_inductive():
 def noc_3x3_resistive():
     """ 3x3 resistive simulations """
     simulate(size=9, result_path=Path("results/3x3"), type=NoiseType.RESISTIVE, threshold=1, clk_upper=None, stride=1)
-    simulate(size=9, result_path=Path("results/3x3"), type=NoiseType.RESISTIVE, threshold=5, clk_upper=None, stride=2)
-    simulate(size=9, result_path=Path("results/3x3"), type=NoiseType.RESISTIVE, threshold=10, clk_upper=None, stride=5)
-    simulate(size=9, result_path=Path("results/3x3"), type=NoiseType.RESISTIVE, threshold=20, clk_upper=None, stride=10)
+    simulate(size=9, result_path=Path("results/3x3"), type=NoiseType.RESISTIVE, threshold=5, clk_upper=None, stride=1)
+    simulate(size=9, result_path=Path("results/3x3"), type=NoiseType.RESISTIVE, threshold=10, clk_upper=None, stride=1)
+    simulate(size=9, result_path=Path("results/3x3"), type=NoiseType.RESISTIVE, threshold=20, clk_upper=None, stride=2)
 
 def noc_3x3_inductive():
     """ 3x3 inductive simulations """
@@ -131,9 +135,9 @@ def noc_3x3_inductive():
 def noc_4x4_resistive():
     """ 4x4 resistive simulations """
     simulate(size=16, result_path=Path("results/4x4"), type=NoiseType.RESISTIVE, threshold=1, clk_upper=None, stride=1)
-    simulate(size=16, result_path=Path("results/4x4"), type=NoiseType.RESISTIVE, threshold=5, clk_upper=None, stride=2)
-    simulate(size=16, result_path=Path("results/4x4"), type=NoiseType.RESISTIVE, threshold=10, clk_upper=None, stride=5)
-    simulate(size=16, result_path=Path("results/4x4"), type=NoiseType.RESISTIVE, threshold=20, clk_upper=None, stride=10)
+    simulate(size=16, result_path=Path("results/4x4"), type=NoiseType.RESISTIVE, threshold=5, clk_upper=None, stride=1)
+    simulate(size=16, result_path=Path("results/4x4"), type=NoiseType.RESISTIVE, threshold=10, clk_upper=None, stride=1)
+    simulate(size=16, result_path=Path("results/4x4"), type=NoiseType.RESISTIVE, threshold=20, clk_upper=None, stride=1)
 
 def noc_4x4_inductive():
     """ 4x4 inductive simulations """
@@ -143,7 +147,7 @@ def noc_4x4_inductive():
 
 if __name__ == "__main__":
     # Resistive Simulations
-    # noc_2x2_resistive()
+    noc_2x2_resistive()
     noc_3x3_resistive()
     noc_4x4_resistive()
 
