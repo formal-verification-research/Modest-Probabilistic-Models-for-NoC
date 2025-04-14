@@ -109,5 +109,45 @@ def noc_2x2_resistive():
     simulate(size=4, result_path=Path("results/2x2"), type=NoiseType.RESISTIVE, threshold=10, clk_upper=None, stride=5)
     simulate(size=4, result_path=Path("results/2x2"), type=NoiseType.RESISTIVE, threshold=20, clk_upper=None, stride=10)
 
+def noc_2x2_inductive():
+    """ 2x2 inductive simulations """
+    simulate(size=4, result_path=Path("results/2x2"), type=NoiseType.INDUCTIVE, threshold=1, clk_upper=None, stride=1)
+    simulate(size=4, result_path=Path("results/2x2"), type=NoiseType.INDUCTIVE, threshold=5, clk_upper=None, stride=2)
+    simulate(size=4, result_path=Path("results/2x2"), type=NoiseType.INDUCTIVE, threshold=10, clk_upper=None, stride=5)
+
+def noc_3x3_resistive():
+    """ 3x3 resistive simulations """
+    simulate(size=9, result_path=Path("results/3x3"), type=NoiseType.RESISTIVE, threshold=1, clk_upper=None, stride=1)
+    simulate(size=9, result_path=Path("results/3x3"), type=NoiseType.RESISTIVE, threshold=5, clk_upper=None, stride=2)
+    simulate(size=9, result_path=Path("results/3x3"), type=NoiseType.RESISTIVE, threshold=10, clk_upper=None, stride=5)
+    simulate(size=9, result_path=Path("results/3x3"), type=NoiseType.RESISTIVE, threshold=20, clk_upper=None, stride=10)
+
+def noc_3x3_inductive():
+    """ 3x3 inductive simulations """
+    simulate(size=9, result_path=Path("results/3x3"), type=NoiseType.INDUCTIVE, threshold=1, clk_upper=None, stride=1)
+    simulate(size=9, result_path=Path("results/3x3"), type=NoiseType.INDUCTIVE, threshold=5, clk_upper=None, stride=2)
+    simulate(size=9, result_path=Path("results/3x3"), type=NoiseType.INDUCTIVE, threshold=10, clk_upper=None, stride=5)
+
+def noc_4x4_resistive():
+    """ 4x4 resistive simulations """
+    simulate(size=16, result_path=Path("results/4x4"), type=NoiseType.RESISTIVE, threshold=1, clk_upper=None, stride=1)
+    simulate(size=16, result_path=Path("results/4x4"), type=NoiseType.RESISTIVE, threshold=5, clk_upper=None, stride=2)
+    simulate(size=16, result_path=Path("results/4x4"), type=NoiseType.RESISTIVE, threshold=10, clk_upper=None, stride=5)
+    simulate(size=16, result_path=Path("results/4x4"), type=NoiseType.RESISTIVE, threshold=20, clk_upper=None, stride=10)
+
+def noc_4x4_inductive():
+    """ 4x4 inductive simulations """
+    simulate(size=16, result_path=Path("results/4x4"), type=NoiseType.INDUCTIVE, threshold=1, clk_upper=None, stride=1)
+    simulate(size=16, result_path=Path("results/4x4"), type=NoiseType.INDUCTIVE, threshold=5, clk_upper=None, stride=2)
+    simulate(size=16, result_path=Path("results/4x4"), type=NoiseType.INDUCTIVE, threshold=10, clk_upper=None, stride=5)
+
 if __name__ == "__main__":
+    # Resistive Simulations
     noc_2x2_resistive()
+    noc_3x3_resistive()
+    noc_4x4_resistive()
+
+    # Inductive Simulations
+    noc_2x2_inductive()
+    noc_3x3_inductive()
+    noc_4x4_inductive()
