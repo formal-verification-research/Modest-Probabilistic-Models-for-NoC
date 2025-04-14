@@ -30,6 +30,7 @@ class Noc:
         return self.type() \
                 + self.variables() \
                 + self.datatypes() \
+                + self.checker_structure() \
                 + self.noc_init() \
                 + self.functions() \
                 + self.processes() \
@@ -46,6 +47,7 @@ class Noc:
         return self.type() \
                 + self.variables() \
                 + self.datatypes() \
+                + self.checker_structure() \
                 + self.noc_init() \
                 + properties \
                 + self.functions() \
@@ -121,18 +123,25 @@ datatype router = {{
 }};
 
 datatype checker = {{bool[] routing}};
-checker[] isRouting = [
-    checker{{routing:[false, false, false, false, false]}},
-    checker{{routing:[false, false, false, false, false]}}, 
-    checker{{routing:[false, false, false, false, false]}},
-    checker{{routing:[false, false, false, false, false]}}];
-int[] states = [0, 0, 0, 0];
 
 action tick;
 action sync;
 
 """
-    
+
+    def checker_structure(self):
+        output = "checker[] isRouting = [\n"
+        for i in range(self.size - 1):
+            output += f"checker{{routing:[false, false, false, false, false]}},\n"
+        output += f"checker{{routing:[false, false, false, false, false]}}];\n\n"
+
+        output += "int[] states = ["
+        for i in range(self.size - 1):
+            output += "0, "
+        output += "0];\n"
+
+        return output
+
     def noc_init(self):
         init: str = "router[] noc = [\n"
 
@@ -158,18 +167,18 @@ action sync;
 
                 init += f"""\
 router {{
-channels: [
-    channel {{serviced: false, isEmpty: true}},
-    channel {{serviced: false, isEmpty: true}},
-    channel {{serviced: false, isEmpty: true}},
-    channel {{serviced: false, isEmpty: true}},
-    channel {{serviced: false, isEmpty: true}}],
-ids: [{id_north}, {id_west}, {id_east}, {id_south}],
-priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
-total_unserviced: 0,
-used: [false, false, false, false, false],
-thisActivity: 0,
-lastActivity: 0
+    channels: [
+        channel {{serviced: false, isEmpty: true}},
+        channel {{serviced: false, isEmpty: true}},
+        channel {{serviced: false, isEmpty: true}},
+        channel {{serviced: false, isEmpty: true}},
+        channel {{serviced: false, isEmpty: true}}],
+    ids: [{id_north}, {id_west}, {id_east}, {id_south}],
+    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
+    total_unserviced: 0,
+    used: [false, false, false, false, false],
+    thisActivity: 0,
+    lastActivity: 0
 }}"""
                 if id < self.size - 1:
                     init += ",\n"
