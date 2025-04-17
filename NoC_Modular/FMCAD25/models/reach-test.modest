@@ -1,0 +1,20 @@
+const int BOUND_I = 10;
+const int BOUND_J = 10;
+
+int(0..BOUND_I) i = 1;
+int(0..BOUND_J) j = 1;
+
+property Reach6 = E<>(i == 6);
+property ReachX = E<>(i > BOUND_I);
+property ReachA = E<>(j > 5 && j != i);
+property PmaxReach5 = Pmax(<> (i == 5));
+property PmaxReach6 = Pmax(<> (i == 6));
+property InvA = A[](j < 5 || j != i);
+property InvX = A[](j <= BOUND_J);
+
+do {
+:: when(i < BOUND_I) tau {= i++ =}
+:: when(j < BOUND_J) tau {= j++ =}
+:: when(i == BOUND_I && j == BOUND_J) tau
+}
+
