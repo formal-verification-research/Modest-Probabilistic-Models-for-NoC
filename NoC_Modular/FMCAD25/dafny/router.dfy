@@ -82,8 +82,8 @@ class Router {
     ensures Valid() 
   {
     if (clk % 10 < 3 && !this.channels[LOCAL].isFull()) {
-      var flit := generate_flits(this.ids.Length, this.id.id);
-      this.channels[LOCAL].insert(flit);
+      // var flit := generate_flits(this.ids.Length, this.id.id);
+      // this.channels[LOCAL].insert(flit);
     }
   }
 
