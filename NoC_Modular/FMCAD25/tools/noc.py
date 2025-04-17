@@ -1,10 +1,11 @@
 import math
 import enum
 
-class NoiseType(enum.Enum):
+class PropertyType(enum.Enum):
     RESISTIVE = 1
     INDUCTIVE = 2
-    BOTH = 3
+    BOTH_RI = 3
+    FUNCTION = 4
 
 class Noc:
     def __init__(self, size: int, *, 
@@ -36,21 +37,24 @@ class Noc:
                 + self.processes() \
                 + self.composition()
     
-    def print(self, noise_type: NoiseType, clk_low: int, clk_high: int, stride: int = 1):
+    def print(self, prop_type: PropertyType, clk_low: int, clk_high: int, stride: int = 1):
         properties: str = ""
-        if noise_type == NoiseType.RESISTIVE or noise_type == NoiseType.BOTH:
+        if prop_type == PropertyType.RESISTIVE or prop_type == PropertyType.BOTH_RI:
             properties += self.resistive_range(clk_low, clk_high, stride)
         
-        if noise_type == NoiseType.INDUCTIVE or noise_type == NoiseType.BOTH:
+        if prop_type == PropertyType.INDUCTIVE or prop_type == PropertyType.BOTH_RI:
             properties += self.inductive_range(clk_low, clk_high, stride)
         
+        if prop_type == PropertyType.FUNCTION:
+            properties += self.never_generates_flits_for_self()
+
         return self.type() \
                 + self.variables() \
                 + self.datatypes() \
                 + self.checker_structure() \
                 + self.noc_init() \
-                + properties \
                 + self.functions() \
+                + properties \
                 + self.processes() \
                 + self.composition()
 
@@ -197,6 +201,14 @@ property resistiveNoiseProbability1RewardBounded{clk}  = Pmax(<>[S(clk_indicator
 property inductiveNoiseProbability1RewardBounded{clk}  = Pmax(<>[S(clk_indicator)<={clk}]  (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
 """
     
+    def never_generates_flits_for_self(self):
+        property = ""
+        for i in range(self.size):
+            property += f"""\
+property neverGeneratesFlitsForSelf{i} = A[](!(contains({i}, noc[{i}].channels[LOCAL].buffer)));
+"""
+        return property
+
     def resistive_range(self, clk_low: int, clk_high: int, stride: int = 1):
         properties: str = ""
         for clk in range(clk_low, clk_high+1, stride):
