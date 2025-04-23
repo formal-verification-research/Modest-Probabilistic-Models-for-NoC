@@ -43,7 +43,7 @@ def time_func(func):
         end_time = time.time()
         elapsed_time = end_time - start_time
         time_str = time_to_str(elapsed_time)
-        print(f"Function '{func.__name__}' took {time_str} to execute.")
+        print(f"[status]: Function '{func.__name__}' took {time_str} to execute.\n")
         return result
     return wrapper
 
