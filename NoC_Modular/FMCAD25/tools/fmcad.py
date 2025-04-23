@@ -63,7 +63,7 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: PropertyTy
     output_str += f"  Stride: {stride}\n"
     output_str += f"  Block Size: {block_size}\n"
     print(output_str, end="")
-    print(f"Starting {noc._n}x{noc._n} {type.name} simulation...")
+    print(f"\nStarting {noc._n}x{noc._n} {type.name} simulation...")
 
     # Initialize variables
     clk = 0
@@ -107,7 +107,7 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: PropertyTy
     time_str = time_to_str(elapsed_time)
 
     # Print out the time string
-    print(f"\nSimulation complete. Time elapsed: {time_str}")
+    print(f"Simulation complete. Time elapsed: {time_str}\n")
 
     # Write the output string to the output file
     output_str += f"\n"
