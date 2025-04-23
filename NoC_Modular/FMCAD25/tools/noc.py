@@ -480,14 +480,14 @@ process UpdateNoiseTracking(int id){
     
     {= 
        // Update inductive noise
-       inductiveNoise += abs(noc[id].lastActivity - noc[id].thisActivity) >= ACTIVITY_THRESH ? 1 : 0,
+       0: inductiveNoise += abs(noc[id].lastActivity - noc[id].thisActivity) >= ACTIVITY_THRESH ? 1 : 0,
        
        // Update resistive noise
-       resistiveNoise += noc[id].thisActivity >= ACTIVITY_THRESH ? 1 : 0,
+       0: resistiveNoise += noc[id].thisActivity >= ACTIVITY_THRESH ? 1 : 0,
        
        // Update trackers for next round
-       noc[id].lastActivity = noc[id].thisActivity,
-       noc[id].thisActivity = 0
+       1: noc[id].lastActivity = noc[id].thisActivity,
+       2: noc[id].thisActivity = 0
     =}
 }
 
