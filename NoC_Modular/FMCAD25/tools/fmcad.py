@@ -28,6 +28,25 @@ import time
 from probabilities import parse_probabilities
 from pathlib import Path
 
+def time_to_str(time: float) -> str:
+    """Format time as HH:MM:SS"""
+    hours, rem = divmod(time, 3600)
+    minutes, seconds = divmod(rem, 60)
+    time_str = "{:0>2}:{:0>2}:{:05.2f}".format(int(hours), int(minutes), seconds)
+    return time_str
+
+def time_func(func):
+    """Decorator to time a function's execution."""
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        time_str = time_to_str(elapsed_time)
+        print(f"Function '{func.__name__}' took {time_str} to execute.")
+        return result
+    return wrapper
+
 def simulate(*, result_path: Path = Path("results"), size: int, type: PropertyType, clk_upper: int | None, threshold: int = 1, stride : int = 1, block_size : int = 50):
     # Create result directory
     result_path.mkdir(parents=True, exist_ok=True)
@@ -85,11 +104,7 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: PropertyTy
     end_time = time.time()
     elapsed_time = end_time - start_time
     timing_file = result_path / Path(f"noc_{noc._n}x{noc._n}_{type.name.lower()}_noise_threshold_{threshold}_stride_{stride}_block_size_{block_size}.time.txt")
-
-    # Format elapsed time as HH:MM:SS
-    hours, rem = divmod(elapsed_time, 3600)
-    minutes, seconds = divmod(rem, 60)
-    time_str = "{:0>2}:{:0>2}:{:05.2f}".format(int(hours), int(minutes), seconds)
+    time_str = time_to_str(elapsed_time)
 
     # Print out the time string
     print(f"\nSimulation complete. Time elapsed: {time_str}")
@@ -108,20 +123,23 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: PropertyTy
         writer.writerows(probs)
 
     return probs 
-            
+
+@time_func
 def noc_2x2_resistive():
     """ 2x2 resistive simulations """
     simulate(size=4, result_path=Path("results/2x2"), type=PropertyType.RESISTIVE, threshold=1, clk_upper=None, stride=1)
     simulate(size=4, result_path=Path("results/2x2"), type=PropertyType.RESISTIVE, threshold=5, clk_upper=None, stride=2)
-    simulate(size=4, result_path=Path("results/2x2"), type=PropertyType.RESISTIVE, threshold=10, clk_upper=None, stride=5)
-    simulate(size=4, result_path=Path("results/2x2"), type=PropertyType.RESISTIVE, threshold=20, clk_upper=None, stride=10)
+    simulate(size=4, result_path=Path("results/2x2"), type=PropertyType.RESISTIVE, threshold=10, clk_upper=None, stride=4)
+    simulate(size=4, result_path=Path("results/2x2"), type=PropertyType.RESISTIVE, threshold=20, clk_upper=None, stride=7)
 
+@time_func
 def noc_2x2_inductive():
     """ 2x2 inductive simulations """
-    # simulate(size=4, result_path=Path("results/2x2"), type=PropertyType.INDUCTIVE, threshold=1, clk_upper=None, stride=5)
-    simulate(size=4, result_path=Path("results/2x2"), type=PropertyType.INDUCTIVE, threshold=5, clk_upper=None, stride=10)
-    simulate(size=4, result_path=Path("results/2x2"), type=PropertyType.INDUCTIVE, threshold=10, clk_upper=None, stride=30)
+    simulate(size=4, result_path=Path("results/2x2"), type=PropertyType.INDUCTIVE, threshold=1, clk_upper=None, stride=6)
+    simulate(size=4, result_path=Path("results/2x2"), type=PropertyType.INDUCTIVE, threshold=5, clk_upper=None, stride=12)
+    simulate(size=4, result_path=Path("results/2x2"), type=PropertyType.INDUCTIVE, threshold=10, clk_upper=None, stride=36)
 
+@time_func
 def noc_3x3_resistive():
     """ 3x3 resistive simulations """
     simulate(size=9, result_path=Path("results/3x3"), type=PropertyType.RESISTIVE, threshold=1, clk_upper=None, stride=1)
@@ -129,12 +147,14 @@ def noc_3x3_resistive():
     simulate(size=9, result_path=Path("results/3x3"), type=PropertyType.RESISTIVE, threshold=10, clk_upper=None, stride=1)
     simulate(size=9, result_path=Path("results/3x3"), type=PropertyType.RESISTIVE, threshold=20, clk_upper=None, stride=1)
 
+@time_func
 def noc_3x3_inductive():
     """ 3x3 inductive simulations """
     simulate(size=9, result_path=Path("results/3x3"), type=PropertyType.INDUCTIVE, threshold=1, clk_upper=None, stride=1)
     simulate(size=9, result_path=Path("results/3x3"), type=PropertyType.INDUCTIVE, threshold=5, clk_upper=None, stride=2)
-    simulate(size=9, result_path=Path("results/3x3"), type=PropertyType.INDUCTIVE, threshold=10, clk_upper=None, stride=5)
+    simulate(size=9, result_path=Path("results/3x3"), type=PropertyType.INDUCTIVE, threshold=10, clk_upper=None, stride=4)
 
+@time_func
 def noc_4x4_resistive():
     """ 4x4 resistive simulations """
     simulate(size=16, result_path=Path("results/4x4"), type=PropertyType.RESISTIVE, threshold=1, clk_upper=None, stride=1)
@@ -142,17 +162,18 @@ def noc_4x4_resistive():
     simulate(size=16, result_path=Path("results/4x4"), type=PropertyType.RESISTIVE, threshold=10, clk_upper=None, stride=1)
     simulate(size=16, result_path=Path("results/4x4"), type=PropertyType.RESISTIVE, threshold=20, clk_upper=None, stride=1)
 
+@time_func
 def noc_4x4_inductive():
     """ 4x4 inductive simulations """
     simulate(size=16, result_path=Path("results/4x4"), type=PropertyType.INDUCTIVE, threshold=1, clk_upper=None, stride=1)
     simulate(size=16, result_path=Path("results/4x4"), type=PropertyType.INDUCTIVE, threshold=5, clk_upper=None, stride=2)
-    simulate(size=16, result_path=Path("results/4x4"), type=PropertyType.INDUCTIVE, threshold=10, clk_upper=None, stride=5)
+    simulate(size=16, result_path=Path("results/4x4"), type=PropertyType.INDUCTIVE, threshold=10, clk_upper=None, stride=4)
 
 if __name__ == "__main__":
     # Resistive Simulations
-    # noc_2x2_resistive()
-    # noc_3x3_resistive()
-    # noc_4x4_resistive()
+    noc_2x2_resistive()
+    noc_3x3_resistive()
+    noc_4x4_resistive()
 
     # Inductive Simulations
     noc_2x2_inductive()
