@@ -9,7 +9,7 @@ class PropertyType(enum.Enum):
     BOTH_RI = 3
     FUNCTION = 4
 
-def add_newline(func: Callable[..., str]) -> Callable[..., str]:
+def add_info(func: Callable[..., str]) -> Callable[..., str]:
     """
     A decorator that appends a newline character to the end of a string returned by a function.
 
@@ -84,11 +84,11 @@ class Noc:
                 + self.processes() \
                 + self.composition()
 
-    @add_newline
+    @add_info
     def type(self) -> str:
         return "option \"dtmc\";\n"
 
-    @add_newline
+    @add_info
     def variables(self) -> str:
         return f"""\
 //----- VARIABLES -----
@@ -127,7 +127,7 @@ const int LOCAL = 4;
 const int NO_CONNECT = -1;
 """
     
-    @add_newline
+    @add_info
     def datatypes(self) -> str:
         return f"""\
 datatype buffer = {{
@@ -162,7 +162,7 @@ action sync;
 
 """
 
-    @add_newline
+    @add_info
     def checker_structure(self) -> str:
         output = "checker[] isRouting = [\n"
         for i in range(self.size - 1):
@@ -176,7 +176,7 @@ action sync;
 
         return output
 
-    @add_newline
+    @add_info
     def noc_init(self) -> str:
         init: str = "router[] noc = [\n"
 
@@ -252,7 +252,7 @@ property neverGeneratesFlitsForSelf{i} = A[](!(contains({i}, noc[{i}].channels[L
             properties += self.inductive_noise(clk)
         return properties
     
-    @add_newline
+    @add_info
     def functions(self) -> str:
         return f"""\
 // Calculate length of list
@@ -302,7 +302,7 @@ function bool contains(int id, buffer option ls) =
 	else contains(id, ls!.tl);
 """
     
-    @add_newline
+    @add_info
     def processes(self) -> str:
         return """\
 process GenerateFlits(int id){
@@ -554,7 +554,7 @@ process Clock(){
 }
 """
 
-    @add_newline
+    @add_info
     def composition(self) -> str:
         composition: str = "par {\n    :: Clock()\n"
         for i in range(self.size):
