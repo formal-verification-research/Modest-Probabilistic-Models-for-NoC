@@ -305,20 +305,20 @@ function bool contains(int id, buffer option ls) =
     @add_info
     def processes(self) -> str:
         return """\
-process GenerateFlits(int id){
+process GenerateFlits(int id) {
     int(0..NOC_MAX_ID) destination;
-    if(clk < INJECTION_RATE_NUMERATOR){
+    if (clk < INJECTION_RATE_NUMERATOR) {
         {= 
             destination = DiscreteUniform(0, NOC_MAX_ID - 1) 
         =};
 
         // Make sure it is not this router and add it to the local buffer.
-        if(destination >= id){
+        if (destination >= id) {
             {=
                 noc[id].channels[LOCAL].buffer = enqueue(destination + 1, noc[id].channels[LOCAL].buffer)
             =}
         }
-        else{
+        else {
             {=
                 noc[id].channels[LOCAL].buffer = enqueue(destination, noc[id].channels[LOCAL].buffer)
             =}

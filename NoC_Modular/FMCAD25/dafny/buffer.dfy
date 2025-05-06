@@ -7,7 +7,7 @@ class Buffer {
   var tail: nat
   var flits: array<Flit>
 
-  ghost predicate Valid()
+  predicate Valid()
     reads this
   {
     && size <= capacity
@@ -32,7 +32,7 @@ class Buffer {
     this.flits := new Flit[capacity];
   }
 
-  ghost function peekFront(): Flit
+  function peekFront(): Flit
     reads this 
     reads this.flits
     requires Valid() && size > 0
@@ -42,7 +42,7 @@ class Buffer {
     this.flits[nextFlitIndex]
   }
 
-  ghost function peekBack(): Flit
+  function peekBack(): Flit
     reads this 
     reads this.flits
     requires Valid() && size > 0

@@ -4,7 +4,7 @@ class Channel {
   var buffers: Buffer
   var serviced: bool
 
-  ghost predicate Valid()
+  predicate Valid()
     reads this 
     reads this.buffers
   {
@@ -72,6 +72,14 @@ class Channel {
   {
     this.serviced := true;
     f := this.buffers.extract();
+  }
+
+  method peekBack() returns (f: Flit)
+    requires Valid()
+    requires this.buffers.size > 0
+    ensures Valid()
+  {
+    f := this.buffers.peekBack();
   }
 
   method resetServiced()
