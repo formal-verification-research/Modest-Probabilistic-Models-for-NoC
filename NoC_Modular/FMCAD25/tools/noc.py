@@ -150,8 +150,8 @@ datatype router = {{
     int(0..4) serviced_index,
     int(0..4) unserviced_index,
     int(0..5) total_unserviced,
-    int thisActivity,
-    int lastActivity,
+    int(0..) thisActivity,
+    int(0..) lastActivity,
     bool[] used
 }};
 
@@ -203,17 +203,20 @@ action sync;
                 init += f"""\
 router {{
     channels: [
-        channel {{serviced: false, isEmpty: true}},
-        channel {{serviced: false, isEmpty: true}},
-        channel {{serviced: false, isEmpty: true}},
-        channel {{serviced: false, isEmpty: true}},
-        channel {{serviced: false, isEmpty: true}}],
+        channel {{buffer: none, serviced: false, isEmpty: true, isFull: false}},
+        channel {{buffer: none, serviced: false, isEmpty: true, isFull: false}},
+        channel {{buffer: none, serviced: false, isEmpty: true, isFull: false}},
+        channel {{buffer: none, serviced: false, isEmpty: true, isFull: false}},
+        channel {{buffer: none, serviced: false, isEmpty: true, isFull: false}}],
     ids: [{id_north}, {id_west}, {id_east}, {id_south}],
     priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
+    priority_list_temp: [NORTH, EAST, SOUTH, WEST, LOCAL],
+    serviced_index: 0,
+    unserviced_index: 0,
     total_unserviced: 0,
-    used: [false, false, false, false, false],
     thisActivity: 0,
-    lastActivity: 0
+    lastActivity: 0,
+    used: [false, false, false, false, false]
 }}"""
                 if id < self.size - 1:
                     init += ",\n"
