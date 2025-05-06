@@ -207,16 +207,14 @@ property neverGeneratesFlitsForSelf3 = A[](!(contains(3, noc[3].channels[LOCAL].
 ***********/
 process GenerateFlits(int id) {
     int(0..NOC_MAX_ID) destination;
-    if (clk < INJECTION_RATE_NUMERATOR) {
-        {= 
-            destination = DiscreteUniform(0, NOC_MAX_ID - 1) 
-        =};
 
+    if (clk < INJECTION_RATE_NUMERATOR) {
         // Add the new flit to the local buffer
         // If the destination is greater than or equal to the ID, we shift it
         // up by one to exclude the possiblity of sending a flit to ourselves
         {=
-            noc[id].channels[LOCAL].buffer = 
+            0: destination = DiscreteUniform(0, NOC_MAX_ID - 1),
+            1: noc[id].channels[LOCAL].buffer = 
                 enqueue(destination >= id ? 
                             destination + 1 : 
                             destination, noc[id].channels[LOCAL].buffer)
@@ -227,19 +225,29 @@ process GenerateFlits(int id) {
     }
 }
 
-process PrepChannel(int id, int ch){
-    {=
-       noc[id].channels[ch].isEmpty = len(noc[id].channels[ch].buffer) == 0,
-       noc[id].channels[ch].isFull = isBufferFull(noc[id].channels[ch].buffer)
-    =}
-}
-
 process PrepRouter(int id){
-    PrepChannel(id, 0);
-    PrepChannel(id, 1);
-    PrepChannel(id, 2);
-    PrepChannel(id, 3);
-    PrepChannel(id, 4)
+    // Prep all the channels
+    {=
+        // North Channel (0)
+        noc[id].channels[NORTH].isEmpty = len(noc[id].channels[NORTH].buffer) == 0,
+        noc[id].channels[NORTH].isFull = isBufferFull(noc[id].channels[NORTH].buffer),
+
+        // WEST Channel (1)
+        noc[id].channels[WEST].isEmpty = len(noc[id].channels[WEST].buffer) == 0,
+        noc[id].channels[WEST].isFull = isBufferFull(noc[id].channels[WEST].buffer),
+
+        // East Channel (2)
+        noc[id].channels[EAST].isEmpty = len(noc[id].channels[EAST].buffer) == 0,
+        noc[id].channels[EAST].isFull = isBufferFull(noc[id].channels[EAST].buffer),
+
+        // South Channel (3)
+        noc[id].channels[SOUTH].isEmpty = len(noc[id].channels[SOUTH].buffer) == 0,
+        noc[id].channels[SOUTH].isFull = isBufferFull(noc[id].channels[SOUTH].buffer),
+
+        // Local Channel (4)
+        noc[id].channels[LOCAL].isEmpty = len(noc[id].channels[LOCAL].buffer) == 0,
+        noc[id].channels[LOCAL].isFull = isBufferFull(noc[id].channels[LOCAL].buffer)
+    =}
 }
 
 // Send flit to northern router. src and dst are channels (ie NORTH, WEST, EAST, SOUTH, LOCAL), NOT the actual router ids!
