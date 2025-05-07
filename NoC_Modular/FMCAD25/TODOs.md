@@ -28,3 +28,16 @@
    - Check small models
      - Basic test: passed. [ctl_dist_test.modest](./models/ctl_dist_test.modest)
    - Based off results, email Arnd
+
+## Findings
+
+### Old Model Comparison
+
+Why didn't previous models run into this issue? On further inspection of the models
+used to validate the router, I realized that they still had the clock bound in place
+of up to 20 cycles. By moving away from using the bounded clocks style found in Jonah's
+thesis and instead using reward bounded properties, we effectively remove the upper
+limit for clock cycles which in turn must allow for a much larger state space.
+
+Some more research will need to be done as to _why_ this is exactly, but that's my
+hypothesis for now.
