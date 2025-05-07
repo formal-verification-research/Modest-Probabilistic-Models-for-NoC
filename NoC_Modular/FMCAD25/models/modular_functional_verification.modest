@@ -479,7 +479,7 @@ process AdvanceRouter(int id){
 	AdvanceChannel(id, noc[id].priority_list[4])
 }
 
-process UpdatePriorityList(int id, int i){
+process UpdatePriorityList(int id, int i) {
 	if(noc[id].channels[noc[id].priority_list[i]].serviced){
 		{=
 			0: noc[id].priority_list_temp[noc[id].total_unserviced + noc[id].serviced_index] = noc[id].priority_list[i],

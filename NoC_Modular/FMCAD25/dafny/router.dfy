@@ -1,6 +1,27 @@
-include "flit_generation.dfy"
+// include "flit_generation.dfy"
 include "channel.dfy"
 include "neighbor.dfy"
+
+method discrete_uniform(min: int, max: int) returns (val: int)
+  requires min <= max 
+  ensures {:axiom} min <= val <= max
+
+method generate_flits(this_id: nat, max_id: nat) returns (f: Flit)
+  requires 0 <= this_id <= max_id
+  requires 1 <= max_id
+  ensures f.destination.Id?
+  ensures 0 <= f.destination.id <= max_id && f.destination.id != this_id
+{
+  var destination := discrete_uniform(0, max_id - 1);
+
+  var dest := if destination >= this_id 
+       then destination + 1 
+       else destination;
+  
+  f := Flit(Id(dest));
+
+  return f;
+}
 
 class Router {
   const ids: array<Id>
@@ -79,11 +100,15 @@ class Router {
 
   method generateFlits(clk: nat)
     requires Valid()
+    modifies this
+    modifies this.channels
     ensures Valid() 
   {
     if (clk % 10 < 3 && !this.channels[LOCAL].isFull()) {
-      // var flit := generate_flits(this.ids.Length, this.id.id);
-      // this.channels[LOCAL].insert(flit);
+
+      assume {:axiom} this.id.id <= this.ids.Length;
+      var flit := generate_flits(this.id.id, this.ids.Length);
+      this.channels[LOCAL].insert(flit);
     }
   }
 
