@@ -58,8 +58,6 @@ datatype router = {
     int(0..4) serviced_index,
     int(0..4) unserviced_index,
     int(0..5) total_unserviced,
-    int(0..) thisActivity,
-    int(0..) lastActivity,
     bool[] used
 };
 
@@ -118,8 +116,6 @@ router { // R4
     serviced_index: 0,
     unserviced_index: 0,
     total_unserviced: 0,
-    thisActivity: 0,
-    lastActivity: 0,
     used: [false, false, false, false, false]
 },
 router { // R5
@@ -285,10 +281,7 @@ process Send(int id, int ch, int dir){
 
             // Mark that output as used and that channel as serviced
             4: noc[id].used[dir] = true,
-            4: noc[id].channels[ch].serviced = true,
-
-            // Incrament the count for buffers serviced in this cycle
-            4: noc[id].thisActivity++
+            4: noc[id].channels[ch].serviced = true
         =}
     }
     // Otherwise, increment total unserviced buffers
@@ -339,9 +332,6 @@ process AdvanceChannel(int id, int ch){
             // Mark the channel as serviced and used
             noc[id].channels[ch].serviced = !noc[id].used[LOCAL],
             noc[id].used[LOCAL] = !noc[id].used[LOCAL],
-
-            // Incrament the count for buffers serviced in this cycle
-            noc[id].thisActivity = !noc[id].used[LOCAL] ? noc[id].thisActivity + 1 : noc[id].thisActivity,
 
             // Remove this flit. It has reached its destination
             noc[id].channels[ch].buffer = !noc[id].used[LOCAL] ? dequeue(noc[id].channels[ch].buffer) : noc[id].channels[ch].buffer,
@@ -412,21 +402,6 @@ process UpdatePiority(int id) {
     =}
 }
 
-// Update the noise tracking variables for this router.
-process UpdateNoiseTracking(int id) {
-    {= 
-       // Update inductive noise
-       0: inductiveNoise += abs(noc[id].lastActivity - noc[id].thisActivity) >= ACTIVITY_THRESH ? 1 : 0,
-       
-       // Update resistive noise
-       0: resistiveNoise += noc[id].thisActivity >= ACTIVITY_THRESH ? 1 : 0,
-       
-       // Update trackers for next round
-       1: noc[id].lastActivity = noc[id].thisActivity,
-       2: noc[id].thisActivity = 0
-    =}
-}
-
 // Process for behavior
 process RouterBehavior(int id) {
     // Run
@@ -440,8 +415,8 @@ process RouterBehavior(int id) {
         AdvanceRouter(id);
         // Update the priority list
         UpdatePiority(id);
-        // Update resistive and inductive values
-        UpdateNoiseTracking(id);
+
+        // no noise tracking because we are abstracting that away :)
 
         tick;
         // Generate new flits
