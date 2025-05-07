@@ -6,6 +6,13 @@ We have an issue with state space explosion, and so I thought to fix it I might 
 
 ## Results With Single Input Values
 
+The enqueue method looks like this:
+
+```modest
+enqueue(1, list) // list
+enqueue(arr, 1) // array
+```
+
 I created a test where two parallel processes randomly enqueued or dequeued the value of 1 into the array. The results of the test showed that `array` required less states but more memory, and `list` was the opposite.
 
 - Array:
@@ -27,6 +34,13 @@ I created a test where two parallel processes randomly enqueued or dequeued the 
   ```
 
 ## Results with DiscreteUniform input values
+
+I changed the enqueue method to look like this:
+
+```modest
+enqueue(DiscreteUniform(0, 9), list) // list
+enqueue(arr, DiscreteUniform(0, 9)) // array
+```
 
 - Array:
   
