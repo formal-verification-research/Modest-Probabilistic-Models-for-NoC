@@ -19,7 +19,7 @@ const int INJECTION_RATE_DENOMINATOR =10;
 int(0..INJECTION_RATE_DENOMINATOR) clk = 0;
 transient int(0..1) clk_indicator;
 
-const int MAX_CLK_CYCLES = 1;
+const int MAX_CLK_CYCLES = 20;
 int(0..MAX_CLK_CYCLES) global_clk_count = 0;
 
 // #CUSTOMIZE this is the upper threshoold for noise detected in the system.
