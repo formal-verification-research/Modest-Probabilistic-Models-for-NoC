@@ -460,7 +460,6 @@ process Router(int id) {
 
 // For syncing parallel processes
 action nextClockCycle;
-const int CLK_MAX = 0;
 process Clock() {
     nextClockCycle {= clk = (clk + 1) % INJECTION_RATE_DENOMINATOR, clk_indicator = 1 =};
     Clock()
