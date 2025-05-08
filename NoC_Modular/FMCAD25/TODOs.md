@@ -46,3 +46,9 @@ hypothesis for now.
 
 - BDDs and lists
 - Models with fixed size state
+
+## To work on
+
+- Try to look for variables that are not reset after a router is used. My thought is
+  that if all the buffers are emptied out after 9 clock cycles, the router should
+  basically be in it's initial state, but clearly it isn't. We'll have to see why.
