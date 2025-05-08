@@ -41,3 +41,8 @@ limit for clock cycles which in turn must allow for a much larger state space.
 
 Some more research will need to be done as to _why_ this is exactly, but that's my
 hypothesis for now.
+
+## To Add to Paper
+
+- BDDs and lists
+- Models with fixed size state
