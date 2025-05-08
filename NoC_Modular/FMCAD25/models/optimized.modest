@@ -445,8 +445,14 @@ process UpdatePiority(int id) {
 
     updatePriority {=
         // Make our next priority list the current priority list
-        0: noc[id].priority_list = noc[id].total_unserviced != 5 ?
-            noc[id].priority_list_temp : [NORTH, EAST, SOUTH, WEST, LOCAL],
+        // However, if all of our channels are empty, then just reset
+        // the priority list. This helps with the state space
+        0: noc[id].priority_list = (noc[id].channels[0].isEmpty &&
+                                    noc[id].channels[1].isEmpty &&
+                                    noc[id].channels[2].isEmpty &&
+                                    noc[id].channels[3].isEmpty &&
+                                    noc[id].channels[4].isEmpty) ?
+                                    [NORTH, EAST, SOUTH, WEST, LOCAL] : noc[id].priority_list_temp,
 
         // Reset the used and serviced variables
         1: noc[id].channels[0].serviced = false,
