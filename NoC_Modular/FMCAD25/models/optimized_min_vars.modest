@@ -46,7 +46,7 @@ const int SOUTH = 3;
 const int LOCAL = 4;
 const int NO_CONNECT = -1;
 
-// ----- Datatypes -----
+// ----- Functional Datatypes -----
 
 datatype buffer = {
     int(0..NOC_MAX_ID) hd,
@@ -70,6 +70,14 @@ datatype router = {
     int(0..5) total_unserviced,
     bool[] used
 };
+
+// ----- Verification Datatypes -----
+
+datatype sendCounter = {
+    int(0..2)[] counts
+};
+
+// ----- Variables -----
 
 router[] noc = [
 router {
@@ -133,7 +141,21 @@ router {
     used: [false, false, false, false, false]
 }];
 
-// ----- Boolean Algebra Functions
+sendCounter[] sendCounts = [
+    sendCounter{counts:[0, 0, 0, 0, 0, 0]},
+    sendCounter{counts:[0, 0, 0, 0, 0, 0]},
+    sendCounter{counts:[0, 0, 0, 0, 0, 0]},
+    sendCounter{counts:[0, 0, 0, 0, 0, 0]}
+];
+
+// ----- Integer functions
+
+// Saturating addition
+function int sat_add(int l, int r, int max) =
+    if (l + r) > max then max
+    else l + r;
+
+// ----- Boolean Algebra Functions -----
 
 // Boolean implication (l ==> r)
 function bool implies(bool l, bool r) = (!l) || r;
@@ -300,6 +322,31 @@ property r3BufferSizeAlwaysValidSouth = A[](len(noc[3].channels[SOUTH].buffer) <
 property r3BufferSizeAlwaysValidWest  = A[](len(noc[3].channels[WEST].buffer) <= BUFFER_LENGTH);
 property r3BufferSizeAlwaysValidLocal = A[](len(noc[3].channels[LOCAL].buffer) <= BUFFER_LENGTH);
 
+// Ensure only one flit is sent per channel per clock cycle
+property r0SendAtMostOnceNorth = A[](sendCounts[0].counts[NORTH] <= 1);
+property r0SendAtMostOnceWest  = A[](sendCounts[0].counts[WEST]  <= 1);
+property r0SendAtMostOnceEast  = A[](sendCounts[0].counts[EAST]  <= 1);
+property r0SendAtMostOnceSouth = A[](sendCounts[0].counts[SOUTH] <= 1);
+property r0SendAtMostOnceLocal = A[](sendCounts[0].counts[LOCAL] <= 1);
+
+property r1SendAtMostOnceNorth = A[](sendCounts[1].counts[NORTH] <= 1);
+property r1SendAtMostOnceWest  = A[](sendCounts[1].counts[WEST]  <= 1);
+property r1SendAtMostOnceEast  = A[](sendCounts[1].counts[EAST]  <= 1);
+property r1SendAtMostOnceSouth = A[](sendCounts[1].counts[SOUTH] <= 1);
+property r1SendAtMostOnceLocal = A[](sendCounts[1].counts[LOCAL] <= 1);
+
+property r2SendAtMostOnceNorth = A[](sendCounts[2].counts[NORTH] <= 1);
+property r2SendAtMostOnceWest  = A[](sendCounts[2].counts[WEST]  <= 1);
+property r2SendAtMostOnceEast  = A[](sendCounts[2].counts[EAST]  <= 1);
+property r2SendAtMostOnceSouth = A[](sendCounts[2].counts[SOUTH] <= 1);
+property r2SendAtMostOnceLocal = A[](sendCounts[2].counts[LOCAL] <= 1);
+
+property r3SendAtMostOnceNorth = A[](sendCounts[3].counts[NORTH] <= 1);
+property r3SendAtMostOnceWest  = A[](sendCounts[3].counts[WEST]  <= 1);
+property r3SendAtMostOnceEast  = A[](sendCounts[3].counts[EAST]  <= 1);
+property r3SendAtMostOnceSouth = A[](sendCounts[3].counts[SOUTH] <= 1);
+property r3SendAtMostOnceLocal = A[](sendCounts[3].counts[LOCAL] <= 1);
+
 // ----- Processes -----
 // General guidance for processes is that we want as much synchronized assignments to happen
 // as possible. A digital system is by default a synchronous system, so we don't typically
@@ -357,7 +404,15 @@ process PrepRouter(int id) {
 
         // Local Channel (4)
         noc[id].channels[LOCAL].isEmpty = len(noc[id].channels[LOCAL].buffer) == 0,
-        noc[id].channels[LOCAL].isFull = isBufferFull(noc[id].channels[LOCAL].buffer)
+        noc[id].channels[LOCAL].isFull = isBufferFull(noc[id].channels[LOCAL].buffer),
+
+        // #VERIFICATION
+        // Reset send counts
+        sendCounts[id].counts[NORTH] = 0,
+        sendCounts[id].counts[WEST] = 0,
+        sendCounts[id].counts[EAST] = 0,
+        sendCounts[id].counts[SOUTH] = 0,
+        sendCounts[id].counts[LOCAL] = 0
     =}
 }
 
@@ -368,6 +423,10 @@ process Send(int id, int ch, int dir) {
     // If the destination is not full, and the channel has not been used in this cycle, then service the buffer
     if(!noc[noc[id].ids[dir]].channels[getDestinationChannel(dir)].isFull && !noc[id].used[dir]){
         advanceChannelSend {=
+            // #VERIFICATION
+            // Increment the send counts using a saturating count
+            0: sendCounts[id].counts[ch] = sat_add(sendCounts[id].counts[ch], 1, 2),
+
             // Add flit to destination buffer
             1: noc[noc[id].ids[dir]].channels[getDestinationChannel(dir)].buffer =
                 enqueue(peekFront(noc[id].channels[ch].buffer), noc[noc[id].ids[dir]].channels[getDestinationChannel(dir)].buffer),
