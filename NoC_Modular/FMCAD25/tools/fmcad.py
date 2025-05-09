@@ -85,7 +85,7 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: PropertyTy
         if clk_upper is not None and upper > clk_upper:
             upper = clk_upper
             
-        sim_output = modest.simulate(noc.print(type, lower, upper, stride))
+        sim_output = modest.simulate(noc.print(type, clk_low=lower, clk_high=upper, stride=stride))
         probs += parse_probabilities(sim_output)
         clk += block_size
 
