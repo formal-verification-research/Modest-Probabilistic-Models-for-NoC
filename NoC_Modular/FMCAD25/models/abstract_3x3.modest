@@ -546,7 +546,7 @@ process Router(int id) {
 action nextClockCycle;
 process Clock() {
     nextClockCycle {= clk = (clk + 1) % INJECTION_RATE_DENOMINATOR, clk_indicator = 1 =};
-    if (clk >= 1) {
+    if (clk >= 2) {
         stop
     } else {
         Clock()
