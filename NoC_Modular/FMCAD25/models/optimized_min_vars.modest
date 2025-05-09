@@ -301,7 +301,18 @@ property r3BufferSizeAlwaysValidSouth = A[](len(noc[3].channels[SOUTH].buffer) <
 property r3BufferSizeAlwaysValidWest  = A[](len(noc[3].channels[WEST].buffer) <= BUFFER_LENGTH);
 property r3BufferSizeAlwaysValidLocal = A[](len(noc[3].channels[LOCAL].buffer) <= BUFFER_LENGTH);
 
+// ----- Processes -----
+// General guidance for processes is that we want as much synchronized assignments to happen
+// as possible. A digital system is by default a synchronous system, so we don't typically
+// need worry about interleavings for our design. To accomplish this most processes also 
+// have an associated action with the same name that synchronizes assignments between
+// routers within those processes.
 
+// #CUSTOMIZE
+// This method is how flits are generated for the NoC. To change the flit injection pattern
+// change this method.
+// Flits are injected into a router's LOCAL buffer and then the router automatically routes
+// the flits to their destination.
 action generateFlits;
 process GenerateFlits(int id) {
     int(0..NOC_MAX_ID) destination;
@@ -319,10 +330,12 @@ process GenerateFlits(int id) {
         =}
     }
     else {
-        generateFlits // replaced tau to remove silly tau actions
+        generateFlits // Take this action instead of tau for better synchronization
     }
 }
 
+// Set the `isEmpty` and `isFull` flags for each channel based off the current
+// state of the buffers in the channel
 action prepRouter;
 process PrepRouter(int id) {
     // Prep all the channels
@@ -349,7 +362,7 @@ process PrepRouter(int id) {
     =}
 }
 
-// Send flit to northern router. src and dst are channels (ie NORTH, WEST, EAST, SOUTH, LOCAL), NOT the actual router ids!
+// Send a flit from Router `id` across channel `ch` in the specified direction `dir`
 process Send(int id, int ch, int dir) {
     advanceChannel;
 
@@ -376,7 +389,7 @@ process Send(int id, int ch, int dir) {
     }
 }
 
-// Advance flits to respective buffers
+// Determine which direction to send the front-most flit in channel `ch` of router `id`
 process AdvanceFlits(int id, int ch) {
     // If flit needs to stay on this row
     if(getColumnShift(id, peekFront(noc[id].channels[ch].buffer)) == 0) {
@@ -399,7 +412,7 @@ process AdvanceFlits(int id, int ch) {
     }
 }
 
-// Update a specific channel
+// Advance a specific channel `ch` in router `id`
 action advanceChannel;
 action advanceChannelSend;
 process AdvanceChannel(int id, int ch) {
@@ -435,7 +448,7 @@ process AdvanceChannel(int id, int ch) {
     }
 }
 
-// Update the directions of the next flits in the buffers
+// Advance every channel in the router in the order of the priority list
 process AdvanceRouter(int id) {
     AdvanceChannel(id, noc[id].priority_list[0]);
     AdvanceChannel(id, noc[id].priority_list[1]);
@@ -444,6 +457,7 @@ process AdvanceRouter(int id) {
     AdvanceChannel(id, noc[id].priority_list[4])
 }
 
+// Update the priority list value at index `i` in router `id`
 process UpdatePriorityList(int id, int i) {
     if (noc[id].channels[noc[id].priority_list[i]].serviced) {
         updatePriority {=
@@ -459,7 +473,7 @@ process UpdatePriorityList(int id, int i) {
     }
 }
 
-// Update priority list
+// Update the entire priority list (schedule) for router `id`
 action updatePriority;
 process UpdatePiority(int id) {
     // Reset all of the temp values
@@ -505,11 +519,13 @@ process UpdatePiority(int id) {
 process Router(int id) {
     // Generate new flits
     GenerateFlits(id);
+
     // Determine what channels will send this cycle
     PrepRouter(id);
 
     // Send the flits
     AdvanceRouter(id);
+    
     // Update the priority list
     UpdatePiority(id);
 
@@ -520,7 +536,7 @@ process Router(int id) {
     Router(id)
 }
 
-// For syncing parallel processes
+// Model the cyclic clock
 action nextClockCycle;
 process Clock() {
     nextClockCycle {= clk = (clk + 1) % INJECTION_RATE_DENOMINATOR, clk_indicator = 1 =};
