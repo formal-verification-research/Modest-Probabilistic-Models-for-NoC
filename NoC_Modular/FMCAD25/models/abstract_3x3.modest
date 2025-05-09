@@ -105,21 +105,16 @@ router { // R1
         channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
         channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
         channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
-    ids: [NO_CONNECT, 0, 2, 4],
+    ids: [1, 3, 5, 7],
+    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
+    priority_list_temp: [0, 0, 0, 0, 0],
+    serviced_index: 0,
+    unserviced_index: 0,
+    total_unserviced: 0,
     used: [false, false, false, false, false]
 },
 router {}, // R2 - abstracted away
 router { // R3
-    channels: [
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
-    ids: [0, NO_CONNECT, 4, 6],
-    used: [false, false, false, false, false]
-},
-router { // R4
     channels: [
         channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
         channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
@@ -141,7 +136,27 @@ router { // R4
         channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
         channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
         channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
-    ids: [2, 4, NO_CONNECT, 8],
+    ids: [1, 3, 5, 7],
+    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
+    priority_list_temp: [0, 0, 0, 0, 0],
+    serviced_index: 0,
+    unserviced_index: 0,
+    total_unserviced: 0,
+    used: [false, false, false, false, false]
+},
+router { // R5
+    channels: [
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
+    ids: [1, 3, 5, 7],
+    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
+    priority_list_temp: [0, 0, 0, 0, 0],
+    serviced_index: 0,
+    unserviced_index: 0,
+    total_unserviced: 0,
     used: [false, false, false, false, false]
 },
 router {}, // R6 - abstracted away
@@ -152,7 +167,12 @@ router { // R7
         channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
         channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
         channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
-    ids: [4, 6, 8, NO_CONNECT],
+    ids: [1, 3, 5, 7],
+    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
+    priority_list_temp: [0, 0, 0, 0, 0],
+    serviced_index: 0,
+    unserviced_index: 0,
+    total_unserviced: 0,
     used: [false, false, false, false, false]
 },
 router {} // R8 - Abstracted away
@@ -160,13 +180,13 @@ router {} // R8 - Abstracted away
 
 sendCounter[] sendCounts = [
     sendCounter{},
+    sendCounter{counts:[0, 0, 0, 0, 0, 0]}, // R1
     sendCounter{},
+    sendCounter{counts:[0, 0, 0, 0, 0, 0]}, // R3
+    sendCounter{counts:[0, 0, 0, 0, 0, 0]}, // R4
+    sendCounter{counts:[0, 0, 0, 0, 0, 0]}, // R5
     sendCounter{},
-    sendCounter{},
-    sendCounter{counts:[0, 0, 0, 0, 0, 0]}, // R4 is the only one we actually care about the counts of
-    sendCounter{},
-    sendCounter{},
-    sendCounter{},
+    sendCounter{counts:[0, 0, 0, 0, 0, 0]}, // R7
     sendCounter{}
 ];
 
@@ -346,6 +366,35 @@ process Send(int id, int ch, int dir) {
     }
 }
 
+// Same behavior as send except it doesn't actually place the flit into
+// the destination buffer (because our abstract neighbors don't actually need
+// to receive the flit)
+process AbstractSend(int id, int ch, int dir) {
+    advanceChannel;
+
+    // If the destination is not full, and the channel has not been used in this cycle, then service the buffer
+    if(!noc[noc[id].ids[dir]].channels[getDestinationChannel(dir)].isFull && !noc[id].used[dir]){
+        advanceChannelSend {=
+            // #VERIFICATION
+            // Increment the send counts using a saturating count
+            0: sendCounts[id].counts[ch] = sat_add(sendCounts[id].counts[ch], 1, 2),
+
+            // Remove the flit from the source buffer
+            2: noc[id].channels[ch].buffer = dequeue(noc[id].channels[ch].buffer),
+
+            // Mark that output as used and that channel as serviced
+            4: noc[id].used[dir] = true,
+            4: noc[id].channels[ch].serviced = true
+        =}
+    }
+    // Otherwise, increment total unserviced buffers
+    else{
+        advanceChannelSend {=
+            noc[id].total_unserviced++
+        =}
+    }
+}
+
 // Determine which direction to send the front-most flit in channel `ch` of router `id`
 process AdvanceFlits(int id, int ch) {
     // If flit needs to stay on this row
@@ -497,7 +546,11 @@ process Router(int id) {
 action nextClockCycle;
 process Clock() {
     nextClockCycle {= clk = (clk + 1) % INJECTION_RATE_DENOMINATOR, clk_indicator = 1 =};
-    Clock()
+    if (clk >= 1) {
+        stop
+    } else {
+        Clock()
+    }
 }
 // [info][section end] Section automatically generated by `processes()`
 
@@ -512,7 +565,7 @@ function int getNeighborChannel(int id) =
 
 // Simplified neighbor model, performs some actions similar to that of the "RouterBehavior"
 // process, but doesn't interact with anyone except the test router (in this case R4)
-process NeighborBehavior(int id) {
+process AbstractNeighbor(int id) {
     // We still need to generate flits, but we do it simpler than the
     // RouterBehavior process. Either we generate a flit destined for 
     // R4 (the test router), or we don't.
@@ -524,11 +577,10 @@ process NeighborBehavior(int id) {
     };
 
     // We still want to prep this "router", but we don't need to prep
-    // every channel because we are only using one channel
+    // every channel because we are only using one channel. 
     prepRouter {=
         // Prep the channel that receives from R4
-        noc[id].channels[getNeighborChannel(id)].isEmpty = len(noc[id].channels[getNeighborChannel(id)].buffer) == 0,
-        noc[id].channels[getNeighborChannel(id)].isFull = isBufferFull(noc[id].channels[getNeighborChannel(id)].buffer),
+        noc[id].channels[getNeighborChannel(id)].isFull = DiscreteUniform(0, 1) == 1,
         
         // Prep the local channel
         noc[id].channels[LOCAL].isEmpty = len(noc[id].channels[LOCAL].buffer) == 0,
@@ -539,22 +591,22 @@ process NeighborBehavior(int id) {
     // We know that we need to send a flit in only one direction, so we
     // don't need to mess around with the priority list or anything like
     // that
-    advanceChannel;
     if (!noc[id].channels[LOCAL].isEmpty) {
         Send(id, LOCAL, getNeighborChannel(id))
     } else { 
-        advanceChannelSend 
+        advanceChannel; // 1st call to `AdvanceChannel`
+        advanceChannelSend
     };
     // However, the router process will still need to check every other buffer
     // so we have to have these synchronizing actions to match up with the 
     // router's `AdvanceRouter` process
-    advanceChannel;
+    advanceChannel; // 2nd call to `AdvanceChannel`
     advanceChannelSend;
-    advanceChannel;
+    advanceChannel; // 3rd call to `AdvanceChannel`
     advanceChannelSend;
-    advanceChannel;
+    advanceChannel; // 4th call to `AdvanceChannel`
     advanceChannelSend;
-    advanceChannel;
+    advanceChannel; // 5th call to `AdvanceChannel`
     advanceChannelSend;
 
     // Need to reset the used and serviced vars. Similar to before we need to 
@@ -577,16 +629,16 @@ process NeighborBehavior(int id) {
     nextClockCycle;
 
     // Recursive call for next clock cycle
-    NeighborBehavior(id)
+    AbstractNeighbor(id)
 }
 
 par {
     :: Clock()
     :: Router(4)
-    :: NeighborBehavior(1)
-    :: NeighborBehavior(3)
-    :: NeighborBehavior(5)
-    :: NeighborBehavior(7)
+    :: AbstractNeighbor(1)
+    :: AbstractNeighbor(3)
+    :: AbstractNeighbor(5)
+    :: AbstractNeighbor(7)
 }
 
 // ----- Properties for Abstracted NoC Focusing on Router 4 Correctness -----
@@ -611,14 +663,19 @@ property allPrioritiesAreUnique4  = A[]((noc[4].priority_list[0] != noc[4].prior
                                           (noc[4].priority_list[3] != noc[4].priority_list[4]));
 
 // Buffer length validation (never goes past specified size)
-property r4BufferSizeAlwaysValidNorth = A[](len(noc[4].channels[NORTH].buffer) <= BUFFER_LENGTH);
-property r4BufferSizeAlwaysValidEast  = A[](len(noc[4].channels[EAST].buffer)  <= BUFFER_LENGTH);
-property r4BufferSizeAlwaysValidSouth = A[](len(noc[4].channels[SOUTH].buffer) <= BUFFER_LENGTH);
-property r4BufferSizeAlwaysValidWest  = A[](len(noc[4].channels[WEST].buffer)  <= BUFFER_LENGTH);
-property r4BufferSizeAlwaysValidLocal = A[](len(noc[4].channels[LOCAL].buffer) <= BUFFER_LENGTH);
+property r4BufferSizeAlwaysValidNorth = Pmax(<>!(len(noc[4].channels[NORTH].buffer) <= BUFFER_LENGTH));
+property r4BufferSizeAlwaysValidEast  = Pmax(<>!(len(noc[4].channels[EAST].buffer)  <= BUFFER_LENGTH));
+property r4BufferSizeAlwaysValidSouth = Pmax(<>!(len(noc[4].channels[SOUTH].buffer) <= BUFFER_LENGTH));
+property r4BufferSizeAlwaysValidWest  = Pmax(<>!(len(noc[4].channels[WEST].buffer)  <= BUFFER_LENGTH));
+property r4BufferSizeAlwaysValidLocal = Pmax(<>!(len(noc[4].channels[LOCAL].buffer) <= BUFFER_LENGTH));
 
 
 // Send once per cycle
+property r1SendAtMostOnce = A[](sendCounts[1].counts[SOUTH] <= 1);
+property r3SendAtMostOnce = A[](sendCounts[3].counts[EAST]  <= 1);
+property r5SendAtMostOnce = A[](sendCounts[3].counts[WEST]  <= 1);
+property r7SendAtMostOnce = A[](sendCounts[3].counts[NORTH] <= 1);
+
 property r4SendAtMostOnceNorth = A[](sendCounts[4].counts[NORTH] <= 1);
 property r4SendAtMostOnceWest  = A[](sendCounts[4].counts[WEST]  <= 1);
 property r4SendAtMostOnceEast  = A[](sendCounts[4].counts[EAST]  <= 1);
