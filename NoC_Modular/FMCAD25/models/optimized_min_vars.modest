@@ -160,59 +160,108 @@ function bool implies(bool l, bool r) = (!l) || r;
 
 // ----- PROPERTIES -----
 
-property clk_partition = clk;
-
+// Flit generation testing
 property neverGeneratesFlitsForSelf0 = A[](!(contains(0, noc[0].channels[LOCAL].buffer)));
 property neverGeneratesFlitsForSelf1 = A[](!(contains(1, noc[1].channels[LOCAL].buffer)));
 property neverGeneratesFlitsForSelf2 = A[](!(contains(2, noc[2].channels[LOCAL].buffer)));
 property neverGeneratesFlitsForSelf3 = A[](!(contains(3, noc[3].channels[LOCAL].buffer)));
 
-property r0LocalEmpty = A[](implies(clk == 9, noc[0].channels[LOCAL].isEmpty));
-property r1LocalEmpty = A[](implies(clk == 9, noc[1].channels[LOCAL].isEmpty));
-property r2LocalEmpty = A[](implies(clk == 9, noc[2].channels[LOCAL].isEmpty));
-property r3LocalEmpty = A[](implies(clk == 9, noc[3].channels[LOCAL].isEmpty));
+// Valid priority list
+property alwaysContainsNorth___0  = A[](noc[0].priority_list[0] == NORTH || noc[0].priority_list[1] == NORTH || noc[0].priority_list[2] == NORTH || noc[0].priority_list[3] == NORTH || noc[0].priority_list[4] == NORTH);
+property alwaysContainsEast____0  = A[](noc[0].priority_list[0] == EAST  || noc[0].priority_list[1] == EAST  || noc[0].priority_list[2] == EAST  || noc[0].priority_list[3] == EAST  || noc[0].priority_list[4] == EAST);
+property alwaysContainsSouth___0  = A[](noc[0].priority_list[0] == SOUTH || noc[0].priority_list[1] == SOUTH || noc[0].priority_list[2] == SOUTH || noc[0].priority_list[3] == SOUTH || noc[0].priority_list[4] == SOUTH);
+property alwaysContainsWest____0  = A[](noc[0].priority_list[0] == WEST  || noc[0].priority_list[1] == WEST  || noc[0].priority_list[2] == WEST  || noc[0].priority_list[3] == WEST  || noc[0].priority_list[4] == WEST);
+property alwaysContainsLocal___0  = A[](noc[0].priority_list[0] == LOCAL || noc[0].priority_list[1] == LOCAL || noc[0].priority_list[2] == LOCAL || noc[0].priority_list[3] == LOCAL || noc[0].priority_list[4] == LOCAL);
+property allPrioritiesAreUnique0  = A[]((noc[0].priority_list[0] != noc[0].priority_list[1]) &&
+                                        (noc[0].priority_list[0] != noc[0].priority_list[2]) && 
+                                        (noc[0].priority_list[0] != noc[0].priority_list[3]) && 
+                                        (noc[0].priority_list[0] != noc[0].priority_list[4]) && 
+                                        (noc[0].priority_list[1] != noc[0].priority_list[2]) && 
+                                        (noc[0].priority_list[1] != noc[0].priority_list[3]) && 
+                                        (noc[0].priority_list[1] != noc[0].priority_list[4]) && 
+                                        (noc[0].priority_list[2] != noc[0].priority_list[3]) && 
+                                        (noc[0].priority_list[2] != noc[0].priority_list[4]) && 
+                                        (noc[0].priority_list[3] != noc[0].priority_list[4]));
 
-property r0NorthEmpty = A[](implies(clk == 9, noc[0].channels[NORTH].isEmpty));
-property r1NorthEmpty = A[](implies(clk == 9, noc[1].channels[NORTH].isEmpty));
-property r2NorthEmpty = A[](implies(clk == 9, noc[2].channels[NORTH].isEmpty));
-property r3NorthEmpty = A[](implies(clk == 9, noc[3].channels[NORTH].isEmpty));
+property alwaysContainsNorth___1  = A[](noc[1].priority_list[0] == NORTH || noc[1].priority_list[1] == NORTH || noc[1].priority_list[2] == NORTH || noc[1].priority_list[3] == NORTH || noc[1].priority_list[4] == NORTH);
+property alwaysContainsEast____1  = A[](noc[1].priority_list[0] == EAST  || noc[1].priority_list[1] == EAST  || noc[1].priority_list[2] == EAST  || noc[1].priority_list[3] == EAST  || noc[1].priority_list[4] == EAST);
+property alwaysContainsSouth___1  = A[](noc[1].priority_list[0] == SOUTH || noc[1].priority_list[1] == SOUTH || noc[1].priority_list[2] == SOUTH || noc[1].priority_list[3] == SOUTH || noc[1].priority_list[4] == SOUTH);
+property alwaysContainsWest____1  = A[](noc[1].priority_list[0] == WEST  || noc[1].priority_list[1] == WEST  || noc[1].priority_list[2] == WEST  || noc[1].priority_list[3] == WEST  || noc[1].priority_list[4] == WEST);
+property alwaysContainsLocal___1  = A[](noc[1].priority_list[0] == LOCAL || noc[1].priority_list[1] == LOCAL || noc[1].priority_list[2] == LOCAL || noc[1].priority_list[3] == LOCAL || noc[1].priority_list[4] == LOCAL);
+property allPrioritiesAreUnique1  = A[]((noc[1].priority_list[0] != noc[1].priority_list[1]) &&
+                                        (noc[1].priority_list[0] != noc[1].priority_list[2]) && 
+                                        (noc[1].priority_list[0] != noc[1].priority_list[3]) && 
+                                        (noc[1].priority_list[0] != noc[1].priority_list[4]) && 
+                                        (noc[1].priority_list[1] != noc[1].priority_list[2]) && 
+                                        (noc[1].priority_list[1] != noc[1].priority_list[3]) && 
+                                        (noc[1].priority_list[1] != noc[1].priority_list[4]) && 
+                                        (noc[1].priority_list[2] != noc[1].priority_list[3]) && 
+                                        (noc[1].priority_list[2] != noc[1].priority_list[4]) && 
+                                        (noc[1].priority_list[3] != noc[1].priority_list[4]));
 
-property r0EastEmpty = A[](implies(clk == 9, noc[0].channels[EAST].isEmpty));
-property r1EastEmpty = A[](implies(clk == 9, noc[1].channels[EAST].isEmpty));
-property r2EastEmpty = A[](implies(clk == 9, noc[2].channels[EAST].isEmpty));
-property r3EastEmpty = A[](implies(clk == 9, noc[3].channels[EAST].isEmpty));
+property alwaysContainsNorth___2  = A[](noc[2].priority_list[0] == NORTH || noc[2].priority_list[1] == NORTH || noc[2].priority_list[2] == NORTH || noc[2].priority_list[3] == NORTH || noc[2].priority_list[4] == NORTH);
+property alwaysContainsEast____2  = A[](noc[2].priority_list[0] == EAST  || noc[2].priority_list[1] == EAST  || noc[2].priority_list[2] == EAST  || noc[2].priority_list[3] == EAST  || noc[2].priority_list[4] == EAST);
+property alwaysContainsSouth___2  = A[](noc[2].priority_list[0] == SOUTH || noc[2].priority_list[1] == SOUTH || noc[2].priority_list[2] == SOUTH || noc[2].priority_list[3] == SOUTH || noc[2].priority_list[4] == SOUTH);
+property alwaysContainsWest____2  = A[](noc[2].priority_list[0] == WEST  || noc[2].priority_list[1] == WEST  || noc[2].priority_list[2] == WEST  || noc[2].priority_list[3] == WEST  || noc[2].priority_list[4] == WEST);
+property alwaysContainsLocal___2  = A[](noc[2].priority_list[0] == LOCAL || noc[2].priority_list[1] == LOCAL || noc[2].priority_list[2] == LOCAL || noc[2].priority_list[3] == LOCAL || noc[2].priority_list[4] == LOCAL);
+property allPrioritiesAreUnique2  = A[]((noc[2].priority_list[0] != noc[2].priority_list[1]) &&
+                                        (noc[2].priority_list[0] != noc[2].priority_list[2]) && 
+                                        (noc[2].priority_list[0] != noc[2].priority_list[3]) && 
+                                        (noc[2].priority_list[0] != noc[2].priority_list[4]) && 
+                                        (noc[2].priority_list[1] != noc[2].priority_list[2]) && 
+                                        (noc[2].priority_list[1] != noc[2].priority_list[3]) && 
+                                        (noc[2].priority_list[1] != noc[2].priority_list[4]) && 
+                                        (noc[2].priority_list[2] != noc[2].priority_list[3]) && 
+                                        (noc[2].priority_list[2] != noc[2].priority_list[4]) && 
+                                        (noc[2].priority_list[3] != noc[2].priority_list[4]));
 
-property r0SouthEmpty = A[](implies(clk == 9, noc[0].channels[SOUTH].isEmpty));
-property r1SouthEmpty = A[](implies(clk == 9, noc[1].channels[SOUTH].isEmpty));
-property r2SouthEmpty = A[](implies(clk == 9, noc[2].channels[SOUTH].isEmpty));
-property r3SouthEmpty = A[](implies(clk == 9, noc[3].channels[SOUTH].isEmpty));
+property alwaysContainsNorth___3  = A[](noc[3].priority_list[0] == NORTH || noc[3].priority_list[1] == NORTH || noc[3].priority_list[2] == NORTH || noc[3].priority_list[3] == NORTH || noc[3].priority_list[4] == NORTH);
+property alwaysContainsEast____3  = A[](noc[3].priority_list[0] == EAST  || noc[3].priority_list[1] == EAST  || noc[3].priority_list[2] == EAST  || noc[3].priority_list[3] == EAST  || noc[3].priority_list[4] == EAST);
+property alwaysContainsSouth___3  = A[](noc[3].priority_list[0] == SOUTH || noc[3].priority_list[1] == SOUTH || noc[3].priority_list[2] == SOUTH || noc[3].priority_list[3] == SOUTH || noc[3].priority_list[4] == SOUTH);
+property alwaysContainsWest____3  = A[](noc[3].priority_list[0] == WEST  || noc[3].priority_list[1] == WEST  || noc[3].priority_list[2] == WEST  || noc[3].priority_list[3] == WEST  || noc[3].priority_list[4] == WEST);
+property alwaysContainsLocal___3  = A[](noc[3].priority_list[0] == LOCAL || noc[3].priority_list[1] == LOCAL || noc[3].priority_list[2] == LOCAL || noc[3].priority_list[3] == LOCAL || noc[3].priority_list[4] == LOCAL);
+property allPrioritiesAreUnique3  = A[]((noc[3].priority_list[0] != noc[3].priority_list[1]) &&
+                                        (noc[3].priority_list[0] != noc[3].priority_list[2]) && 
+                                        (noc[3].priority_list[0] != noc[3].priority_list[3]) && 
+                                        (noc[3].priority_list[0] != noc[3].priority_list[4]) && 
+                                        (noc[3].priority_list[1] != noc[3].priority_list[2]) && 
+                                        (noc[3].priority_list[1] != noc[3].priority_list[3]) && 
+                                        (noc[3].priority_list[1] != noc[3].priority_list[4]) && 
+                                        (noc[3].priority_list[2] != noc[3].priority_list[3]) && 
+                                        (noc[3].priority_list[2] != noc[3].priority_list[4]) && 
+                                        (noc[3].priority_list[3] != noc[3].priority_list[4]));
 
-property r0WestEmpty = A[](implies(clk == 9, noc[0].channels[WEST].isEmpty));
-property r1WestEmpty = A[](implies(clk == 9, noc[1].channels[WEST].isEmpty));
-property r2WestEmpty = A[](implies(clk == 9, noc[2].channels[WEST].isEmpty));
-property r3WestEmpty = A[](implies(clk == 9, noc[3].channels[WEST].isEmpty));
+// Buffer Verification
+property r0BufferSizeAlwaysValidNorth = A[](len(noc[0].channels[NORTH].buffer) <= BUFFER_LENGTH);
+property r0BufferSizeAlwaysValidEast  = A[](len(noc[0].channels[EAST].buffer) <= BUFFER_LENGTH);
+property r0BufferSizeAlwaysValidSouth = A[](len(noc[0].channels[SOUTH].buffer) <= BUFFER_LENGTH);
+property r0BufferSizeAlwaysValidWest  = A[](len(noc[0].channels[WEST].buffer) <= BUFFER_LENGTH);
+property r0BufferSizeAlwaysValidLocal = A[](len(noc[0].channels[LOCAL].buffer) <= BUFFER_LENGTH);
 
-property r0IsReset = A[](implies(clk == 9, noc[0] == router {
-    channels: [
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
-    ids: [1, 2, NO_CONNECT, NO_CONNECT],
-    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
-    priority_list_temp: [0, 0, 0, 0, 0],
-    serviced_index: 0,
-    unserviced_index: 0,
-    total_unserviced: 0,
-    used: [false, false, false, false, false]
-}));
+property r1BufferSizeAlwaysValidNorth = A[](len(noc[1].channels[NORTH].buffer) <= BUFFER_LENGTH);
+property r1BufferSizeAlwaysValidEast  = A[](len(noc[1].channels[EAST].buffer) <= BUFFER_LENGTH);
+property r1BufferSizeAlwaysValidSouth = A[](len(noc[1].channels[SOUTH].buffer) <= BUFFER_LENGTH);
+property r1BufferSizeAlwaysValidWest  = A[](len(noc[1].channels[WEST].buffer) <= BUFFER_LENGTH);
+property r1BufferSizeAlwaysValidLocal = A[](len(noc[1].channels[LOCAL].buffer) <= BUFFER_LENGTH);
+
+property r2BufferSizeAlwaysValidNorth = A[](len(noc[2].channels[NORTH].buffer) <= BUFFER_LENGTH);
+property r2BufferSizeAlwaysValidEast  = A[](len(noc[2].channels[EAST].buffer) <= BUFFER_LENGTH);
+property r2BufferSizeAlwaysValidSouth = A[](len(noc[2].channels[SOUTH].buffer) <= BUFFER_LENGTH);
+property r2BufferSizeAlwaysValidWest  = A[](len(noc[2].channels[WEST].buffer) <= BUFFER_LENGTH);
+property r2BufferSizeAlwaysValidLocal = A[](len(noc[2].channels[LOCAL].buffer) <= BUFFER_LENGTH);
+
+property r3BufferSizeAlwaysValidNorth = A[](len(noc[3].channels[NORTH].buffer) <= BUFFER_LENGTH);
+property r3BufferSizeAlwaysValidEast  = A[](len(noc[3].channels[EAST].buffer) <= BUFFER_LENGTH);
+property r3BufferSizeAlwaysValidSouth = A[](len(noc[3].channels[SOUTH].buffer) <= BUFFER_LENGTH);
+property r3BufferSizeAlwaysValidWest  = A[](len(noc[3].channels[WEST].buffer) <= BUFFER_LENGTH);
+property r3BufferSizeAlwaysValidLocal = A[](len(noc[3].channels[LOCAL].buffer) <= BUFFER_LENGTH);
+
 
 action generateFlits;
 process GenerateFlits(int id) {
     int(0..NOC_MAX_ID) destination;
 
-    if (clk < INJECTION_RATE_NUMERATOR) {
+    if (!isBufferFull(noc[id].channels[LOCAL].buffer) && clk < INJECTION_RATE_NUMERATOR) {
         // Add the new flit to the local buffer
         // If the destination is greater than or equal to the ID, we shift it
         // up by one to exclude the possiblity of sending a flit to ourselves
