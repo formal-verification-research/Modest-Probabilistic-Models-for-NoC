@@ -336,11 +336,13 @@ process PrepRouter(int id) {
 }
 
 // Send a flit from Router `id` across channel `ch` in the specified direction `dir`
-process Send(int id, int ch, int dir) {
+// This is abstracted to model the sending behavior of one of router 4 neighbors, and
+// and doesn't include unnecessary assignment
+process NeighborSend(int id, int ch, int dir) {
     advanceChannel;
 
     // If the destination is not full, and the channel has not been used in this cycle, then service the buffer
-    if(!noc[noc[id].ids[dir]].channels[getDestinationChannel(dir)].isFull && !noc[id].used[dir]){
+    if(!noc[noc[id].ids[dir]].channels[getDestinationChannel(dir)].isFull){
         advanceChannelSend {=
             // #VERIFICATION
             // Increment the send counts using a saturating count
@@ -351,18 +353,11 @@ process Send(int id, int ch, int dir) {
                 enqueue(peekFront(noc[id].channels[ch].buffer), noc[noc[id].ids[dir]].channels[getDestinationChannel(dir)].buffer),
 
             // Then, remove it from the source buffer
-            2: noc[id].channels[ch].buffer = dequeue(noc[id].channels[ch].buffer),
-
-            // Mark that output as used and that channel as serviced
-            4: noc[id].used[dir] = true,
-            4: noc[id].channels[ch].serviced = true
+            2: noc[id].channels[ch].buffer = dequeue(noc[id].channels[ch].buffer)
         =}
     }
-    // Otherwise, increment total unserviced buffers
     else{
-        advanceChannelSend {=
-            noc[id].total_unserviced++
-        =}
+        advanceChannelSend
     }
 }
 
@@ -401,20 +396,20 @@ process AdvanceFlits(int id, int ch) {
     if(getColumnShift(id, peekFront(noc[id].channels[ch].buffer)) == 0) {
         // Send it north
         if(peekFront(noc[id].channels[ch].buffer) < id){
-            Send(id, ch, NORTH)
+            AbstractSend(id, ch, NORTH)
         }
         // Or send it south
         else{
-            Send(id, ch, SOUTH)
+            AbstractSend(id, ch, SOUTH)
         }
     }
     // Else, if flit needs to go west
     else if(getColumnShift(id, peekFront(noc[id].channels[ch].buffer)) < 0) {
-        Send(id, ch, WEST)
+        AbstractSend(id, ch, WEST)
     }
     // Else, flit needs to go east
     else{
-        Send(id, ch, EAST)
+        AbstractSend(id, ch, EAST)
     }
 }
 
@@ -592,7 +587,7 @@ process AbstractNeighbor(int id) {
     // don't need to mess around with the priority list or anything like
     // that
     if (!noc[id].channels[LOCAL].isEmpty) {
-        Send(id, LOCAL, getNeighborChannel(id))
+        NeighborSend(id, LOCAL, getNeighborChannel(id))
     } else { 
         advanceChannel; // 1st call to `AdvanceChannel`
         advanceChannelSend
@@ -619,11 +614,7 @@ process AbstractNeighbor(int id) {
     updatePriority;
     updatePriority;
 
-    updatePriority {= // last assignment in `UpdatePriority`
-        noc[id].channels[getNeighborChannel(id)].serviced = false,
-        noc[id].total_unserviced = 0,
-        noc[id].used = [false, false, false, false, false]
-    =};
+    updatePriority; // last assignment in `UpdatePriority`
 
     // Sync with the clock
     nextClockCycle;
