@@ -2,6 +2,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
+MODEST_EXECUTABLE: str = "modest_cust"
 
 def is_modest_on_path() -> bool:
     """Checks if 'modest' is available in the system's PATH.
@@ -9,9 +10,9 @@ def is_modest_on_path() -> bool:
     Returns:
         bool: True if 'modest' is found, False otherwise.
     """
-    return shutil.which("modest") is not None
+    return shutil.which(MODEST_EXECUTABLE) is not None
 
-def __run(model: str | Path, output_path: Path | None = None, command: list[str] = ["modest", "check"], opts: list[str] = []) -> str | None:
+def __run(model: str | Path, output_path: Path | None = None, command: list[str] = [MODEST_EXECUTABLE, "check"], opts: list[str] = []) -> str | None:
     """Runs the modest tool with the given model and property files.
 
     Args:
@@ -68,7 +69,7 @@ def __run(model: str | Path, output_path: Path | None = None, command: list[str]
     return output
 
 def check(model: str | Path, output_path: Path | None = None) -> str | None:
-    return __run(model, output_path, ["modest", "check"])
+    return __run(model, output_path, [MODEST_EXECUTABLE, "check"])
 
 def simulate(model: str | Path, output_path: Path | None = None) -> str | None:
-    return __run(model, output_path, command=["modest", "simulate"], opts=["--max-run-length", "0", "--unsafe"])
+    return __run(model, output_path, command=[MODEST_EXECUTABLE, "simulate"], opts=["--max-run-length", "0", "--unsafe"])
