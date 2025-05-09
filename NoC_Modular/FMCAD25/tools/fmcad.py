@@ -97,7 +97,7 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: PropertyTy
         print(*[f"{p[1]:.3f}" for p in probs[-3:]], sep=", ", end="")
         print(f"]. Pmax: {pmax:.3f}")
 
-        if pmax >= (1.0 - 1e-3):            
+        if pmax >= (1.0 - 1e-5):            
             break
     
     # Timing
