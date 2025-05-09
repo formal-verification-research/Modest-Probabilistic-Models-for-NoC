@@ -1,4 +1,5 @@
 # CTL Tests
 
 Arnd recently added CTL `A[]` and `E<>` operators to Modest for us. I wrote a few tests to just
-make sure that the operators did what I expected them to do.
+make sure that the operators did what I expected them to do. The tests overall just check that
+Modest performs as we expected when using `DiscreteUniform` and `alt`.
