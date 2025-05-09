@@ -145,8 +145,7 @@ function int len(buffer option ls) = if ls == none then 0 else 1 + len(ls!.tl);
 
 // Add a flit to the buffer
 function buffer option enqueue(int n, buffer option ls) =
-    if len(ls) == BUFFER_LENGTH then ls
-    else some(buffer {
+    some(buffer {
         hd: n,
         tl: ls
     });
@@ -369,7 +368,7 @@ process Send(int id, int ch, int dir) {
     // If the destination is not full, and the channel has not been used in this cycle, then service the buffer
     if(!noc[noc[id].ids[dir]].channels[getDestinationChannel(dir)].isFull && !noc[id].used[dir]){
         advanceChannelSend {=
-            // First, add flit to destination buffer
+            // Add flit to destination buffer
             1: noc[noc[id].ids[dir]].channels[getDestinationChannel(dir)].buffer =
                 enqueue(peekFront(noc[id].channels[ch].buffer), noc[noc[id].ids[dir]].channels[getDestinationChannel(dir)].buffer),
 
@@ -525,7 +524,7 @@ process Router(int id) {
 
     // Send the flits
     AdvanceRouter(id);
-    
+
     // Update the priority list
     UpdatePiority(id);
 
