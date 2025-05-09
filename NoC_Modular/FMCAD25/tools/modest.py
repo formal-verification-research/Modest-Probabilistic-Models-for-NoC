@@ -2,7 +2,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
-MODEST_EXECUTABLE: str = "modest_cust"
+MODEST_EXECUTABLE: str = "modest"
 
 def is_modest_on_path() -> bool:
     """Checks if 'modest' is available in the system's PATH.
