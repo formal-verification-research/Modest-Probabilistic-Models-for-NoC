@@ -8,6 +8,7 @@ class PropertyType(enum.Enum):
     INDUCTIVE = 2
     BOTH_RI = 3
     FUNCTION = 4
+    NO_PROPS = 5
 
 def add_info(func: Callable[..., str]) -> Callable[..., str]:
     """
@@ -52,16 +53,6 @@ class Noc:
         self.inductive_noise_threshold = inductive_noise_threshold
     
     def print(self, ptype: PropertyType, *, clk_low: int = 0, clk_high: int = 100, stride: int = 1):
-        properties: str = ""
-        if ptype == PropertyType.RESISTIVE or ptype == PropertyType.BOTH_RI:
-            properties += self.resistive_range(clk_low, clk_high, stride)
-        
-        if ptype == PropertyType.INDUCTIVE or ptype == PropertyType.BOTH_RI:
-            properties += self.inductive_range(clk_low, clk_high, stride)
-        
-        if ptype == PropertyType.FUNCTION:
-            properties += self.never_generates_flits_for_self()
-
         return self.type() \
                 + self.user_defined_constants() \
                 + self.calculated_constants()\
@@ -70,7 +61,8 @@ class Noc:
                 + self.variables(ptype) \
                 + self.functions() \
                 + self.processes(ptype) \
-                + self.composition()
+                + self.composition() \
+                + self.properties(ptype, clk_low=clk_low, clk_high=clk_high, stride=stride)
 
     @add_info
     def type(self) -> str:
@@ -104,7 +96,11 @@ int(0..INJECTION_RATE_DENOMINATOR) clk = 0;
 transient int(0..1) clk_indicator;
 
 // #CUSTOMIZE the number of buffers a router must service before noise will be incremented.
-const int ACTIVITY_THRESH = 3;
+const int ACTIVITY_THRESH = {self.activity_thresh};
+
+// #CUSTOMIZE this is the upper threshoold for noise detected in the system.
+const int RESISTIVE_NOISE_THRESH = {self.resistive_noise_threshold};
+const int INDUCTIVE_NOISE_THRESH = {self.inductive_noise_threshold};
 """
 
     @add_info
@@ -272,36 +268,6 @@ int inductiveNoise = 0;
         
         return var
 
-    def resistive_noise(self, clk: int) -> str:
-        return f"""\
-property resistiveNoiseProbability1RewardBounded{clk}  = Pmax(<>[S(clk_indicator)<={clk}] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
-"""
-    
-    def inductive_noise(self, clk: int) -> str:
-        return f"""\
-property inductiveNoiseProbability1RewardBounded{clk}  = Pmax(<>[S(clk_indicator)<={clk}]  (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
-"""
-    
-    def never_generates_flits_for_self(self) -> str:
-        property = ""
-        for i in range(self.num_nodes):
-            property += f"""\
-property neverGeneratesFlitsForSelf{i} = A[](!(contains({i}, noc[{i}].channels[LOCAL].buffer)));
-"""
-        return property
-
-    def resistive_range(self, clk_low: int, clk_high: int, stride: int = 1) -> str:
-        properties: str = ""
-        for clk in range(clk_low, clk_high+1, stride):
-            properties += self.resistive_noise(clk)
-        return properties
-    
-    def inductive_range(self, clk_low: int, clk_high: int, stride: int = 1) -> str:
-        properties: str = ""
-        for clk in range(clk_low, clk_high+1, stride):
-            properties += self.inductive_noise(clk)
-        return properties
-    
     @add_info
     def functions(self) -> str:
         return """\
@@ -917,3 +883,102 @@ process Clock() {
         composition += "}\n"
 
         return composition
+
+    def resistive_noise(self, clk: int) -> str:
+        return f"""\
+property resistiveNoiseProbability1RewardBounded{clk}  = Pmax(<>[S(clk_indicator)<={clk}] (resistiveNoise >= RESISTIVE_NOISE_THRESH));
+"""
+    
+    def inductive_noise(self, clk: int) -> str:
+        return f"""\
+property inductiveNoiseProbability1RewardBounded{clk}  = Pmax(<>[S(clk_indicator)<={clk}]  (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+"""
+
+    def resistive_range(self, clk_low: int, clk_high: int, stride: int = 1) -> str:
+        properties: str = ""
+        for clk in range(clk_low, clk_high+1, stride):
+            properties += self.resistive_noise(clk)
+        return properties
+    
+    def inductive_range(self, clk_low: int, clk_high: int, stride: int = 1) -> str:
+        properties: str = ""
+        for clk in range(clk_low, clk_high+1, stride):
+            properties += self.inductive_noise(clk)
+        return properties
+    
+    def correctness(self) -> str:
+        prop: str = ""
+
+        # never generates flits for self (flit generation correctness)
+        prop += "// Flit generation verification\n"
+        for i in range(self.num_nodes):
+            prop += f"property neverGeneratesFlitsForSelf{i} = A[](!(contains({i}, noc[{i}].channels[LOCAL].buffer)));\n"
+        prop += "\n"
+
+        # priority list is always valid
+        prop += "// Valid priority list\n"
+        for i in range(self.num_nodes):
+            prop += f"""\
+property alwaysContainsNorth{i} = A[](noc[0].priority_list[0] == NORTH || noc[0].priority_list[1] == NORTH || noc[0].priority_list[2] == NORTH || noc[0].priority_list[3] == NORTH || noc[0].priority_list[4] == NORTH);
+property alwaysContainsEast{i}  = A[](noc[0].priority_list[0] == EAST  || noc[0].priority_list[1] == EAST  || noc[0].priority_list[2] == EAST  || noc[0].priority_list[3] == EAST  || noc[0].priority_list[4] == EAST);
+property alwaysContainsSouth{i} = A[](noc[0].priority_list[0] == SOUTH || noc[0].priority_list[1] == SOUTH || noc[0].priority_list[2] == SOUTH || noc[0].priority_list[3] == SOUTH || noc[0].priority_list[4] == SOUTH);
+property alwaysContainsWest{i}  = A[](noc[0].priority_list[0] == WEST  || noc[0].priority_list[1] == WEST  || noc[0].priority_list[2] == WEST  || noc[0].priority_list[3] == WEST  || noc[0].priority_list[4] == WEST);
+property alwaysContainsLocal{i} = A[](noc[0].priority_list[0] == LOCAL || noc[0].priority_list[1] == LOCAL || noc[0].priority_list[2] == LOCAL || noc[0].priority_list[3] == LOCAL || noc[0].priority_list[4] == LOCAL);
+
+property allPrioritiesAreUnique{i}  = A[]((noc[{i}].priority_list[0] != noc[{i}].priority_list[1]) &&
+                                          (noc[{i}].priority_list[0] != noc[{i}].priority_list[2]) && 
+                                          (noc[{i}].priority_list[0] != noc[{i}].priority_list[3]) && 
+                                          (noc[{i}].priority_list[0] != noc[{i}].priority_list[4]) && 
+                                          (noc[{i}].priority_list[1] != noc[{i}].priority_list[2]) && 
+                                          (noc[{i}].priority_list[1] != noc[{i}].priority_list[3]) && 
+                                          (noc[{i}].priority_list[1] != noc[{i}].priority_list[4]) && 
+                                          (noc[{i}].priority_list[2] != noc[{i}].priority_list[3]) && 
+                                          (noc[{i}].priority_list[2] != noc[{i}].priority_list[4]) && 
+                                          (noc[{i}].priority_list[3] != noc[{i}].priority_list[4]));
+
+"""
+        prop += "\n"
+
+        # buffer length valid
+        prop += "// Buffer length validation (never goes past specified size)\n"
+        for i in range(self.num_nodes):
+            prop += f"""\
+property r{i}BufferSizeAlwaysValidNorth = A[](len(noc[{i}].channels[NORTH].buffer) <= BUFFER_LENGTH);
+property r{i}BufferSizeAlwaysValidEast  = A[](len(noc[{i}].channels[EAST].buffer)  <= BUFFER_LENGTH);
+property r{i}BufferSizeAlwaysValidSouth = A[](len(noc[{i}].channels[SOUTH].buffer) <= BUFFER_LENGTH);
+property r{i}BufferSizeAlwaysValidWest  = A[](len(noc[{i}].channels[WEST].buffer)  <= BUFFER_LENGTH);
+property r{i}BufferSizeAlwaysValidLocal = A[](len(noc[{i}].channels[LOCAL].buffer) <= BUFFER_LENGTH);
+
+"""
+        prop += "\n"
+
+        # only sends once per cycle
+        prop += "// Send once per cycle\n"
+        for i in range(self.num_nodes):
+            prop += f"""\
+property r{i}SendAtMostOnceNorth = A[](sendCounts[{i}].counts[NORTH] <= 1);
+property r{i}SendAtMostOnceWest  = A[](sendCounts[{i}].counts[WEST]  <= 1);
+property r{i}SendAtMostOnceEast  = A[](sendCounts[{i}].counts[EAST]  <= 1);
+property r{i}SendAtMostOnceSouth = A[](sendCounts[{i}].counts[SOUTH] <= 1);
+property r{i}SendAtMostOnceLocal = A[](sendCounts[{i}].counts[LOCAL] <= 1);
+
+"""
+        return prop
+
+    @add_info
+    def properties(self, ptype: PropertyType, *, clk_low: int = 0, clk_high: int = 100, stride: int = 1) -> str:
+        properties: str = ""
+
+        if ptype == PropertyType.NO_PROPS:
+            return properties
+        
+        if ptype == PropertyType.RESISTIVE or ptype == PropertyType.BOTH_RI:
+            properties += self.resistive_range(clk_low, clk_high, stride)
+        
+        if ptype == PropertyType.INDUCTIVE or ptype == PropertyType.BOTH_RI:
+            properties += self.inductive_range(clk_low, clk_high, stride)
+        
+        if ptype == PropertyType.FUNCTION:
+            properties += self.correctness()
+        
+        return properties
