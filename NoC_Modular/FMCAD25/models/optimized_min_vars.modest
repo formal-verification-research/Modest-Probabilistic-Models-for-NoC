@@ -160,6 +160,9 @@ function bool implies(bool l, bool r) = (!l) || r;
 
 // ----- PROPERTIES -----
 
+// Simulation property
+property neverGeneratesFlitsForSelfSim = Pmax(<>(contains(0, noc[0].channels[LOCAL].buffer)));
+
 // Flit generation testing
 property neverGeneratesFlitsForSelf0 = A[](!(contains(0, noc[0].channels[LOCAL].buffer)));
 property neverGeneratesFlitsForSelf1 = A[](!(contains(1, noc[1].channels[LOCAL].buffer)));
