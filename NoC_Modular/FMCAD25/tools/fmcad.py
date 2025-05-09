@@ -92,12 +92,12 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: PropertyTy
         pmax = max(probs, key=lambda x: x[1])[1]
 
         print(f"  [info]: finished clock cycle block ({lower},{upper}). P: [", end="")        
-        print(*[f"{p[1]:.3f}" for p in probs[:3]], sep=", ", end="")
+        print(*[f"{p[1]:.3f}" for p in probs[lower:lower+3]], sep=", ", end="")
         print("...", end="")        
         print(*[f"{p[1]:.3f}" for p in probs[-3:]], sep=", ", end="")
         print(f"]. Pmax: {pmax:.3f}")
 
-        if pmax >= 1.0:            
+        if pmax >= (1.0 - 1e-3):            
             break
     
     # Timing
