@@ -663,11 +663,11 @@ property allPrioritiesAreUnique4  = A[]((noc[4].priority_list[0] != noc[4].prior
                                           (noc[4].priority_list[3] != noc[4].priority_list[4]));
 
 // Buffer length validation (never goes past specified size)
-property r4BufferSizeAlwaysValidNorth = Pmax(<>!(len(noc[4].channels[NORTH].buffer) <= BUFFER_LENGTH));
-property r4BufferSizeAlwaysValidEast  = Pmax(<>!(len(noc[4].channels[EAST].buffer)  <= BUFFER_LENGTH));
-property r4BufferSizeAlwaysValidSouth = Pmax(<>!(len(noc[4].channels[SOUTH].buffer) <= BUFFER_LENGTH));
-property r4BufferSizeAlwaysValidWest  = Pmax(<>!(len(noc[4].channels[WEST].buffer)  <= BUFFER_LENGTH));
-property r4BufferSizeAlwaysValidLocal = Pmax(<>!(len(noc[4].channels[LOCAL].buffer) <= BUFFER_LENGTH));
+property r4BufferSizeAlwaysValidNorth = A[](len(noc[4].channels[NORTH].buffer) <= BUFFER_LENGTH);
+property r4BufferSizeAlwaysValidEast  = A[](len(noc[4].channels[EAST].buffer)  <= BUFFER_LENGTH);
+property r4BufferSizeAlwaysValidSouth = A[](len(noc[4].channels[SOUTH].buffer) <= BUFFER_LENGTH);
+property r4BufferSizeAlwaysValidWest  = A[](len(noc[4].channels[WEST].buffer)  <= BUFFER_LENGTH);
+property r4BufferSizeAlwaysValidLocal = A[](len(noc[4].channels[LOCAL].buffer) <= BUFFER_LENGTH);
 
 
 // Send once per cycle
