@@ -127,47 +127,47 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: PropertyTy
 @time_func
 def noc_2x2_resistive():
     """ 2x2 resistive simulations """
-    simulate(size=4, result_path=Path("results/2x2"), type=PropertyType.RESISTIVE, threshold=1, clk_upper=None, stride=1)
-    simulate(size=4, result_path=Path("results/2x2"), type=PropertyType.RESISTIVE, threshold=5, clk_upper=None, stride=1)
-    simulate(size=4, result_path=Path("results/2x2"), type=PropertyType.RESISTIVE, threshold=10, clk_upper=None, stride=4)
-    simulate(size=4, result_path=Path("results/2x2"), type=PropertyType.RESISTIVE, threshold=20, clk_upper=None, stride=7)
+    simulate(size=2, result_path=Path("results/2x2"), type=PropertyType.RESISTIVE, threshold=1, clk_upper=None, stride=1)
+    simulate(size=2, result_path=Path("results/2x2"), type=PropertyType.RESISTIVE, threshold=5, clk_upper=None, stride=1)
+    simulate(size=2, result_path=Path("results/2x2"), type=PropertyType.RESISTIVE, threshold=10, clk_upper=None, stride=4)
+    simulate(size=2, result_path=Path("results/2x2"), type=PropertyType.RESISTIVE, threshold=20, clk_upper=None, stride=7)
 
 @time_func
 def noc_2x2_inductive():
     """ 2x2 inductive simulations """
-    simulate(size=4, result_path=Path("results/2x2"), type=PropertyType.INDUCTIVE, threshold=1, clk_upper=None, stride=6)
-    simulate(size=4, result_path=Path("results/2x2"), type=PropertyType.INDUCTIVE, threshold=5, clk_upper=None, stride=12)
-    simulate(size=4, result_path=Path("results/2x2"), type=PropertyType.INDUCTIVE, threshold=10, clk_upper=None, stride=36)
+    simulate(size=2, result_path=Path("results/2x2"), type=PropertyType.INDUCTIVE, threshold=1, clk_upper=None, stride=6)
+    simulate(size=2, result_path=Path("results/2x2"), type=PropertyType.INDUCTIVE, threshold=5, clk_upper=None, stride=12)
+    simulate(size=2, result_path=Path("results/2x2"), type=PropertyType.INDUCTIVE, threshold=10, clk_upper=None, stride=36)
 
 @time_func
 def noc_3x3_resistive():
     """ 3x3 resistive simulations """
-    simulate(size=9, result_path=Path("results/3x3"), type=PropertyType.RESISTIVE, threshold=1, clk_upper=None, stride=1)
-    simulate(size=9, result_path=Path("results/3x3"), type=PropertyType.RESISTIVE, threshold=5, clk_upper=None, stride=1)
-    simulate(size=9, result_path=Path("results/3x3"), type=PropertyType.RESISTIVE, threshold=10, clk_upper=None, stride=1)
-    simulate(size=9, result_path=Path("results/3x3"), type=PropertyType.RESISTIVE, threshold=20, clk_upper=None, stride=1)
+    simulate(size=3, result_path=Path("results/3x3"), type=PropertyType.RESISTIVE, threshold=1, clk_upper=None, stride=1)
+    simulate(size=3, result_path=Path("results/3x3"), type=PropertyType.RESISTIVE, threshold=5, clk_upper=None, stride=1)
+    simulate(size=3, result_path=Path("results/3x3"), type=PropertyType.RESISTIVE, threshold=10, clk_upper=None, stride=1)
+    simulate(size=3, result_path=Path("results/3x3"), type=PropertyType.RESISTIVE, threshold=20, clk_upper=None, stride=1)
 
 @time_func
 def noc_3x3_inductive():
     """ 3x3 inductive simulations """
-    simulate(size=9, result_path=Path("results/3x3"), type=PropertyType.INDUCTIVE, threshold=1, clk_upper=None, stride=1)
-    simulate(size=9, result_path=Path("results/3x3"), type=PropertyType.INDUCTIVE, threshold=5, clk_upper=None, stride=2)
-    simulate(size=9, result_path=Path("results/3x3"), type=PropertyType.INDUCTIVE, threshold=10, clk_upper=None, stride=4)
+    simulate(size=3, result_path=Path("results/3x3"), type=PropertyType.INDUCTIVE, threshold=1, clk_upper=None, stride=1)
+    simulate(size=3, result_path=Path("results/3x3"), type=PropertyType.INDUCTIVE, threshold=5, clk_upper=None, stride=2)
+    simulate(size=3, result_path=Path("results/3x3"), type=PropertyType.INDUCTIVE, threshold=10, clk_upper=None, stride=4)
 
 @time_func
 def noc_4x4_resistive():
     """ 4x4 resistive simulations """
-    simulate(size=16, result_path=Path("results/4x4"), type=PropertyType.RESISTIVE, threshold=1, clk_upper=None, stride=1)
-    simulate(size=16, result_path=Path("results/4x4"), type=PropertyType.RESISTIVE, threshold=5, clk_upper=None, stride=1)
-    simulate(size=16, result_path=Path("results/4x4"), type=PropertyType.RESISTIVE, threshold=10, clk_upper=None, stride=1)
-    simulate(size=16, result_path=Path("results/4x4"), type=PropertyType.RESISTIVE, threshold=20, clk_upper=None, stride=1)
+    simulate(size=46, result_path=Path("results/4x4"), type=PropertyType.RESISTIVE, threshold=1, clk_upper=None, stride=1)
+    simulate(size=46, result_path=Path("results/4x4"), type=PropertyType.RESISTIVE, threshold=5, clk_upper=None, stride=1)
+    simulate(size=46, result_path=Path("results/4x4"), type=PropertyType.RESISTIVE, threshold=10, clk_upper=None, stride=1)
+    simulate(size=46, result_path=Path("results/4x4"), type=PropertyType.RESISTIVE, threshold=20, clk_upper=None, stride=1)
 
 @time_func
 def noc_4x4_inductive():
     """ 4x4 inductive simulations """
-    simulate(size=16, result_path=Path("results/4x4"), type=PropertyType.INDUCTIVE, threshold=1, clk_upper=None, stride=1)
-    simulate(size=16, result_path=Path("results/4x4"), type=PropertyType.INDUCTIVE, threshold=5, clk_upper=None, stride=2)
-    simulate(size=16, result_path=Path("results/4x4"), type=PropertyType.INDUCTIVE, threshold=10, clk_upper=None, stride=4)
+    simulate(size=4, result_path=Path("results/4x4"), type=PropertyType.INDUCTIVE, threshold=1, clk_upper=None, stride=1)
+    simulate(size=4, result_path=Path("results/4x4"), type=PropertyType.INDUCTIVE, threshold=5, clk_upper=None, stride=2)
+    simulate(size=4, result_path=Path("results/4x4"), type=PropertyType.INDUCTIVE, threshold=10, clk_upper=None, stride=4)
 
 if __name__ == "__main__":
     # Resistive Simulations
