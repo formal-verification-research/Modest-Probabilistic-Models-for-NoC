@@ -150,9 +150,10 @@ function buffer option dequeue(buffer option ls) =
         tl: dequeue(ls!.tl)
     });
 
-// Returns True if the buffer `ls` contains `id`, otherwise returns false 
+// Returns true if the buffer `ls` contains `id`, otherwise returns false 
 function bool contains(int id, buffer option ls) =
-	if ls == none then false 
+	if ls == none then false
+    else if ls!.hd == id then true
 	else contains(id, ls!.tl);
 
 // Boolean implication (l ==> r)
