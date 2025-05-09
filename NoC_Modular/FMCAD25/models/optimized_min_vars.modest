@@ -1,28 +1,52 @@
 option "dtmc";
 
-//----- VARIABLES -----
+//----- User Defined Constants -----
 
-// #MODULARIZE by setting NOC_MAX_ID to 1 less than the total number of routers and allocating spaces for more routers
-const int NOC_MAX_ID = 3;
+// #CUSTOMIZE
+// Set the dimensions for the NoC, note that square dimensions are currently
+// the only accepted dimensions
+const int NOC_MESH_WIDTH = 2;
+const int NOC_MESH_HEIGHT = 2;
 
-// #CUSTOMIZE this value changes the buffer length of all buffers.
+// #CUSTOMIZE 
+// This value changes the buffer length of all buffers.
 const int BUFFER_LENGTH = 4;
 
-// #CUSTOMIZE these values change the frequency with witch flits are injected.
+// #CUSTOMIZE 
+// These values change the frequency with witch flits are injected.
 const int INJECTION_RATE_NUMERATOR = 3;
-const int INJECTION_RATE_DENOMINATOR =10;
+const int INJECTION_RATE_DENOMINATOR = 10;
 
-// #CUSTOMIZE this is the upper bound of cycles run before quiting.
+// #CUSTOMIZE
+// This represents a cyclic clock counter that wraps from 0 to INJECTION_RATE_DENOMINATOR - 1
+// and it's used to determine the flit generation pattern. For unique patterns you'll need
+// to adjust this to meet your use case.
 int(0..INJECTION_RATE_DENOMINATOR) clk = 0;
 transient int(0..1) clk_indicator;
 
-// These values are enumerations and are NOT to be changed
+// ----- Calculated Constants -----
+
+// The max id for each router in the NoC. Ids range from 0 to NOC_MAX_ID in a
+// left-to-right, line by line pattern in the NoC
+/*
+e.g. a 2x2 NoC with it's corresponding ids
+
+ 0 -- 1
+ |    |
+ 2 -- 3
+*/
+const int NOC_MAX_ID = (NOC_MESH_WIDTH * NOC_MESH_HEIGHT) - 1;
+
+// Enumerated values representing the different directions in the
+// mesh
 const int NORTH = 0;
 const int WEST = 1;
 const int EAST = 2;
 const int SOUTH = 3;
 const int LOCAL = 4;
 const int NO_CONNECT = -1;
+
+// ----- Datatypes -----
 
 datatype buffer = {
     int(0..NOC_MAX_ID) hd,
@@ -109,29 +133,15 @@ router {
     used: [false, false, false, false, false]
 }];
 
+// ----- Boolean Algebra Functions
+
+// Boolean implication (l ==> r)
+function bool implies(bool l, bool r) = (!l) || r;
+
+// ----- List Functions -----
+
 // Calculate length of list
 function int len(buffer option ls) = if ls == none then 0 else 1 + len(ls!.tl);
-
-// Tell if the buffer is full
-function bool isBufferFull(buffer option ls) = len(ls) >= BUFFER_LENGTH;
-
-// Get the mirror direction
-function int getDestinationChannel(int dir) =
-    if dir == NORTH then SOUTH
-    else if dir == WEST then EAST
-    else if dir == EAST then WEST
-    else if dir == SOUTH then NORTH
-    else -1;
-
-// Determine if the flits destination is in the same column as the current router
-function int getColumnShift(int id, int dst) =
-(dst % ((int)sqrt(NOC_MAX_ID + 1))) - (id % ((int)sqrt(NOC_MAX_ID + 1)));
-
-// Return the front of the queue
-function int peekFront(buffer option ls) =
-    if ls == none then -1
-    else if ls!.tl == none then ls!.hd
-    else peekFront(ls!.tl);
 
 // Add a flit to the buffer
 function buffer option enqueue(int n, buffer option ls) =
@@ -156,8 +166,39 @@ function bool contains(int id, buffer option ls) =
     else if ls!.hd == id then true
 	else contains(id, ls!.tl);
 
-// Boolean implication (l ==> r)
-function bool implies(bool l, bool r) = (!l) || r;
+// Return the front of the queue
+function int peekFront(buffer option ls) =
+    if ls == none then -1
+    else if ls!.tl == none then ls!.hd
+    else peekFront(ls!.tl);
+
+// ----- Buffer Specific Functions -----
+
+// Tell if the buffer is full
+function bool isBufferFull(buffer option ls) = len(ls) >= BUFFER_LENGTH;
+
+// ----- Routing Functions
+
+// Get the mirror direction to determine what buffer will receive the flit
+// e.g. if we are R0 and we are sending across the South Channel to R2,
+// then R2 should receive the flit in their North Buffer
+function int getDestinationChannel(int dir) =
+    if dir == NORTH then SOUTH
+    else if dir == WEST then EAST
+    else if dir == EAST then WEST
+    else if dir == SOUTH then NORTH
+    else -1;
+
+// Calculate what column a specific ID is destined for
+function int idToColumn(int id) = (id % NOC_MESH_WIDTH);
+
+// Calculate what row a specific ID is destined for
+function int idToRow(int id) = (int)(id / NOC_MESH_HEIGHT);
+
+// Determine if the flits destination is in the same column as the current router
+// Returns < 0 if id needs to go to the left, > 0 to go right, and 0 if it's the
+// correct column
+function int getColumnShift(int id, int dst) = idToColumn(dst) - idToColumn(id);
 
 // ----- PROPERTIES -----
 
