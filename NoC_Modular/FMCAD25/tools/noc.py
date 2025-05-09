@@ -919,11 +919,11 @@ property inductiveNoiseProbability1RewardBounded{clk}  = Pmax(<>[S(clk_indicator
         prop += "// Valid priority list\n"
         for i in range(self.num_nodes):
             prop += f"""\
-property alwaysContainsNorth{i} = A[](noc[0].priority_list[0] == NORTH || noc[0].priority_list[1] == NORTH || noc[0].priority_list[2] == NORTH || noc[0].priority_list[3] == NORTH || noc[0].priority_list[4] == NORTH);
-property alwaysContainsEast{i}  = A[](noc[0].priority_list[0] == EAST  || noc[0].priority_list[1] == EAST  || noc[0].priority_list[2] == EAST  || noc[0].priority_list[3] == EAST  || noc[0].priority_list[4] == EAST);
-property alwaysContainsSouth{i} = A[](noc[0].priority_list[0] == SOUTH || noc[0].priority_list[1] == SOUTH || noc[0].priority_list[2] == SOUTH || noc[0].priority_list[3] == SOUTH || noc[0].priority_list[4] == SOUTH);
-property alwaysContainsWest{i}  = A[](noc[0].priority_list[0] == WEST  || noc[0].priority_list[1] == WEST  || noc[0].priority_list[2] == WEST  || noc[0].priority_list[3] == WEST  || noc[0].priority_list[4] == WEST);
-property alwaysContainsLocal{i} = A[](noc[0].priority_list[0] == LOCAL || noc[0].priority_list[1] == LOCAL || noc[0].priority_list[2] == LOCAL || noc[0].priority_list[3] == LOCAL || noc[0].priority_list[4] == LOCAL);
+property alwaysContainsNorth{i} = A[](noc[{i}].priority_list[0] == NORTH || noc[{i}].priority_list[1] == NORTH || noc[{i}].priority_list[2] == NORTH || noc[{i}].priority_list[3] == NORTH || noc[{i}].priority_list[4] == NORTH);
+property alwaysContainsEast{i}  = A[](noc[{i}].priority_list[0] == EAST  || noc[{i}].priority_list[1] == EAST  || noc[{i}].priority_list[2] == EAST  || noc[{i}].priority_list[3] == EAST  || noc[{i}].priority_list[4] == EAST);
+property alwaysContainsSouth{i} = A[](noc[{i}].priority_list[0] == SOUTH || noc[{i}].priority_list[1] == SOUTH || noc[{i}].priority_list[2] == SOUTH || noc[{i}].priority_list[3] == SOUTH || noc[{i}].priority_list[4] == SOUTH);
+property alwaysContainsWest{i}  = A[](noc[{i}].priority_list[0] == WEST  || noc[{i}].priority_list[1] == WEST  || noc[{i}].priority_list[2] == WEST  || noc[{i}].priority_list[3] == WEST  || noc[{i}].priority_list[4] == WEST);
+property alwaysContainsLocal{i} = A[](noc[{i}].priority_list[0] == LOCAL || noc[{i}].priority_list[1] == LOCAL || noc[{i}].priority_list[2] == LOCAL || noc[{i}].priority_list[3] == LOCAL || noc[{i}].priority_list[4] == LOCAL);
 
 property allPrioritiesAreUnique{i}  = A[]((noc[{i}].priority_list[0] != noc[{i}].priority_list[1]) &&
                                           (noc[{i}].priority_list[0] != noc[{i}].priority_list[2]) && 
