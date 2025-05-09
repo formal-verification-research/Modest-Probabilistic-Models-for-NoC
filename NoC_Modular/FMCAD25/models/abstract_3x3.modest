@@ -215,6 +215,14 @@ function buffer option enqueue(int n, buffer option ls) =
         tl: ls
     });
 
+// Add a flit to the buffer but if the buffer is full then drop
+// the flit
+function buffer option boundedEnqueue(int n, buffer option ls) =
+    if len(ls) == BUFFER_LENGTH then ls
+    else some(buffer {
+        hd: n,
+        tl: ls
+    });
 // Remove a flit from the buffer
 function buffer option dequeue(buffer option ls) =
     if ls == none then none
@@ -567,7 +575,7 @@ process AbstractNeighbor(int id) {
     alt {
         // Note: enqueue's ipml ensures buffer length is maintained
     ::	generateFlits {= noc[id].channels[LOCAL].buffer =
-                enqueue(4, noc[id].channels[LOCAL].buffer) =}
+                boundedEnqueue(4, noc[id].channels[LOCAL].buffer) =}
     ::	generateFlits
     };
 
