@@ -56,14 +56,14 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: PropertyTy
 
     # Print starting message
     output_str = f"Simulation parameters:\n"
-    output_str += f"  Size: {noc._n}x{noc._n}\n"
+    output_str += f"  Size: {noc.dimension}x{noc.dimension}\n"
     output_str += f"  Noise Type: {type.name}\n"
     output_str += f"  Clock Upper Bound: {clk_upper}\n"
     output_str += f"  Threshold: {threshold}\n"
     output_str += f"  Stride: {stride}\n"
     output_str += f"  Block Size: {block_size}\n"
     print(output_str, end="")
-    print(f"\nStarting {noc._n}x{noc._n} {type.name} simulation...")
+    print(f"\nStarting {noc.dimension}x{noc.dimension} {type.name} simulation...")
 
     # Initialize variables
     clk = 0
@@ -103,7 +103,7 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: PropertyTy
     # Timing
     end_time = time.time()
     elapsed_time = end_time - start_time
-    timing_file = result_path / Path(f"noc_{noc._n}x{noc._n}_{type.name.lower()}_noise_threshold_{threshold}_stride_{stride}_block_size_{block_size}.time.txt")
+    timing_file = result_path / Path(f"noc_{noc.dimension}x{noc.dimension}_{type.name.lower()}_noise_threshold_{threshold}_stride_{stride}_block_size_{block_size}.time.txt")
     time_str = time_to_str(elapsed_time)
 
     # Print out the time string
@@ -116,7 +116,7 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: PropertyTy
         f.write(output_str)
 
     # Probabilities
-    filename = result_path / Path(f"noc_{noc._n}x{noc._n}_{type.name.lower()}_noise_threshold_{threshold}_stride_{stride}_block_size_{block_size}.csv")
+    filename = result_path / Path(f"noc_{noc.dimension}x{noc.dimension}_{type.name.lower()}_noise_threshold_{threshold}_stride_{stride}_block_size_{block_size}.csv")
     with open(filename, "w", newline="") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(["Clock Cycle", "Probability"])
