@@ -1,27 +1,16 @@
-Peak memory usage: 8417 MB
-Analysis results for optimized_min_vars.modest
+Analysis results for functional_2x2.modest
 
 + State space exploration
   Min. state size:    96 bytes
-  States:             2119209
-  Transitions:        2119209
-  Branches:           4186809
-  Rate:               3001 states/s
-  Peak memory:        7460.88 MB
-  Final size:         80.05 MB
-  Size on disk:       8.16 MB
-  Time (exploration): 706.1 s
-  Time (merging):     0.9 s
-
-+ Property neverGeneratesFlitsForSelfSim
-  Probability: 0
-  Bounds:      [0, 0]
-  Time:        0.2 s
-
-  + Value iteration
-    Final error: 0
-    Iterations:  1
-    Time:        0.1 s
+  States:             3446073
+  Transitions:        3446073
+  Branches:           5513673
+  Rate:               8905 states/s
+  Peak memory:        9844.28 MB
+  Final size:         110.42 MB
+  Size on disk:       19.24 MB
+  Time (exploration): 387.0 s
+  Time (merging):     0.7 s
 
 + Property neverGeneratesFlitsForSelf0
   Result: True
@@ -36,6 +25,54 @@ Analysis results for optimized_min_vars.modest
   Time:   0.0 s
 
 + Property neverGeneratesFlitsForSelf3
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations0to1
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations0t02
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations0t03
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations1to0
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations1t02
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations1t03
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations2to0
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations2t01
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations2t03
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations3to0
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations3t01
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations3t02
   Result: True
   Time:   0.0 s
 

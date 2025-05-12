@@ -223,14 +223,27 @@ function int getColumnShift(int id, int dst) = idToColumn(dst) - idToColumn(id);
 
 // ----- PROPERTIES -----
 
-// Simulation property
-property neverGeneratesFlitsForSelfSim = Pmax(<>(contains(0, noc[0].channels[LOCAL].buffer)));
-
 // Flit generation testing
 property neverGeneratesFlitsForSelf0 = A[](!(contains(0, noc[0].channels[LOCAL].buffer)));
 property neverGeneratesFlitsForSelf1 = A[](!(contains(1, noc[1].channels[LOCAL].buffer)));
 property neverGeneratesFlitsForSelf2 = A[](!(contains(2, noc[2].channels[LOCAL].buffer)));
 property neverGeneratesFlitsForSelf3 = A[](!(contains(3, noc[3].channels[LOCAL].buffer)));
+
+property generatesForAllDestinations0to1 = E<>(contains(1, noc[0].channels[LOCAL].buffer));
+property generatesForAllDestinations0t02 = E<>(contains(2, noc[0].channels[LOCAL].buffer));
+property generatesForAllDestinations0t03 = E<>(contains(3, noc[0].channels[LOCAL].buffer));
+
+property generatesForAllDestinations1to0 = E<>(contains(0, noc[1].channels[LOCAL].buffer));
+property generatesForAllDestinations1t02 = E<>(contains(2, noc[1].channels[LOCAL].buffer));
+property generatesForAllDestinations1t03 = E<>(contains(3, noc[1].channels[LOCAL].buffer));
+
+property generatesForAllDestinations2to0 = E<>(contains(0, noc[2].channels[LOCAL].buffer));
+property generatesForAllDestinations2t01 = E<>(contains(1, noc[2].channels[LOCAL].buffer));
+property generatesForAllDestinations2t03 = E<>(contains(3, noc[2].channels[LOCAL].buffer));
+
+property generatesForAllDestinations3to0 = E<>(contains(0, noc[3].channels[LOCAL].buffer));
+property generatesForAllDestinations3t01 = E<>(contains(1, noc[3].channels[LOCAL].buffer));
+property generatesForAllDestinations3t02 = E<>(contains(2, noc[3].channels[LOCAL].buffer));
 
 // Valid priority list
 property alwaysContainsNorth___0  = A[](noc[0].priority_list[0] == NORTH || noc[0].priority_list[1] == NORTH || noc[0].priority_list[2] == NORTH || noc[0].priority_list[3] == NORTH || noc[0].priority_list[4] == NORTH);
