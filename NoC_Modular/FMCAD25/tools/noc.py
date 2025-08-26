@@ -346,21 +346,9 @@ function int getColumnShift(int id, int dst) = idToColumn(dst) - idToColumn(id);
 """
     
     @add_info
-    def processes(self, ptype: PropertyType) -> str:
-        verification: str = """\
-// ----- Processes -----
-// General guidance for processes is that we want as much synchronized assignments to happen
-// as possible. A digital system is by default a synchronous system, so we don't typically
-// need worry about interleavings for our design. To accomplish this most processes also 
-// have an associated action with the same name that synchronizes assignments between
-// routers within those processes.
-
-// #CUSTOMIZE
-// This method is how flits are generated for the NoC. To change the flit injection pattern
-// change this method.
-// Flits are injected into a router's LOCAL buffer and then the router automatically routes
-// the flits to their destination.
-action generateFlits;
+    def processes(self, ptype: PropertyType, generate_flits: str | None) -> str:
+        if generate_flits is None:
+            generate_flits = """\
 process GenerateFlits(int id) {
     int(0..NOC_MAX_ID) destination;
 
@@ -379,7 +367,25 @@ process GenerateFlits(int id) {
     else {
         generateFlits // Take this action instead of tau for better synchronization
     }
-}
+}"""
+
+        verification: str = """\
+// ----- Processes -----
+// General guidance for processes is that we want as much synchronized assignments to happen
+// as possible. A digital system is by default a synchronous system, so we don't typically
+// need worry about interleavings for our design. To accomplish this most processes also 
+// have an associated action with the same name that synchronizes assignments between
+// routers within those processes.
+
+// #CUSTOMIZE
+// This method is how flits are generated for the NoC. To change the flit injection pattern
+// change this method.
+// Flits are injected into a router's LOCAL buffer and then the router automatically routes
+// the flits to their destination.
+action generateFlits;
+""" + \
+generate_flits + \
+"""\
 
 // Set the `isEmpty` and `isFull` flags for each channel based off the current
 // state of the buffers in the channel
@@ -617,25 +623,9 @@ process Clock() {
 // Flits are injected into a router's LOCAL buffer and then the router automatically routes
 // the flits to their destination.
 action generateFlits;
-process GenerateFlits(int id) {
-    int(0..NOC_MAX_ID) destination;
-
-    if (!isBufferFull(noc[id].channels[LOCAL].buffer) && clk < INJECTION_RATE_NUMERATOR) {
-        // Add the new flit to the local buffer
-        // If the destination is greater than or equal to the ID, we shift it
-        // up by one to exclude the possiblity of sending a flit to ourselves
-        generateFlits {=
-            0: destination = DiscreteUniform(0, NOC_MAX_ID - 1),
-            1: noc[id].channels[LOCAL].buffer = 
-                enqueue(destination >= id ? 
-                            destination + 1 : 
-                            destination, noc[id].channels[LOCAL].buffer)
-        =}
-    }
-    else {
-        generateFlits // Take this action instead of tau for better synchronization
-    }
-}
+""" + \
+generate_flits + \
+"""\
 
 // Set the `isEmpty` and `isFull` flags for each channel based off the current
 // state of the buffers in the channel
