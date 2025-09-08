@@ -47,7 +47,7 @@ def time_func(func):
         return result
     return wrapper
 
-def simulate(*, result_path: Path = Path("results"), size: int, type: PropertyType, clk_upper: int | None, threshold: int = 1, stride : int = 1, block_size : int = 50):
+def simulate(*, result_path: Path = Path("results"), size: int, type: PropertyType, clk_upper: int | None, threshold: int = 1, stride : int = 1, block_size : int = 50, generate_flits: str | None = None):
     # Create result directory
     result_path.mkdir(parents=True, exist_ok=True)
     
@@ -85,7 +85,7 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: PropertyTy
         if clk_upper is not None and upper > clk_upper:
             upper = clk_upper
             
-        sim_output = modest.simulate(noc.print(type, clk_low=lower, clk_high=upper, stride=stride))
+        sim_output = modest.simulate(noc.print(type, clk_low=lower, clk_high=upper, stride=stride, generate_flits=generate_flits))
         probs += parse_probabilities(sim_output)
         clk += block_size
 

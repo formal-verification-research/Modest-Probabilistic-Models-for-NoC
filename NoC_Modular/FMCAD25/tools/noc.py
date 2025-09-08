@@ -43,16 +43,16 @@ class Noc:
                  inductive_noise_threshold: int = 1):
         assert size >= 2, "Size must be at least 2x2"
 
-        self.num_nodes = size * size
-        self.dimension = size
-        self.buffer_size = buffer_size
-        self.activity_thresh = activity_thresh
-        self.injection_rate_numerator = injection_rate_numerator
-        self.injection_rate_denominator = injection_rate_denominator
-        self.resistive_noise_threshold = resistive_noise_threshold
-        self.inductive_noise_threshold = inductive_noise_threshold
+        self.num_nodes: int = size * size
+        self.dimension: int = size
+        self.buffer_size: int = buffer_size
+        self.activity_thresh: int = activity_thresh
+        self.injection_rate_numerator: int = injection_rate_numerator
+        self.injection_rate_denominator: int = injection_rate_denominator
+        self.resistive_noise_threshold: int = resistive_noise_threshold
+        self.inductive_noise_threshold: int = inductive_noise_threshold
     
-    def print(self, ptype: PropertyType, *, clk_low: int = 0, clk_high: int = 100, stride: int = 1):
+    def print(self, ptype: PropertyType, *, clk_low: int = 0, clk_high: int = 100, stride: int = 1, generate_flits: str | None = None):
         return self.type() \
                 + self.user_defined_constants() \
                 + self.calculated_constants()\
@@ -60,7 +60,7 @@ class Noc:
                 + self.verification_datatypes() \
                 + self.variables(ptype) \
                 + self.functions() \
-                + self.processes(ptype) \
+                + self.processes(ptype, generate_flits=generate_flits) \
                 + self.composition() \
                 + self.properties(ptype, clk_low=clk_low, clk_high=clk_high, stride=stride)
 
@@ -346,7 +346,7 @@ function int getColumnShift(int id, int dst) = idToColumn(dst) - idToColumn(id);
 """
     
     @add_info
-    def processes(self, ptype: PropertyType, generate_flits: str | None) -> str:
+    def processes(self, ptype: PropertyType, generate_flits: str | None = None) -> str:
         if generate_flits is None:
             generate_flits = """\
 process GenerateFlits(int id) {
