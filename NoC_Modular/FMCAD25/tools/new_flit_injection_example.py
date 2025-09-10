@@ -53,7 +53,7 @@ process GenerateFlits(int id) {
         result_path=Path("results/2x2_custom_flit_gen"),
         type=PropertyType.RESISTIVE,
         threshold=5,
-        clk_upper=1500,
+        clk_upper=50,
         stride=2,
         generate_flits=custom_generate_flits,
     )
