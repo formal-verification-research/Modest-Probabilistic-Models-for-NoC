@@ -183,6 +183,7 @@ def noc_8x8_inductive():
     simulate(size=8, result_path=Path("results/8x8"), type=PropertyType.INDUCTIVE, threshold=1, clk_upper=40, stride=1)
     simulate(size=8, result_path=Path("results/8x8"), type=PropertyType.INDUCTIVE, threshold=5, clk_upper=40, stride=1)
     simulate(size=8, result_path=Path("results/8x8"), type=PropertyType.INDUCTIVE, threshold=10, clk_upper=40, stride=1)
+    simulate(size=8, result_path=Path("results/8x8"), type=PropertyType.INDUCTIVE, threshold=20, clk_upper=40, stride=1)
 
 if __name__ == "__main__":
     # Resistive Simulations
