@@ -186,14 +186,22 @@ def noc_8x8_inductive():
     simulate(size=8, result_path=Path("results/8x8"), type=PropertyType.INDUCTIVE, threshold=20, clk_upper=40, stride=1)
 
 if __name__ == "__main__":
+    # Check to make sure that this script was called from above the tools directory
+    if Path.cwd().name == "tools":
+        raise Exception("This script must be called from the directory above 'tools'.\n"
+                        "Example: python tools/fmcad.py")
+
     # Resistive Simulations
-    # noc_2x2_resistive()
-    # noc_3x3_resistive()
-    # noc_4x4_resistive()
+    noc_2x2_resistive()
+    noc_3x3_resistive()
+    noc_4x4_resistive()
     noc_8x8_resistive()
 
     # Inductive Simulations
-    # noc_2x2_inductive()
-    # noc_3x3_inductive()
-    # noc_4x4_inductive()
+    noc_2x2_inductive()
+    noc_3x3_inductive()
+    noc_4x4_inductive()
     noc_8x8_inductive()
+
+    # Specific simulations
+    
