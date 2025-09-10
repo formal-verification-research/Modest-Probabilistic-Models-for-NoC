@@ -25,6 +25,10 @@ function plot_noise(directory)
     leg = strings(0);
     thresholds = [];
     for j = 1:size(files,1)
+        if files(j).name == ".." || files(j).name == "."
+            continue
+        end
+
         is_inductive = contains(files(j).name, "inductive", ...
             "IgnoreCase",true);
         [~, ~, ext] = fileparts(files(j).name);
@@ -48,7 +52,9 @@ function plot_noise(directory)
     grid on
 
     [~, i] = sort(thresholds);
-    set(gca,'Children',fliplr(line(i)))
+    if exist("line", "var")
+        set(gca,'Children',fliplr(line(i)));
+    end
     leg = leg(i);
 
     legend(leg, "Interpreter","latex", "Location","southeast");
@@ -90,7 +96,9 @@ function plot_noise(directory)
     grid on
 
     [~, i] = sort(thresholds);
-    set(gca,'Children',fliplr(line(i)))
+    if exist("line", "var")
+        set(gca,'Children',fliplr(line(i)));
+    end
     leg = leg(i);
 
     legend(leg, "Interpreter","latex", "Location","southeast");
