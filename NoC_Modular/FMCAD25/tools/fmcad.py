@@ -97,6 +97,8 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: PropertyTy
         print(*[f"{p[1]:.3f}" for p in probs[-3:]], sep=", ", end="")
         print(f"]. Pmax: {pmax:.3f}")
 
+        output_str += f"\n{sim_output}\n"
+
         if pmax >= (1.0 - 1e-5):            
             break
     
@@ -111,7 +113,7 @@ def simulate(*, result_path: Path = Path("results"), size: int, type: PropertyTy
 
     # Write the output string to the output file
     output_str += f"\n"
-    output_str += f"Elapsed time: {time_str}\n"
+    output_str += f"Total elapsed time: {time_str}\n"
     with open(timing_file, "w") as f:
         f.write(output_str)
 
@@ -202,6 +204,3 @@ if __name__ == "__main__":
     noc_3x3_inductive()
     noc_4x4_inductive()
     noc_8x8_inductive()
-
-    # Specific simulations
-    
