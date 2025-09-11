@@ -47,6 +47,85 @@ def time_func(func):
         return result
     return wrapper
 
+def check(*, result_path: Path = Path("results"), size: int, type: PropertyType, clk_upper: int | None, threshold: int = 1, stride : int = 1, block_size : int = 50, generate_flits: str | None = None):
+    # Create result directory
+    result_path.mkdir(parents=True, exist_ok=True)
+    
+    # Initialize the NoC
+    noc = Noc(size, resistive_noise_threshold=threshold, inductive_noise_threshold=threshold)
+
+    # Print starting message
+    output_str = f"Simulation parameters:\n"
+    output_str += f"  Size: {noc.dimension}x{noc.dimension}\n"
+    output_str += f"  Noise Type: {type.name}\n"
+    output_str += f"  Clock Upper Bound: {clk_upper}\n"
+    output_str += f"  Threshold: {threshold}\n"
+    output_str += f"  Stride: {stride}\n"
+    output_str += f"  Block Size: {block_size}\n"
+    print(output_str, end="")
+    print(f"\nStarting {noc.dimension}x{noc.dimension} {type.name} simulation...")
+
+    # Initialize variables
+    clk = 0
+    probs = []
+
+    # The block size is how many properties to count at once. If we have a stride > 1 then
+    # we need to multiply the block size by the stride to get the the correct number of 
+    # properties tested at a single time
+    block_size *= stride
+
+    # Start the sim counter
+    start_time = time.time()
+
+    # Simulation
+    while clk_upper is None or clk <= clk_upper:
+        lower = clk 
+        upper = clk + block_size - 1 
+
+        if clk_upper is not None and upper > clk_upper:
+            upper = clk_upper
+            
+        sim_output = modest.check(noc.print(type, clk_low=lower, clk_high=upper, stride=stride, generate_flits=generate_flits))
+        probs += parse_probabilities(sim_output)
+        clk += block_size
+
+        pmax = max(probs, key=lambda x: x[1])[1]
+
+        print(f"  [info]: finished clock cycle block ({lower},{upper}). P: [", end="")        
+        print(*[f"{p[1]:.3f}" for p in probs[lower:lower+3]], sep=", ", end="")
+        print("...", end="")        
+        print(*[f"{p[1]:.3f}" for p in probs[-3:]], sep=", ", end="")
+        print(f"]. Pmax: {pmax:.3f}")
+
+        output_str += f"\n{sim_output}\n"
+
+        if pmax >= (1.0 - 1e-5):            
+            break
+    
+    # Timing
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    timing_file = result_path / Path(f"noc_{noc.dimension}x{noc.dimension}_{type.name.lower()}_noise_threshold_{threshold}_stride_{stride}_block_size_{block_size}.time.txt")
+    time_str = time_to_str(elapsed_time)
+
+    # Print out the time string
+    print(f"Simulation complete. Time elapsed: {time_str}\n")
+
+    # Write the output string to the output file
+    output_str += f"\n"
+    output_str += f"Total elapsed time: {time_str}\n"
+    with open(timing_file, "w") as f:
+        f.write(output_str)
+
+    # Probabilities
+    filename = result_path / Path(f"noc_{noc.dimension}x{noc.dimension}_{type.name.lower()}_noise_threshold_{threshold}_stride_{stride}_block_size_{block_size}.csv")
+    with open(filename, "w", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(["Clock Cycle", "Probability"])
+        writer.writerows(probs)
+
+    return probs 
+
 def simulate(*, result_path: Path = Path("results"), size: int, type: PropertyType, clk_upper: int | None, threshold: int = 1, stride : int = 1, block_size : int = 50, generate_flits: str | None = None):
     # Create result directory
     result_path.mkdir(parents=True, exist_ok=True)
@@ -141,6 +220,22 @@ def noc_2x2_inductive():
     simulate(size=2, result_path=Path("results/2x2"), type=PropertyType.INDUCTIVE, threshold=5, clk_upper=None, stride=12)
     simulate(size=2, result_path=Path("results/2x2"), type=PropertyType.INDUCTIVE, threshold=10, clk_upper=None, stride=36)
 
+
+@time_func
+def noc_2x2_resistive_check():
+    """ 2x2 resistive simulations with modest check """
+    check(size=2, result_path=Path("results/2x2_check"), type=PropertyType.RESISTIVE, threshold=1, clk_upper=None, stride=1)
+    check(size=2, result_path=Path("results/2x2_check"), type=PropertyType.RESISTIVE, threshold=5, clk_upper=None, stride=1)
+    check(size=2, result_path=Path("results/2x2_check"), type=PropertyType.RESISTIVE, threshold=10, clk_upper=None, stride=4)
+    check(size=2, result_path=Path("results/2x2_check"), type=PropertyType.RESISTIVE, threshold=20, clk_upper=None, stride=7)
+
+@time_func
+def noc_2x2_inductive_check():
+    """ 2x2 inductive simulations with modest check """
+    check(size=2, result_path=Path("results/2x2_check"), type=PropertyType.INDUCTIVE, threshold=1, clk_upper=None, stride=6)
+    check(size=2, result_path=Path("results/2x2_check"), type=PropertyType.INDUCTIVE, threshold=5, clk_upper=None, stride=12)
+    check(size=2, result_path=Path("results/2x2_check"), type=PropertyType.INDUCTIVE, threshold=10, clk_upper=None, stride=36)
+
 @time_func
 def noc_3x3_resistive():
     """ 3x3 resistive simulations """
@@ -195,12 +290,14 @@ if __name__ == "__main__":
 
     # Resistive Simulations
     noc_2x2_resistive()
+    noc_2x2_resistive_check()
     noc_3x3_resistive()
     noc_4x4_resistive()
     noc_8x8_resistive()
 
     # Inductive Simulations
     noc_2x2_inductive()
+    noc_2x2_inductive_check()
     noc_3x3_inductive()
     noc_4x4_inductive()
     noc_8x8_inductive()

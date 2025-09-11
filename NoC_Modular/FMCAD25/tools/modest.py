@@ -69,7 +69,7 @@ def __run(model: str | Path, output_path: Path | None = None, command: list[str]
     return output
 
 def check(model: str | Path, output_path: Path | None = None) -> str | None:
-    return __run(model, output_path, [MODEST_EXECUTABLE, "check"])
+    return __run(model, output_path, [MODEST_EXECUTABLE, "check", "--unsafe", "--chainopt", "-D"])
 
 def simulate(model: str | Path, output_path: Path | None = None) -> str | None:
     return __run(model, output_path, command=[MODEST_EXECUTABLE, "simulate"], opts=["--max-run-length", "0", "--unsafe"])
