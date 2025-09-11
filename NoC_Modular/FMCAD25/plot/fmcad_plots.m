@@ -64,6 +64,16 @@ function plot_noise(directory)
     ylim tight
     png_filename = sprintf("%s_inductive.png", noc_size);
     exportgraphics(fig, fullfile("plot", png_filename), "Resolution",600);
+
+    % Save small version of plot
+    set(fig, "Position", [5,5,3.3*(30/44),2.7*(30/44)])
+    xlabel("Clock cycles", "FontSize", 8);
+    ylabel("Probability", "FontSize", 8);
+    xlim tight
+    ylim tight
+    png_filename = sprintf("%s_inductive_small.png", noc_size);
+    exportgraphics(fig, fullfile("plot", png_filename), "Resolution",600);
+
     close all
 
     % plot resistive noise second
@@ -108,6 +118,16 @@ function plot_noise(directory)
     ylim tight
     png_filename = sprintf("%s_resistive.png", noc_size);
     exportgraphics(fig, fullfile("plot", png_filename), "Resolution",600);
+    
+    % Save small version of plot
+    set(fig, "Position", [5,5,3.3*(30/44),2.7*(30/44)])
+    xlabel("Clock cycles", "FontSize", 8);
+    ylabel("Probability", "FontSize", 8);
+    xlim tight
+    ylim tight
+    png_filename = sprintf("%s_resistive_small.png", noc_size);
+    exportgraphics(fig, fullfile("plot", png_filename), "Resolution",600);
+
     close all
 end
 
