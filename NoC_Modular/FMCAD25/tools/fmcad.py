@@ -55,7 +55,7 @@ def check(*, result_path: Path = Path("results"), size: int, type: PropertyType,
     noc = Noc(size, resistive_noise_threshold=threshold, inductive_noise_threshold=threshold)
 
     # Print starting message
-    output_str = f"Simulation parameters:\n"
+    output_str = f"Modest check parameters:\n"
     output_str += f"  Size: {noc.dimension}x{noc.dimension}\n"
     output_str += f"  Noise Type: {type.name}\n"
     output_str += f"  Clock Upper Bound: {clk_upper}\n"
@@ -86,16 +86,20 @@ def check(*, result_path: Path = Path("results"), size: int, type: PropertyType,
             upper = clk_upper
             
         sim_output = modest.check(noc.print(type, clk_low=lower, clk_high=upper, stride=stride, generate_flits=generate_flits))
-        probs += parse_probabilities(sim_output)
+        new_probs = parse_probabilities(sim_output)
         clk += block_size
 
-        pmax = max(probs, key=lambda x: x[1])[1]
+        if len(new_probs) > 0:
+            probs += new_probs
+            pmax = max(probs, key=lambda x: x[1])[1]
 
-        print(f"  [info]: finished clock cycle block ({lower},{upper}). P: [", end="")        
-        print(*[f"{p[1]:.3f}" for p in probs[lower:lower+3]], sep=", ", end="")
-        print("...", end="")        
-        print(*[f"{p[1]:.3f}" for p in probs[-3:]], sep=", ", end="")
-        print(f"]. Pmax: {pmax:.3f}")
+            print(f"  [info]: finished clock cycle block ({lower},{upper}). P: [", end="")        
+            print(*[f"{p[1]:.3f}" for p in probs[lower:lower+3]], sep=", ", end="")
+            print("...", end="")        
+            print(*[f"{p[1]:.3f}" for p in probs[-3:]], sep=", ", end="")
+            print(f"]. Pmax: {pmax:.3f}")
+        else:
+            print(f"  [info]: finished clock cycle block ({lower},{upper}) but probs were not calculated") 
 
         output_str += f"\n{sim_output}\n"
 
