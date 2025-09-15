@@ -86,25 +86,11 @@ def check(*, result_path: Path = Path("results"), size: int, type: PropertyType,
             upper = clk_upper
             
         sim_output = modest.check(noc.print(type, clk_low=lower, clk_high=upper, stride=stride, generate_flits=generate_flits))
-        new_probs = parse_probabilities(sim_output)
         clk += block_size
 
-        if len(new_probs) > 0:
-            probs += new_probs
-            pmax = max(probs, key=lambda x: x[1])[1]
-
-            print(f"  [info]: finished clock cycle block ({lower},{upper}). P: [", end="")        
-            print(*[f"{p[1]:.3f}" for p in probs[lower:lower+3]], sep=", ", end="")
-            print("...", end="")        
-            print(*[f"{p[1]:.3f}" for p in probs[-3:]], sep=", ", end="")
-            print(f"]. Pmax: {pmax:.3f}")
-        else:
-            print(f"  [info]: finished clock cycle block ({lower},{upper}) but probs were not calculated") 
+        print(f"  [info]: finished clock cycle block ({lower},{upper}) but probs were not calculated") 
 
         output_str += f"\n{sim_output}\n"
-
-        if pmax >= (1.0 - 1e-5):            
-            break
     
     # Timing
     end_time = time.time()
@@ -232,17 +218,17 @@ def noc_2x2_inductive():
 @time_func
 def noc_2x2_resistive_check():
     """ 2x2 resistive simulations with modest check """
-    check(size=2, result_path=Path("results/2x2_check"), type=PropertyType.RESISTIVE, threshold=1, clk_upper=None, stride=1)
-    check(size=2, result_path=Path("results/2x2_check"), type=PropertyType.RESISTIVE, threshold=5, clk_upper=None, stride=1)
-    check(size=2, result_path=Path("results/2x2_check"), type=PropertyType.RESISTIVE, threshold=10, clk_upper=None, stride=4)
-    check(size=2, result_path=Path("results/2x2_check"), type=PropertyType.RESISTIVE, threshold=20, clk_upper=None, stride=7)
+    check(size=2, result_path=Path("results/2x2_check"), type=PropertyType.RESISTIVE, threshold=1, clk_upper=175, stride=1)
+    check(size=2, result_path=Path("results/2x2_check"), type=PropertyType.RESISTIVE, threshold=5, clk_upper=250, stride=1)
+    check(size=2, result_path=Path("results/2x2_check"), type=PropertyType.RESISTIVE, threshold=10, clk_upper=400, stride=4)
+    check(size=2, result_path=Path("results/2x2_check"), type=PropertyType.RESISTIVE, threshold=20, clk_upper=675, stride=7)
 
 @time_func
 def noc_2x2_inductive_check():
     """ 2x2 inductive simulations with modest check """
-    check(size=2, result_path=Path("results/2x2_check"), type=PropertyType.INDUCTIVE, threshold=1, clk_upper=None, stride=6)
-    check(size=2, result_path=Path("results/2x2_check"), type=PropertyType.INDUCTIVE, threshold=5, clk_upper=None, stride=12)
-    check(size=2, result_path=Path("results/2x2_check"), type=PropertyType.INDUCTIVE, threshold=10, clk_upper=None, stride=36)
+    check(size=2, result_path=Path("results/2x2_check"), type=PropertyType.INDUCTIVE, threshold=1, clk_upper=1500, stride=6)
+    check(size=2, result_path=Path("results/2x2_check"), type=PropertyType.INDUCTIVE, threshold=5, clk_upper=2500, stride=12)
+    check(size=2, result_path=Path("results/2x2_check"), type=PropertyType.INDUCTIVE, threshold=10, clk_upper=5250, stride=36)
 
 @time_func
 def noc_3x3_resistive():
@@ -297,13 +283,17 @@ if __name__ == "__main__":
                         "Example: python tools/fmcad.py")
 
     # Resistive Simulations
-    noc_2x2_resistive()
-    noc_3x3_resistive()
-    noc_4x4_resistive()
-    noc_8x8_resistive()
+    # noc_2x2_resistive()
+    # noc_3x3_resistive()
+    # noc_4x4_resistive()
+    # noc_8x8_resistive()
 
     # Inductive Simulations
-    noc_2x2_inductive()
-    noc_3x3_inductive()
-    noc_4x4_inductive()
-    noc_8x8_inductive()
+    # noc_2x2_inductive()
+    # noc_3x3_inductive()
+    # noc_4x4_inductive()
+    # noc_8x8_inductive()
+
+    # Check
+    noc_2x2_inductive_check()
+    noc_2x2_resistive_check()
