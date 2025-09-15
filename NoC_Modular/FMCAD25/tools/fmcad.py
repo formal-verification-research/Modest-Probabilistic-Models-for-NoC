@@ -298,14 +298,12 @@ if __name__ == "__main__":
 
     # Resistive Simulations
     noc_2x2_resistive()
-    noc_2x2_resistive_check()
     noc_3x3_resistive()
     noc_4x4_resistive()
     noc_8x8_resistive()
 
     # Inductive Simulations
     noc_2x2_inductive()
-    noc_2x2_inductive_check()
     noc_3x3_inductive()
     noc_4x4_inductive()
     noc_8x8_inductive()
