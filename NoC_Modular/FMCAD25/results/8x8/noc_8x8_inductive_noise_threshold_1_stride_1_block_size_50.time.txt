@@ -1,0 +1,520 @@
+Simulation parameters:
+  Size: 8x8
+  Noise Type: INDUCTIVE
+  Clock Upper Bound: 40
+  Threshold: 1
+  Stride: 1
+  Block Size: 50
+
+The Modest Toolset (www.modestchecker.net), version v3.1.290-gff8cae090+ff8cae0903ec136f9c4c15123e444b0b0399ff6b.
+Command: modest simulate __tmp_model__.modest --max-run-length 0 --unsafe
+
+
+
+
+__tmp_model__.modest: info: __tmp_model__ is a DTMC model and will be simulated as an MDP using uniform resolution of nondeterminism.
+__tmp_model__.modest: info: Using default confidence level of 0.95.
+__tmp_model__.modest: info: Using default absolute half-width of 0.01.
+
+Peak memory usage: 545 MB
+Analysis results for __tmp_model__.modest
+Status:          Finished
+Simulation time: 88.1 s
+
++ Properties "inductiveNoiseProbability1RewardBounded0", "inductiveNoiseProbability1RewardBounded1", "inductiveNoiseProbability1RewardBounded2", "inductiveNoiseProbability1RewardBounded3", "inductiveNoiseProbability1RewardBounded4", "inductiveNoiseProbability1RewardBounded5", "inductiveNoiseProbability1RewardBounded6", "inductiveNoiseProbability1RewardBounded7", "inductiveNoiseProbability1RewardBounded8", "inductiveNoiseProbability1RewardBounded9", "inductiveNoiseProbability1RewardBounded10", "inductiveNoiseProbability1RewardBounded11", "inductiveNoiseProbability1RewardBounded12", "inductiveNoiseProbability1RewardBounded13", "inductiveNoiseProbability1RewardBounded14", "inductiveNoiseProbability1RewardBounded15", "inductiveNoiseProbability1RewardBounded16", "inductiveNoiseProbability1RewardBounded17", "inductiveNoiseProbability1RewardBounded18", "inductiveNoiseProbability1RewardBounded19", "inductiveNoiseProbability1RewardBounded20", "inductiveNoiseProbability1RewardBounded21", "inductiveNoiseProbability1RewardBounded22", "inductiveNoiseProbability1RewardBounded23", "inductiveNoiseProbability1RewardBounded24", "inductiveNoiseProbability1RewardBounded25", "inductiveNoiseProbability1RewardBounded26", "inductiveNoiseProbability1RewardBounded27", "inductiveNoiseProbability1RewardBounded28", "inductiveNoiseProbability1RewardBounded29", "inductiveNoiseProbability1RewardBounded30", "inductiveNoiseProbability1RewardBounded31", "inductiveNoiseProbability1RewardBounded32", "inductiveNoiseProbability1RewardBounded33", "inductiveNoiseProbability1RewardBounded34", "inductiveNoiseProbability1RewardBounded35", "inductiveNoiseProbability1RewardBounded36", "inductiveNoiseProbability1RewardBounded37", "inductiveNoiseProbability1RewardBounded38", "inductiveNoiseProbability1RewardBounded39" and "inductiveNoiseProbability1RewardBounded40"
+  Run type: MDP
+  Status:   Finished
+
+  + Property inductiveNoiseProbability1RewardBounded0
+    Estimated probability: 0
+    Confidence interval:   [0, 0.00038014618150505886]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded1
+    Estimated probability: 0.20758606472892188
+    Confidence interval:   [0.19955287291853474, 0.2157951701513989]
+    Interval half-width:   0.00812114861643208
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded2
+    Estimated probability: 0.5743145743145743
+    Confidence interval:   [0.56440326801468, 0.5841812407153953]
+    Interval half-width:   0.009888986350357676
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded3
+    Estimated probability: 0.8133374561945991
+    Confidence interval:   [0.8054390770222986, 0.821047270029888]
+    Interval half-width:   0.007804096503794711
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded4
+    Estimated probability: 0.9057926200783344
+    Confidence interval:   [0.8998059673034946, 0.9115343617242783]
+    Interval half-width:   0.0058641972103918305
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded5
+    Estimated probability: 0.9578437435580293
+    Confidence interval:   [0.9536539631878537, 0.9617557583771856]
+    Interval half-width:   0.004050897594665981
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded6
+    Estimated probability: 0.9820655534941249
+    Confidence interval:   [0.9792237871186503, 0.9846123798588997]
+    Interval half-width:   0.0026942963701246936
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded7
+    Estimated probability: 0.9907235621521335
+    Confidence interval:   [0.9886098216516613, 0.9925342368024063]
+    Interval half-width:   0.0019622075753724655
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded8
+    Estimated probability: 0.9956709956709957
+    Confidence interval:   [0.9941529007438368, 0.9968783065858327]
+    Interval half-width:   0.001362702920997938
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded9
+    Estimated probability: 0.9976293547722119
+    Confidence interval:   [0.9964449787713295, 0.9984966391235172]
+    Interval half-width:   0.0010258301760938116
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded10
+    Estimated probability: 0.9991754277468563
+    Confidence interval:   [0.9983759139201253, 0.9996439431463529]
+    Interval half-width:   0.000634014613113798
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded11
+    Estimated probability: 0.9998969284683571
+    Confidence interval:   [0.9994258574652792, 0.999997390458187]
+    Interval half-width:   0.0002857664964538986
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded12
+    Estimated probability: 0.9998969284683571
+    Confidence interval:   [0.9994258574652792, 0.999997390458187]
+    Interval half-width:   0.0002857664964538986
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded13
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded14
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded15
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded16
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded17
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded18
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded19
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded20
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded21
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded22
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded23
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded24
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded25
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded26
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded27
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded28
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded29
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded30
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded31
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded32
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded33
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded34
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded35
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded36
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded37
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded38
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded39
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property inductiveNoiseProbability1RewardBounded40
+    Estimated probability: 1
+    Confidence interval:   [0.9996198538184949, 1]
+    Interval half-width:   0.00019007309075252943
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+Total elapsed time: 00:01:44.96
