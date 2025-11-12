@@ -16,6 +16,11 @@ directory.
 - [PreviousModels](./PreviousModels/): Contains previous works (both
   published and not published).
 
+> [!NOTE]
+> This repository used to be laid out quite differently. If you would
+> like to see the old layout, check out the
+> ["`pre-cleanup`"](https://github.com/formal-verification-research/Modest-Probabilistic-Models-for-NoC/releases/tag/pre-cleanup) tag.
+
 ## Contributing
 
 Currently, there is really only one contributor to this repository at a
