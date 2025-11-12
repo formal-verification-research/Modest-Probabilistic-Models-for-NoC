@@ -1,0 +1,9 @@
+int(0..1) value;
+
+property willBeZero = E<>(value == 0);
+property willBeOne = E<>(value == 1);
+
+alt {
+    :: {= value = 0 =}
+    :: {= value = 1 =}
+}

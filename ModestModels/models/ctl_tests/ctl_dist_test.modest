@@ -1,0 +1,18 @@
+option "dtmc";
+
+const int MIN = 0;
+const int MAX = 3;
+
+int val;
+
+property willBeZero  = E<>(val == 0);
+property willBeOne   = E<>(val == 1);
+property willBeTwo   = E<>(val == 2);
+property willBeThree = E<>(val == 3);
+
+property isBounded   = A[](MIN <= val && val <= MAX);
+
+do
+{
+    {= val = DiscreteUniform(MIN, MAX) =}
+}

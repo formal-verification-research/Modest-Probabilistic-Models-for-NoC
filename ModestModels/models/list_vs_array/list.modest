@@ -1,0 +1,71 @@
+option "dtmc";
+
+const int MAX_LENGTH = 4;
+
+datatype List = {
+    int(0..3) head,
+    List option tail
+};
+
+// Get the length of the list
+function int len(List option ls) = if ls == none then 0 else 1 + len(ls!.tail);
+
+// Return the front of the List without dequeuing
+function int peekFront(List option ls) =
+    if ls == none then -1
+    else if ls!.tail == none then ls!.head
+    else peekFront(ls!.tail);
+
+// Add a value to the List
+function List option enqueue(int n, List option ls) =
+    if len(ls) == MAX_LENGTH then ls
+    else some(List {
+        head: n,
+        tail: ls
+    });
+
+// Remove a value from the List
+function List option dequeue(List option ls) =
+    if ls == none then none
+    else if ls!.tail == none then none
+    else some(List {
+        head: ls!.head,
+        tail: dequeue(ls!.tail)
+    });
+
+// Returns True if the List `ls` contains `x`, otherwise returns false 
+function bool contains(int x, List option ls) =
+    if ls == none then false 
+    else if ls!.head == x then true
+    else contains(x, ls!.tail);
+
+// Variable to test on
+List option list;
+
+// Check that list never exceeds the max length
+property maxLength = A[](len(list) <= MAX_LENGTH);
+
+// Check that it is possible for the list to reach the max length
+property canReachMaxLength = E<>(len(list) == MAX_LENGTH);
+
+// randomly dequeue or enqueue a value
+process RandomStep() {
+    alt {
+    ::	{= list = enqueue(DiscreteUniform(0, 9), list) =}
+    ::	{= list = dequeue(list) =}
+    }
+}
+
+// init
+{= 
+    list = none
+=};
+
+// Random loop where we either enqueue a value or dequeue a value
+do
+{
+    par {
+    ::	RandomStep()
+    ::	RandomStep()
+    }
+}

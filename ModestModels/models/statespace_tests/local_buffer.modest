@@ -1,0 +1,79 @@
+option "dtmc";
+
+// List type (same as the buffer type used in the NoC)
+datatype List = {
+    int(0..3) head,
+    List option tail
+};
+
+// List max length
+const int MAX_LENGTH = 4;
+
+// Get the length of the list
+function int len(List option ls) = if ls == none then 0 else 1 + len(ls!.tail);
+
+// Return the front of the List without dequeuing
+function int peekFront(List option ls) =
+    if ls == none then -1
+    else if ls!.tail == none then ls!.head
+    else peekFront(ls!.tail);
+
+// Add a value to the List
+function List option enqueue(int n, List option ls) =
+    if len(ls) == MAX_LENGTH then ls
+    else some(List {
+        head: n,
+        tail: ls
+    });
+
+// Remove a value from the List
+function List option dequeue(List option ls) =
+    if ls == none then none
+    else if ls!.tail == none then none
+    else some(List {
+        head: ls!.head,
+        tail: dequeue(ls!.tail)
+    });
+
+// Returns True if the List `ls` contains `x`, otherwise returns false 
+function bool contains(int x, List option ls) =
+    if ls == none then false 
+    else if ls!.head == x then true
+    else contains(x, ls!.tail);
+
+// Maximum number of clock cycles
+const int CLK_MAX = 100;
+
+// Global clock counter
+int(0..CLK_MAX) clk = 0;
+
+// Injection rate (set to 3/10 for parity with the NoC)
+const int I_RATE_NUM = 3;
+const int I_RATE_DENOM = 10;
+
+// Model of the local buffer
+List option local = none;
+
+do
+{
+    if ((clk % I_RATE_DENOM) < I_RATE_NUM) {
+        {= local = enqueue(DiscreteUniform(0, 2), local) =}
+    } else {
+        tau
+    };
+
+    alt {
+    ::	{= local = dequeue(local) =}
+    ::	tau
+    };
+
+    {= clk = (clk + 1) % I_RATE_DENOM =};
+
+    if (clk >= CLK_MAX) {
+        stop
+    } else {
+        tau
+    }
+}
+
+property probOfBufferHalfFull = Pmax(<>(len(local) == MAX_LENGTH / 2));

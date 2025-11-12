@@ -1,0 +1,32 @@
+option "dtmc";
+
+const int NOC_MAX_ID = 8;
+const int INJECTION_RATE_NUMERATOR = 3;
+const int INJECTION_RATE_DENOMINATOR = 10;
+
+int(0..INJECTION_RATE_DENOMINATOR) clk;
+int(0..NOC_MAX_ID) flit = 1;
+int(0..NOC_MAX_ID) id = 0;
+
+property neverGenerateFlitsForSelf = A[](id != flit);
+
+process GenerateFlits(int id) {
+	int(0..NOC_MAX_ID) destination;
+
+	if((clk % INJECTION_RATE_DENOMINATOR) < INJECTION_RATE_NUMERATOR){
+		{= 
+			destination = DiscreteUniform(0, NOC_MAX_ID - 1) 
+		=};
+
+		if(destination >= id) { {= flit = destination + 1 =} }
+		else { {= flit = destination =} }
+	}
+	else {
+		tau
+	}
+}
+
+do
+{
+    GenerateFlits(id)
+}

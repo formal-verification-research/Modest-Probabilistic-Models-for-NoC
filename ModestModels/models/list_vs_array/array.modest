@@ -1,0 +1,68 @@
+option "dtmc";
+
+const int MAX_LENGTH = 4;
+
+datatype Array = {
+    int[] values,
+    int(0..MAX_LENGTH-1) head,
+    int(0..MAX_LENGTH-1) tail
+};
+
+Array arr;
+
+int dequeue_return = 0;
+
+// Get the length of the array
+function int len(Array arr) =
+    if arr.head > arr.tail then arr.head - arr.tail 
+    else (arr.head + MAX_LENGTH) - arr.tail;
+
+// Add a new value to the array
+process enqueue(Array arr, int n) {
+    if (len(arr) < MAX_LENGTH) {{=
+        0: arr.values[arr.head] = n,
+        1: arr.head = arr.head + 1 >= MAX_LENGTH ? 0 : arr.head + 1
+    =}} else {
+        tau
+    }
+}
+
+// Remove a value from the array
+process dequeue(Array arr) {
+    if (len(arr) < MAX_LENGTH) {{=
+        0: dequeue_return = arr.values[arr.tail],
+        1: arr.tail = arr.tail + 1 >= MAX_LENGTH ? 0 : arr.tail + 1
+    =}} else {
+        tau
+    }
+}
+
+// Check that list never exceeds the max length
+property maxLength = A[](len(arr) <= MAX_LENGTH);
+
+// Check that it is possible for the list to reach the max length
+property canReachMaxLength = E<>(len(arr) == MAX_LENGTH);
+
+// randomly dequeue or enqueue a value
+process RandomStep() {
+    alt {
+    ::	enqueue(arr, DiscreteUniform(0, 9))
+    ::	dequeue(arr)
+    }
+}
+
+// Init
+{= arr = Array {
+    values: array(i, MAX_LENGTH, 0),
+    head: 0,
+    tail: 0
+} =};
+
+// Random loop where we either enqueue a value or dequeue a value
+do
+{
+    par {
+    ::	RandomStep()
+    ::	RandomStep()
+    }
+}

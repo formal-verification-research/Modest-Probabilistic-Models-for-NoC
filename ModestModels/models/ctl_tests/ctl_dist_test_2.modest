@@ -1,0 +1,18 @@
+const int MIN = 0;
+const int MAX = 2;
+
+datatype point_t = {
+    int x,
+    int y
+};
+
+point_t point;
+
+property isBounded = A[](MIN <= point.x && point.x <= MAX && MIN <= point.y && point.y <= MAX);
+property boundedSum = A[](point.x + point.y <= 4);
+
+do
+{
+    {= point.x = DiscreteUniform(MIN, MAX), 
+       point.y = DiscreteUniform(MIN, MAX) =}
+}
