@@ -23,7 +23,7 @@ VerificationType = Literal["mcsta-CTL", "mcsta-PMC", "modes"]
 class SimulationRun(BaseModel):
     """Stores all data for a single Modest verification run."""
     title: str
-    start_time: datetime
+    start_time: str
     noc_parameters: Dict[str, Any]
     noc_model_file: str
     modest_command: str
@@ -61,7 +61,7 @@ def save_as_directory(summary: SimulationSummary, base_dir: Path) -> Path:
     print(f" - saving summary to {summary_dir}")
     
     # 2. Save each sub-run in its own subdirectory
-    sub_run_identifiers = []
+    sub_run_identifiers: List[str] = []
     for run in summary.sub_runs:
         # Use a clean title for the directory name
         run_dir_name = Path(sanitize_filename(run.title))
@@ -86,7 +86,7 @@ def save_as_directory(summary: SimulationSummary, base_dir: Path) -> Path:
         with open(run_dir / "metadata.json", 'w', encoding='utf-8') as f:
             json.dump(metadata, f, indent=2)
             
-        sub_run_identifiers.append(run_dir_name)
+        sub_run_identifiers.append(str(run_dir_name))
 
     # 3. Save the main summary file
     summary_metadata = summary.model_dump(exclude={'sub_runs'})
@@ -111,7 +111,7 @@ def save_as_directory(summary: SimulationSummary, base_dir: Path) -> Path:
             for f in files:
                 print(f'{subindent}{f}')
     
-    print_directory_tree(summary_dir.absolute())
+    print_directory_tree(str(summary_dir.absolute()))
 
     # Return the path for the main summary dir
     return summary_dir
