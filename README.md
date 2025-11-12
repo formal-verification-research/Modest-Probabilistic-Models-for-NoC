@@ -1,4 +1,4 @@
-# USU Formal NoC Verification
+# Formal NoC Verification
 
 This repository is dedicated to NoC verification work under Dr. Zhen
 Zhang at Utah State University. This currently includes probabilistic
@@ -25,7 +25,7 @@ file organization is made when working in this repository.
 
 ## Related Works
 
-These are some of the works that have come out of this work.
+These are some of the published papers that have come out of this work.
 
 ### Probabilistic Verification for Reliable Network-on-Chip System Design
 
