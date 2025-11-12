@@ -74,12 +74,5 @@ def check(model: str | Path, output_path: Path | None = None) -> str | None:
 def simulate(model: str | Path, output_path: Path | None = None) -> str | None:
     return __run(model, output_path, command=[MODEST_EXECUTABLE, "simulate"], opts=["--max-run-length", "0", "--unsafe"])
 
-if is_modest_on_path():
-    result = subprocess.run([MODEST_EXECUTABLE, "--version"], capture_output=True, text=True)
-
-    stdout = result.stdout.strip()
-    stderr = result.stderr.strip()
-
-    output = stdout + stderr
-
-    print(f"Found modest: {output.splitlines()[0]}")
+if not is_modest_on_path():
+    print("Could not find Modest executable!!!")
