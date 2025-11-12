@@ -1,0 +1,59 @@
+# USU Formal NoC Verification
+
+This repository is dedicated to NoC verification work under Dr. Zhen
+Zhang at Utah State University. This currently includes probabilistic
+models using the Modest toolset and deductive models using Dafny.
+
+## Repository Layout
+
+Each sub-directory in this repository has it's own README file with
+instructions on how to read, use, and extend the work in that
+directory.
+
+- [DafnyModels](./DafnyModels/): Contains deductive NoC models in Dafny.
+- [ModestModels](./ModestModels/): Contains probabilistic NoC models in
+  Modest.
+- [PreviousModels](./PreviousModels/): Contains previous works (both
+  published and not published).
+
+## Contributing
+
+Currently, there is really only one contributor to this repository at a
+time, so they will contribute however they would like. However, to
+maintain ease of use it's recommended that careful consideration to
+file organization is made when working in this repository.
+
+## Related Works
+
+These are some of the works that have come out of this work.
+
+### Probabilistic Verification for Reliable Network-on-Chip System Design
+
+```bibtex
+@inproceedings{lewis_probabilistic_2019,
+  title = {Probabilistic {{Verification}} for {{Reliable Network-on-Chip System Design}}},
+  booktitle = {Formal {{Methods}} for {{Industrial Critical Systems}}},
+  author = {Lewis, Benjamin and Hartmanns, Arnd and Basu, Prabal and Jayashankara Shridevi, Rajesh and Chakraborty, Koushik and Roy, Sanghamitra and Zhang, Zhen},
+  editor = {Larsen, Kim Guldstrand and Willemse, Tim},
+  year = 2019,
+  pages = {110--126},
+  publisher = {Springer International Publishing},
+  doi = {10.1007/978-3-030-27008-7_7},
+  isbn = {978-3-030-27008-7},
+}
+```
+
+### Probabilistic Verification for Reliability of a Two-by-Two Network-on-Chip System
+
+```bibtex
+@inproceedings{roberts_probabilistic_2021,
+  title = {Probabilistic {{Verification}} for {{Reliability}} of a {{Two-by-Two Network-on-Chip System}}},
+  booktitle = {Formal {{Methods}} for {{Industrial Critical Systems}}},
+  author = {Roberts, Riley and Lewis, Benjamin and Hartmanns, Arnd and Basu, Prabal and Roy, Sanghamitra and Chakraborty, Koushik and Zhang, Zhen},
+  editor = {Lluch Lafuente, Alberto and Mavridou, Anastasia},
+  year = 2021,
+  pages = {232--248},
+  publisher = {Springer International Publishing},
+  doi = {10.1007/978-3-030-85248-1_16},
+}
+```
