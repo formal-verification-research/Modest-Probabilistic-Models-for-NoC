@@ -1,5 +1,6 @@
 import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 
 MODEST_EXECUTABLE: str = "modest"
@@ -12,67 +13,53 @@ def is_modest_on_path() -> bool:
     """
     return shutil.which(MODEST_EXECUTABLE) is not None
 
-def __run(model: str | Path, output_path: Path | None = None, command: list[str] = [MODEST_EXECUTABLE, "check"], opts: list[str] = []) -> str | None:
-    """Runs the modest tool with the given model and property files.
+def __run(model: str, command: list[str], *, opts: list[str] = []) -> str:
+    """Runs the modest tool with the given model.
 
     Args:
-        model_path (str | Path): Path to the model file or string repr of the model.
-        output_path (Path | None): Path to the output file. If None, the output is
-            returned as a string.
+        model (str): String repr of the model
+        command: the modest executable command
+        opts: cli opts to pass to modest
     
     Returns:
-        None if output_path is set, modest result as string otherwise
-    
-    Raises:
-        FileNotFoundError: If 'modest' is not found in the system's PATH.
-        TypeError if model is not a string or Path.
+        Output of running command + opts result as string
     """
+    output: str = ""
+    with tempfile.TemporaryFile("w", encoding="utf-8") as modelfile:
+        # Write the model to the tempfile
+        modelfile.write(model)
+        # Create the modest command
+        process_command = command + [modelfile] + opts
+        # Run the modest command
+        result = subprocess.run(process_command, capture_output=True, text=True)
+        # Combine stdout and stderr
+        stdout = result.stdout.strip()
+        stderr = result.stderr.strip()
+        output = stdout + stderr
 
-    if not is_modest_on_path():
-        raise FileNotFoundError("modest is not on the system's PATH.")
-
-    tmp_model = False
-
-    if isinstance(model, str):
-        try:
-            if Path(model).exists():
-                filename = model
-            else:
-                raise FileNotFoundError
-        except:
-            filename = model
-            filename = "__tmp_model__.modest"
-            with open(filename, "w") as f:
-                f.write(model)
-            tmp_model = True
-    elif isinstance(model, Path):
-        filename = model 
-    else:
-        raise TypeError(f"model must be a string or Path. Instead got {type(model)}")
-
-    process_command = command + [filename] + opts
-
-    result = subprocess.run(process_command, capture_output=True, text=True)
-
-    stdout = result.stdout.strip()
-    stderr = result.stderr.strip()
-
-    output = stdout + stderr
-
-    if tmp_model and not "error:" in output:
-        Path(filename).unlink(missing_ok=False)
-        
-    if output_path is not None:
-        with open(output_path, "w", encoding="utf-8") as f:
-            f.write(output)
-
+    # Return the combined stdout and stderr    
     return output
 
-def check(model: str | Path, output_path: Path | None = None) -> str | None:
-    return __run(model, output_path, [MODEST_EXECUTABLE, "check", "--unsafe", "--chainopt", "-D"])
+def check(model: str, opts: list[str] = []) -> str:
+    """Runs the modest mcsta model checking engine.
 
-def simulate(model: str | Path, output_path: Path | None = None) -> str | None:
-    return __run(model, output_path, command=[MODEST_EXECUTABLE, "simulate"], opts=["--max-run-length", "0", "--unsafe"])
+    Args:
+        model (str): String repr of the model
+        opts: cli opts to pass to modest
+    
+    Returns:
+        Output of running command + opts result as string
+    """
+    return __run(model, command=[MODEST_EXECUTABLE, "mcsta"], opts=opts)
 
-if not is_modest_on_path():
-    print("Could not find Modest executable!!!")
+def simulate(model: str, opts: list[str] = []) -> str:
+    """Runs the modest mcsta model checking engine.
+    
+    Args:
+        model (str): String repr of the model
+        opts: cli opts to pass to modest
+    
+    Returns:
+        Output of running command + opts result as string
+    """
+    return __run(model, command=[MODEST_EXECUTABLE, "modes"], opts=opts)
