@@ -1,4 +1,5 @@
 def noc_init(dimension) -> str:
+    """Returns initialization for a dimension x dimension NoC"""
     num_nodes = dimension*dimension
     init: str = "router[] noc = [\n"
 
@@ -48,12 +49,14 @@ router {{
     return init
 
 def noise_tracking_init() -> str:
+    """Returns initialization for resistive and inductive noise"""
     return """\
 int resistiveNoise = 0;
 int inductiveNoise = 0;
 """
 
 def composition(dimension) -> str:
+    """Returns the composition of Clock with Router for a dimension x dimension NoC"""
     num_nodes = dimension*dimension
     composition: str = "par {\n    :: Clock()\n"
     for i in range(num_nodes):
@@ -63,6 +66,7 @@ def composition(dimension) -> str:
     return composition
 
 def property(name: str, prop: int) -> str:
+    """Returns a Modest property"""
     return f"""\
 property {name} = {prop};
 """
