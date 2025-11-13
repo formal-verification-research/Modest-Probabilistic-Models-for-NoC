@@ -25,11 +25,11 @@ def __run(model: str, command: list[str], *, opts: list[str] = []) -> str:
         Output of running command + opts result as string
     """
     output: str = ""
-    with tempfile.TemporaryFile("w", encoding="utf-8") as modelfile:
+    with tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".modest") as modelfile:
         # Write the model to the tempfile
         modelfile.write(model)
         # Create the modest command
-        process_command = command + [modelfile] + opts
+        process_command = command + [modelfile.name] + opts
         # Run the modest command
         result = subprocess.run(process_command, capture_output=True, text=True)
         # Combine stdout and stderr
