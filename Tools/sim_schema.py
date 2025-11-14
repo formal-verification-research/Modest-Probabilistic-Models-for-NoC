@@ -22,8 +22,6 @@ VerificationType = Literal["mcsta-CTL", "mcsta-PMC", "modes"]
 
 class SimulationRun(BaseModel):
     """Stores all data for a single Modest verification run."""
-    title: str
-    start_time: str
     noc_parameters: Dict[str, Any]
     noc_model_file: str
     modest_command: str
@@ -62,12 +60,12 @@ def save_as_directory(summary: SimulationSummary, base_dir: Path) -> Path:
     
     # 2. Save each sub-run in its own subdirectory
     sub_run_identifiers: List[str] = []
-    for run in summary.sub_runs:
-        # Use a clean title for the directory name
-        run_dir_name = Path(sanitize_filename(run.title))
+    for idx, run in enumerate(summary.sub_runs):
+        # Use index-based directory name since title is no longer available
+        run_dir_name = Path(sanitize_filename(f"run_{idx}"))
         run_dir = summary_dir / run_dir_name
         run_dir.mkdir(exist_ok=True)
-        print(f" - saving run {run.title} to {run_dir}")
+        print(f" - saving run {idx} to {run_dir}")
         
         # 2a. Create a metadata dict for everything else
         metadata = run.model_dump(

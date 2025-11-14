@@ -68,8 +68,6 @@ class TestSimulationRun:
     def basic_simulation_run(self):
         """Fixture providing a basic SimulationRun instance."""
         return SimulationRun(
-            title="Test Run 1",
-            start_time=datetime(2025, 11, 12, 10, 30, 0).isoformat(),
             noc_parameters={
                 "size": (2, 2),
                 "buffer_size": 4,
@@ -87,7 +85,6 @@ class TestSimulationRun:
     def test_simulation_run_creation(self, basic_simulation_run):
         """Test basic SimulationRun creation."""
         run = basic_simulation_run
-        assert run.title == "Test Run 1"
         assert run.verification_time_sec == 15.5
         assert run.verification_memory_mb == 256.0
         assert run.verification_type == "mcsta-CTL"
@@ -98,8 +95,6 @@ class TestSimulationRun:
         valid_types = ["mcsta-CTL", "mcsta-PMC", "modes"]
         for vtype in valid_types:
             run = SimulationRun(
-                title="Type Test",
-                start_time=datetime.now().isoformat(),
                 noc_parameters={},
                 noc_model_file="model",
                 modest_command="cmd",
@@ -115,8 +110,6 @@ class TestSimulationRun:
         """Test that invalid verification types are rejected."""
         with pytest.raises(ValueError):
             SimulationRun(
-                title="Invalid Type Test",
-                start_time=datetime.now().isoformat(),
                 noc_parameters={},
                 noc_model_file="model",
                 modest_command="cmd",
@@ -131,8 +124,7 @@ class TestSimulationRun:
         """Test that SimulationRun can be serialized to dict."""
         run_dict = basic_simulation_run.model_dump()
         assert isinstance(run_dict, dict)
-        assert run_dict["title"] == "Test Run 1"
-        assert "start_time" in run_dict
+        assert "start_time" not in run_dict
         assert run_dict["verification_time_sec"] == 15.5
 
 
@@ -144,8 +136,6 @@ class TestSimulationSummary:
         """Fixture providing sample SimulationRun instances."""
         return [
             SimulationRun(
-                title=f"Run {i}",
-                start_time=datetime(2025, 11, 12, 10, 30, i).isoformat(),
                 noc_parameters={"size": (2, 2), "buffer_size": 4},
                 noc_model_file=f"model {i}",
                 modest_command=f"cmd {i}",
@@ -203,8 +193,6 @@ class TestSaveAndLoadDirectory:
         """Fixture providing a sample SimulationSummary."""
         runs = [
             SimulationRun(
-                title="Verification Run 1",
-                start_time=datetime(2025, 11, 12, 10, 0, 0).isoformat(),
                 noc_parameters={"size": (2, 2), "buffer_size": 4},
                 noc_model_file="process noc { ... }",
                 modest_command="mcsta -m test.modest",
@@ -215,8 +203,6 @@ class TestSaveAndLoadDirectory:
                 clock_cycle_bounds=(0, 100),
             ),
             SimulationRun(
-                title="Verification Run 2",
-                start_time=datetime(2025, 11, 12, 10, 15, 0).isoformat(),
                 noc_parameters={"size": (3, 3), "buffer_size": 8},
                 noc_model_file="process noc3x3 { ... }",
                 modest_command="mcsta -m test3x3.modest",
@@ -249,13 +235,13 @@ class TestSaveAndLoadDirectory:
         # Check summary.json exists
         assert (result_dir / "summary.json").exists()
         
-        # Check sub-run directories exist
-        assert (result_dir / "Verification Run 1").exists()
-        assert (result_dir / "Verification Run 2").exists()
+        # Check sub-run directories exist (now named run_0, run_1)
+        assert (result_dir / "run_0").exists()
+        assert (result_dir / "run_1").exists()
         
         # Check files in sub-run directories
-        for run_name in ["Verification Run 1", "Verification Run 2"]:
-            run_dir = result_dir / run_name
+        for run_idx in [0, 1]:
+            run_dir = result_dir / f"run_{run_idx}"
             assert (run_dir / "metadata.json").exists()
             assert (run_dir / "noc_model.modest").exists()
             assert (run_dir / "modest_output.txt").exists()
@@ -277,15 +263,15 @@ class TestSaveAndLoadDirectory:
         result_dir = save_as_directory(sample_summary, temp_dir)
         
         # Check first run's files
-        run1_model = (result_dir / "Verification Run 1" / "noc_model.modest").read_text()
-        assert run1_model == "process noc { ... }"
+        run0_model = (result_dir / "run_0" / "noc_model.modest").read_text()
+        assert run0_model == "process noc { ... }"
         
-        run1_output = (result_dir / "Verification Run 1" / "modest_output.txt").read_text()
-        assert run1_output == "Result: 0.95"
+        run0_output = (result_dir / "run_0" / "modest_output.txt").read_text()
+        assert run0_output == "Result: 0.95"
         
         # Check second run's files
-        run2_model = (result_dir / "Verification Run 2" / "noc_model.modest").read_text()
-        assert run2_model == "process noc3x3 { ... }"
+        run1_model = (result_dir / "run_1" / "noc_model.modest").read_text()
+        assert run1_model == "process noc3x3 { ... }"
 
     def test_load_from_directory_recovers_data(self, sample_summary, temp_dir):
         """Test that load_from_directory recovers original SimulationSummary."""
@@ -308,7 +294,6 @@ class TestSaveAndLoadDirectory:
         
         # Compare original and loaded runs
         for original, loaded in zip(sample_summary.sub_runs, loaded_summary.sub_runs):
-            assert loaded.title == original.title
             assert loaded.verification_time_sec == original.verification_time_sec
             assert loaded.verification_memory_mb == original.verification_memory_mb
             assert loaded.verification_type == original.verification_type
@@ -332,8 +317,6 @@ class TestSaveAndLoadDirectory:
         """Test that titles with special characters are sanitized."""
         runs = [
             SimulationRun(
-                title="Run with / special \\ characters : ?",
-                start_time=datetime.now().isoformat(),
                 noc_parameters={},
                 noc_model_file="model",
                 modest_command="cmd",
@@ -366,8 +349,6 @@ class TestSaveAndLoadDirectory:
         
         runs = [
             SimulationRun(
-                title="Large Model Run",
-                start_time=datetime.now().isoformat(),
                 noc_parameters={},
                 noc_model_file=large_content,
                 modest_command="cmd",
@@ -425,8 +406,6 @@ class TestDataConsistency:
             "timeout": None,
         }
         run = SimulationRun(
-            title="Flexible Params",
-            start_time=datetime.now().isoformat(),
             noc_parameters=params_dict,
             noc_model_file="model",
             modest_command="cmd",
