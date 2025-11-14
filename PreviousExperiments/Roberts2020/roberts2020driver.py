@@ -69,7 +69,7 @@ def run_psn_analysis(
     # Run resistive simulations
     for i in range(0, max_clk + 1, batch*stride):
         low = i
-        high = i + batch - 1
+        high = i + batch*stride - 1
         if high >= max_clk: high = max_clk
 
         model = generate_model(original_model,
@@ -129,7 +129,7 @@ def main():
     # Inductive Simulations
     for thresh, clk in [(1,1500),(5,2500),(10,3500)]:
         i = run_psn_analysis(max_clk=clk,
-                             stride=50,
+                             stride=10,
                              batch=100,
                              resistive_threshold=1,
                              inductive_threshold=thresh,
