@@ -80,10 +80,11 @@ def run_psn_analysis(
         results, properties = modest.simulate(model, opts=opts)
         elapsed = time() - start
 
+        opt_string = " ".join(opts)
         this_run = sim_schema.SimulationRun(
             noc_parameters=noc_parameters.model_dump(),
             noc_model_file=model,
-            modest_command=f"modest <model_file> {" ".join(opts)}",
+            modest_command=f"modest <model_file> {opt_string}",
             raw_modest_output=results,
             verification_time_sec=elapsed,
             verification_type="modes",
@@ -106,7 +107,8 @@ def main():
     script_dir = Path(__file__).resolve().parent
 
     # Setup the output directory
-    output_dir = script_dir / sanitize_filename(f"results_{datetime.now().strftime("%Y_%m_%d_%H_%M_%S")}")
+    timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+    output_dir = script_dir / sanitize_filename(f"results_{timestamp}")
     output_dir.mkdir()
 
     # Run the simulations
