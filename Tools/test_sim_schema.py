@@ -77,7 +77,6 @@ class TestSimulationRun:
             modest_command="mcsta test.modest",
             raw_modest_output="output from modest",
             verification_time_sec=15.5,
-            verification_memory_mb=256.0,
             verification_type="mcsta-CTL",
             clock_cycle_bounds=(0, 100),
         )
@@ -86,7 +85,6 @@ class TestSimulationRun:
         """Test basic SimulationRun creation."""
         run = basic_simulation_run
         assert run.verification_time_sec == 15.5
-        assert run.verification_memory_mb == 256.0
         assert run.verification_type == "mcsta-CTL"
         assert run.clock_cycle_bounds == (0, 100)
 
@@ -100,7 +98,6 @@ class TestSimulationRun:
                 modest_command="cmd",
                 raw_modest_output="output",
                 verification_time_sec=1.0,
-                verification_memory_mb=100.0,
                 verification_type=vtype,
                 clock_cycle_bounds=(0, 50),
             )
@@ -115,7 +112,6 @@ class TestSimulationRun:
                 modest_command="cmd",
                 raw_modest_output="output",
                 verification_time_sec=1.0,
-                verification_memory_mb=100.0,
                 verification_type="invalid-type",
                 clock_cycle_bounds=(0, 50),
             )
@@ -141,7 +137,6 @@ class TestSimulationSummary:
                 modest_command=f"cmd {i}",
                 raw_modest_output=f"output {i}",
                 verification_time_sec=10.0 + i,
-                verification_memory_mb=100.0 + (i * 10),
                 verification_type="mcsta-CTL",
                 clock_cycle_bounds=(0, 50),
             )
@@ -198,7 +193,6 @@ class TestSaveAndLoadDirectory:
                 modest_command="mcsta -m test.modest",
                 raw_modest_output="Result: 0.95",
                 verification_time_sec=12.5,
-                verification_memory_mb=200.0,
                 verification_type="mcsta-CTL",
                 clock_cycle_bounds=(0, 100),
             ),
@@ -208,7 +202,6 @@ class TestSaveAndLoadDirectory:
                 modest_command="mcsta -m test3x3.modest",
                 raw_modest_output="Result: 0.97",
                 verification_time_sec=18.3,
-                verification_memory_mb=256.0,
                 verification_type="mcsta-PMC",
                 clock_cycle_bounds=(0, 150),
             ),
@@ -295,7 +288,6 @@ class TestSaveAndLoadDirectory:
         # Compare original and loaded runs
         for original, loaded in zip(sample_summary.sub_runs, loaded_summary.sub_runs):
             assert loaded.verification_time_sec == original.verification_time_sec
-            assert loaded.verification_memory_mb == original.verification_memory_mb
             assert loaded.verification_type == original.verification_type
             assert loaded.noc_model_file == original.noc_model_file
             assert loaded.raw_modest_output == original.raw_modest_output
@@ -322,7 +314,6 @@ class TestSaveAndLoadDirectory:
                 modest_command="cmd",
                 raw_modest_output="output",
                 verification_time_sec=1.0,
-                verification_memory_mb=100.0,
                 verification_type="mcsta-CTL",
                 clock_cycle_bounds=(0, 50),
             )
@@ -354,7 +345,6 @@ class TestSaveAndLoadDirectory:
                 modest_command="cmd",
                 raw_modest_output="output",
                 verification_time_sec=1.0,
-                verification_memory_mb=100.0,
                 verification_type="mcsta-CTL",
                 clock_cycle_bounds=(0, 50),
             )
@@ -411,7 +401,6 @@ class TestDataConsistency:
             modest_command="cmd",
             raw_modest_output="output",
             verification_time_sec=1.0,
-            verification_memory_mb=100.0,
             verification_type="mcsta-CTL",
             clock_cycle_bounds=(0, 50),
         )

@@ -27,7 +27,6 @@ class SimulationRun(BaseModel):
     modest_command: str
     raw_modest_output: str
     verification_time_sec: float
-    verification_memory_mb: float
     verification_type: VerificationType
     clock_cycle_bounds: Tuple[int, int]
     # `new_field: Optional[str] = None`
