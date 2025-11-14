@@ -22,6 +22,7 @@ VerificationType = Literal["mcsta-CTL", "mcsta-PMC", "modes"]
 
 class SimulationRun(BaseModel):
     """Stores all data for a single Modest verification run."""
+    model_config = ConfigDict(extra='allow')
     noc_parameters: Dict[str, Any]
     noc_model_file: str
     modest_command: str
@@ -33,6 +34,7 @@ class SimulationRun(BaseModel):
 
 class SimulationSummary(BaseModel):
     """Stores a summary of multiple related sub-runs."""
+    model_config = ConfigDict(extra='allow')
     title: str
     sub_runs: Annotated[
         List[SimulationRun],
@@ -128,7 +130,11 @@ def load_from_directory(summary_dir: Path) -> SimulationSummary:
         model_file = (run_dir / metadata["noc_model_file_path"]).read_text(encoding='utf-8')
         output_file = (run_dir / metadata["raw_modest_output_path"]).read_text(encoding='utf-8')
         
-        # 2c. Create the SimulationRun object
+        # 2c. Remove the file path references before creating the object
+        metadata.pop("noc_model_file_path", None)
+        metadata.pop("raw_modest_output_path", None)
+        
+        # 2d. Create the SimulationRun object
         run_obj = SimulationRun.model_validate({
             **metadata,  # Unpack all metadata
             "noc_model_file": model_file,  # Add the full text
@@ -136,7 +142,8 @@ def load_from_directory(summary_dir: Path) -> SimulationSummary:
         })
         loaded_runs.append(run_obj)
 
-    # 3. Create the final SimulationSummary object
+    # 3. Create the final SimulationSummary object, excluding sub_run_dirs
+    summary_data.pop("sub_run_dirs", None)
     return SimulationSummary.model_validate({
         **summary_data, # Unpack summary metadata
         "sub_runs": loaded_runs # Add the list of loaded run objects
