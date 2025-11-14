@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import List, Dict, Any, Literal, Optional, Tuple, Annotated
+from typing import List, Dict, Any, Literal, Optional, Tuple, Annotated, Union
 from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
 from pathvalidate import sanitize_filename
@@ -28,6 +28,10 @@ class SimulationRun(BaseModel):
     modest_command: str
     raw_modest_output: str
     verification_time_sec: float
+    properties: Annotated[
+        Dict[str, Union[float, bool]],
+        Field(description="{Property name} -> {float (pctl) || bool (ctl)}")
+    ] = {}
     verification_type: VerificationType
     clock_cycle_bounds: Tuple[int, int]
     # `new_field: Optional[str] = None`

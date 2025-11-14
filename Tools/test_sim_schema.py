@@ -77,6 +77,7 @@ class TestSimulationRun:
             modest_command="mcsta test.modest",
             raw_modest_output="output from modest",
             verification_time_sec=15.5,
+            properties={"prop": 0.5},
             verification_type="mcsta-CTL",
             clock_cycle_bounds=(0, 100),
         )
@@ -98,6 +99,7 @@ class TestSimulationRun:
                 modest_command="cmd",
                 raw_modest_output="output",
                 verification_time_sec=1.0,
+                properties={"prop": 0.0},
                 verification_type=vtype,
                 clock_cycle_bounds=(0, 50),
             )
@@ -112,6 +114,7 @@ class TestSimulationRun:
                 modest_command="cmd",
                 raw_modest_output="output",
                 verification_time_sec=1.0,
+                properties={"prop": 0.0},
                 verification_type="invalid-type",
                 clock_cycle_bounds=(0, 50),
             )
@@ -137,6 +140,7 @@ class TestSimulationSummary:
                 modest_command=f"cmd {i}",
                 raw_modest_output=f"output {i}",
                 verification_time_sec=10.0 + i,
+                properties={"index": i},
                 verification_type="mcsta-CTL",
                 clock_cycle_bounds=(0, 50),
             )
@@ -184,6 +188,7 @@ class TestSaveAndLoadDirectory:
                 modest_command="mcsta -m test.modest",
                 raw_modest_output="Result: 0.95",
                 verification_time_sec=12.5,
+                properties={"pctl_result": 0.95},
                 verification_type="mcsta-CTL",
                 clock_cycle_bounds=(0, 100),
             ),
@@ -193,6 +198,7 @@ class TestSaveAndLoadDirectory:
                 modest_command="mcsta -m test3x3.modest",
                 raw_modest_output="Result: 0.97",
                 verification_time_sec=18.3,
+                properties={"pctl_result": 0.97},
                 verification_type="mcsta-PMC",
                 clock_cycle_bounds=(0, 150),
             ),
@@ -299,6 +305,7 @@ class TestSaveAndLoadDirectory:
                 modest_command="cmd",
                 raw_modest_output="output",
                 verification_time_sec=1.0,
+                properties={"ok": True},
                 verification_type="mcsta-CTL",
                 clock_cycle_bounds=(0, 50),
             )
@@ -328,6 +335,7 @@ class TestSaveAndLoadDirectory:
                 modest_command="cmd",
                 raw_modest_output="output",
                 verification_time_sec=1.0,
+                properties={"prop": 0.0},
                 verification_type="mcsta-CTL",
                 clock_cycle_bounds=(0, 50),
             )
@@ -363,6 +371,7 @@ class TestDataConsistency:
             modest_command="cmd",
             raw_modest_output="output",
             verification_time_sec=1.0,
+            properties={"prob": 0.1, "flag": True},
             verification_type="mcsta-CTL",
             clock_cycle_bounds=(0, 50),
         )
