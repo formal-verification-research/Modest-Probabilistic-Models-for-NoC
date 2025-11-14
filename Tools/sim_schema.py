@@ -34,17 +34,11 @@ class SimulationRun(BaseModel):
 class SimulationSummary(BaseModel):
     """Stores a summary of multiple related sub-runs."""
     title: str
-    combined_data: Annotated[
-        List[Dict[str, Any]],
-        Field(description="The combined data from each simulation run")
-        # e.g., [{"clock": 0, "result": 0.95}, {"clock": 1, "result": 0.98}]
-    ]
     sub_runs: Annotated[
         List[SimulationRun],
         Field(description="The full data for each sub-run")
     ]
     total_time_sec: float
-    max_memory_mb: float
 
 def save_as_directory(summary: SimulationSummary, base_dir: Path) -> Path:
     """Saves the summary in a structured directory."""

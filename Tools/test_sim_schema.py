@@ -147,28 +147,19 @@ class TestSimulationSummary:
         """Test basic SimulationSummary creation."""
         summary = SimulationSummary(
             title="Test Summary",
-            combined_data=[
-                {"clock": 0, "result": 0.95},
-                {"clock": 1, "result": 0.98},
-            ],
             sub_runs=sample_runs,
             total_time_sec=35.0,
-            max_memory_mb=130.0,
         )
         assert summary.title == "Test Summary"
         assert len(summary.sub_runs) == 3
-        assert len(summary.combined_data) == 2
         assert summary.total_time_sec == 35.0
-        assert summary.max_memory_mb == 130.0
 
     def test_simulation_summary_empty_sub_runs(self):
         """Test SimulationSummary with empty sub_runs list."""
         summary = SimulationSummary(
             title="Empty Summary",
-            combined_data=[],
             sub_runs=[],
             total_time_sec=0.0,
-            max_memory_mb=0.0,
         )
         assert len(summary.sub_runs) == 0
         assert summary.total_time_sec == 0.0
@@ -208,13 +199,8 @@ class TestSaveAndLoadDirectory:
         ]
         return SimulationSummary(
             title="NoC Verification Suite",
-            combined_data=[
-                {"clock": 0, "result": 0.95},
-                {"clock": 1, "result": 0.97},
-            ],
             sub_runs=runs,
             total_time_sec=30.8,
-            max_memory_mb=256.0,
         )
 
     def test_save_as_directory_creates_structure(self, sample_summary, temp_dir):
@@ -278,7 +264,6 @@ class TestSaveAndLoadDirectory:
         assert loaded_summary.title == sample_summary.title
         assert len(loaded_summary.sub_runs) == len(sample_summary.sub_runs)
         assert loaded_summary.total_time_sec == sample_summary.total_time_sec
-        assert loaded_summary.max_memory_mb == sample_summary.max_memory_mb
 
     def test_load_recovers_run_details(self, sample_summary, temp_dir):
         """Test that loaded runs match original runs."""
@@ -320,10 +305,8 @@ class TestSaveAndLoadDirectory:
         ]
         summary = SimulationSummary(
             title="Summary with / special \\ characters",
-            combined_data=[],
             sub_runs=runs,
             total_time_sec=1.0,
-            max_memory_mb=100.0,
         )
         
         # Should not raise an exception
@@ -351,10 +334,8 @@ class TestSaveAndLoadDirectory:
         ]
         summary = SimulationSummary(
             title="Large Content Summary",
-            combined_data=[],
             sub_runs=runs,
             total_time_sec=1.0,
-            max_memory_mb=100.0,
         )
         
         result_dir = save_as_directory(summary, temp_dir)
@@ -365,25 +346,6 @@ class TestSaveAndLoadDirectory:
 
 class TestDataConsistency:
     """Test suite for data consistency and edge cases."""
-
-    def test_combined_data_structure(self):
-        """Test that combined_data maintains expected structure."""
-        combined_data = [
-            {"clock": 0, "result": 0.90, "extra": "field1"},
-            {"clock": 10, "result": 0.95, "extra": "field2"},
-            {"clock": 20, "result": 0.98},
-        ]
-        summary = SimulationSummary(
-            title="Data Structure Test",
-            combined_data=combined_data,
-            sub_runs=[],
-            total_time_sec=0.0,
-            max_memory_mb=0.0,
-        )
-        
-        # Verify combined_data is preserved
-        assert summary.combined_data == combined_data
-        assert len(summary.combined_data) == 3
 
     def test_noc_parameters_flexibility(self):
         """Test that noc_parameters can contain various data types."""
