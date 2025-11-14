@@ -4,7 +4,7 @@ from pathlib import Path
 from Tools import modest, sim_schema
 from datetime import datetime
 from pathvalidate import sanitize_filename
-from typing import Literal, Tuple
+from typing import Literal, Dict
 from dataclasses import dataclass
 from time import time
 
@@ -77,7 +77,7 @@ def run_psn_analysis(
                                sim_type)
         
         start = time()
-        results = modest.simulate(model, opts=opts)
+        results, properties = modest.simulate(model, opts=opts)
         elapsed = time() - start
 
         this_run = sim_schema.SimulationRun(
@@ -87,7 +87,8 @@ def run_psn_analysis(
             raw_modest_output=results,
             verification_time_sec=elapsed,
             verification_type="modes",
-            clock_cycle_bounds=(low, high)
+            clock_cycle_bounds=(low, high),
+            properties=properties
         )
 
         sims.sub_runs += [this_run]
@@ -115,10 +116,10 @@ def main():
     # Resistive Simulations
     for thresh, clk in [(1,200),(5,250),(10,400),(20,600)]:
         r = run_psn_analysis(max_clk=clk,
-                             stride=10,
+                             stride=1,
                              batch=100,
                              resistive_threshold=thresh,
-                             inductive_threshold=0,
+                             inductive_threshold=1,
                              original_model=model,
                              sim_type="Resistive")
         sim_schema.save_as_directory(r, output_dir)
@@ -128,7 +129,7 @@ def main():
         i = run_psn_analysis(max_clk=clk,
                              stride=50,
                              batch=100,
-                             resistive_threshold=0,
+                             resistive_threshold=1,
                              inductive_threshold=thresh,
                              original_model=model,
                              sim_type="Inductive")
