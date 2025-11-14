@@ -151,7 +151,7 @@ def main():
     sim_schema.save_as_directory(i, output_dir)
 
 if __name__ == "__main__":
-    pass
+    main()
 else:
     print("Driver should only be run as a main CLI script.")
     exit(1)
