@@ -30,8 +30,9 @@ def run_psn_analysis(
         batch: int,
         resistive_threshold: int,
         inductive_threshold: int,
-        original_model: str
-    ) -> Tuple[sim_schema.SimulationSummary, sim_schema.SimulationSummary]:
+        original_model: str,
+        sim_type: NoiseType
+    ) -> sim_schema.SimulationSummary:
     """Runs psn analysis on the 2x2 model for `max_clk` cycles with a stride
     of `stride` cycles in batches of `batch`"""
 
@@ -49,20 +50,10 @@ def run_psn_analysis(
             "-E", f"RESISTIVE_THRESH={resistive_threshold}, INDUCTIVE_THRESH={inductive_threshold}"]
 
     # Create simulation data
-    resistive_sims = sim_schema.SimulationSummary(
-        title=f"resistive_monolithic_2x2",
-        combined_data=[],
+    sims = sim_schema.SimulationSummary(
+        title=f"{sim_type}_monolithic_2x2_r{resistive_threshold}_i{inductive_threshold}",
         sub_runs=[],
-        total_time_sec=0.0,
-        max_memory_mb=0.0
-    )
-
-    inductive_sims = sim_schema.SimulationSummary(
-        title=f"inductive_monolithic_2x2",
-        combined_data=[],
-        sub_runs=[],
-        total_time_sec=0.0,
-        max_memory_mb=0.0
+        total_time_sec=0.0
     )
 
     noc_parameters = sim_schema.NocParams(
@@ -76,58 +67,33 @@ def run_psn_analysis(
     )
 
     # Run resistive simulations
-    for i in range(0, max_clk + 1, batch):
+    for i in range(0, max_clk + 1, batch*stride):
         low = i
         high = i + batch - 1
         if high >= max_clk: high = max_clk
 
-        resistive_model = generate_model(original_model,
-                                         Steps(low=low, high=high, stride=stride),
-                                         "Resistive")
+        model = generate_model(original_model,
+                               Steps(low=low, high=high, stride=stride),
+                               sim_type)
         
         start = time()
-        resistive_results = modest.simulate(resistive_model, opts=opts)
+        results = modest.simulate(model, opts=opts)
         elapsed = time() - start
 
         this_run = sim_schema.SimulationRun(
             noc_parameters=noc_parameters.model_dump(),
-            noc_model_file=resistive_model,
+            noc_model_file=model,
             modest_command=f"modest <model_file> {" ".join(opts)}",
-            raw_modest_output=resistive_results,
+            raw_modest_output=results,
             verification_time_sec=elapsed,
             verification_type="modes",
             clock_cycle_bounds=(low, high)
         )
 
-        resistive_sims.sub_runs += [this_run]
-        resistive_sims.total_time_sec += elapsed
+        sims.sub_runs += [this_run]
+        sims.total_time_sec += elapsed
 
-    # Run inductive simulations
-    for i in range(0, max_clk + 1, batch):
-        low = i
-        high = i + batch - 1
-        if high >= max_clk: high = max_clk  
-    
-        inductive_model = generate_model(original_model,
-                                         Steps(low=low, high=high, stride=stride),
-                                         "Inductive")
-        
-        inductive_results = modest.simulate(inductive_model, opts=opts)
-
-        this_run = sim_schema.SimulationRun(
-            noc_parameters=noc_parameters.model_dump(),
-            noc_model_file=inductive_model,
-            modest_command=f"modest <model_file> {" ".join(opts)}",
-            raw_modest_output=inductive_results,
-            verification_time_sec=elapsed,
-            verification_type="modes",
-            clock_cycle_bounds=(low, high)
-        )
-
-        inductive_sims.sub_runs += [this_run]
-        inductive_sims.total_time_sec += elapsed
-
-    return (resistive_sims, inductive_sims)
+    return sims
 
 def main():
     # Check if modest is available
@@ -146,11 +112,27 @@ def main():
     with open(script_dir / "monolithic_2x2.modest", "r") as f:
         model = f.read()
 
-    (r, i) = run_psn_analysis(10, 1, 10, 5, 5, model)
+    # Resistive Simulations
+    for thresh, clk in [(1,200),(5,250),(10,400),(20,600)]:
+        r = run_psn_analysis(max_clk=clk,
+                             stride=10,
+                             batch=100,
+                             resistive_threshold=thresh,
+                             inductive_threshold=0,
+                             original_model=model,
+                             sim_type="Resistive")
+        sim_schema.save_as_directory(r, output_dir)
 
-    # Save the output
-    sim_schema.save_as_directory(r, output_dir)
-    sim_schema.save_as_directory(i, output_dir)
+    # Inductive Simulations
+    for thresh, clk in [(1,1500),(5,2500),(10,3500)]:
+        i = run_psn_analysis(max_clk=clk,
+                             stride=50,
+                             batch=100,
+                             resistive_threshold=0,
+                             inductive_threshold=thresh,
+                             original_model=model,
+                             sim_type="Inductive")
+        sim_schema.save_as_directory(i, output_dir)
 
 if __name__ == "__main__":
     main()
