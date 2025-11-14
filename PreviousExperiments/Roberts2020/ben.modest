@@ -24,8 +24,13 @@ const int INJECTIONRATENUMERATOR = 1;
 const int INJECTIONRATEDENOMINATOR = 2;
 
 const int DUR;
-const int clkLower = 100; 
+const int clkLower = 0; 
 const int clkUpper = clkLower + DUR;
+
+const int ACTIVITY_THRESH = 3;
+const int RESISTIVE_THRESH;
+const int INDUCTIVE_THRESH;
+
 int(clkLower..clkUpper) clk;
 //transient int(0..1) clk;
 
@@ -51,11 +56,13 @@ datatype router = {
 	channel[] channelArray,
 	channel[] temp,
 	int(0..2) localPos,
-	int(0..2)nsPos,
-	int(0..2)ewPos /*int[] bufferID*/
+	int(0..2) nsPos,
+	int(0..2) ewPos /*int[] bufferID*/
 };
 
-int (0..40) optimalRuns;
+// Noise counters 
+int(0..) resistiveNoise = 0;
+int(0..) inductiveNoise = 0;
 
 router[] noc = [
 	router {unserviced:0},
@@ -67,10 +74,7 @@ router[] noc = [
 action tick;
 
 // ------ Begin: properties ---------
-property Pr1 = Pmax(<> (optimalRuns >= 1));
-//property test = Pmax(<> (test >= 1));
-//property p1 = Pmax(<>[S(clk)<=(clkUpper-clkLower)] (optimalRuns >= 1));
-//property optimalRuns = Pmax(<> (optimalRuns >= OPTIMALRUNSMEASURE));
+
 // ------ End: properties ---------
 
 // ------ Begin: function definitions ------- 
@@ -188,7 +192,6 @@ process Top() {
 }
 
 process Populate() {
-
 	if ((clk % INJECTIONRATEDENOMINATOR) < INJECTIONRATENUMERATOR){																// Flit injection happens every n/d clk cycles
 		palt {
 			:(1/3): {= noc[0].channelArray[noc[0].localPos].buff = enqueue(1, noc[0].channelArray[noc[0].localPos].buff) =}		// A new flit produced by noc 0 has a 1 in 3 chanc of
@@ -261,24 +264,13 @@ process Arbiter_corner(int routerID) {
 			=}
 		};
 		
-		
-		//Increment optimal runs if all buffers forwarded a flit ------------------------------------------------------------------- // If all queues had flits, and all where serviced
-		if (noc[routerID].unserviced == 0 && noc[routerID].channelArray[0].direction != -1 && noc[routerID].channelArray[1].direction != -1 && noc[routerID].channelArray[2].direction != -1){
-			{= 
-				optimalRuns++
-			=}
-		} else {
-			tau
-		};
-		
 		//Set priority directions for the next run and update the direction of the buffers----------------------------------------------
 		setPriority(0, routerID);
 		setPriority(1, routerID);
 		setPriority(2, routerID);
 		
-		//need to update the bufferID array
-		//test update for router 0
-		
+		// need to update the bufferID array
+		// test update for router 0
 		{=
 			noc[routerID].ewPos = noc[routerID].channelArray[noc[routerID].ewPos].priority,
 			noc[routerID].nsPos = noc[routerID].channelArray[noc[routerID].nsPos].priority,
