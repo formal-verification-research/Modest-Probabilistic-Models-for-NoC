@@ -20,12 +20,8 @@ option "dtmc";
 //Top level varables
 const int BUFFERLENGTH = 3; //Each buffer actually has length of BUFFERLENGTH + 1 because one directionue is stored in the arbiter itself for easy use when routing.
 const int NOCSIZE = 2;
-const int INJECTIONRATENUMERATOR = 1;
-const int INJECTIONRATEDENOMINATOR = 2;
-
-const int DUR;
-const int clkLower = 0; 
-const int clkUpper = clkLower + DUR;
+const int INJECTIONRATENUMERATOR = 3;
+const int INJECTIONRATEDENOMINATOR = 10;
 
 const int ACTIVITY_THRESH = 3;
 const int RESISTIVE_THRESH;
