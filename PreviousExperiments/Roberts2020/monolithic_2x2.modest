@@ -48,6 +48,7 @@ datatype channel = {
 datatype router = {
 	int(0..3) unserviced,
 	int(0..3) totalUnserviced,
+	int(0..3) thisActivity,
 	int(0..3) lastActivity,
 	channel[] channelArray,
 	channel[] temp,
@@ -147,6 +148,11 @@ process Top() {
 		Arbiter_corner(2);
 		Arbiter_corner(3);	
 		
+		Measure_noise(0);
+		Measure_noise(1);
+		Measure_noise(2);
+		Measure_noise(3);
+
 		tick;
 		
 		Populate();																												// Populate new flits
@@ -199,7 +205,6 @@ process Populate() {
 
 //---- Sub processes ----
 process Arbiter_corner(int routerID) {
-	int current_service;
 	//Service buffers-------------------------------------------------------------------------------------------------------
 		
 		//Buffer priority 0
@@ -242,26 +247,6 @@ process Arbiter_corner(int routerID) {
 			noc[routerID].unserviced++			//Increment unserviced
 			=}
 		};
-
-		// Calculate the number of served buffers during this cycle
-		{= current_service =
-			  (noc[routerID].channelArray[0].serviced ? 1 : 0)
-			+ (noc[routerID].channelArray[1].serviced ? 1 : 0)
-			+ (noc[routerID].channelArray[2].serviced ? 1 : 0) =};
-
-		// Update the resistive noise tracker
-		if (current_service >= ACTIVITY_THRESH) {
-			{= resistiveNoise++ =}
-		} else {
-			tau
-		};
-
-		// Update the inductive noise tracker
-		if (abs(current_service - noc[routerID].lastActivity) >= ACTIVITY_THRESH) {
-			{= inductiveNoise++ =}
-		} else {
-			tau
-		};
 	
 		//Set priority directions for the next run and update the direction of the buffers----------------------------------------------
 		setPriority(0, routerID);
@@ -292,6 +277,22 @@ process Arbiter_corner(int routerID) {
 		{= noc[routerID].channelArray = noc[routerID].temp =}
 }
 	
+// Measure PSN
+process Measure_noise(int routerID)
+{
+	{=
+		0: resistiveNoise = noc[routerID].thisActivity >= ACTIVITY_THRESH
+			? resistiveNoise + 1
+			: resistiveNoise,
+		0: inductiveNoise = abs(noc[routerID].lastActivity - noc[routerID].thisActivity) >= ACTIVITY_THRESH
+			? inductiveNoise + 1
+			: inductiveNoise,
+		
+		1: noc[routerID].lastActivity = noc[routerID].thisActivity,
+		1: noc[routerID].thisActivity = 0
+	=}
+}
+
 //initialize values --------------------------------------------------------------------------------------------------------------------------------------------
 process initialize() {
 	initialize_node_nw(0);
@@ -317,6 +318,7 @@ process initialize_node_nw(int routerID) {
 	//noc[routerID].channelArray[2].id = 4,
 	
 	noc[routerID].unserviced = 0,
+	noc[routerID].thisActivity = 0,
 	noc[routerID].lastActivity = 0
 	=}
 }
@@ -338,6 +340,7 @@ process initialize_node_ne(int routerID) {
 	//noc[routerID].channelArray[2].id = 4,
 	
 	noc[routerID].unserviced = 0,
+	noc[routerID].thisActivity = 0,
 	noc[routerID].lastActivity = 0
 	=}
 }
@@ -359,6 +362,7 @@ process initialize_node_sw(int routerID) {
 	//noc[routerID].channelArray[2].id = 4,
 	
 	noc[routerID].unserviced = 0,
+	noc[routerID].thisActivity = 0,
 	noc[routerID].lastActivity = 0
 	=}
 }
@@ -380,6 +384,7 @@ process initialize_node_se(int routerID) {
 	//noc[routerID].channelArray[2].id = 4,
 	
 	noc[routerID].unserviced = 0,
+	noc[routerID].thisActivity = 0,
 	noc[routerID].lastActivity = 0
 	=}
 	
@@ -402,24 +407,37 @@ process setPriority(int i, int routerID) {
 		else if(noc[routerID].channelArray[i].direction == 4) {			//Send in the local direction
 			{= 
 			noc[routerID].channelArray[i].direction = -1,
-			noc[routerID].channelArray[i].buff = dequeue(noc[routerID].channelArray[i].buff)			
+			noc[routerID].channelArray[i].buff = dequeue(noc[routerID].channelArray[i].buff),
+			noc[routerID].thisActivity++
 			=}			//flit delivered
 		}
 		else if (noc[routerID].channelArray[i].direction == 0) {			//Send in the north direction
 			sendNorth(routerID, noc[routerID].channelArray[i].buff);
-			{= noc[routerID].channelArray[i].buff = dequeue(noc[routerID].channelArray[i].buff) =}
+			{=
+				noc[routerID].channelArray[i].buff = dequeue(noc[routerID].channelArray[i].buff),
+				noc[routerID].thisActivity++
+			=}
 		}
 		else if (noc[routerID].channelArray[i].direction == 1) {			//Send in the east direction
 			sendEast(routerID, noc[routerID].channelArray[i].buff);
-			{= noc[routerID].channelArray[i].buff = dequeue(noc[routerID].channelArray[i].buff) =}
+			{=
+				noc[routerID].channelArray[i].buff = dequeue(noc[routerID].channelArray[i].buff),
+				noc[routerID].thisActivity++
+			=}
 		}
 		else if (noc[routerID].channelArray[i].direction == 2) {			//Send in the south direction
 			sendSouth(routerID, noc[routerID].channelArray[i].buff);
-			{= noc[routerID].channelArray[i].buff = dequeue(noc[routerID].channelArray[i].buff) =}
+			{=
+				noc[routerID].channelArray[i].buff = dequeue(noc[routerID].channelArray[i].buff),
+				noc[routerID].thisActivity++
+			=}
 		}
 		else if (noc[routerID].channelArray[i].direction == 3) {			//Send in the west direction
 			sendWest(routerID, noc[routerID].channelArray[i].buff);
-			{= noc[routerID].channelArray[i].buff = dequeue(noc[routerID].channelArray[i].buff) =}
+			{= 
+				noc[routerID].channelArray[i].buff = dequeue(noc[routerID].channelArray[i].buff),
+				noc[routerID].thisActivity++
+			=}
 		}
 		else { tau };
 		
