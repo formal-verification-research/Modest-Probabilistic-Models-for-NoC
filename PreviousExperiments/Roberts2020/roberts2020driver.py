@@ -100,6 +100,7 @@ def run_psn_analysis(
         )
 
         resistive_sims.sub_runs += [this_run]
+        resistive_sims.total_time_sec += elapsed
 
     # Run inductive simulations
     for i in range(0, max_clk + 1, batch):
@@ -124,6 +125,7 @@ def run_psn_analysis(
         )
 
         inductive_sims.sub_runs += [this_run]
+        inductive_sims.total_time_sec += elapsed
 
     return (resistive_sims, inductive_sims)
 
