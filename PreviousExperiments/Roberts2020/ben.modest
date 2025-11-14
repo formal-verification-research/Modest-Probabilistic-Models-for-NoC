@@ -52,6 +52,7 @@ datatype channel = {
 datatype router = {
 	int(0..3) unserviced,
 	int(0..3) totalUnserviced,
+	int(0..3) lastActivity,
 	channel[] channelArray,
 	channel[] temp,
 	int(0..2) localPos,
@@ -202,6 +203,7 @@ process Populate() {
 
 //---- Sub processes ----
 process Arbiter_corner(int routerID) {
+	int current_service;
 	//Service buffers-------------------------------------------------------------------------------------------------------
 		
 		//Buffer priority 0
@@ -244,7 +246,27 @@ process Arbiter_corner(int routerID) {
 			noc[routerID].unserviced++			//Increment unserviced
 			=}
 		};
-		
+
+		// Calculate the number of served buffers during this cycle
+		{= current_service =
+			  (noc[routerID].channelArray[0].serviced ? 1 : 0)
+			+ (noc[routerID].channelArray[1].serviced ? 1 : 0)
+			+ (noc[routerID].channelArray[2].serviced ? 1 : 0) =};
+
+		// Update the resistive noise tracker
+		if (current_service >= ACTIVITY_THRESH) {
+			{= resistiveNoise++ =}
+		} else {
+			tau
+		};
+
+		// Update the inductive noise tracker
+		if (abs(current_service - noc[routerID].lastActivity) >= ACTIVITY_THRESH) {
+			{= inductiveNoise++ =}
+		} else {
+			tau
+		};
+	
 		//Set priority directions for the next run and update the direction of the buffers----------------------------------------------
 		setPriority(0, routerID);
 		setPriority(1, routerID);
@@ -298,7 +320,8 @@ process initialize_node_nw(int routerID) {
 	//noc[routerID].channelArray[1].id = 2, 
 	//noc[routerID].channelArray[2].id = 4,
 	
-	noc[routerID].unserviced = 0
+	noc[routerID].unserviced = 0,
+	noc[routerID].lastActivity = 0
 	=}
 }
 
@@ -318,7 +341,8 @@ process initialize_node_ne(int routerID) {
 	//noc[routerID].channelArray[1].id = 3, 
 	//noc[routerID].channelArray[2].id = 4,
 	
-	noc[routerID].unserviced = 0
+	noc[routerID].unserviced = 0,
+	noc[routerID].lastActivity = 0
 	=}
 }
 
@@ -338,7 +362,8 @@ process initialize_node_sw(int routerID) {
 	//noc[routerID].channelArray[1].id = 1, 
 	//noc[routerID].channelArray[2].id = 4,
 	
-	noc[routerID].unserviced = 0
+	noc[routerID].unserviced = 0,
+	noc[routerID].lastActivity = 0
 	=}
 }
 
@@ -358,7 +383,8 @@ process initialize_node_se(int routerID) {
 	//noc[routerID].channelArray[1].id = 3, 
 	//noc[routerID].channelArray[2].id = 4,
 	
-	noc[routerID].unserviced = 0
+	noc[routerID].unserviced = 0,
+	noc[routerID].lastActivity = 0
 	=}
 	
 }
