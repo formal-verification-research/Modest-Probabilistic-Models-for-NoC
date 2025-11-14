@@ -31,8 +31,7 @@ const int ACTIVITY_THRESH = 3;
 const int RESISTIVE_THRESH;
 const int INDUCTIVE_THRESH;
 
-int(clkLower..clkUpper) clk;
-//transient int(0..1) clk;
+transient int(0..1) clk;
 
 datatype intlist = {
 	int(0..((NOCSIZE*NOCSIZE)-1)) hd,
@@ -138,16 +137,8 @@ function int(0..1) checkNotFullIncrement(int direction, int routerID) =
 // ------ Begin: process definitions ------
 //---- Parallel Processes ----
 process Clock() {	
-	//tick {= clk=1 =};
-	//Clock()	
-	
-	tick {= clk++ =};
-
-	if (clk <= clkUpper) {
-	   Clock()
-	} else {
-	   stop
-	}	
+	tick {= clk = 1 =};
+	Clock()
 }
 
 process Top() {
@@ -181,13 +172,7 @@ process Top() {
 		
 		updateDestination(0, 3);
 		updateDestination(1, 3);
-		updateDestination(2, 3);
-
-		if(clk>=clkUpper) {
-			stop
-		} else {
-			tau
-		} 
+		updateDestination(2, 3)
 	}
 }
 
