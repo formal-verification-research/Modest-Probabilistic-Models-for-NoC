@@ -1,0 +1,589 @@
+/* 
+Monolithic NoC model
+Author:
+  Riley Roberts
+  Jonah Boe
+  Nick Waddoups
+
+Edit history:
+  Nick Waddoups, 2025: Setup file to regenerate reproducible results
+*/
+/*
+NoC router IDs
+	0 - 1
+	|   |
+	2 - 3
+*/
+
+option "dtmc";
+
+//Top level varables
+const int BUFFERLENGTH = 3; //Each buffer actually has length of BUFFERLENGTH + 1 because one directionue is stored in the arbiter itself for easy use when routing.
+const int NOCSIZE = 2;
+const int INJECTIONRATENUMERATOR = 3;
+const int INJECTIONRATEDENOMINATOR = 10;
+
+const int ACTIVITY_THRESH = 3;
+const int RESISTIVE_THRESH;
+const int INDUCTIVE_THRESH;
+
+transient int(0..1) clk;
+
+datatype intlist = {
+	int(0..((NOCSIZE*NOCSIZE)-1)) hd,
+	intlist option tl
+};
+
+// Datatype for a channel with the next buffer directionue, id of the buffer,
+// whether the buffer was serviced last clock cycle or not, and the priority
+// number of the buffer
+datatype channel = {
+	int(-1..4) direction,
+	bool serviced,
+	int(0..2) priority,
+	intlist option buff
+};
+
+// Datatype for a router, includes router-specific variables and an array of buffers
+datatype router = {
+	int(0..3) unserviced,
+	int(0..3) totalUnserviced,
+	int(0..3) thisActivity,
+	int(0..3) lastActivity,
+	channel[] channelArray,
+	channel[] temp,
+	int(0..2) localPos,
+	int(0..2) nsPos,
+	int(0..2) ewPos /*int[] bufferID*/
+};
+
+// Noise counters 
+int(0..) resistiveNoise = 0;
+int(0..) inductiveNoise = 0;
+
+router[] noc = [
+	router {unserviced:0},
+	router {unserviced:0},
+	router {unserviced:0},
+	router {unserviced:0}
+];
+
+action tick;
+
+// ------ Begin: function definitions ------- 
+// Calculate length of list:
+// "!" accesses the value of a non-empty option (causes an error if the option is empty)
+function int len(intlist option ls) =
+	if ls == none 
+	then 0 
+	else 1 + len(ls!.tl); 
+
+// Return the front of the queue, i.e., the last element of the given integer list.
+// No changes are made to the list.
+function int peekFront(intlist option ls) =
+	if ls == none then -1
+	else if ls!.tl == none then ls!.hd
+	else peekFront(ls!.tl);
+
+//Remove the front of the queue, i.e., the last element of the given integer list.
+// Return the modified list.
+function intlist option dequeue(intlist option ls) = 
+	if ls == none then none
+	else if	ls!.tl == none then none 
+	else some(intlist { hd: ls!.hd, tl: dequeue(ls!.tl) });																		// Remove the last item from the tail
+
+//Insert a new entry n as the head of the list ls. If ls has already reached its
+// capacity before adding n, return ls; otherwise, return modified ls with n as
+// its head. 
+function intlist option enqueue(int n, intlist option ls) = 
+	if len(ls) == BUFFERLENGTH then ls
+	else some(intlist { hd: n, tl: ls });		 
+
+//Routing function	(x-y routing)
+function int route(int dest, int routerID) =
+	if dest == -1 then -1//no flit
+	else if (dest == routerID) then 4//local
+	else if (dest % NOCSIZE) > (routerID % NOCSIZE) then 1/*east*/
+	else if (dest % NOCSIZE) < (routerID % NOCSIZE) then 3/*west*/
+	else if (dest / NOCSIZE) > (routerID / NOCSIZE) then 2/*south*/
+	else if (dest / NOCSIZE) < (routerID / NOCSIZE) then 0/*north*/
+	else 4//local
+	;
+
+function bool checkNotFull(int direction, int routerID) = 																		// Check if input buffer of input NoC is full
+	if direction == -1 then true //no flit
+	else if (direction == 0 && routerID - NOCSIZE >= 0) 
+		then len(noc[routerID - NOCSIZE].channelArray[noc[routerID - NOCSIZE].nsPos].buff) < BUFFERLENGTH
+	else if (direction == 1  && routerID + 1 <= 3) 
+		then len(noc[routerID + 1].channelArray[noc[routerID + 1].ewPos].buff) < BUFFERLENGTH
+	else if (direction == 2  && routerID + NOCSIZE <= 3) 
+		then len(noc[routerID + NOCSIZE].channelArray[noc[routerID + NOCSIZE].nsPos].buff) < BUFFERLENGTH
+	else if (direction == 3  && routerID - 1 >= 0) 
+		then len(noc[routerID - 1].channelArray[noc[routerID - 1].ewPos].buff) < BUFFERLENGTH
+	else if direction == 4 
+		then true //send local
+	else false //catch all case
+	;
+	
+function int(0..1) checkNotFullIncrement(int direction, int routerID) = 
+	(checkNotFull(direction, routerID)) ? 0 : 1;			// CheckNotFull, but returning int 0 or 1
+
+// ------ Begin: process definitions ------
+//---- Parallel Processes ----
+process Clock() {	
+	tick {= clk = 1 =};
+	Clock()
+}
+
+process Top() {
+	initialize();
+	Populate();
+	initialRoute(0);
+	initialRoute(1);
+	initialRoute(2);
+	initialRoute(3);
+	do {
+		Arbiter_corner(0);																										// Resolve shifting the input buffers by one
+		Arbiter_corner(1);
+		Arbiter_corner(2);
+		Arbiter_corner(3);	
+		
+		Measure_noise(0);
+		Measure_noise(1);
+		Measure_noise(2);
+		Measure_noise(3);
+
+		tick;
+		
+		Populate();																												// Populate new flits
+		
+		updateDestination(0, 0);																								// Update where the flits that have been serviced now
+		updateDestination(1, 0);																								// need to go
+		updateDestination(2, 0);
+		
+		updateDestination(0, 1);
+		updateDestination(1, 1);
+		updateDestination(2, 1);
+		
+		updateDestination(0, 2);
+		updateDestination(1, 2);
+		updateDestination(2, 2);
+		
+		updateDestination(0, 3);
+		updateDestination(1, 3);
+		updateDestination(2, 3)
+	}
+}
+
+process Populate() {
+	if ((clk % INJECTIONRATEDENOMINATOR) < INJECTIONRATENUMERATOR){																// Flit injection happens every n/d clk cycles
+		palt {
+			:(1/3): {= noc[0].channelArray[noc[0].localPos].buff = enqueue(1, noc[0].channelArray[noc[0].localPos].buff) =}		// A new flit produced by noc 0 has a 1 in 3 chanc of
+			:(1/3): {= noc[0].channelArray[noc[0].localPos].buff = enqueue(2, noc[0].channelArray[noc[0].localPos].buff) =}		// any of the other 3 oncs being its endpoint
+			:(1/3): {= noc[0].channelArray[noc[0].localPos].buff = enqueue(3, noc[0].channelArray[noc[0].localPos].buff) =}
+		};
+		palt {
+			:(1/3): {= noc[1].channelArray[noc[1].localPos].buff = enqueue(0, noc[1].channelArray[noc[1].localPos].buff) =}
+			:(1/3): {= noc[1].channelArray[noc[1].localPos].buff = enqueue(2, noc[1].channelArray[noc[1].localPos].buff) =}
+			:(1/3): {= noc[1].channelArray[noc[1].localPos].buff = enqueue(3, noc[1].channelArray[noc[1].localPos].buff) =}
+		};
+		palt {
+			:(1/3): {= noc[2].channelArray[noc[2].localPos].buff = enqueue(0, noc[2].channelArray[noc[2].localPos].buff) =}
+			:(1/3): {= noc[2].channelArray[noc[2].localPos].buff = enqueue(1, noc[2].channelArray[noc[2].localPos].buff) =}
+			:(1/3): {= noc[2].channelArray[noc[2].localPos].buff = enqueue(3, noc[2].channelArray[noc[2].localPos].buff) =}
+		};
+		palt {
+			:(1/3): {= noc[3].channelArray[noc[3].localPos].buff = enqueue(0, noc[3].channelArray[noc[3].localPos].buff) =}
+			:(1/3): {= noc[3].channelArray[noc[3].localPos].buff = enqueue(1, noc[3].channelArray[noc[3].localPos].buff) =}
+			:(1/3): {= noc[3].channelArray[noc[3].localPos].buff = enqueue(2, noc[3].channelArray[noc[3].localPos].buff) =}
+		}
+	} else {
+		tau
+	}
+}
+
+
+//---- Sub processes ----
+process Arbiter_corner(int routerID) {
+	//Service buffers-------------------------------------------------------------------------------------------------------
+		
+		//Buffer priority 0
+		//<Service Buffer channelArray[0]>--------------------------------------------------------
+		{=
+		noc[routerID].channelArray[0].serviced = checkNotFull(noc[routerID].channelArray[0].direction, routerID),				// If buffer between ID and direction is not full...
+		noc[routerID].totalUnserviced += checkNotFullIncrement(noc[routerID].channelArray[0].direction, routerID),				// add one more to the buffer if a new flit has been
+		noc[routerID].unserviced += checkNotFullIncrement(noc[routerID].channelArray[0].direction, routerID)					// generated in that direction
+		=};
+		
+		//<Service buffer channelArray[1]> ------------------------------------------------------
+		if (noc[routerID].channelArray[1].direction == -1 || noc[routerID].channelArray[1].direction != noc[routerID].channelArray[0].direction) {			//If buffer channelArray[1] does not conflict with channelArray[0]
+			{= 	//Service Buffer
+			noc[routerID].channelArray[1].serviced = checkNotFull(noc[routerID].channelArray[1].direction, routerID),
+			noc[routerID].totalUnserviced += checkNotFullIncrement(noc[routerID].channelArray[1].direction, routerID),
+			noc[routerID].unserviced += checkNotFullIncrement(noc[routerID].channelArray[1].direction, routerID)
+			=}
+		}
+		else {
+			{= 
+			noc[routerID].channelArray[1].serviced = false,
+			noc[routerID].totalUnserviced++,
+			noc[routerID].unserviced++ 		//Increment unserviced
+			=}
+		};
+		
+		//<Service buffer channelArray[2]> --------------------------------------------------------
+		//If buffer channelArray[2] does not conflict with channelArray[1] or channelArray[0]
+		if (noc[routerID].channelArray[2].direction == -1 || noc[routerID].channelArray[2].direction != noc[routerID].channelArray[1].direction && noc[routerID].channelArray[2].direction != noc[routerID].channelArray[0].direction){	
+			{= 	//Service Buffer
+			noc[routerID].channelArray[2].serviced = checkNotFull(noc[routerID].channelArray[2].direction, routerID),
+			noc[routerID].totalUnserviced += checkNotFullIncrement(noc[routerID].channelArray[2].direction, routerID),
+			noc[routerID].unserviced += checkNotFullIncrement(noc[routerID].channelArray[2].direction, routerID)
+			=}
+		}
+		else {
+			{= 
+			noc[routerID].channelArray[2].serviced = false, 
+			noc[routerID].totalUnserviced++,
+			noc[routerID].unserviced++			//Increment unserviced
+			=}
+		};
+	
+		//Set priority directions for the next run and update the direction of the buffers----------------------------------------------
+		setPriority(0, routerID);
+		setPriority(1, routerID);
+		setPriority(2, routerID);
+		
+		// need to update the bufferID array
+		// test update for router 0
+		{=
+			noc[routerID].ewPos = noc[routerID].channelArray[noc[routerID].ewPos].priority,
+			noc[routerID].nsPos = noc[routerID].channelArray[noc[routerID].nsPos].priority,
+			noc[routerID].localPos = noc[routerID].channelArray[noc[routerID].localPos].priority,
+			
+			noc[routerID].totalUnserviced = 0			//reset Total Unserviced to 0 for next cycle
+		=};
+		
+		//Rewrite buffer array with new priority values-------------------------------------------------------------------------
+		{= 
+		noc[routerID].temp[noc[routerID].channelArray[0].priority] = noc[routerID].channelArray[0],
+		noc[routerID].temp[noc[routerID].channelArray[1].priority] = noc[routerID].channelArray[1],
+		noc[routerID].temp[noc[routerID].channelArray[2].priority] = noc[routerID].channelArray[2]//,
+		
+		//noc[routerID].bufferID[noc[routerID].channelArray[0].id] = noc[routerID].channelArray[0].priority,
+		//noc[routerID].bufferID[noc[routerID].channelArray[1].id] = noc[routerID].channelArray[1].priority,
+		//noc[routerID].bufferID[noc[routerID].channelArray[2].id] = noc[routerID].channelArray[2].priority
+		=};
+		
+		{= noc[routerID].channelArray = noc[routerID].temp =}
+}
+	
+// Measure PSN
+process Measure_noise(int routerID)
+{
+	{=
+		0: resistiveNoise = noc[routerID].thisActivity >= ACTIVITY_THRESH
+			? resistiveNoise + 1
+			: resistiveNoise,
+		0: inductiveNoise = abs(noc[routerID].lastActivity - noc[routerID].thisActivity) >= ACTIVITY_THRESH
+			? inductiveNoise + 1
+			: inductiveNoise,
+		
+		1: noc[routerID].lastActivity = noc[routerID].thisActivity,
+		1: noc[routerID].thisActivity = 0
+	=}
+}
+
+//initialize values --------------------------------------------------------------------------------------------------------------------------------------------
+process initialize() {
+	initialize_node_nw(0);
+	initialize_node_ne(1);
+	initialize_node_sw(2);
+	initialize_node_se(3)
+}
+
+process initialize_node_nw(int routerID) {
+	channel east, south, local, spare1, spare2, spare3;
+	{=
+	noc[routerID].channelArray = [east, south, local, spare1, spare2, spare3],
+	noc[routerID].temp = [east, south, local, spare1, spare2, spare3],
+	
+	noc[routerID].ewPos = 0,
+	noc[routerID].nsPos = 1,
+	noc[routerID].localPos = 2,
+	
+	//noc[routerID].bufferID = [0/**/, 0, 1, 0/**/, 2],
+	
+	//noc[routerID].channelArray[0].id = 1, 
+	//noc[routerID].channelArray[1].id = 2, 
+	//noc[routerID].channelArray[2].id = 4,
+	
+	noc[routerID].unserviced = 0,
+	noc[routerID].thisActivity = 0,
+	noc[routerID].lastActivity = 0
+	=}
+}
+
+process initialize_node_ne(int routerID) {
+	channel south, west, local, spare1, spare2, spare3;
+	{=
+	noc[routerID].channelArray = [south, west, local, spare1, spare2, spare3],
+	noc[routerID].temp = [south, west, local, spare1, spare2, spare3], 
+	
+	noc[routerID].nsPos = 0,
+	noc[routerID].ewPos = 1,
+	noc[routerID].localPos = 2,
+	
+	//noc[routerID].bufferID = [0/**/, 0/**/, 0, 1, 2],
+	
+	//noc[routerID].channelArray[0].id = 2, 
+	//noc[routerID].channelArray[1].id = 3, 
+	//noc[routerID].channelArray[2].id = 4,
+	
+	noc[routerID].unserviced = 0,
+	noc[routerID].thisActivity = 0,
+	noc[routerID].lastActivity = 0
+	=}
+}
+
+process initialize_node_sw(int routerID) {
+	channel north, east, local, spare1, spare2, spare3;
+	{=
+	noc[routerID].channelArray = [north, east, local, spare1, spare2, spare3],
+	noc[routerID].temp = [north, east, local, spare1, spare2, spare3], 
+	
+	noc[routerID].nsPos = 0,
+	noc[routerID].ewPos = 1,
+	noc[routerID].localPos = 2,
+	
+	//noc[routerID].bufferID = [0, 1, 0/**/, 0/**/, 2],
+	
+	//noc[routerID].channelArray[0].id = 0, 
+	//noc[routerID].channelArray[1].id = 1, 
+	//noc[routerID].channelArray[2].id = 4,
+	
+	noc[routerID].unserviced = 0,
+	noc[routerID].thisActivity = 0,
+	noc[routerID].lastActivity = 0
+	=}
+}
+
+process initialize_node_se(int routerID) {
+	channel north, west, local, spare1, spare2, spare3;
+	{=
+	noc[routerID].channelArray = [north, west, local, spare1, spare2, spare3],
+	noc[routerID].temp = [north, west, local, spare1, spare2, spare3], 
+	
+	noc[routerID].nsPos = 0,
+	noc[routerID].ewPos = 1,
+	noc[routerID].localPos = 2,
+	
+	//noc[routerID].bufferID = [0, 0/**/, 0/**/, 1, 2],
+	
+	//noc[routerID].channelArray[0].id = 0, 
+	//noc[routerID].channelArray[1].id = 3, 
+	//noc[routerID].channelArray[2].id = 4,
+	
+	noc[routerID].unserviced = 0,
+	noc[routerID].thisActivity = 0,
+	noc[routerID].lastActivity = 0
+	=}
+	
+}
+
+//runs routing after initial setup (for testing)
+process initialRoute(int routerID) {
+	{=
+	noc[routerID].channelArray[0].direction = route(peekFront(noc[routerID].channelArray[0].buff), routerID),
+	noc[routerID].channelArray[1].direction = route(peekFront(noc[routerID].channelArray[1].buff), routerID),
+	noc[routerID].channelArray[2].direction = route(peekFront(noc[routerID].channelArray[2].buff), routerID)
+	=}
+}
+
+
+//Sets the new priority of buffer channelArray[i] and forwards the destination if the buffer was serviced ------------------------------------------------------------------
+process setPriority(int i, int routerID) {
+	if (noc[routerID].channelArray[i].serviced == true) {
+		if (noc[routerID].channelArray[i].direction == -1){ tau }
+		else if(noc[routerID].channelArray[i].direction == 4) {			//Send in the local direction
+			{= 
+			noc[routerID].channelArray[i].direction = -1,
+			noc[routerID].channelArray[i].buff = dequeue(noc[routerID].channelArray[i].buff),
+			noc[routerID].thisActivity++
+			=}			//flit delivered
+		}
+		else if (noc[routerID].channelArray[i].direction == 0) {			//Send in the north direction
+			sendNorth(routerID, noc[routerID].channelArray[i].buff);
+			{=
+				noc[routerID].channelArray[i].buff = dequeue(noc[routerID].channelArray[i].buff),
+				noc[routerID].thisActivity++
+			=}
+		}
+		else if (noc[routerID].channelArray[i].direction == 1) {			//Send in the east direction
+			sendEast(routerID, noc[routerID].channelArray[i].buff);
+			{=
+				noc[routerID].channelArray[i].buff = dequeue(noc[routerID].channelArray[i].buff),
+				noc[routerID].thisActivity++
+			=}
+		}
+		else if (noc[routerID].channelArray[i].direction == 2) {			//Send in the south direction
+			sendSouth(routerID, noc[routerID].channelArray[i].buff);
+			{=
+				noc[routerID].channelArray[i].buff = dequeue(noc[routerID].channelArray[i].buff),
+				noc[routerID].thisActivity++
+			=}
+		}
+		else if (noc[routerID].channelArray[i].direction == 3) {			//Send in the west direction
+			sendWest(routerID, noc[routerID].channelArray[i].buff);
+			{= 
+				noc[routerID].channelArray[i].buff = dequeue(noc[routerID].channelArray[i].buff),
+				noc[routerID].thisActivity++
+			=}
+		}
+		else { tau };
+		
+		{=																								
+		noc[routerID].channelArray[i].direction = -1,								
+		noc[routerID].channelArray[i].priority = i + noc[routerID].unserviced 				//Set new priority                     
+		=}
+	}
+	else {
+		{= 
+		noc[routerID].channelArray[i].priority = noc[routerID].totalUnserviced - noc[routerID].unserviced,		//Set new priority
+		noc[routerID].unserviced-- 						//decrement unserviced
+		=}
+	}
+}
+
+//Updates the destination from the buffer if the buffer was serviced
+process updateDestination(int i , int routerID) {
+	if (noc[routerID].channelArray[i].serviced == true) {
+		{=
+		noc[routerID].channelArray[i].direction = route(peekFront(noc[routerID].channelArray[i].buff), routerID)		//Update direction from buffer
+		=}
+	} else {
+		tau
+	}
+}
+
+process sendNorth(int routerID, intlist option source) {
+	if (routerID == 2) {
+		{=
+		noc[0].channelArray[noc[0].nsPos].buff = enqueue(peekFront(source), noc[0].channelArray[noc[0].nsPos].buff)
+		//,source = dequeue(source)
+		=}
+	}
+	else if (routerID == 3) {
+		{=
+		noc[1].channelArray[noc[1].nsPos].buff = enqueue(peekFront(source), noc[1].channelArray[noc[1].nsPos].buff)
+		//,source = dequeue(source)
+		=}
+	} else {
+		tau
+	}
+}
+
+process sendEast(int routerID, intlist option source) {
+	if (routerID == 0) {
+		{=
+		noc[1].channelArray[noc[1].ewPos].buff = enqueue(peekFront(source), noc[1].channelArray[noc[1].ewPos].buff)
+		//,source = dequeue(source)
+		=}
+	} else if(routerID == 2) {
+		{=
+		noc[3].channelArray[noc[3].ewPos].buff = enqueue(peekFront(source), noc[3].channelArray[noc[3].ewPos].buff)
+		//,source = dequeue(source)
+		=}
+	} else {
+		tau
+	}
+}
+
+process sendSouth(int routerID, intlist option source) {
+	if (routerID == 0) {
+		{=
+		noc[2].channelArray[noc[2].nsPos].buff = enqueue(peekFront(source), noc[2].channelArray[noc[2].nsPos].buff),
+		source = dequeue(source)
+		=}
+	} else if(routerID == 1) {
+		{=
+		noc[3].channelArray[noc[3].nsPos].buff = enqueue(peekFront(source), noc[3].channelArray[noc[3].nsPos].buff),
+		source = dequeue(source)
+		=}
+	} else {
+		tau
+	}
+}
+
+process sendWest(int routerID, intlist option source) {
+	if (routerID == 1) {
+		{=
+		noc[0].channelArray[noc[0].ewPos].buff = enqueue(peekFront(source), noc[0].channelArray[noc[0].ewPos].buff),
+		source = dequeue(source)
+		=}
+	} else if (routerID == 3) {
+		{=
+		noc[2].channelArray[noc[2].ewPos].buff = enqueue(peekFront(source), noc[2].channelArray[noc[2].ewPos].buff),
+		source = dequeue(source)
+		=}
+	} else {
+		tau
+	}
+}
+
+// ------- End: process definitions -------
+par {
+::	Clock()
+:: 	Top()
+}
+
+property R_200 = Pmax(<>[S(clk)<=200] (resistiveNoise >= RESISTIVE_THRESH));
+property R_201 = Pmax(<>[S(clk)<=201] (resistiveNoise >= RESISTIVE_THRESH));
+property R_202 = Pmax(<>[S(clk)<=202] (resistiveNoise >= RESISTIVE_THRESH));
+property R_203 = Pmax(<>[S(clk)<=203] (resistiveNoise >= RESISTIVE_THRESH));
+property R_204 = Pmax(<>[S(clk)<=204] (resistiveNoise >= RESISTIVE_THRESH));
+property R_205 = Pmax(<>[S(clk)<=205] (resistiveNoise >= RESISTIVE_THRESH));
+property R_206 = Pmax(<>[S(clk)<=206] (resistiveNoise >= RESISTIVE_THRESH));
+property R_207 = Pmax(<>[S(clk)<=207] (resistiveNoise >= RESISTIVE_THRESH));
+property R_208 = Pmax(<>[S(clk)<=208] (resistiveNoise >= RESISTIVE_THRESH));
+property R_209 = Pmax(<>[S(clk)<=209] (resistiveNoise >= RESISTIVE_THRESH));
+property R_210 = Pmax(<>[S(clk)<=210] (resistiveNoise >= RESISTIVE_THRESH));
+property R_211 = Pmax(<>[S(clk)<=211] (resistiveNoise >= RESISTIVE_THRESH));
+property R_212 = Pmax(<>[S(clk)<=212] (resistiveNoise >= RESISTIVE_THRESH));
+property R_213 = Pmax(<>[S(clk)<=213] (resistiveNoise >= RESISTIVE_THRESH));
+property R_214 = Pmax(<>[S(clk)<=214] (resistiveNoise >= RESISTIVE_THRESH));
+property R_215 = Pmax(<>[S(clk)<=215] (resistiveNoise >= RESISTIVE_THRESH));
+property R_216 = Pmax(<>[S(clk)<=216] (resistiveNoise >= RESISTIVE_THRESH));
+property R_217 = Pmax(<>[S(clk)<=217] (resistiveNoise >= RESISTIVE_THRESH));
+property R_218 = Pmax(<>[S(clk)<=218] (resistiveNoise >= RESISTIVE_THRESH));
+property R_219 = Pmax(<>[S(clk)<=219] (resistiveNoise >= RESISTIVE_THRESH));
+property R_220 = Pmax(<>[S(clk)<=220] (resistiveNoise >= RESISTIVE_THRESH));
+property R_221 = Pmax(<>[S(clk)<=221] (resistiveNoise >= RESISTIVE_THRESH));
+property R_222 = Pmax(<>[S(clk)<=222] (resistiveNoise >= RESISTIVE_THRESH));
+property R_223 = Pmax(<>[S(clk)<=223] (resistiveNoise >= RESISTIVE_THRESH));
+property R_224 = Pmax(<>[S(clk)<=224] (resistiveNoise >= RESISTIVE_THRESH));
+property R_225 = Pmax(<>[S(clk)<=225] (resistiveNoise >= RESISTIVE_THRESH));
+property R_226 = Pmax(<>[S(clk)<=226] (resistiveNoise >= RESISTIVE_THRESH));
+property R_227 = Pmax(<>[S(clk)<=227] (resistiveNoise >= RESISTIVE_THRESH));
+property R_228 = Pmax(<>[S(clk)<=228] (resistiveNoise >= RESISTIVE_THRESH));
+property R_229 = Pmax(<>[S(clk)<=229] (resistiveNoise >= RESISTIVE_THRESH));
+property R_230 = Pmax(<>[S(clk)<=230] (resistiveNoise >= RESISTIVE_THRESH));
+property R_231 = Pmax(<>[S(clk)<=231] (resistiveNoise >= RESISTIVE_THRESH));
+property R_232 = Pmax(<>[S(clk)<=232] (resistiveNoise >= RESISTIVE_THRESH));
+property R_233 = Pmax(<>[S(clk)<=233] (resistiveNoise >= RESISTIVE_THRESH));
+property R_234 = Pmax(<>[S(clk)<=234] (resistiveNoise >= RESISTIVE_THRESH));
+property R_235 = Pmax(<>[S(clk)<=235] (resistiveNoise >= RESISTIVE_THRESH));
+property R_236 = Pmax(<>[S(clk)<=236] (resistiveNoise >= RESISTIVE_THRESH));
+property R_237 = Pmax(<>[S(clk)<=237] (resistiveNoise >= RESISTIVE_THRESH));
+property R_238 = Pmax(<>[S(clk)<=238] (resistiveNoise >= RESISTIVE_THRESH));
+property R_239 = Pmax(<>[S(clk)<=239] (resistiveNoise >= RESISTIVE_THRESH));
+property R_240 = Pmax(<>[S(clk)<=240] (resistiveNoise >= RESISTIVE_THRESH));
+property R_241 = Pmax(<>[S(clk)<=241] (resistiveNoise >= RESISTIVE_THRESH));
+property R_242 = Pmax(<>[S(clk)<=242] (resistiveNoise >= RESISTIVE_THRESH));
+property R_243 = Pmax(<>[S(clk)<=243] (resistiveNoise >= RESISTIVE_THRESH));
+property R_244 = Pmax(<>[S(clk)<=244] (resistiveNoise >= RESISTIVE_THRESH));
+property R_245 = Pmax(<>[S(clk)<=245] (resistiveNoise >= RESISTIVE_THRESH));
+property R_246 = Pmax(<>[S(clk)<=246] (resistiveNoise >= RESISTIVE_THRESH));
+property R_247 = Pmax(<>[S(clk)<=247] (resistiveNoise >= RESISTIVE_THRESH));
+property R_248 = Pmax(<>[S(clk)<=248] (resistiveNoise >= RESISTIVE_THRESH));
+property R_249 = Pmax(<>[S(clk)<=249] (resistiveNoise >= RESISTIVE_THRESH));
+property R_250 = Pmax(<>[S(clk)<=250] (resistiveNoise >= RESISTIVE_THRESH));
