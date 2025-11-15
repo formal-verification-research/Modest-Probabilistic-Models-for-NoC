@@ -9,13 +9,13 @@
  * In order to add routers to the NoC, visit all coments labled with #MODULARIZE
  * In order to change system properties and the functionality of indevidual routers, visit all coments labled with #CUSTOMIZE
  *
- * Editors: Jonah Boe
- * Date: Dec 16, 2021
- * Designed using: The Modest Toolset (www.modestchecker.net), version v3.1.182-g3d5d3ecdf.
+ * Editors:
+ *	Jonah Boe
+ *	Nick Waddoups
+ * Date: Nov 14, 2025
  ***************************************************************************************************************************/
 
 option "dtmc";
-
 
 
 // --------------------------------------------------- Top level varables ---------------------------------------------------
@@ -35,8 +35,8 @@ const int INJECTION_RATE_NUMERATOR = 3;
 const int INJECTION_RATE_DENOMINATOR = 10;
 
 // #CUSTOMIZE this is the upper bound of cycles run before quiting.
-const int CLK_UPPER = 1;
-int clk = 0;
+transient int(0..1) clk = 0;
+int(0..INJECTION_RATE_DENOMINATOR-1) clk_counter = 0;
 
 // #CUSTOMIZE this is the upper threshoold for noise detected in the system.
 const int RESISTIVE_NOISE_THRESH = 20;
@@ -244,19 +244,11 @@ property Router3PriorityAlwaysContainsLocal = Pmax(<>(!(
 // All routers are syncronized
 //property AllRoutersAreInSync = Pmax(<>(!(states[0] == states[1] && states[1] == states[2] && states[2] == states[3]))) == 0;
 
-// Final Results
-property resistiveNoiseProbability = Pmax(<> (resistiveNoise >= RESISTIVE_NOISE_THRESH));
-property inductiveNoiseProbability = Pmax(<> (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
-
-
-
 // -------------------------------------------------------- Actions ---------------------------------------------------------
 
 // For keeping parallel processes synced
 action tick;
 action sync;
-
-
 
 // ------------------------------------------------------- Functions --------------------------------------------------------
 
@@ -307,7 +299,7 @@ function buffer option dequeue(buffer option ls) =
 
 process GenerateFlits(int id){
 	int(0..NOC_MAX_ID) destination;
-	if((clk % INJECTION_RATE_DENOMINATOR) < INJECTION_RATE_NUMERATOR){
+	if((clk_counter % INJECTION_RATE_DENOMINATOR) < INJECTION_RATE_NUMERATOR){
 		// Determine a destiantion
 		//palt{
 			// #MODULARIZE by adding a probability for (NOC_MAX_ID - 1) destinations.
@@ -597,29 +589,15 @@ process RouterBehavior(int id, int id_north, int id_west, int id_east, int id_so
 		// Generate new flits
 		GenerateFlits(id);
 		// Determine what channels will send this cycle
-		PrepRouter(id);
-
-		if(clk >= CLK_UPPER){
-			stop
-		}
-		else{
-			tau
-		}
+		PrepRouter(id)
 	}
 }
 
 // For syncing parallell processes
 process Clock(){
-	tick {= clk++ =};
-	if (clk <= CLK_UPPER) {
-	   Clock()
-	}
-	else {
-	   stop
-	}
+	tick {= clk = 1, clk_counter = (clk_counter + 1) % INJECTION_RATE_DENOMINATOR =};
+	Clock()
 }
-
-
 
 // ------------------------------------------------------- Execution --------------------------------------------------------
 
