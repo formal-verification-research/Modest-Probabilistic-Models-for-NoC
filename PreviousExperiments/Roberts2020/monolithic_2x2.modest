@@ -28,6 +28,7 @@ const int RESISTIVE_THRESH;
 const int INDUCTIVE_THRESH;
 
 transient int(0..1) clk;
+int(0..INJECTIONRATEDENOMINATOR-1) clk_counter = 0;
 
 datatype intlist = {
 	int(0..((NOCSIZE*NOCSIZE)-1)) hd,
@@ -131,7 +132,7 @@ function int(0..1) checkNotFullIncrement(int direction, int routerID) =
 // ------ Begin: process definitions ------
 //---- Parallel Processes ----
 process Clock() {	
-	tick {= clk = 1 =};
+	tick {= clk = 1, clk_counter = (clk_counter + 1) % INJECTIONRATEDENOMINATOR =};
 	Clock()
 }
 
@@ -176,7 +177,7 @@ process Top() {
 }
 
 process Populate() {
-	if ((clk % INJECTIONRATEDENOMINATOR) < INJECTIONRATENUMERATOR){																// Flit injection happens every n/d clk cycles
+	if ((clk_counter % INJECTIONRATEDENOMINATOR) < INJECTIONRATENUMERATOR){																// Flit injection happens every n/d clk cycles
 		palt {
 			:(1/3): {= noc[0].channelArray[noc[0].localPos].buff = enqueue(1, noc[0].channelArray[noc[0].localPos].buff) =}		// A new flit produced by noc 0 has a 1 in 3 chanc of
 			:(1/3): {= noc[0].channelArray[noc[0].localPos].buff = enqueue(2, noc[0].channelArray[noc[0].localPos].buff) =}		// any of the other 3 oncs being its endpoint
