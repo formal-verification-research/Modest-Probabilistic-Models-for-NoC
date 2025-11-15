@@ -2,6 +2,8 @@
 
 This model is the 2x2 model Riley used in his FMICS 2021 paper, "Probabilistic Verification for Reliability of a Two-by-Two Network-on-Chip System." In 2025 the model was updated to better reflect the operation of the modular model such that we can generate reproducible comparisons. The logic of the model was not changed, only the formatting and re-introduction of the PSN tracking variables.
 
+Specifically, the `clk` variable was changed to a transient variable for use in reward bounded properties, PSN properties were added, and `activity` variables were added to the router data structure to track PSN using the same method as the modular router from Boe2023.
+
 ## Directory Overview
 
 - [monolithic_2x2.modest](./monolithic_2x2.modest): The monolithic 2x2 NoC model set up to
