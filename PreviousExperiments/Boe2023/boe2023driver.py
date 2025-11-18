@@ -20,9 +20,9 @@ NoCSize = Literal["2x2", "3x3"]
 def generate_model(original_model: str, clk: range, type: NoiseType):
     for i in clk:
         if type == "Resistive":
-            original_model += f"\nproperty R_{i} = Pmax(<>[S(clk)<={i}] (resistiveNoise >= RESISTIVE_THRESH));"
+            original_model += f"\nproperty R_{i} = Pmax(<>[S(clk)<={i}] (resistiveNoise >= RESISTIVE_NOISE_THRESH));"
         elif type == "Inductive":
-            original_model += f"\nproperty I_{i} = Pmax(<>[S(clk)<={i}] (inductiveNoise >= INDUCTIVE_THRESH));"
+            original_model += f"\nproperty I_{i} = Pmax(<>[S(clk)<={i}] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));"
     return original_model
 
 def run_psn_analysis(
@@ -49,7 +49,7 @@ def run_psn_analysis(
             "--max-run-length", "0", 
             "-D", 
             "--rng", "MersenneTwister", 
-            "-E", f"RESISTIVE_THRESH={resistive_threshold}, INDUCTIVE_THRESH={inductive_threshold}"]
+            "-E", f"RESISTIVE_NOISE_THRESH={resistive_threshold}, INDUCTIVE_NOISE_THRESH={inductive_threshold}"]
 
     # Create the title
     title = f"{sim_type}_modular_{size}_" + (f"r{resistive_threshold}" if sim_type == "Resistive" else f"i{inductive_threshold}")
