@@ -1,0 +1,1483 @@
+option "dtmc";
+
+//----- User Defined Constants -----
+
+// #CUSTOMIZE
+// Set the dimensions for the NoC, note that square dimensions are currently
+// the only accepted dimensions
+const int NOC_MESH_WIDTH = 3;
+const int NOC_MESH_HEIGHT = 3;
+
+// #CUSTOMIZE 
+// This value changes the buffer length of all buffers.
+const int BUFFER_LENGTH = 4;
+
+// #CUSTOMIZE 
+// These values change the frequency with witch flits are injected.
+const int INJECTION_RATE_NUMERATOR = 3;
+const int INJECTION_RATE_DENOMINATOR = 10;
+
+// #CUSTOMIZE
+// This represents a cyclic clock counter that wraps from 0 to INJECTION_RATE_DENOMINATOR - 1
+// and it's used to determine the flit generation pattern. For unique patterns you'll need
+// to adjust this to meet your use case.
+int(0..INJECTION_RATE_DENOMINATOR) clk = 0;
+transient int(0..1) clk_indicator;
+
+// #CUSTOMIZE the number of buffers a router must service before noise will be incremented.
+const int ACTIVITY_THRESH;
+
+// ----- Calculated Constants -----
+
+// The max id for each router in the NoC. Ids range from 0 to NOC_MAX_ID in a
+// left-to-right, line by line pattern in the NoC
+/*
+e.g. a 2x2 NoC with it's corresponding ids
+
+ 0 -- 1
+ |    |
+ 2 -- 3
+*/
+const int NOC_MAX_ID = (NOC_MESH_WIDTH * NOC_MESH_HEIGHT) - 1;
+
+// Enumerated values representing the different directions in the
+// mesh
+const int NORTH = 0;
+const int WEST = 1;
+const int EAST = 2;
+const int SOUTH = 3;
+const int LOCAL = 4;
+const int NO_CONNECT = -1;
+
+// ----- Functional Datatypes -----
+
+datatype buffer = {
+    int(0..NOC_MAX_ID) hd,
+    buffer option tl
+};
+
+datatype channel = {
+    buffer option buffer,
+    bool serviced,
+    bool isEmpty,
+    bool isFull
+};
+
+datatype router = {
+    channel[] channels,
+    int(-1..NOC_MAX_ID)[] ids,
+    int(0..4)[] priority_list,
+    int(0..4)[] priority_list_temp,
+    int(0..4) serviced_index,
+    int(0..4) unserviced_index,
+    int(0..5) total_unserviced,
+	int(0..5) thisActivity,
+	int(0..5) lastActivity,
+    bool[] used
+};
+
+// ----- Verification Datatypes -----
+
+datatype sendCounter = {
+    int(0..2)[] counts
+};
+
+// ----- Variables -----
+router[] noc = [
+router {
+    channels: [
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
+    ids: [NO_CONNECT, NO_CONNECT, 1, 3],
+    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
+    priority_list_temp: [0, 0, 0, 0, 0],
+    serviced_index: 0,
+    unserviced_index: 0,
+    total_unserviced: 0,
+    thisActivity: 0,
+    lastActivity: 0,
+    used: [false, false, false, false, false]
+},
+router {
+    channels: [
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
+    ids: [NO_CONNECT, 0, 2, 4],
+    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
+    priority_list_temp: [0, 0, 0, 0, 0],
+    serviced_index: 0,
+    unserviced_index: 0,
+    total_unserviced: 0,
+    thisActivity: 0,
+    lastActivity: 0,
+    used: [false, false, false, false, false]
+},
+router {
+    channels: [
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
+    ids: [NO_CONNECT, 1, NO_CONNECT, 5],
+    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
+    priority_list_temp: [0, 0, 0, 0, 0],
+    serviced_index: 0,
+    unserviced_index: 0,
+    total_unserviced: 0,
+    thisActivity: 0,
+    lastActivity: 0,
+    used: [false, false, false, false, false]
+},
+router {
+    channels: [
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
+    ids: [0, NO_CONNECT, 4, 6],
+    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
+    priority_list_temp: [0, 0, 0, 0, 0],
+    serviced_index: 0,
+    unserviced_index: 0,
+    total_unserviced: 0,
+    thisActivity: 0,
+    lastActivity: 0,
+    used: [false, false, false, false, false]
+},
+router {
+    channels: [
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
+    ids: [1, 3, 5, 7],
+    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
+    priority_list_temp: [0, 0, 0, 0, 0],
+    serviced_index: 0,
+    unserviced_index: 0,
+    total_unserviced: 0,
+    thisActivity: 0,
+    lastActivity: 0,
+    used: [false, false, false, false, false]
+},
+router {
+    channels: [
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
+    ids: [2, 4, NO_CONNECT, 8],
+    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
+    priority_list_temp: [0, 0, 0, 0, 0],
+    serviced_index: 0,
+    unserviced_index: 0,
+    total_unserviced: 0,
+    thisActivity: 0,
+    lastActivity: 0,
+    used: [false, false, false, false, false]
+},
+router {
+    channels: [
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
+    ids: [3, NO_CONNECT, 7, NO_CONNECT],
+    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
+    priority_list_temp: [0, 0, 0, 0, 0],
+    serviced_index: 0,
+    unserviced_index: 0,
+    total_unserviced: 0,
+    thisActivity: 0,
+    lastActivity: 0,
+    used: [false, false, false, false, false]
+},
+router {
+    channels: [
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
+    ids: [4, 6, 8, NO_CONNECT],
+    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
+    priority_list_temp: [0, 0, 0, 0, 0],
+    serviced_index: 0,
+    unserviced_index: 0,
+    total_unserviced: 0,
+    thisActivity: 0,
+    lastActivity: 0,
+    used: [false, false, false, false, false]
+},
+router {
+    channels: [
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
+    ids: [5, 7, NO_CONNECT, NO_CONNECT],
+    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
+    priority_list_temp: [0, 0, 0, 0, 0],
+    serviced_index: 0,
+    unserviced_index: 0,
+    total_unserviced: 0,
+    thisActivity: 0,
+    lastActivity: 0,
+    used: [false, false, false, false, false]
+}];
+
+// ----- Integer functions -----
+
+// Saturating addition
+function int sat_add(int l, int r, int max) =
+    if (l + r) > max then max
+    else l + r;
+
+// ----- Boolean Algebra Functions -----
+
+// Boolean implication (l ==> r)
+function bool implies(bool l, bool r) = (!l) || r;
+
+// ----- List Functions -----
+
+// Calculate length of list
+function int len(buffer option ls) = if ls == none then 0 else 1 + len(ls!.tl);
+
+// Add a flit to the buffer
+function buffer option enqueue(int n, buffer option ls) =
+    some(buffer {
+        hd: n,
+        tl: ls
+    });
+
+// Remove a flit from the buffer
+function buffer option dequeue(buffer option ls) =
+    if ls == none then none
+    else if ls!.tl == none then none
+    else some(buffer {
+        hd: ls!.hd,
+        tl: dequeue(ls!.tl)
+    });
+
+// Returns true if the buffer `ls` contains `id`, otherwise returns false 
+function bool contains(int id, buffer option ls) =
+	if ls == none then false
+    else if ls!.hd == id then true
+	else contains(id, ls!.tl);
+
+// Return the front of the queue
+function int peekFront(buffer option ls) =
+    if ls == none then -1
+    else if ls!.tl == none then ls!.hd
+    else peekFront(ls!.tl);
+
+// ----- Buffer Specific Functions -----
+
+// Tell if the buffer is full
+function bool isBufferFull(buffer option ls) = len(ls) >= BUFFER_LENGTH;
+
+// ----- Routing Functions
+
+// Get the mirror direction to determine what buffer will receive the flit
+// e.g. if we are R0 and we are sending across the South Channel to R2,
+// then R2 should receive the flit in their North Buffer
+function int getDestinationChannel(int dir) =
+    if dir == NORTH then SOUTH
+    else if dir == WEST then EAST
+    else if dir == EAST then WEST
+    else if dir == SOUTH then NORTH
+    else -1;
+
+// Calculate what column a specific ID is destined for
+function int idToColumn(int id) = (id % NOC_MESH_WIDTH);
+
+// Calculate what row a specific ID is destined for
+function int idToRow(int id) = (int)(id / NOC_MESH_HEIGHT);
+
+// Determine if the flits destination is in the same column as the current router
+// Returns < 0 if id needs to go to the left, > 0 to go right, and 0 if it's the
+// correct column
+function int getColumnShift(int id, int dst) = idToColumn(dst) - idToColumn(id);
+
+// ----- Processes -----
+// General guidance for processes is that we want as much synchronized assignments to happen
+// as possible. A digital system is by default a synchronous system, so we don't typically
+// need worry about interleavings for our design. To accomplish this most processes also 
+// have an associated action with the same name that synchronizes assignments between
+// routers within those processes.
+
+// #CUSTOMIZE
+// This method is how flits are generated for the NoC. To change the flit injection pattern
+// change this method.
+// Flits are injected into a router's LOCAL buffer and then the router automatically routes
+// the flits to their destination.
+action generateFlits;
+process GenerateFlits(int id) {
+    int(0..NOC_MAX_ID) destination;
+
+    if (!isBufferFull(noc[id].channels[LOCAL].buffer) && clk < INJECTION_RATE_NUMERATOR) {
+        // Add the new flit to the local buffer
+        // If the destination is greater than or equal to the ID, we shift it
+        // up by one to exclude the possiblity of sending a flit to ourselves
+        generateFlits {=
+            0: destination = DiscreteUniform(0, NOC_MAX_ID - 1),
+            1: noc[id].channels[LOCAL].buffer = 
+                enqueue(destination >= id ? 
+                            destination + 1 : 
+                            destination, noc[id].channels[LOCAL].buffer)
+        =}
+    }
+    else {
+        generateFlits // Take this action instead of tau for better synchronization
+    }
+}
+// Set the `isEmpty` and `isFull` flags for each channel based off the current
+// state of the buffers in the channel
+action prepRouter;
+process PrepRouter(int id) {
+    // Prep all the channels
+    prepRouter {=
+        // North Channel (0)
+        noc[id].channels[NORTH].isEmpty = len(noc[id].channels[NORTH].buffer) == 0,
+        noc[id].channels[NORTH].isFull = isBufferFull(noc[id].channels[NORTH].buffer),
+
+        // WEST Channel (1)
+        noc[id].channels[WEST].isEmpty = len(noc[id].channels[WEST].buffer) == 0,
+        noc[id].channels[WEST].isFull = isBufferFull(noc[id].channels[WEST].buffer),
+
+        // East Channel (2)
+        noc[id].channels[EAST].isEmpty = len(noc[id].channels[EAST].buffer) == 0,
+        noc[id].channels[EAST].isFull = isBufferFull(noc[id].channels[EAST].buffer),
+
+        // South Channel (3)
+        noc[id].channels[SOUTH].isEmpty = len(noc[id].channels[SOUTH].buffer) == 0,
+        noc[id].channels[SOUTH].isFull = isBufferFull(noc[id].channels[SOUTH].buffer),
+
+        // Local Channel (4)
+        noc[id].channels[LOCAL].isEmpty = len(noc[id].channels[LOCAL].buffer) == 0,
+        noc[id].channels[LOCAL].isFull = isBufferFull(noc[id].channels[LOCAL].buffer)
+    =}
+}
+
+// Send a flit from Router `id` across channel `ch` in the specified direction `dir`
+process Send(int id, int ch, int dir) {
+    advanceChannel;
+
+    // If the destination is not full, and the channel has not been used in this cycle, then service the buffer
+    if(!noc[noc[id].ids[dir]].channels[getDestinationChannel(dir)].isFull && !noc[id].used[dir]){
+        advanceChannelSend {=
+            // Add flit to destination buffer
+            1: noc[noc[id].ids[dir]].channels[getDestinationChannel(dir)].buffer =
+                enqueue(peekFront(noc[id].channels[ch].buffer), noc[noc[id].ids[dir]].channels[getDestinationChannel(dir)].buffer),
+
+            // Then, remove it from the source buffer
+            2: noc[id].channels[ch].buffer = dequeue(noc[id].channels[ch].buffer),
+
+            // Mark that output as used and that channel as serviced
+            4: noc[id].used[dir] = true,
+            4: noc[id].channels[ch].serviced = true,
+
+			// Increment the count for buffers serviced in this cycle
+			4: noc[id].thisActivity++
+        =}
+    }
+    // Otherwise, increment total unserviced buffers
+    else{
+        advanceChannelSend {=
+            noc[id].total_unserviced++
+        =}
+    }
+}
+
+// Determine which direction to send the front-most flit in channel `ch` of router `id`
+process AdvanceFlits(int id, int ch) {
+    // If flit needs to stay on this row
+    if(getColumnShift(id, peekFront(noc[id].channels[ch].buffer)) == 0) {
+        // Send it north
+        if(peekFront(noc[id].channels[ch].buffer) < id){
+            Send(id, ch, NORTH)
+        }
+        // Or send it south
+        else{
+            Send(id, ch, SOUTH)
+        }
+    }
+    // Else, if flit needs to go west
+    else if(getColumnShift(id, peekFront(noc[id].channels[ch].buffer)) < 0) {
+        Send(id, ch, WEST)
+    }
+    // Else, flit needs to go east
+    else{
+        Send(id, ch, EAST)
+    }
+}
+
+// Advance a specific channel `ch` in router `id`
+action advanceChannel;
+action advanceChannelSend;
+process AdvanceChannel(int id, int ch) {
+    // If this channel was not assigned a neighbor or if it is
+    // empty, then mark it as serviced and move on to the next one
+    if ((ch != 4 && noc[id].ids[ch] == NO_CONNECT) || noc[id].channels[ch].isEmpty == true) {
+        advanceChannel {=
+            // Mark the channel as serviced
+            noc[id].channels[ch].serviced = true
+        =};
+	    advanceChannelSend
+    }
+    // If the flit has reached its destination...
+    else if (peekFront(noc[id].channels[ch].buffer) == id) {
+        advanceChannel {=
+            /* -- if the local channel has not been used this clock cycle -- */
+            // Mark the channel as serviced and used
+            noc[id].channels[ch].serviced = !noc[id].used[LOCAL],
+            noc[id].used[LOCAL] = !noc[id].used[LOCAL],
+
+            // Remove this flit. It has reached its destination
+            noc[id].channels[ch].buffer = !noc[id].used[LOCAL] ? dequeue(noc[id].channels[ch].buffer) : noc[id].channels[ch].buffer,
+
+            // Increment the activity for this cycle as we removed a flit
+            noc[id].thisActivity = !noc[id].used[LOCAL] ? noc[id].thisActivity + 1 : noc[id].thisActivity,
+
+            /* -- if the local channel has been used this clock cycle -- */
+            // Otherwise, increment total unserviced buffers
+            noc[id].total_unserviced = !noc[id].used[LOCAL] ? noc[id].total_unserviced : noc[id].total_unserviced + 1
+        =};
+	    advanceChannelSend
+    }
+    // Otherwise, the flit must be for another router
+    else {
+        AdvanceFlits(id, ch)
+    }
+}
+
+// Advance every channel in the router in the order of the priority list
+process AdvanceRouter(int id) {
+    AdvanceChannel(id, noc[id].priority_list[0]);
+    AdvanceChannel(id, noc[id].priority_list[1]);
+    AdvanceChannel(id, noc[id].priority_list[2]);
+    AdvanceChannel(id, noc[id].priority_list[3]);
+    AdvanceChannel(id, noc[id].priority_list[4])
+}
+
+// Update the priority list value at index `i` in router `id`
+process UpdatePriorityList(int id, int i) {
+    if (noc[id].channels[noc[id].priority_list[i]].serviced) {
+        updatePriority {=
+            0: noc[id].priority_list_temp[noc[id].total_unserviced + noc[id].serviced_index] = noc[id].priority_list[i],
+            1: noc[id].serviced_index++
+        =}
+    }
+    else {
+        updatePriority {=
+            0: noc[id].priority_list_temp[noc[id].unserviced_index] = noc[id].priority_list[i],
+            1: noc[id].unserviced_index++
+        =}
+    }
+}
+
+// Update the entire priority list (schedule) for router `id`
+action updatePriority;
+process UpdatePiority(int id) {
+    // Reset all of the temp values
+    updatePriority {=
+        noc[id].priority_list_temp = [0, 0, 0, 0, 0],
+        noc[id].serviced_index = 0,
+        noc[id].unserviced_index = 0
+    =};
+
+    // Update the ordering of priorities in the lists
+    UpdatePriorityList(id, 0);
+    UpdatePriorityList(id, 1);
+    UpdatePriorityList(id, 2);
+    UpdatePriorityList(id, 3);
+    UpdatePriorityList(id, 4);
+
+    updatePriority {=
+        // Make our next priority list the current priority list
+        // However, if all of our channels are empty, then just reset
+        // the priority list. This helps with the state space
+        0: noc[id].priority_list = (noc[id].channels[0].isEmpty &&
+                                    noc[id].channels[1].isEmpty &&
+                                    noc[id].channels[2].isEmpty &&
+                                    noc[id].channels[3].isEmpty &&
+                                    noc[id].channels[4].isEmpty) ?
+                                    [NORTH, EAST, SOUTH, WEST, LOCAL] : noc[id].priority_list_temp,
+
+        // Reset the used and serviced variables
+        1: noc[id].channels[0].serviced = false,
+        1: noc[id].channels[1].serviced = false,
+        1: noc[id].channels[2].serviced = false,
+        1: noc[id].channels[3].serviced = false,
+        1: noc[id].channels[4].serviced = false,
+        1: noc[id].total_unserviced = 0,
+        1: noc[id].used = [false, false, false, false, false],
+        1: noc[id].priority_list_temp = [0, 0, 0, 0, 0],
+        1: noc[id].serviced_index = 0,
+        1: noc[id].unserviced_index = 0
+    =}
+}
+
+process UpdateGlobalNoiseTracking(int id) {
+    {=
+       // Update trackers for next round
+       1: noc[id].lastActivity = noc[id].thisActivity,
+       2: noc[id].thisActivity = 0
+    =}
+}
+
+// Router model
+process Router(int id) {
+    // Generate new flits
+    GenerateFlits(id);
+
+    // Determine what channels will send this cycle
+    PrepRouter(id);
+
+    // Send the flits
+    AdvanceRouter(id);
+
+    // Update the priority list
+    UpdatePiority(id);
+
+    // Update noise tracking
+    UpdateGlobalNoiseTracking(id);
+
+    // Sync w/ the clock -
+    nextClockCycle;
+
+    // recursive call for next clock cycle
+    Router(id)
+}
+
+// Model the cyclic clock
+action nextClockCycle;
+process Clock() {
+    nextClockCycle {= clk = (clk + 1) % INJECTION_RATE_DENOMINATOR, clk_indicator = 1 =};
+    Clock()
+}
+
+par {
+    :: Clock()
+    :: Router(0)
+    :: Router(1)
+    :: Router(2)
+    :: Router(3)
+    :: Router(4)
+    :: Router(5)
+    :: Router(6)
+    :: Router(7)
+    :: Router(8)
+}
+property r0_I_100 = Pmax(<>[S(clk)<=100] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_101 = Pmax(<>[S(clk)<=101] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_102 = Pmax(<>[S(clk)<=102] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_103 = Pmax(<>[S(clk)<=103] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_104 = Pmax(<>[S(clk)<=104] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_105 = Pmax(<>[S(clk)<=105] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_106 = Pmax(<>[S(clk)<=106] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_107 = Pmax(<>[S(clk)<=107] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_108 = Pmax(<>[S(clk)<=108] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_109 = Pmax(<>[S(clk)<=109] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_110 = Pmax(<>[S(clk)<=110] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_111 = Pmax(<>[S(clk)<=111] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_112 = Pmax(<>[S(clk)<=112] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_113 = Pmax(<>[S(clk)<=113] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_114 = Pmax(<>[S(clk)<=114] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_115 = Pmax(<>[S(clk)<=115] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_116 = Pmax(<>[S(clk)<=116] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_117 = Pmax(<>[S(clk)<=117] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_118 = Pmax(<>[S(clk)<=118] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_119 = Pmax(<>[S(clk)<=119] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_120 = Pmax(<>[S(clk)<=120] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_121 = Pmax(<>[S(clk)<=121] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_122 = Pmax(<>[S(clk)<=122] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_123 = Pmax(<>[S(clk)<=123] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_124 = Pmax(<>[S(clk)<=124] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_125 = Pmax(<>[S(clk)<=125] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_126 = Pmax(<>[S(clk)<=126] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_127 = Pmax(<>[S(clk)<=127] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_128 = Pmax(<>[S(clk)<=128] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_129 = Pmax(<>[S(clk)<=129] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_130 = Pmax(<>[S(clk)<=130] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_131 = Pmax(<>[S(clk)<=131] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_132 = Pmax(<>[S(clk)<=132] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_133 = Pmax(<>[S(clk)<=133] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_134 = Pmax(<>[S(clk)<=134] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_135 = Pmax(<>[S(clk)<=135] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_136 = Pmax(<>[S(clk)<=136] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_137 = Pmax(<>[S(clk)<=137] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_138 = Pmax(<>[S(clk)<=138] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_139 = Pmax(<>[S(clk)<=139] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_140 = Pmax(<>[S(clk)<=140] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_141 = Pmax(<>[S(clk)<=141] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_142 = Pmax(<>[S(clk)<=142] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_143 = Pmax(<>[S(clk)<=143] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_144 = Pmax(<>[S(clk)<=144] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_145 = Pmax(<>[S(clk)<=145] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_146 = Pmax(<>[S(clk)<=146] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_147 = Pmax(<>[S(clk)<=147] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_148 = Pmax(<>[S(clk)<=148] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_149 = Pmax(<>[S(clk)<=149] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_150 = Pmax(<>[S(clk)<=150] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_151 = Pmax(<>[S(clk)<=151] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_152 = Pmax(<>[S(clk)<=152] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_153 = Pmax(<>[S(clk)<=153] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_154 = Pmax(<>[S(clk)<=154] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_155 = Pmax(<>[S(clk)<=155] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_156 = Pmax(<>[S(clk)<=156] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_157 = Pmax(<>[S(clk)<=157] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_158 = Pmax(<>[S(clk)<=158] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_159 = Pmax(<>[S(clk)<=159] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_160 = Pmax(<>[S(clk)<=160] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_161 = Pmax(<>[S(clk)<=161] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_162 = Pmax(<>[S(clk)<=162] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_163 = Pmax(<>[S(clk)<=163] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_164 = Pmax(<>[S(clk)<=164] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_165 = Pmax(<>[S(clk)<=165] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_166 = Pmax(<>[S(clk)<=166] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_167 = Pmax(<>[S(clk)<=167] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_168 = Pmax(<>[S(clk)<=168] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_169 = Pmax(<>[S(clk)<=169] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_170 = Pmax(<>[S(clk)<=170] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_171 = Pmax(<>[S(clk)<=171] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_172 = Pmax(<>[S(clk)<=172] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_173 = Pmax(<>[S(clk)<=173] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_174 = Pmax(<>[S(clk)<=174] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_175 = Pmax(<>[S(clk)<=175] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_176 = Pmax(<>[S(clk)<=176] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_177 = Pmax(<>[S(clk)<=177] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_178 = Pmax(<>[S(clk)<=178] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_179 = Pmax(<>[S(clk)<=179] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_180 = Pmax(<>[S(clk)<=180] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_181 = Pmax(<>[S(clk)<=181] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_182 = Pmax(<>[S(clk)<=182] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_183 = Pmax(<>[S(clk)<=183] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_184 = Pmax(<>[S(clk)<=184] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_185 = Pmax(<>[S(clk)<=185] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_186 = Pmax(<>[S(clk)<=186] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_187 = Pmax(<>[S(clk)<=187] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_188 = Pmax(<>[S(clk)<=188] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_189 = Pmax(<>[S(clk)<=189] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_190 = Pmax(<>[S(clk)<=190] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_191 = Pmax(<>[S(clk)<=191] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_192 = Pmax(<>[S(clk)<=192] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_193 = Pmax(<>[S(clk)<=193] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_194 = Pmax(<>[S(clk)<=194] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_195 = Pmax(<>[S(clk)<=195] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_196 = Pmax(<>[S(clk)<=196] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_197 = Pmax(<>[S(clk)<=197] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_198 = Pmax(<>[S(clk)<=198] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r0_I_199 = Pmax(<>[S(clk)<=199] (abs(noc[0].thisActivity - noc[0].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_100 = Pmax(<>[S(clk)<=100] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_101 = Pmax(<>[S(clk)<=101] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_102 = Pmax(<>[S(clk)<=102] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_103 = Pmax(<>[S(clk)<=103] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_104 = Pmax(<>[S(clk)<=104] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_105 = Pmax(<>[S(clk)<=105] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_106 = Pmax(<>[S(clk)<=106] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_107 = Pmax(<>[S(clk)<=107] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_108 = Pmax(<>[S(clk)<=108] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_109 = Pmax(<>[S(clk)<=109] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_110 = Pmax(<>[S(clk)<=110] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_111 = Pmax(<>[S(clk)<=111] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_112 = Pmax(<>[S(clk)<=112] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_113 = Pmax(<>[S(clk)<=113] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_114 = Pmax(<>[S(clk)<=114] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_115 = Pmax(<>[S(clk)<=115] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_116 = Pmax(<>[S(clk)<=116] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_117 = Pmax(<>[S(clk)<=117] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_118 = Pmax(<>[S(clk)<=118] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_119 = Pmax(<>[S(clk)<=119] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_120 = Pmax(<>[S(clk)<=120] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_121 = Pmax(<>[S(clk)<=121] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_122 = Pmax(<>[S(clk)<=122] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_123 = Pmax(<>[S(clk)<=123] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_124 = Pmax(<>[S(clk)<=124] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_125 = Pmax(<>[S(clk)<=125] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_126 = Pmax(<>[S(clk)<=126] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_127 = Pmax(<>[S(clk)<=127] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_128 = Pmax(<>[S(clk)<=128] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_129 = Pmax(<>[S(clk)<=129] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_130 = Pmax(<>[S(clk)<=130] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_131 = Pmax(<>[S(clk)<=131] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_132 = Pmax(<>[S(clk)<=132] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_133 = Pmax(<>[S(clk)<=133] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_134 = Pmax(<>[S(clk)<=134] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_135 = Pmax(<>[S(clk)<=135] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_136 = Pmax(<>[S(clk)<=136] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_137 = Pmax(<>[S(clk)<=137] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_138 = Pmax(<>[S(clk)<=138] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_139 = Pmax(<>[S(clk)<=139] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_140 = Pmax(<>[S(clk)<=140] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_141 = Pmax(<>[S(clk)<=141] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_142 = Pmax(<>[S(clk)<=142] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_143 = Pmax(<>[S(clk)<=143] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_144 = Pmax(<>[S(clk)<=144] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_145 = Pmax(<>[S(clk)<=145] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_146 = Pmax(<>[S(clk)<=146] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_147 = Pmax(<>[S(clk)<=147] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_148 = Pmax(<>[S(clk)<=148] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_149 = Pmax(<>[S(clk)<=149] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_150 = Pmax(<>[S(clk)<=150] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_151 = Pmax(<>[S(clk)<=151] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_152 = Pmax(<>[S(clk)<=152] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_153 = Pmax(<>[S(clk)<=153] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_154 = Pmax(<>[S(clk)<=154] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_155 = Pmax(<>[S(clk)<=155] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_156 = Pmax(<>[S(clk)<=156] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_157 = Pmax(<>[S(clk)<=157] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_158 = Pmax(<>[S(clk)<=158] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_159 = Pmax(<>[S(clk)<=159] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_160 = Pmax(<>[S(clk)<=160] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_161 = Pmax(<>[S(clk)<=161] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_162 = Pmax(<>[S(clk)<=162] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_163 = Pmax(<>[S(clk)<=163] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_164 = Pmax(<>[S(clk)<=164] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_165 = Pmax(<>[S(clk)<=165] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_166 = Pmax(<>[S(clk)<=166] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_167 = Pmax(<>[S(clk)<=167] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_168 = Pmax(<>[S(clk)<=168] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_169 = Pmax(<>[S(clk)<=169] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_170 = Pmax(<>[S(clk)<=170] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_171 = Pmax(<>[S(clk)<=171] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_172 = Pmax(<>[S(clk)<=172] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_173 = Pmax(<>[S(clk)<=173] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_174 = Pmax(<>[S(clk)<=174] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_175 = Pmax(<>[S(clk)<=175] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_176 = Pmax(<>[S(clk)<=176] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_177 = Pmax(<>[S(clk)<=177] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_178 = Pmax(<>[S(clk)<=178] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_179 = Pmax(<>[S(clk)<=179] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_180 = Pmax(<>[S(clk)<=180] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_181 = Pmax(<>[S(clk)<=181] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_182 = Pmax(<>[S(clk)<=182] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_183 = Pmax(<>[S(clk)<=183] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_184 = Pmax(<>[S(clk)<=184] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_185 = Pmax(<>[S(clk)<=185] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_186 = Pmax(<>[S(clk)<=186] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_187 = Pmax(<>[S(clk)<=187] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_188 = Pmax(<>[S(clk)<=188] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_189 = Pmax(<>[S(clk)<=189] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_190 = Pmax(<>[S(clk)<=190] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_191 = Pmax(<>[S(clk)<=191] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_192 = Pmax(<>[S(clk)<=192] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_193 = Pmax(<>[S(clk)<=193] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_194 = Pmax(<>[S(clk)<=194] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_195 = Pmax(<>[S(clk)<=195] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_196 = Pmax(<>[S(clk)<=196] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_197 = Pmax(<>[S(clk)<=197] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_198 = Pmax(<>[S(clk)<=198] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r1_I_199 = Pmax(<>[S(clk)<=199] (abs(noc[1].thisActivity - noc[1].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_100 = Pmax(<>[S(clk)<=100] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_101 = Pmax(<>[S(clk)<=101] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_102 = Pmax(<>[S(clk)<=102] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_103 = Pmax(<>[S(clk)<=103] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_104 = Pmax(<>[S(clk)<=104] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_105 = Pmax(<>[S(clk)<=105] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_106 = Pmax(<>[S(clk)<=106] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_107 = Pmax(<>[S(clk)<=107] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_108 = Pmax(<>[S(clk)<=108] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_109 = Pmax(<>[S(clk)<=109] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_110 = Pmax(<>[S(clk)<=110] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_111 = Pmax(<>[S(clk)<=111] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_112 = Pmax(<>[S(clk)<=112] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_113 = Pmax(<>[S(clk)<=113] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_114 = Pmax(<>[S(clk)<=114] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_115 = Pmax(<>[S(clk)<=115] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_116 = Pmax(<>[S(clk)<=116] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_117 = Pmax(<>[S(clk)<=117] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_118 = Pmax(<>[S(clk)<=118] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_119 = Pmax(<>[S(clk)<=119] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_120 = Pmax(<>[S(clk)<=120] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_121 = Pmax(<>[S(clk)<=121] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_122 = Pmax(<>[S(clk)<=122] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_123 = Pmax(<>[S(clk)<=123] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_124 = Pmax(<>[S(clk)<=124] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_125 = Pmax(<>[S(clk)<=125] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_126 = Pmax(<>[S(clk)<=126] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_127 = Pmax(<>[S(clk)<=127] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_128 = Pmax(<>[S(clk)<=128] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_129 = Pmax(<>[S(clk)<=129] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_130 = Pmax(<>[S(clk)<=130] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_131 = Pmax(<>[S(clk)<=131] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_132 = Pmax(<>[S(clk)<=132] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_133 = Pmax(<>[S(clk)<=133] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_134 = Pmax(<>[S(clk)<=134] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_135 = Pmax(<>[S(clk)<=135] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_136 = Pmax(<>[S(clk)<=136] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_137 = Pmax(<>[S(clk)<=137] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_138 = Pmax(<>[S(clk)<=138] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_139 = Pmax(<>[S(clk)<=139] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_140 = Pmax(<>[S(clk)<=140] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_141 = Pmax(<>[S(clk)<=141] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_142 = Pmax(<>[S(clk)<=142] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_143 = Pmax(<>[S(clk)<=143] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_144 = Pmax(<>[S(clk)<=144] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_145 = Pmax(<>[S(clk)<=145] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_146 = Pmax(<>[S(clk)<=146] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_147 = Pmax(<>[S(clk)<=147] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_148 = Pmax(<>[S(clk)<=148] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_149 = Pmax(<>[S(clk)<=149] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_150 = Pmax(<>[S(clk)<=150] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_151 = Pmax(<>[S(clk)<=151] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_152 = Pmax(<>[S(clk)<=152] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_153 = Pmax(<>[S(clk)<=153] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_154 = Pmax(<>[S(clk)<=154] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_155 = Pmax(<>[S(clk)<=155] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_156 = Pmax(<>[S(clk)<=156] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_157 = Pmax(<>[S(clk)<=157] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_158 = Pmax(<>[S(clk)<=158] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_159 = Pmax(<>[S(clk)<=159] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_160 = Pmax(<>[S(clk)<=160] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_161 = Pmax(<>[S(clk)<=161] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_162 = Pmax(<>[S(clk)<=162] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_163 = Pmax(<>[S(clk)<=163] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_164 = Pmax(<>[S(clk)<=164] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_165 = Pmax(<>[S(clk)<=165] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_166 = Pmax(<>[S(clk)<=166] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_167 = Pmax(<>[S(clk)<=167] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_168 = Pmax(<>[S(clk)<=168] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_169 = Pmax(<>[S(clk)<=169] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_170 = Pmax(<>[S(clk)<=170] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_171 = Pmax(<>[S(clk)<=171] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_172 = Pmax(<>[S(clk)<=172] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_173 = Pmax(<>[S(clk)<=173] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_174 = Pmax(<>[S(clk)<=174] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_175 = Pmax(<>[S(clk)<=175] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_176 = Pmax(<>[S(clk)<=176] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_177 = Pmax(<>[S(clk)<=177] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_178 = Pmax(<>[S(clk)<=178] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_179 = Pmax(<>[S(clk)<=179] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_180 = Pmax(<>[S(clk)<=180] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_181 = Pmax(<>[S(clk)<=181] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_182 = Pmax(<>[S(clk)<=182] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_183 = Pmax(<>[S(clk)<=183] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_184 = Pmax(<>[S(clk)<=184] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_185 = Pmax(<>[S(clk)<=185] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_186 = Pmax(<>[S(clk)<=186] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_187 = Pmax(<>[S(clk)<=187] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_188 = Pmax(<>[S(clk)<=188] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_189 = Pmax(<>[S(clk)<=189] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_190 = Pmax(<>[S(clk)<=190] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_191 = Pmax(<>[S(clk)<=191] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_192 = Pmax(<>[S(clk)<=192] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_193 = Pmax(<>[S(clk)<=193] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_194 = Pmax(<>[S(clk)<=194] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_195 = Pmax(<>[S(clk)<=195] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_196 = Pmax(<>[S(clk)<=196] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_197 = Pmax(<>[S(clk)<=197] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_198 = Pmax(<>[S(clk)<=198] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r2_I_199 = Pmax(<>[S(clk)<=199] (abs(noc[2].thisActivity - noc[2].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_100 = Pmax(<>[S(clk)<=100] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_101 = Pmax(<>[S(clk)<=101] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_102 = Pmax(<>[S(clk)<=102] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_103 = Pmax(<>[S(clk)<=103] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_104 = Pmax(<>[S(clk)<=104] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_105 = Pmax(<>[S(clk)<=105] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_106 = Pmax(<>[S(clk)<=106] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_107 = Pmax(<>[S(clk)<=107] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_108 = Pmax(<>[S(clk)<=108] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_109 = Pmax(<>[S(clk)<=109] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_110 = Pmax(<>[S(clk)<=110] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_111 = Pmax(<>[S(clk)<=111] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_112 = Pmax(<>[S(clk)<=112] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_113 = Pmax(<>[S(clk)<=113] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_114 = Pmax(<>[S(clk)<=114] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_115 = Pmax(<>[S(clk)<=115] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_116 = Pmax(<>[S(clk)<=116] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_117 = Pmax(<>[S(clk)<=117] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_118 = Pmax(<>[S(clk)<=118] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_119 = Pmax(<>[S(clk)<=119] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_120 = Pmax(<>[S(clk)<=120] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_121 = Pmax(<>[S(clk)<=121] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_122 = Pmax(<>[S(clk)<=122] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_123 = Pmax(<>[S(clk)<=123] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_124 = Pmax(<>[S(clk)<=124] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_125 = Pmax(<>[S(clk)<=125] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_126 = Pmax(<>[S(clk)<=126] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_127 = Pmax(<>[S(clk)<=127] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_128 = Pmax(<>[S(clk)<=128] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_129 = Pmax(<>[S(clk)<=129] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_130 = Pmax(<>[S(clk)<=130] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_131 = Pmax(<>[S(clk)<=131] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_132 = Pmax(<>[S(clk)<=132] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_133 = Pmax(<>[S(clk)<=133] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_134 = Pmax(<>[S(clk)<=134] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_135 = Pmax(<>[S(clk)<=135] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_136 = Pmax(<>[S(clk)<=136] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_137 = Pmax(<>[S(clk)<=137] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_138 = Pmax(<>[S(clk)<=138] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_139 = Pmax(<>[S(clk)<=139] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_140 = Pmax(<>[S(clk)<=140] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_141 = Pmax(<>[S(clk)<=141] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_142 = Pmax(<>[S(clk)<=142] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_143 = Pmax(<>[S(clk)<=143] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_144 = Pmax(<>[S(clk)<=144] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_145 = Pmax(<>[S(clk)<=145] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_146 = Pmax(<>[S(clk)<=146] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_147 = Pmax(<>[S(clk)<=147] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_148 = Pmax(<>[S(clk)<=148] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_149 = Pmax(<>[S(clk)<=149] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_150 = Pmax(<>[S(clk)<=150] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_151 = Pmax(<>[S(clk)<=151] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_152 = Pmax(<>[S(clk)<=152] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_153 = Pmax(<>[S(clk)<=153] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_154 = Pmax(<>[S(clk)<=154] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_155 = Pmax(<>[S(clk)<=155] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_156 = Pmax(<>[S(clk)<=156] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_157 = Pmax(<>[S(clk)<=157] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_158 = Pmax(<>[S(clk)<=158] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_159 = Pmax(<>[S(clk)<=159] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_160 = Pmax(<>[S(clk)<=160] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_161 = Pmax(<>[S(clk)<=161] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_162 = Pmax(<>[S(clk)<=162] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_163 = Pmax(<>[S(clk)<=163] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_164 = Pmax(<>[S(clk)<=164] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_165 = Pmax(<>[S(clk)<=165] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_166 = Pmax(<>[S(clk)<=166] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_167 = Pmax(<>[S(clk)<=167] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_168 = Pmax(<>[S(clk)<=168] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_169 = Pmax(<>[S(clk)<=169] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_170 = Pmax(<>[S(clk)<=170] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_171 = Pmax(<>[S(clk)<=171] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_172 = Pmax(<>[S(clk)<=172] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_173 = Pmax(<>[S(clk)<=173] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_174 = Pmax(<>[S(clk)<=174] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_175 = Pmax(<>[S(clk)<=175] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_176 = Pmax(<>[S(clk)<=176] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_177 = Pmax(<>[S(clk)<=177] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_178 = Pmax(<>[S(clk)<=178] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_179 = Pmax(<>[S(clk)<=179] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_180 = Pmax(<>[S(clk)<=180] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_181 = Pmax(<>[S(clk)<=181] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_182 = Pmax(<>[S(clk)<=182] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_183 = Pmax(<>[S(clk)<=183] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_184 = Pmax(<>[S(clk)<=184] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_185 = Pmax(<>[S(clk)<=185] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_186 = Pmax(<>[S(clk)<=186] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_187 = Pmax(<>[S(clk)<=187] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_188 = Pmax(<>[S(clk)<=188] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_189 = Pmax(<>[S(clk)<=189] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_190 = Pmax(<>[S(clk)<=190] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_191 = Pmax(<>[S(clk)<=191] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_192 = Pmax(<>[S(clk)<=192] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_193 = Pmax(<>[S(clk)<=193] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_194 = Pmax(<>[S(clk)<=194] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_195 = Pmax(<>[S(clk)<=195] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_196 = Pmax(<>[S(clk)<=196] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_197 = Pmax(<>[S(clk)<=197] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_198 = Pmax(<>[S(clk)<=198] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r3_I_199 = Pmax(<>[S(clk)<=199] (abs(noc[3].thisActivity - noc[3].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_100 = Pmax(<>[S(clk)<=100] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_101 = Pmax(<>[S(clk)<=101] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_102 = Pmax(<>[S(clk)<=102] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_103 = Pmax(<>[S(clk)<=103] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_104 = Pmax(<>[S(clk)<=104] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_105 = Pmax(<>[S(clk)<=105] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_106 = Pmax(<>[S(clk)<=106] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_107 = Pmax(<>[S(clk)<=107] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_108 = Pmax(<>[S(clk)<=108] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_109 = Pmax(<>[S(clk)<=109] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_110 = Pmax(<>[S(clk)<=110] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_111 = Pmax(<>[S(clk)<=111] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_112 = Pmax(<>[S(clk)<=112] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_113 = Pmax(<>[S(clk)<=113] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_114 = Pmax(<>[S(clk)<=114] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_115 = Pmax(<>[S(clk)<=115] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_116 = Pmax(<>[S(clk)<=116] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_117 = Pmax(<>[S(clk)<=117] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_118 = Pmax(<>[S(clk)<=118] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_119 = Pmax(<>[S(clk)<=119] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_120 = Pmax(<>[S(clk)<=120] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_121 = Pmax(<>[S(clk)<=121] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_122 = Pmax(<>[S(clk)<=122] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_123 = Pmax(<>[S(clk)<=123] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_124 = Pmax(<>[S(clk)<=124] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_125 = Pmax(<>[S(clk)<=125] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_126 = Pmax(<>[S(clk)<=126] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_127 = Pmax(<>[S(clk)<=127] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_128 = Pmax(<>[S(clk)<=128] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_129 = Pmax(<>[S(clk)<=129] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_130 = Pmax(<>[S(clk)<=130] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_131 = Pmax(<>[S(clk)<=131] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_132 = Pmax(<>[S(clk)<=132] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_133 = Pmax(<>[S(clk)<=133] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_134 = Pmax(<>[S(clk)<=134] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_135 = Pmax(<>[S(clk)<=135] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_136 = Pmax(<>[S(clk)<=136] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_137 = Pmax(<>[S(clk)<=137] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_138 = Pmax(<>[S(clk)<=138] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_139 = Pmax(<>[S(clk)<=139] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_140 = Pmax(<>[S(clk)<=140] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_141 = Pmax(<>[S(clk)<=141] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_142 = Pmax(<>[S(clk)<=142] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_143 = Pmax(<>[S(clk)<=143] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_144 = Pmax(<>[S(clk)<=144] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_145 = Pmax(<>[S(clk)<=145] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_146 = Pmax(<>[S(clk)<=146] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_147 = Pmax(<>[S(clk)<=147] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_148 = Pmax(<>[S(clk)<=148] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_149 = Pmax(<>[S(clk)<=149] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_150 = Pmax(<>[S(clk)<=150] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_151 = Pmax(<>[S(clk)<=151] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_152 = Pmax(<>[S(clk)<=152] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_153 = Pmax(<>[S(clk)<=153] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_154 = Pmax(<>[S(clk)<=154] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_155 = Pmax(<>[S(clk)<=155] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_156 = Pmax(<>[S(clk)<=156] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_157 = Pmax(<>[S(clk)<=157] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_158 = Pmax(<>[S(clk)<=158] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_159 = Pmax(<>[S(clk)<=159] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_160 = Pmax(<>[S(clk)<=160] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_161 = Pmax(<>[S(clk)<=161] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_162 = Pmax(<>[S(clk)<=162] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_163 = Pmax(<>[S(clk)<=163] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_164 = Pmax(<>[S(clk)<=164] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_165 = Pmax(<>[S(clk)<=165] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_166 = Pmax(<>[S(clk)<=166] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_167 = Pmax(<>[S(clk)<=167] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_168 = Pmax(<>[S(clk)<=168] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_169 = Pmax(<>[S(clk)<=169] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_170 = Pmax(<>[S(clk)<=170] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_171 = Pmax(<>[S(clk)<=171] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_172 = Pmax(<>[S(clk)<=172] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_173 = Pmax(<>[S(clk)<=173] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_174 = Pmax(<>[S(clk)<=174] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_175 = Pmax(<>[S(clk)<=175] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_176 = Pmax(<>[S(clk)<=176] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_177 = Pmax(<>[S(clk)<=177] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_178 = Pmax(<>[S(clk)<=178] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_179 = Pmax(<>[S(clk)<=179] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_180 = Pmax(<>[S(clk)<=180] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_181 = Pmax(<>[S(clk)<=181] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_182 = Pmax(<>[S(clk)<=182] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_183 = Pmax(<>[S(clk)<=183] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_184 = Pmax(<>[S(clk)<=184] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_185 = Pmax(<>[S(clk)<=185] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_186 = Pmax(<>[S(clk)<=186] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_187 = Pmax(<>[S(clk)<=187] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_188 = Pmax(<>[S(clk)<=188] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_189 = Pmax(<>[S(clk)<=189] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_190 = Pmax(<>[S(clk)<=190] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_191 = Pmax(<>[S(clk)<=191] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_192 = Pmax(<>[S(clk)<=192] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_193 = Pmax(<>[S(clk)<=193] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_194 = Pmax(<>[S(clk)<=194] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_195 = Pmax(<>[S(clk)<=195] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_196 = Pmax(<>[S(clk)<=196] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_197 = Pmax(<>[S(clk)<=197] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_198 = Pmax(<>[S(clk)<=198] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r4_I_199 = Pmax(<>[S(clk)<=199] (abs(noc[4].thisActivity - noc[4].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_100 = Pmax(<>[S(clk)<=100] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_101 = Pmax(<>[S(clk)<=101] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_102 = Pmax(<>[S(clk)<=102] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_103 = Pmax(<>[S(clk)<=103] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_104 = Pmax(<>[S(clk)<=104] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_105 = Pmax(<>[S(clk)<=105] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_106 = Pmax(<>[S(clk)<=106] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_107 = Pmax(<>[S(clk)<=107] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_108 = Pmax(<>[S(clk)<=108] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_109 = Pmax(<>[S(clk)<=109] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_110 = Pmax(<>[S(clk)<=110] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_111 = Pmax(<>[S(clk)<=111] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_112 = Pmax(<>[S(clk)<=112] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_113 = Pmax(<>[S(clk)<=113] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_114 = Pmax(<>[S(clk)<=114] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_115 = Pmax(<>[S(clk)<=115] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_116 = Pmax(<>[S(clk)<=116] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_117 = Pmax(<>[S(clk)<=117] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_118 = Pmax(<>[S(clk)<=118] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_119 = Pmax(<>[S(clk)<=119] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_120 = Pmax(<>[S(clk)<=120] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_121 = Pmax(<>[S(clk)<=121] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_122 = Pmax(<>[S(clk)<=122] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_123 = Pmax(<>[S(clk)<=123] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_124 = Pmax(<>[S(clk)<=124] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_125 = Pmax(<>[S(clk)<=125] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_126 = Pmax(<>[S(clk)<=126] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_127 = Pmax(<>[S(clk)<=127] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_128 = Pmax(<>[S(clk)<=128] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_129 = Pmax(<>[S(clk)<=129] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_130 = Pmax(<>[S(clk)<=130] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_131 = Pmax(<>[S(clk)<=131] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_132 = Pmax(<>[S(clk)<=132] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_133 = Pmax(<>[S(clk)<=133] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_134 = Pmax(<>[S(clk)<=134] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_135 = Pmax(<>[S(clk)<=135] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_136 = Pmax(<>[S(clk)<=136] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_137 = Pmax(<>[S(clk)<=137] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_138 = Pmax(<>[S(clk)<=138] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_139 = Pmax(<>[S(clk)<=139] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_140 = Pmax(<>[S(clk)<=140] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_141 = Pmax(<>[S(clk)<=141] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_142 = Pmax(<>[S(clk)<=142] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_143 = Pmax(<>[S(clk)<=143] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_144 = Pmax(<>[S(clk)<=144] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_145 = Pmax(<>[S(clk)<=145] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_146 = Pmax(<>[S(clk)<=146] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_147 = Pmax(<>[S(clk)<=147] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_148 = Pmax(<>[S(clk)<=148] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_149 = Pmax(<>[S(clk)<=149] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_150 = Pmax(<>[S(clk)<=150] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_151 = Pmax(<>[S(clk)<=151] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_152 = Pmax(<>[S(clk)<=152] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_153 = Pmax(<>[S(clk)<=153] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_154 = Pmax(<>[S(clk)<=154] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_155 = Pmax(<>[S(clk)<=155] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_156 = Pmax(<>[S(clk)<=156] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_157 = Pmax(<>[S(clk)<=157] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_158 = Pmax(<>[S(clk)<=158] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_159 = Pmax(<>[S(clk)<=159] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_160 = Pmax(<>[S(clk)<=160] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_161 = Pmax(<>[S(clk)<=161] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_162 = Pmax(<>[S(clk)<=162] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_163 = Pmax(<>[S(clk)<=163] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_164 = Pmax(<>[S(clk)<=164] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_165 = Pmax(<>[S(clk)<=165] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_166 = Pmax(<>[S(clk)<=166] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_167 = Pmax(<>[S(clk)<=167] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_168 = Pmax(<>[S(clk)<=168] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_169 = Pmax(<>[S(clk)<=169] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_170 = Pmax(<>[S(clk)<=170] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_171 = Pmax(<>[S(clk)<=171] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_172 = Pmax(<>[S(clk)<=172] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_173 = Pmax(<>[S(clk)<=173] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_174 = Pmax(<>[S(clk)<=174] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_175 = Pmax(<>[S(clk)<=175] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_176 = Pmax(<>[S(clk)<=176] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_177 = Pmax(<>[S(clk)<=177] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_178 = Pmax(<>[S(clk)<=178] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_179 = Pmax(<>[S(clk)<=179] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_180 = Pmax(<>[S(clk)<=180] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_181 = Pmax(<>[S(clk)<=181] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_182 = Pmax(<>[S(clk)<=182] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_183 = Pmax(<>[S(clk)<=183] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_184 = Pmax(<>[S(clk)<=184] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_185 = Pmax(<>[S(clk)<=185] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_186 = Pmax(<>[S(clk)<=186] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_187 = Pmax(<>[S(clk)<=187] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_188 = Pmax(<>[S(clk)<=188] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_189 = Pmax(<>[S(clk)<=189] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_190 = Pmax(<>[S(clk)<=190] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_191 = Pmax(<>[S(clk)<=191] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_192 = Pmax(<>[S(clk)<=192] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_193 = Pmax(<>[S(clk)<=193] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_194 = Pmax(<>[S(clk)<=194] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_195 = Pmax(<>[S(clk)<=195] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_196 = Pmax(<>[S(clk)<=196] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_197 = Pmax(<>[S(clk)<=197] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_198 = Pmax(<>[S(clk)<=198] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r5_I_199 = Pmax(<>[S(clk)<=199] (abs(noc[5].thisActivity - noc[5].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_100 = Pmax(<>[S(clk)<=100] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_101 = Pmax(<>[S(clk)<=101] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_102 = Pmax(<>[S(clk)<=102] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_103 = Pmax(<>[S(clk)<=103] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_104 = Pmax(<>[S(clk)<=104] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_105 = Pmax(<>[S(clk)<=105] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_106 = Pmax(<>[S(clk)<=106] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_107 = Pmax(<>[S(clk)<=107] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_108 = Pmax(<>[S(clk)<=108] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_109 = Pmax(<>[S(clk)<=109] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_110 = Pmax(<>[S(clk)<=110] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_111 = Pmax(<>[S(clk)<=111] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_112 = Pmax(<>[S(clk)<=112] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_113 = Pmax(<>[S(clk)<=113] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_114 = Pmax(<>[S(clk)<=114] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_115 = Pmax(<>[S(clk)<=115] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_116 = Pmax(<>[S(clk)<=116] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_117 = Pmax(<>[S(clk)<=117] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_118 = Pmax(<>[S(clk)<=118] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_119 = Pmax(<>[S(clk)<=119] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_120 = Pmax(<>[S(clk)<=120] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_121 = Pmax(<>[S(clk)<=121] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_122 = Pmax(<>[S(clk)<=122] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_123 = Pmax(<>[S(clk)<=123] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_124 = Pmax(<>[S(clk)<=124] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_125 = Pmax(<>[S(clk)<=125] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_126 = Pmax(<>[S(clk)<=126] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_127 = Pmax(<>[S(clk)<=127] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_128 = Pmax(<>[S(clk)<=128] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_129 = Pmax(<>[S(clk)<=129] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_130 = Pmax(<>[S(clk)<=130] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_131 = Pmax(<>[S(clk)<=131] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_132 = Pmax(<>[S(clk)<=132] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_133 = Pmax(<>[S(clk)<=133] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_134 = Pmax(<>[S(clk)<=134] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_135 = Pmax(<>[S(clk)<=135] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_136 = Pmax(<>[S(clk)<=136] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_137 = Pmax(<>[S(clk)<=137] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_138 = Pmax(<>[S(clk)<=138] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_139 = Pmax(<>[S(clk)<=139] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_140 = Pmax(<>[S(clk)<=140] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_141 = Pmax(<>[S(clk)<=141] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_142 = Pmax(<>[S(clk)<=142] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_143 = Pmax(<>[S(clk)<=143] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_144 = Pmax(<>[S(clk)<=144] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_145 = Pmax(<>[S(clk)<=145] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_146 = Pmax(<>[S(clk)<=146] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_147 = Pmax(<>[S(clk)<=147] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_148 = Pmax(<>[S(clk)<=148] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_149 = Pmax(<>[S(clk)<=149] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_150 = Pmax(<>[S(clk)<=150] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_151 = Pmax(<>[S(clk)<=151] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_152 = Pmax(<>[S(clk)<=152] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_153 = Pmax(<>[S(clk)<=153] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_154 = Pmax(<>[S(clk)<=154] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_155 = Pmax(<>[S(clk)<=155] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_156 = Pmax(<>[S(clk)<=156] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_157 = Pmax(<>[S(clk)<=157] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_158 = Pmax(<>[S(clk)<=158] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_159 = Pmax(<>[S(clk)<=159] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_160 = Pmax(<>[S(clk)<=160] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_161 = Pmax(<>[S(clk)<=161] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_162 = Pmax(<>[S(clk)<=162] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_163 = Pmax(<>[S(clk)<=163] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_164 = Pmax(<>[S(clk)<=164] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_165 = Pmax(<>[S(clk)<=165] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_166 = Pmax(<>[S(clk)<=166] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_167 = Pmax(<>[S(clk)<=167] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_168 = Pmax(<>[S(clk)<=168] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_169 = Pmax(<>[S(clk)<=169] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_170 = Pmax(<>[S(clk)<=170] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_171 = Pmax(<>[S(clk)<=171] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_172 = Pmax(<>[S(clk)<=172] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_173 = Pmax(<>[S(clk)<=173] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_174 = Pmax(<>[S(clk)<=174] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_175 = Pmax(<>[S(clk)<=175] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_176 = Pmax(<>[S(clk)<=176] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_177 = Pmax(<>[S(clk)<=177] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_178 = Pmax(<>[S(clk)<=178] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_179 = Pmax(<>[S(clk)<=179] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_180 = Pmax(<>[S(clk)<=180] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_181 = Pmax(<>[S(clk)<=181] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_182 = Pmax(<>[S(clk)<=182] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_183 = Pmax(<>[S(clk)<=183] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_184 = Pmax(<>[S(clk)<=184] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_185 = Pmax(<>[S(clk)<=185] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_186 = Pmax(<>[S(clk)<=186] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_187 = Pmax(<>[S(clk)<=187] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_188 = Pmax(<>[S(clk)<=188] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_189 = Pmax(<>[S(clk)<=189] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_190 = Pmax(<>[S(clk)<=190] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_191 = Pmax(<>[S(clk)<=191] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_192 = Pmax(<>[S(clk)<=192] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_193 = Pmax(<>[S(clk)<=193] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_194 = Pmax(<>[S(clk)<=194] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_195 = Pmax(<>[S(clk)<=195] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_196 = Pmax(<>[S(clk)<=196] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_197 = Pmax(<>[S(clk)<=197] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_198 = Pmax(<>[S(clk)<=198] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r6_I_199 = Pmax(<>[S(clk)<=199] (abs(noc[6].thisActivity - noc[6].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_100 = Pmax(<>[S(clk)<=100] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_101 = Pmax(<>[S(clk)<=101] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_102 = Pmax(<>[S(clk)<=102] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_103 = Pmax(<>[S(clk)<=103] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_104 = Pmax(<>[S(clk)<=104] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_105 = Pmax(<>[S(clk)<=105] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_106 = Pmax(<>[S(clk)<=106] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_107 = Pmax(<>[S(clk)<=107] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_108 = Pmax(<>[S(clk)<=108] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_109 = Pmax(<>[S(clk)<=109] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_110 = Pmax(<>[S(clk)<=110] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_111 = Pmax(<>[S(clk)<=111] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_112 = Pmax(<>[S(clk)<=112] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_113 = Pmax(<>[S(clk)<=113] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_114 = Pmax(<>[S(clk)<=114] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_115 = Pmax(<>[S(clk)<=115] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_116 = Pmax(<>[S(clk)<=116] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_117 = Pmax(<>[S(clk)<=117] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_118 = Pmax(<>[S(clk)<=118] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_119 = Pmax(<>[S(clk)<=119] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_120 = Pmax(<>[S(clk)<=120] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_121 = Pmax(<>[S(clk)<=121] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_122 = Pmax(<>[S(clk)<=122] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_123 = Pmax(<>[S(clk)<=123] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_124 = Pmax(<>[S(clk)<=124] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_125 = Pmax(<>[S(clk)<=125] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_126 = Pmax(<>[S(clk)<=126] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_127 = Pmax(<>[S(clk)<=127] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_128 = Pmax(<>[S(clk)<=128] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_129 = Pmax(<>[S(clk)<=129] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_130 = Pmax(<>[S(clk)<=130] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_131 = Pmax(<>[S(clk)<=131] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_132 = Pmax(<>[S(clk)<=132] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_133 = Pmax(<>[S(clk)<=133] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_134 = Pmax(<>[S(clk)<=134] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_135 = Pmax(<>[S(clk)<=135] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_136 = Pmax(<>[S(clk)<=136] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_137 = Pmax(<>[S(clk)<=137] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_138 = Pmax(<>[S(clk)<=138] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_139 = Pmax(<>[S(clk)<=139] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_140 = Pmax(<>[S(clk)<=140] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_141 = Pmax(<>[S(clk)<=141] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_142 = Pmax(<>[S(clk)<=142] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_143 = Pmax(<>[S(clk)<=143] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_144 = Pmax(<>[S(clk)<=144] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_145 = Pmax(<>[S(clk)<=145] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_146 = Pmax(<>[S(clk)<=146] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_147 = Pmax(<>[S(clk)<=147] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_148 = Pmax(<>[S(clk)<=148] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_149 = Pmax(<>[S(clk)<=149] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_150 = Pmax(<>[S(clk)<=150] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_151 = Pmax(<>[S(clk)<=151] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_152 = Pmax(<>[S(clk)<=152] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_153 = Pmax(<>[S(clk)<=153] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_154 = Pmax(<>[S(clk)<=154] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_155 = Pmax(<>[S(clk)<=155] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_156 = Pmax(<>[S(clk)<=156] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_157 = Pmax(<>[S(clk)<=157] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_158 = Pmax(<>[S(clk)<=158] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_159 = Pmax(<>[S(clk)<=159] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_160 = Pmax(<>[S(clk)<=160] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_161 = Pmax(<>[S(clk)<=161] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_162 = Pmax(<>[S(clk)<=162] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_163 = Pmax(<>[S(clk)<=163] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_164 = Pmax(<>[S(clk)<=164] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_165 = Pmax(<>[S(clk)<=165] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_166 = Pmax(<>[S(clk)<=166] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_167 = Pmax(<>[S(clk)<=167] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_168 = Pmax(<>[S(clk)<=168] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_169 = Pmax(<>[S(clk)<=169] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_170 = Pmax(<>[S(clk)<=170] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_171 = Pmax(<>[S(clk)<=171] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_172 = Pmax(<>[S(clk)<=172] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_173 = Pmax(<>[S(clk)<=173] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_174 = Pmax(<>[S(clk)<=174] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_175 = Pmax(<>[S(clk)<=175] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_176 = Pmax(<>[S(clk)<=176] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_177 = Pmax(<>[S(clk)<=177] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_178 = Pmax(<>[S(clk)<=178] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_179 = Pmax(<>[S(clk)<=179] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_180 = Pmax(<>[S(clk)<=180] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_181 = Pmax(<>[S(clk)<=181] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_182 = Pmax(<>[S(clk)<=182] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_183 = Pmax(<>[S(clk)<=183] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_184 = Pmax(<>[S(clk)<=184] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_185 = Pmax(<>[S(clk)<=185] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_186 = Pmax(<>[S(clk)<=186] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_187 = Pmax(<>[S(clk)<=187] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_188 = Pmax(<>[S(clk)<=188] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_189 = Pmax(<>[S(clk)<=189] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_190 = Pmax(<>[S(clk)<=190] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_191 = Pmax(<>[S(clk)<=191] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_192 = Pmax(<>[S(clk)<=192] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_193 = Pmax(<>[S(clk)<=193] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_194 = Pmax(<>[S(clk)<=194] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_195 = Pmax(<>[S(clk)<=195] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_196 = Pmax(<>[S(clk)<=196] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_197 = Pmax(<>[S(clk)<=197] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_198 = Pmax(<>[S(clk)<=198] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r7_I_199 = Pmax(<>[S(clk)<=199] (abs(noc[7].thisActivity - noc[7].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_100 = Pmax(<>[S(clk)<=100] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_101 = Pmax(<>[S(clk)<=101] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_102 = Pmax(<>[S(clk)<=102] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_103 = Pmax(<>[S(clk)<=103] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_104 = Pmax(<>[S(clk)<=104] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_105 = Pmax(<>[S(clk)<=105] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_106 = Pmax(<>[S(clk)<=106] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_107 = Pmax(<>[S(clk)<=107] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_108 = Pmax(<>[S(clk)<=108] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_109 = Pmax(<>[S(clk)<=109] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_110 = Pmax(<>[S(clk)<=110] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_111 = Pmax(<>[S(clk)<=111] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_112 = Pmax(<>[S(clk)<=112] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_113 = Pmax(<>[S(clk)<=113] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_114 = Pmax(<>[S(clk)<=114] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_115 = Pmax(<>[S(clk)<=115] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_116 = Pmax(<>[S(clk)<=116] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_117 = Pmax(<>[S(clk)<=117] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_118 = Pmax(<>[S(clk)<=118] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_119 = Pmax(<>[S(clk)<=119] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_120 = Pmax(<>[S(clk)<=120] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_121 = Pmax(<>[S(clk)<=121] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_122 = Pmax(<>[S(clk)<=122] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_123 = Pmax(<>[S(clk)<=123] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_124 = Pmax(<>[S(clk)<=124] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_125 = Pmax(<>[S(clk)<=125] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_126 = Pmax(<>[S(clk)<=126] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_127 = Pmax(<>[S(clk)<=127] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_128 = Pmax(<>[S(clk)<=128] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_129 = Pmax(<>[S(clk)<=129] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_130 = Pmax(<>[S(clk)<=130] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_131 = Pmax(<>[S(clk)<=131] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_132 = Pmax(<>[S(clk)<=132] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_133 = Pmax(<>[S(clk)<=133] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_134 = Pmax(<>[S(clk)<=134] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_135 = Pmax(<>[S(clk)<=135] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_136 = Pmax(<>[S(clk)<=136] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_137 = Pmax(<>[S(clk)<=137] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_138 = Pmax(<>[S(clk)<=138] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_139 = Pmax(<>[S(clk)<=139] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_140 = Pmax(<>[S(clk)<=140] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_141 = Pmax(<>[S(clk)<=141] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_142 = Pmax(<>[S(clk)<=142] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_143 = Pmax(<>[S(clk)<=143] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_144 = Pmax(<>[S(clk)<=144] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_145 = Pmax(<>[S(clk)<=145] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_146 = Pmax(<>[S(clk)<=146] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_147 = Pmax(<>[S(clk)<=147] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_148 = Pmax(<>[S(clk)<=148] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_149 = Pmax(<>[S(clk)<=149] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_150 = Pmax(<>[S(clk)<=150] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_151 = Pmax(<>[S(clk)<=151] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_152 = Pmax(<>[S(clk)<=152] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_153 = Pmax(<>[S(clk)<=153] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_154 = Pmax(<>[S(clk)<=154] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_155 = Pmax(<>[S(clk)<=155] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_156 = Pmax(<>[S(clk)<=156] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_157 = Pmax(<>[S(clk)<=157] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_158 = Pmax(<>[S(clk)<=158] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_159 = Pmax(<>[S(clk)<=159] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_160 = Pmax(<>[S(clk)<=160] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_161 = Pmax(<>[S(clk)<=161] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_162 = Pmax(<>[S(clk)<=162] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_163 = Pmax(<>[S(clk)<=163] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_164 = Pmax(<>[S(clk)<=164] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_165 = Pmax(<>[S(clk)<=165] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_166 = Pmax(<>[S(clk)<=166] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_167 = Pmax(<>[S(clk)<=167] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_168 = Pmax(<>[S(clk)<=168] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_169 = Pmax(<>[S(clk)<=169] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_170 = Pmax(<>[S(clk)<=170] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_171 = Pmax(<>[S(clk)<=171] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_172 = Pmax(<>[S(clk)<=172] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_173 = Pmax(<>[S(clk)<=173] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_174 = Pmax(<>[S(clk)<=174] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_175 = Pmax(<>[S(clk)<=175] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_176 = Pmax(<>[S(clk)<=176] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_177 = Pmax(<>[S(clk)<=177] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_178 = Pmax(<>[S(clk)<=178] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_179 = Pmax(<>[S(clk)<=179] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_180 = Pmax(<>[S(clk)<=180] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_181 = Pmax(<>[S(clk)<=181] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_182 = Pmax(<>[S(clk)<=182] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_183 = Pmax(<>[S(clk)<=183] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_184 = Pmax(<>[S(clk)<=184] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_185 = Pmax(<>[S(clk)<=185] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_186 = Pmax(<>[S(clk)<=186] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_187 = Pmax(<>[S(clk)<=187] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_188 = Pmax(<>[S(clk)<=188] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_189 = Pmax(<>[S(clk)<=189] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_190 = Pmax(<>[S(clk)<=190] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_191 = Pmax(<>[S(clk)<=191] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_192 = Pmax(<>[S(clk)<=192] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_193 = Pmax(<>[S(clk)<=193] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_194 = Pmax(<>[S(clk)<=194] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_195 = Pmax(<>[S(clk)<=195] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_196 = Pmax(<>[S(clk)<=196] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_197 = Pmax(<>[S(clk)<=197] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_198 = Pmax(<>[S(clk)<=198] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));
+property r8_I_199 = Pmax(<>[S(clk)<=199] (abs(noc[8].thisActivity - noc[8].lastActivity) >= ACTIVITY_THRESH));

@@ -1,0 +1,667 @@
+/****************************************************************************************************************************
+ * This is a modularized version of the concrete model for NoC model verification.
+ *
+ * Current NoC router IDs
+ *	0 - 1
+ *	|   |
+ *	2 - 3
+ *
+ * In order to add routers to the NoC, visit all coments labled with #MODULARIZE
+ * In order to change system properties and the functionality of indevidual routers, visit all coments labled with #CUSTOMIZE
+ *
+ * Editors:
+ *	Jonah Boe
+ *	Nick Waddoups
+ * Date: Nov 14, 2025
+ ***************************************************************************************************************************/
+
+option "dtmc";
+
+
+// --------------------------------------------------- Top level varables ---------------------------------------------------
+
+// #MODULARIZE by setting NOC_MAX_ID to 1 less than the total number of routers and allocating spaces for more routers
+const int NOC_MAX_ID = 3;
+router[] noc = array(i, NOC_MAX_ID + 1, router{});
+
+// #CUSTOMIZE this value changes the buffer length of all buffers.
+const int BUFFER_LENGTH = 4;
+
+// #CUSTOMIZE the number of buffers a router must service before noise will be incramented.
+const int ACTIVITY_THRESH = 3;
+
+// #CUSTOMIZE these values change the frequency with witch flits are injected.
+const int INJECTION_RATE_NUMERATOR = 3;
+const int INJECTION_RATE_DENOMINATOR = 10;
+
+// #CUSTOMIZE this is the upper bound of cycles run before quiting.
+transient int(0..1) clk = 0;
+int(0..INJECTION_RATE_DENOMINATOR-1) clk_counter = 0;
+
+// #CUSTOMIZE this is the upper threshoold for noise detected in the system.
+const int RESISTIVE_NOISE_THRESH;
+const int INDUCTIVE_NOISE_THRESH;
+
+// These are for tracking resistive and inductive noise and must be initialized to 0.
+int resistiveNoise = 0;
+int inductiveNoise = 0;
+
+// These values are enumerations and are NOT to be changed
+const int NORTH = 0;
+const int WEST = 1;
+const int EAST = 2;
+const int SOUTH = 3;
+const int LOCAL = 4;
+
+// ------------------------------------------------------- Datatypes --------------------------------------------------------
+
+datatype buffer = {
+	int(0..NOC_MAX_ID) hd,
+	buffer option tl
+};
+
+datatype channel = {
+	buffer option buffer,
+	bool serviced,
+	bool isEmpty,
+	bool isFull
+};
+
+datatype router = {
+	channel[] channels,
+	int(-1..NOC_MAX_ID)[] ids,
+	int(0..4)[] priority_list,
+	int(0..4)[] priority_list_temp,
+	int(0..4) serviced_index,
+	int(0..4) unserviced_index,
+	int(0..5) total_unserviced,
+	int thisActivity,
+	int lastActivity,
+	bool[] used
+};
+
+// TEST: These are for testing
+datatype checker = {bool[] routing};
+checker[] isRouting = [
+	checker{routing:[false, false, false, false, false]},
+	checker{routing:[false, false, false, false, false]}, 
+	checker{routing:[false, false, false, false, false]},
+	checker{routing:[false, false, false, false, false]}];
+int[] states = [0, 0, 0, 0];
+
+
+
+// ------------------------------------------------------- Properties -------------------------------------------------------
+/*
+// TEST 1: Generate flits
+// Each router must eventualy generate a flit for every other router.
+property Router0GeneratesFlitsFor1 = Pmax(<>(peekFront(noc[0].channels[LOCAL].buffer) == 1)) > 0;
+property Router0GeneratesFlitsFor2 = Pmax(<>(peekFront(noc[0].channels[LOCAL].buffer) == 2)) > 0;
+property Router0GeneratesFlitsFor3 = Pmax(<>(peekFront(noc[0].channels[LOCAL].buffer) == 3)) > 0;
+property Router1GeneratesFlitsFor0 = Pmax(<>(peekFront(noc[1].channels[LOCAL].buffer) == 0)) > 0;
+property Router1GeneratesFlitsFor2 = Pmax(<>(peekFront(noc[1].channels[LOCAL].buffer) == 2)) > 0;
+property Router1GeneratesFlitsFor3 = Pmax(<>(peekFront(noc[1].channels[LOCAL].buffer) == 3)) > 0;
+property Router2GeneratesFlitsFor0 = Pmax(<>(peekFront(noc[2].channels[LOCAL].buffer) == 0)) > 0;
+property Router2GeneratesFlitsFor1 = Pmax(<>(peekFront(noc[2].channels[LOCAL].buffer) == 1)) > 0;
+property Router2GeneratesFlitsFor3 = Pmax(<>(peekFront(noc[2].channels[LOCAL].buffer) == 3)) > 0;
+property Router3GeneratesFlitsFor1 = Pmax(<>(peekFront(noc[3].channels[LOCAL].buffer) == 0)) > 0;
+property Router3GeneratesFlitsFor2 = Pmax(<>(peekFront(noc[3].channels[LOCAL].buffer) == 1)) > 0;
+property Router3GeneratesFlitsFor3 = Pmax(<>(peekFront(noc[3].channels[LOCAL].buffer) == 2)) > 0;
+// Routers cannot generate flits for themselves
+property Router0DoesNotSelfGenerate = Pmax(<>(peekFront(noc[0].channels[LOCAL].buffer) == 0)) == 0;
+property Router1DoesNotSelfGenerate = Pmax(<>(peekFront(noc[1].channels[LOCAL].buffer) == 1)) == 0;
+property Router2DoesNotSelfGenerate = Pmax(<>(peekFront(noc[2].channels[LOCAL].buffer) == 2)) == 0;
+property Router3DoesNotSelfGenerate = Pmax(<>(peekFront(noc[3].channels[LOCAL].buffer) == 3)) == 0;
+
+// Test 2: Prep channel
+// Buffers can be empty
+property Router0LocalCanBeEmpty = Pmax(<>(noc[0].channels[LOCAL].isEmpty)) > 0;
+property Router0SouhtCanBeEmpty = Pmax(<>(noc[0].channels[SOUTH].isEmpty)) > 0;
+property Router0EastCanBeEmpty = Pmax(<>(noc[0].channels[EAST].isEmpty)) > 0;
+property Router1LocalCanBeEmpty = Pmax(<>(noc[1].channels[LOCAL].isEmpty)) > 0;
+property Router1SouhtCanBeEmpty = Pmax(<>(noc[1].channels[SOUTH].isEmpty)) > 0;
+property Router1WestCanBeEmpty = Pmax(<>(noc[1].channels[WEST].isEmpty)) > 0;
+property Router2LocalCanBeEmpty = Pmax(<>(noc[2].channels[LOCAL].isEmpty)) > 0;
+property Router2NorthCanBeEmpty = Pmax(<>(noc[2].channels[NORTH].isEmpty)) > 0;
+property Router2EastCanBeEmpty = Pmax(<>(noc[2].channels[EAST].isEmpty)) > 0;
+property Router3LocalCanBeEmpty = Pmax(<>(noc[3].channels[LOCAL].isEmpty)) > 0;
+property Router3NorthCanBeEmpty = Pmax(<>(noc[3].channels[NORTH].isEmpty)) > 0;
+property Router3WestCanBeEmpty = Pmax(<>(noc[3].channels[WEST].isEmpty)) > 0;
+// Buffers can be not empty (can have contents, full or less than full, but not empty)
+property Router0LocalCanBeNotEmpty = Pmax(<>(!noc[0].channels[LOCAL].isEmpty)) > 0;
+property Router0SouhtCanBeNotEmpty = Pmax(<>(!noc[0].channels[SOUTH].isEmpty)) > 0;
+property Router0EastCanBeNotEmpty = Pmax(<>(!noc[0].channels[EAST].isEmpty)) > 0;
+property Router1LocalCanBeNotEmpty = Pmax(<>(!noc[1].channels[LOCAL].isEmpty)) > 0;
+property Router1SouhtCanBeNotEmpty = Pmax(<>(!noc[1].channels[SOUTH].isEmpty)) > 0;
+property Router1WestCanBeNotEmpty = Pmax(<>(!noc[1].channels[WEST].isEmpty)) > 0;
+property Router2LocalCanBeNotEmpty = Pmax(<>(!noc[2].channels[LOCAL].isEmpty)) > 0;
+property Router2NorthCanBeNotEmpty = Pmax(<>(!noc[2].channels[NORTH].isEmpty)) > 0;
+property Router2EastCanBeNotEmpty = Pmax(<>(!noc[2].channels[EAST].isEmpty)) > 0;
+property Router3LocalCanBeNotEmpty = Pmax(<>(!noc[3].channels[LOCAL].isEmpty)) > 0;
+property Router3NorthCanBeNotEmpty = Pmax(<>(!noc[3].channels[NORTH].isEmpty)) > 0;
+property Router3WestCanBeNotEmpty = Pmax(<>(!noc[3].channels[WEST].isEmpty)) > 0;
+// Buffers can be full
+property Router0LocalCanBeFull = Pmax(<>(noc[0].channels[LOCAL].isFull)) > 0;
+property Router0SouhtCanBeFull = Pmax(<>(noc[0].channels[SOUTH].isFull)) > 0;
+property Router0EastCanBeFull = Pmax(<>(noc[0].channels[EAST].isFull)) > 0;
+property Router1LocalCanBeFull = Pmax(<>(noc[1].channels[LOCAL].isFull)) > 0;
+property Router1SouhtCanBeFull = Pmax(<>(noc[1].channels[SOUTH].isFull)) > 0;
+property Router1WestCanBeFull = Pmax(<>(noc[1].channels[WEST].isFull)) > 0;
+property Router2LocalCanBeFull = Pmax(<>(noc[2].channels[LOCAL].isFull)) > 0;
+property Router2NorthCanBeFull = Pmax(<>(noc[2].channels[NORTH].isFull)) > 0;
+property Router2EastCanBeFull = Pmax(<>(noc[2].channels[EAST].isFull)) > 0;
+property Router3LocalCanBeFull = Pmax(<>(noc[3].channels[LOCAL].isFull)) > 0;
+property Router3NorthCanBeFull = Pmax(<>(noc[3].channels[NORTH].isFull)) > 0;
+property Router3WestCanBeFull = Pmax(<>(noc[3].channels[WEST].isFull)) > 0;
+
+// TEST 3: Advance Router
+// A flit can only be routed when its source buffer is not empty and its destination buffer is not full.
+// Example: [](isRouting[0].routing[SOUTH] => (!noc[0].channels[SOUTH].isEmpty && !noc[2].channels[NORTH].isFull))
+property Router0RoutingSouthSynced = Pmax(<>(!(!isRouting[0].routing[SOUTH] || (!noc[0].channels[SOUTH].isEmpty && !noc[2].channels[NORTH].isFull)))) == 0;
+property Router0RoutingEastSynced = Pmax(<>(!(!isRouting[0].routing[EAST] || (!noc[0].channels[EAST].isEmpty && !noc[1].channels[WEST].isFull)))) == 0;
+property Router1RoutingSouthSynced = Pmax(<>(!(!isRouting[1].routing[SOUTH] || (!noc[1].channels[SOUTH].isEmpty && !noc[3].channels[NORTH].isFull)))) == 0;
+property Router1RoutingWestSynced = Pmax(<>(!(!isRouting[1].routing[WEST] || (!noc[1].channels[WEST].isEmpty && !noc[0].channels[EAST].isFull)))) == 0;
+property Router2RoutingSouthSynced = Pmax(<>(!(!isRouting[2].routing[NORTH] || (!noc[2].channels[NORTH].isEmpty && !noc[0].channels[SOUTH].isFull)))) == 0;
+property Router2RoutingEastSynced = Pmax(<>(!(!isRouting[2].routing[EAST] || (!noc[2].channels[EAST].isEmpty && !noc[3].channels[WEST].isFull)))) == 0;
+property Router3RoutingSouthSynced = Pmax(<>(!(!isRouting[3].routing[NORTH] || (!noc[3].channels[NORTH].isEmpty && !noc[1].channels[SOUTH].isFull)))) == 0;
+property Router3RoutingWestSynced = Pmax(<>(!(!isRouting[3].routing[WEST] || (!noc[3].channels[WEST].isEmpty && !noc[2].channels[EAST].isFull)))) == 0;
+// A flit can only be routed if the channel has not been used in this cycle.
+// Example: [](isRouting[0].routing[SOUTH] => !noc[0].used[SOUTH])
+property Router0RoutsSouthWhenNotUsed = Pmax(<>(!(!isRouting[0].routing[SOUTH] || !noc[0].used[SOUTH]))) == 0;
+property Router0RoutsEastWhenNotUsed = Pmax(<>(!(!isRouting[0].routing[EAST] || !noc[0].used[EAST]))) == 0;
+property Router1RoutsSouthWhenNotUsed = Pmax(<>(!(!isRouting[1].routing[SOUTH] || !noc[1].used[SOUTH]))) == 0;
+property Router1RoutsWestWhenNotUsed = Pmax(<>(!(!isRouting[1].routing[WEST] || !noc[1].used[WEST]))) == 0;
+property Router2RoutsNorthWhenNotUsed = Pmax(<>(!(!isRouting[2].routing[NORTH] || !noc[2].used[NORTH]))) == 0;
+property Router2RoutsEastWhenNotUsed = Pmax(<>(!(!isRouting[2].routing[EAST] || !noc[2].used[EAST]))) == 0;
+property Router3RoutsNorthWhenNotUsed = Pmax(<>(!(!isRouting[3].routing[NORTH] || !noc[3].used[NORTH]))) == 0;
+property Router3RoutsWestWhenNotUsed = Pmax(<>(!(!isRouting[3].routing[WEST] || !noc[3].used[WEST]))) == 0;
+
+// TEST 4: Update Priority
+// All buffers must always exist in the priority list.
+// Example: [](noc[0].priority_list[0] == NORTH || noc[0].priority_list[1] == NORTH || noc[0].priority_list[2] == NORTH || ...)
+property Router0PriorityAlwaysContainsNorth = Pmax(<>(!(
+	noc[0].priority_list[0] == NORTH || noc[0].priority_list[1] == NORTH || noc[0].priority_list[2] == NORTH ||
+	noc[0].priority_list[3] == NORTH || noc[0].priority_list[4] == NORTH))) == 0;
+property Router0PriorityAlwaysContainsEast = Pmax(<>(!(
+	noc[0].priority_list[0] == EAST || noc[0].priority_list[1] == EAST || noc[0].priority_list[2] == EAST ||
+	noc[0].priority_list[3] == EAST || noc[0].priority_list[4] == EAST))) == 0;
+property Router0PriorityAlwaysContainsSouth = Pmax(<>(!(
+	noc[0].priority_list[0] == SOUTH || noc[0].priority_list[1] == SOUTH || noc[0].priority_list[2] == SOUTH ||
+	noc[0].priority_list[3] == SOUTH || noc[0].priority_list[4] == SOUTH))) == 0;
+property Router0PriorityAlwaysContainsWest = Pmax(<>(!(
+	noc[0].priority_list[0] == WEST || noc[0].priority_list[1] == WEST || noc[0].priority_list[2] == WEST ||
+	noc[0].priority_list[3] == WEST || noc[0].priority_list[4] == WEST))) == 0;
+property Router0PriorityAlwaysContainsLocal = Pmax(<>(!(
+	noc[0].priority_list[0] == LOCAL || noc[0].priority_list[1] == LOCAL || noc[0].priority_list[2] == LOCAL ||
+	noc[0].priority_list[3] == LOCAL || noc[0].priority_list[4] == LOCAL))) == 0;
+property Router1PriorityAlwaysContainsNorth = Pmax(<>(!(
+	noc[1].priority_list[0] == NORTH || noc[1].priority_list[1] == NORTH || noc[1].priority_list[2] == NORTH ||
+	noc[1].priority_list[3] == NORTH || noc[1].priority_list[4] == NORTH))) == 0;
+property Router1PriorityAlwaysContainsEast = Pmax(<>(!(
+	noc[1].priority_list[0] == EAST || noc[1].priority_list[1] == EAST || noc[1].priority_list[2] == EAST ||
+	noc[1].priority_list[3] == EAST || noc[1].priority_list[4] == EAST))) == 0;
+property Router1PriorityAlwaysContainsSouth = Pmax(<>(!(
+	noc[1].priority_list[0] == SOUTH || noc[1].priority_list[1] == SOUTH || noc[1].priority_list[2] == SOUTH ||
+	noc[1].priority_list[3] == SOUTH || noc[1].priority_list[4] == SOUTH))) == 0;
+property Router1PriorityAlwaysContainsWest = Pmax(<>(!(
+	noc[1].priority_list[0] == WEST || noc[1].priority_list[1] == WEST || noc[1].priority_list[2] == WEST ||
+	noc[1].priority_list[3] == WEST || noc[1].priority_list[4] == WEST))) == 0;
+property Router1PriorityAlwaysContainsLocal = Pmax(<>(!(
+	noc[1].priority_list[0] == LOCAL || noc[1].priority_list[1] == LOCAL || noc[1].priority_list[2] == LOCAL ||
+	noc[1].priority_list[3] == LOCAL || noc[1].priority_list[4] == LOCAL))) == 0;
+property Router2PriorityAlwaysContainsNorth = Pmax(<>(!(
+	noc[2].priority_list[0] == NORTH || noc[2].priority_list[1] == NORTH || noc[2].priority_list[2] == NORTH ||
+	noc[2].priority_list[3] == NORTH || noc[2].priority_list[4] == NORTH))) == 0;
+property Router2PriorityAlwaysContainsEast = Pmax(<>(!(
+	noc[2].priority_list[0] == EAST || noc[2].priority_list[1] == EAST || noc[2].priority_list[2] == EAST ||
+	noc[2].priority_list[3] == EAST || noc[2].priority_list[4] == EAST))) == 0;
+property Router2PriorityAlwaysContainsSouth = Pmax(<>(!(
+	noc[2].priority_list[0] == SOUTH || noc[2].priority_list[1] == SOUTH || noc[2].priority_list[2] == SOUTH ||
+	noc[2].priority_list[3] == SOUTH || noc[2].priority_list[4] == SOUTH))) == 0;
+property Router2PriorityAlwaysContainsWest = Pmax(<>(!(
+	noc[2].priority_list[0] == WEST || noc[2].priority_list[1] == WEST || noc[2].priority_list[2] == WEST ||
+	noc[2].priority_list[3] == WEST || noc[2].priority_list[4] == WEST))) == 0;
+property Router2PriorityAlwaysContainsLocal = Pmax(<>(!(
+	noc[2].priority_list[0] == LOCAL || noc[2].priority_list[1] == LOCAL || noc[2].priority_list[2] == LOCAL ||
+	noc[2].priority_list[3] == LOCAL || noc[2].priority_list[4] == LOCAL))) == 0;
+property Router3PriorityAlwaysContainsNorth = Pmax(<>(!(
+	noc[3].priority_list[0] == NORTH || noc[3].priority_list[1] == NORTH || noc[3].priority_list[2] == NORTH ||
+	noc[3].priority_list[3] == NORTH || noc[3].priority_list[4] == NORTH))) == 0;
+property Router3PriorityAlwaysContainsEast = Pmax(<>(!(
+	noc[3].priority_list[0] == EAST || noc[3].priority_list[1] == EAST || noc[3].priority_list[2] == EAST ||
+	noc[3].priority_list[3] == EAST || noc[3].priority_list[4] == EAST))) == 0;
+property Router3PriorityAlwaysContainsSouth = Pmax(<>(!(
+	noc[3].priority_list[0] == SOUTH || noc[3].priority_list[1] == SOUTH || noc[3].priority_list[2] == SOUTH ||
+	noc[3].priority_list[3] == SOUTH || noc[3].priority_list[4] == SOUTH))) == 0;
+property Router3PriorityAlwaysContainsWest = Pmax(<>(!(
+	noc[3].priority_list[0] == WEST || noc[3].priority_list[1] == WEST || noc[3].priority_list[2] == WEST ||
+	noc[3].priority_list[3] == WEST || noc[3].priority_list[4] == WEST))) == 0;
+property Router3PriorityAlwaysContainsLocal = Pmax(<>(!(
+	noc[3].priority_list[0] == LOCAL || noc[3].priority_list[1] == LOCAL || noc[3].priority_list[2] == LOCAL ||
+	noc[3].priority_list[3] == LOCAL || noc[3].priority_list[4] == LOCAL))) == 0;
+*/
+// TEST: General
+// All routers are syncronized
+//property AllRoutersAreInSync = Pmax(<>(!(states[0] == states[1] && states[1] == states[2] && states[2] == states[3]))) == 0;
+
+// -------------------------------------------------------- Actions ---------------------------------------------------------
+
+// For keeping parallel processes synced
+action tick;
+action sync;
+
+// ------------------------------------------------------- Functions --------------------------------------------------------
+
+// Calculate length of list
+function int len(buffer option ls) = if ls == none then 0 else 1 + len(ls!.tl);
+
+// Tell if the buffer is full
+function bool isBufferFull(buffer option ls) = len(ls) >= BUFFER_LENGTH;
+
+// Get the mirror direction
+function int getDestinationChannel(int dir) =
+	if dir == NORTH then SOUTH
+	else if dir == WEST then EAST
+	else if dir == EAST then WEST
+	else if dir == SOUTH then NORTH
+	else -1;
+
+// Determine if the flits destination is in the same column as the current router
+function int getColumnShift(int id, int dst) =
+   (dst % ((int)sqrt(NOC_MAX_ID + 1))) - (id % ((int)sqrt(NOC_MAX_ID + 1)));
+
+// Return the front of the queue
+function int peekFront(buffer option ls) =
+	if ls == none then -1
+	else if ls!.tl == none then ls!.hd
+	else peekFront(ls!.tl);
+
+// Add a flit to the buffer
+function buffer option enqueue(int n, buffer option ls) =
+	if len(ls) == BUFFER_LENGTH then ls
+	else some(buffer {
+		hd: n,
+		tl: ls
+	});
+
+// Remove a flit from the buffer
+function buffer option dequeue(buffer option ls) =
+	if ls == none then none
+	else if ls!.tl == none then none
+	else some(buffer {
+		hd: ls!.hd,
+		tl: dequeue(ls!.tl)
+	});
+
+
+
+// ------------------------------------------------------- Processes --------------------------------------------------------
+
+process GenerateFlits(int id){
+	int(0..NOC_MAX_ID) destination;
+	if((clk_counter % INJECTION_RATE_DENOMINATOR) < INJECTION_RATE_NUMERATOR){
+		// Determine a destiantion
+		//palt{
+			// #MODULARIZE by adding a probability for (NOC_MAX_ID - 1) destinations.
+			// #CUSTOMIZE by changing the flit injection pattern. Check router IDs with if-else blocks to make more router specific changes.
+		//	:(1/3): {= destination = 0 =}
+		//	:(1/3): {= destination = 1 =}
+		//	:(1/3): {= destination = 2 =}
+		//};
+		{= 
+			destination = DiscreteUniform(0, NOC_MAX_ID - 1) 
+		=};
+
+		// Make sure it is not this router and add it to the local buffer.
+		if(destination >= id){
+			{=
+				noc[id].channels[LOCAL].buffer = enqueue(destination + 1, noc[id].channels[LOCAL].buffer)
+			=}
+		}
+		else{
+			{=
+				noc[id].channels[LOCAL].buffer = enqueue(destination, noc[id].channels[LOCAL].buffer)
+			=}
+		}
+	}
+	else {
+		tau
+	}
+}
+
+process PrepChannel(int id, int ch){
+	if(len(noc[id].channels[ch].buffer) == 0){
+		{=
+			noc[id].channels[ch].isEmpty = true
+		=}
+	}
+	else{
+		{=
+			noc[id].channels[ch].isEmpty = false
+		=}
+	};
+	if(isBufferFull(noc[id].channels[ch].buffer)){
+		{=
+			noc[id].channels[ch].isFull = true
+		=}
+	}
+	else{
+		{=
+			noc[id].channels[ch].isFull = false
+		=}
+	}
+}
+
+process PrepRouter(int id){
+	PrepChannel(id, 0);
+	PrepChannel(id, 1);
+	PrepChannel(id, 2);
+	PrepChannel(id, 3);
+	PrepChannel(id, 4)
+}
+
+// Send flit to northern router. src and dst are channels (ie NORTH, WEST, EAST, SOUTH, LOCAL), NOT the actual router ids!
+process Send(int id, int ch, int dir){
+	// We want to chech the final destination buffer of the router we are headed into, to see if it is full
+	int(-1..3) dst;
+	{=
+		// A flit going from router 0 to router 1 leaves 0 from the SOUTH and enters 1 from the NORTH.
+		dst = getDestinationChannel(dir)
+	=};
+
+	// If the destination is not full, and the channel has not been used in this cycle, then service the buffer
+	if(!noc[noc[id].ids[dir]].channels[dst].isFull && !noc[id].used[dir]){
+		{=
+			// First set that a transaction is being made
+			0: isRouting[id].routing[ch] = true,
+
+			// First, add flit to destination buffer
+			1: noc[noc[id].ids[dir]].channels[dst].buffer =
+				enqueue(peekFront(noc[id].channels[ch].buffer), noc[noc[id].ids[dir]].channels[dst].buffer),
+
+			// Then, remove it from the source buffer
+			2: noc[id].channels[ch].buffer = dequeue(noc[id].channels[ch].buffer),
+
+			// Remove the inditactor
+			3: isRouting[id].routing[ch] = false,
+
+			// Mark that output as used and that channel as serviced
+			4: noc[id].used[dir] = true,
+			4: noc[id].channels[ch].serviced = true,
+
+			// Incrament the count for buffers serviced in this cycle
+			4: noc[id].thisActivity++
+		=}
+	}
+	// Otherwise, increment total unserviced buffers
+	else{
+		{=
+			noc[id].total_unserviced++
+		=}
+	}
+}
+
+// Advance flits to respective buffers
+process AdvanceFlits(int id, int ch){
+	// If flit needs to stay on this row
+	if(getColumnShift(id, peekFront(noc[id].channels[ch].buffer)) == 0){
+		// Send it north
+		if(peekFront(noc[id].channels[ch].buffer) < id){
+			Send(id, ch, NORTH)
+		}
+		// Or send it south
+		else{
+			Send(id, ch, SOUTH)
+		}
+	}
+	// Else, if flit needs to go west
+	else if(getColumnShift(id, peekFront(noc[id].channels[ch].buffer)) < 0){
+		Send(id, ch, WEST)
+	}
+	// Else, flit needs to go east
+	else{
+		Send(id, ch, EAST)
+	}
+}
+
+// Update a specific channel
+process AdvanceChannel(int id, int ch){
+	// If this channel was not assigned a neighbor...
+	if(ch != 4 && noc[id].ids[ch] == -1){
+		{=
+			// Mark the channel as serviced
+			noc[id].channels[ch].serviced = true
+		=}
+	}
+	// If this channel was assigned a neighbor or is local, but it is empty...
+	else if(noc[id].channels[ch].isEmpty == true){
+		{=
+			// Mark the channel as serviced
+			noc[id].channels[ch].serviced = true
+		=}
+	}
+	// If the flit has reached its destination...
+	else if(peekFront(noc[id].channels[ch].buffer) == id){
+		// ... and the local channel has not been used
+		if (!noc[id].used[LOCAL]){
+			{=
+				// Mark the channel as serviced and used
+				noc[id].channels[ch].serviced = true,
+				noc[id].used[LOCAL] = true,
+
+				// Incrament the count for buffers serviced in this cycle
+				noc[id].thisActivity++,
+
+				// Remove this flit. It has reached its destination
+				noc[id].channels[ch].buffer = dequeue(noc[id].channels[ch].buffer)
+			=}
+		}
+		// Otherwise, increment total unserviced buffers
+		else{
+			{=
+				noc[id].total_unserviced++
+			=}
+		}
+	}
+
+	// Otherwise, the flit must be for another router
+	else{
+		AdvanceFlits(id, ch)
+	}
+}
+
+// Update the directions of the next flits in the buffers
+process AdvanceRouter(int id){
+	AdvanceChannel(id, noc[id].priority_list[0]);
+	AdvanceChannel(id, noc[id].priority_list[1]);
+	AdvanceChannel(id, noc[id].priority_list[2]);
+	AdvanceChannel(id, noc[id].priority_list[3]);
+	AdvanceChannel(id, noc[id].priority_list[4])
+}
+
+process UpdatePriorityList(int id, int i){
+	if(noc[id].channels[noc[id].priority_list[i]].serviced){
+		{=
+			0: noc[id].priority_list_temp[noc[id].total_unserviced + noc[id].serviced_index] = noc[id].priority_list[i],
+			1: noc[id].serviced_index++
+		=}
+	}
+	else{
+		{=
+			0: noc[id].priority_list_temp[noc[id].unserviced_index] = noc[id].priority_list[i],
+			1: noc[id].unserviced_index++
+		=}
+	}
+}
+
+// Update priority list
+process UpdatePiority(int id){
+	// Reset all of the temp values
+	{=
+		noc[id].priority_list_temp = [0, 0, 0, 0, 0],
+		noc[id].serviced_index = 0,
+		noc[id].unserviced_index = 0
+	=};
+	// Update the ordering of priorities in the lists
+	UpdatePriorityList(id, 0);
+	UpdatePriorityList(id, 1);
+	UpdatePriorityList(id, 2);
+	UpdatePriorityList(id, 3);
+	UpdatePriorityList(id, 4);
+
+	{=
+		// Make our next priority list the current priority list
+		noc[id].priority_list = noc[id].priority_list_temp,
+
+		// Reset the used and serviced variables
+		noc[id].channels[0].serviced = false,
+		noc[id].channels[1].serviced = false,
+		noc[id].channels[2].serviced = false,
+		noc[id].channels[3].serviced = false,
+		noc[id].channels[4].serviced = false,
+		noc[id].total_unserviced = 0,
+		noc[id].used = [false, false, false, false, false]
+	=}
+}
+
+// Update the noise tracking variables for this router.
+process UpdateNoiseTracking(int id){
+	// Update inductive noise
+	if (abs(noc[id].lastActivity - noc[id].thisActivity) >= ACTIVITY_THRESH) {
+		{=
+			inductiveNoise++
+		=}
+	}
+	else{
+		tau
+	};
+	// Update resistive noise
+	if(noc[id].thisActivity >= ACTIVITY_THRESH){
+		{=
+			resistiveNoise++
+		=}
+	}
+	else{
+		tau
+	};
+
+	// Update trackers for next round
+	{=
+		0: noc[id].lastActivity = noc[id].thisActivity,
+		1: noc[id].thisActivity = 0
+	=}
+}
+
+// Process for behavior
+process RouterBehavior(int id, int id_north, int id_west, int id_east, int id_south){
+	// Initialize the router
+	{=
+		noc[id] = router {
+			channels: [
+				channel {serviced: false, isEmpty: false},
+				channel {serviced: false, isEmpty: false},
+				channel {serviced: false, isEmpty: false},
+				channel {serviced: false, isEmpty: false},
+				channel {serviced: false, isEmpty: false}],
+			ids: [id_north, id_west, id_east, id_south],
+			priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
+			total_unserviced: 0,
+			used: [false, false, false, false, false],
+			thisActivity: 0,
+			lastActivity: 0
+		}
+	=};
+	
+	// Run
+	GenerateFlits(id);
+	// Determine what channels will send this cycle
+	PrepRouter(id);
+	do{
+		sync{= states[id] = 1 =};
+		// Send the flits
+		AdvanceRouter(id);
+		// Update the priority list
+		UpdatePiority(id);
+		// Update resistive and inductive values
+		UpdateNoiseTracking(id);
+
+		tick{= states[id] = 0 =};
+		// Generate new flits
+		GenerateFlits(id);
+		// Determine what channels will send this cycle
+		PrepRouter(id)
+	}
+}
+
+// For syncing parallell processes
+process Clock(){
+	tick {= clk = 1, clk_counter = (clk_counter + 1) % INJECTION_RATE_DENOMINATOR =};
+	Clock()
+}
+
+// ------------------------------------------------------- Execution --------------------------------------------------------
+
+// These processes are run concurrently and kept in sync by tick and tock.
+par{
+	::	Clock()
+	// #MODULARIZE by adding new arbiter processes for any additional routers.
+	//	0 - 1
+	//	|   |
+	//	2 - 3
+	:: RouterBehavior(0, -1, -1,  1,  2)
+	:: RouterBehavior(1, -1,  0, -1,  3)
+	:: RouterBehavior(2,  0, -1,  3, -1)
+	:: RouterBehavior(3,  1,  2, -1, -1)
+}
+
+property I_1000 = Pmax(<>[S(clk)<=1000] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1010 = Pmax(<>[S(clk)<=1010] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1020 = Pmax(<>[S(clk)<=1020] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1030 = Pmax(<>[S(clk)<=1030] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1040 = Pmax(<>[S(clk)<=1040] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1050 = Pmax(<>[S(clk)<=1050] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1060 = Pmax(<>[S(clk)<=1060] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1070 = Pmax(<>[S(clk)<=1070] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1080 = Pmax(<>[S(clk)<=1080] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1090 = Pmax(<>[S(clk)<=1090] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1100 = Pmax(<>[S(clk)<=1100] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1110 = Pmax(<>[S(clk)<=1110] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1120 = Pmax(<>[S(clk)<=1120] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1130 = Pmax(<>[S(clk)<=1130] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1140 = Pmax(<>[S(clk)<=1140] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1150 = Pmax(<>[S(clk)<=1150] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1160 = Pmax(<>[S(clk)<=1160] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1170 = Pmax(<>[S(clk)<=1170] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1180 = Pmax(<>[S(clk)<=1180] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1190 = Pmax(<>[S(clk)<=1190] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1200 = Pmax(<>[S(clk)<=1200] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1210 = Pmax(<>[S(clk)<=1210] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1220 = Pmax(<>[S(clk)<=1220] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1230 = Pmax(<>[S(clk)<=1230] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1240 = Pmax(<>[S(clk)<=1240] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1250 = Pmax(<>[S(clk)<=1250] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1260 = Pmax(<>[S(clk)<=1260] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1270 = Pmax(<>[S(clk)<=1270] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1280 = Pmax(<>[S(clk)<=1280] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1290 = Pmax(<>[S(clk)<=1290] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1300 = Pmax(<>[S(clk)<=1300] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1310 = Pmax(<>[S(clk)<=1310] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1320 = Pmax(<>[S(clk)<=1320] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1330 = Pmax(<>[S(clk)<=1330] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1340 = Pmax(<>[S(clk)<=1340] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1350 = Pmax(<>[S(clk)<=1350] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1360 = Pmax(<>[S(clk)<=1360] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1370 = Pmax(<>[S(clk)<=1370] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1380 = Pmax(<>[S(clk)<=1380] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1390 = Pmax(<>[S(clk)<=1390] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1400 = Pmax(<>[S(clk)<=1400] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1410 = Pmax(<>[S(clk)<=1410] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1420 = Pmax(<>[S(clk)<=1420] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1430 = Pmax(<>[S(clk)<=1430] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1440 = Pmax(<>[S(clk)<=1440] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1450 = Pmax(<>[S(clk)<=1450] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1460 = Pmax(<>[S(clk)<=1460] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1470 = Pmax(<>[S(clk)<=1470] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1480 = Pmax(<>[S(clk)<=1480] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1490 = Pmax(<>[S(clk)<=1490] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));
+property I_1500 = Pmax(<>[S(clk)<=1500] (inductiveNoise >= INDUCTIVE_NOISE_THRESH));

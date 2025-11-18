@@ -1,0 +1,23 @@
+The Modest Toolset (www.modestchecker.net), version v3.1.290-gff8cae090+ff8cae0903ec136f9c4c15123e444b0b0399ff6b.
+Command: modest modes /tmp/tmplqubln3k/__tmp__.modest --unsafe --max-run-length 0 -D --rng MersenneTwister -E "RESISTIVE_NOISE_THRESH=40, INDUCTIVE_NOISE_THRESH=1" -O /tmp/tmplqubln3k/__tmp__.txt minimal
+
+
+
+
+__tmp__.modest: info: __tmp__ is a DTMC model and will be simulated as an MDP using uniform resolution of nondeterminism.
+__tmp__.modest: info: Using default confidence level of 0.95.
+__tmp__.modest: info: Using default absolute half-width of 0.01.
+__tmp__.modest: error: Array index out of range.
+
+Peak memory usage: 153 MB
+Analysis results for __tmp__.modest
+Experiment RESISTIVE_NOISE_THRESH=40, INDUCTIVE_NOISE_THRESH=1
+Time for model compilation: 0.8 s
+Number of states:           unknown
+Min. probability:           ≥ 1/3
+Status:                     Error
+Simulation time:            0.9 s
+
++ R_200
+  Distribution support: {0, 1}
+  Status:               Error
