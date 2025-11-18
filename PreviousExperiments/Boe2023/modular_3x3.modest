@@ -39,8 +39,8 @@ transient int(0..1) clk = 0;
 int(0..INJECTION_RATE_DENOMINATOR-1) clk_counter = 0;
 
 // #CUSTOMIZE this is the upper threshoold for noise detected in the system.
-const int RESISTIVE_NOISE_THRESH = 20;
-const int INDUCTIVE_NOISE_THRESH = 8;
+const int RESISTIVE_NOISE_THRESH;
+const int INDUCTIVE_NOISE_THRESH;
 
 // These are for tracking resistive and inductive noise and must be initialized to 0.
 int resistiveNoise = 0;
