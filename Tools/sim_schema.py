@@ -12,10 +12,10 @@ class NocParams(BaseModel):
     size: Tuple[int, int]
     buffer_size: int
     activity_thresh: int
-    injection_rate_numerator: int
-    injection_rate_denominator: int
-    resistive_noise_threshold: int 
-    inductive_noise_threshold: int 
+    injection_rate_numerator: Optional[int]   = None
+    injection_rate_denominator: Optional[int] = None
+    resistive_noise_threshold: Optional[int]  = None
+    inductive_noise_threshold: Optional[int]  = None
 
 # This defines the possible verification types
 VerificationType = Literal["mcsta-CTL", "mcsta-PMC", "modes"]
