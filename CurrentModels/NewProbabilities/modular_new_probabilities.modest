@@ -238,6 +238,9 @@ router {
     used: [false, false, false, false, false]
 }];
 
+int(0..5)[] currentActivities  = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+int(0..5)[] previousActivities = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+
 // ----- Integer functions -----
 
 // Saturating addition
@@ -535,8 +538,10 @@ process UpdatePiority(int id) {
 process UpdateGlobalNoiseTracking(int id) {
     {=
        // Update trackers for next round
-       1: noc[id].lastActivity = noc[id].thisActivity,
-       2: noc[id].thisActivity = 0
+       0: currentActivities[id]  = noc[id].thisActivity,
+       0: previousActivities[id] = noc[id].lastActivity,
+       1: noc[id].lastActivity   = noc[id].thisActivity,
+       2: noc[id].thisActivity   = 0
     =}
 }
 
