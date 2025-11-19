@@ -28,19 +28,16 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 These are some of the published papers that have come out of this work.
 
-### Probabilistic Verification for Reliable Network-on-Chip System Design
+### Probabilistic Verification for Modular Network-on-Chip Systems
 
 ```bibtex
-@inproceedings{lewis_probabilistic_2019,
-  title = {Probabilistic {{Verification}} for {{Reliable Network-on-Chip System Design}}},
-  booktitle = {Formal {{Methods}} for {{Industrial Critical Systems}}},
-  author = {Lewis, Benjamin and Hartmanns, Arnd and Basu, Prabal and Jayashankara Shridevi, Rajesh and Chakraborty, Koushik and Roy, Sanghamitra and Zhang, Zhen},
-  editor = {Larsen, Kim Guldstrand and Willemse, Tim},
-  year = 2019,
-  pages = {110--126},
-  publisher = {Springer International Publishing},
-  doi = {10.1007/978-3-030-27008-7_7},
-  isbn = {978-3-030-27008-7},
+@article{boe_probabilistic_2023,
+  title = {Probabilistic {{Verification}} for {{Modular Network-on-Chip Systems}}},
+  author = {Boe, Jonah},
+  year = 2023,
+  month = may,
+  journal = {All Graduate Theses and Dissertations, Spring 1920 to Summer 2023},
+  doi = {10.26076/4f5a-4a68}
 }
 ```
 
@@ -56,5 +53,21 @@ These are some of the published papers that have come out of this work.
   pages = {232--248},
   publisher = {Springer International Publishing},
   doi = {10.1007/978-3-030-85248-1_16},
+}
+```
+
+### Probabilistic Verification for Reliable Network-on-Chip System Design
+
+```bibtex
+@inproceedings{lewis_probabilistic_2019,
+  title = {Probabilistic {{Verification}} for {{Reliable Network-on-Chip System Design}}},
+  booktitle = {Formal {{Methods}} for {{Industrial Critical Systems}}},
+  author = {Lewis, Benjamin and Hartmanns, Arnd and Basu, Prabal and Jayashankara Shridevi, Rajesh and Chakraborty, Koushik and Roy, Sanghamitra and Zhang, Zhen},
+  editor = {Larsen, Kim Guldstrand and Willemse, Tim},
+  year = 2019,
+  pages = {110--126},
+  publisher = {Springer International Publishing},
+  doi = {10.1007/978-3-030-27008-7_7},
+  isbn = {978-3-030-27008-7},
 }
 ```
