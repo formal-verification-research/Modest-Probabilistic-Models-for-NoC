@@ -441,19 +441,21 @@ process AdvanceChannel(int id, int ch) {
     else if (peekFront(noc[id].channels[ch].buffer) == id) {
         advanceChannel {=
             /* -- if the local channel has not been used this clock cycle -- */
-            // Mark the channel as serviced and used
-            noc[id].channels[ch].serviced = !noc[id].used[LOCAL],
-            noc[id].used[LOCAL] = !noc[id].used[LOCAL],
-
+            // Mark the channel as serviced
+            1: noc[id].channels[ch].serviced = !noc[id].used[LOCAL],
+            
             // Remove this flit. It has reached its destination
-            noc[id].channels[ch].buffer = !noc[id].used[LOCAL] ? dequeue(noc[id].channels[ch].buffer) : noc[id].channels[ch].buffer,
-
+            1: noc[id].channels[ch].buffer = !noc[id].used[LOCAL] ? dequeue(noc[id].channels[ch].buffer) : noc[id].channels[ch].buffer,
+            
             // Increment the activity for this cycle as we removed a flit
-            noc[id].thisActivity = !noc[id].used[LOCAL] ? noc[id].thisActivity + 1 : noc[id].thisActivity,
-
+            1: noc[id].thisActivity = !noc[id].used[LOCAL] ? noc[id].thisActivity + 1 : noc[id].thisActivity,
+            
             /* -- if the local channel has been used this clock cycle -- */
             // Otherwise, increment total unserviced buffers
-            noc[id].total_unserviced = !noc[id].used[LOCAL] ? noc[id].total_unserviced : noc[id].total_unserviced + 1
+            1: noc[id].total_unserviced = !noc[id].used[LOCAL] ? noc[id].total_unserviced : noc[id].total_unserviced + 1,
+            
+            // Mark the channel as used now
+            2: noc[id].used[LOCAL] = !noc[id].used[LOCAL]
         =};
 	    advanceChannelSend
     }
