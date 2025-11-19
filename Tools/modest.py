@@ -80,3 +80,5 @@ def simulate(model: str, opts: list[str] = []) -> Tuple[str, Dict[str, float]]:
         Output of running command + opts result as string
     """
     return __run(model, command=[MODEST_EXECUTABLE, "modes"], opts=opts)
+
+__all__ = ["check", "simulate", "is_modest_on_path"]

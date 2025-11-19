@@ -1,3 +1,5 @@
+"""Helper functions for instantiating NoCs in Modest"""
+
 def noc_init(dimension) -> str:
     """Returns initialization for a dimension x dimension NoC"""
     num_nodes = dimension*dimension
@@ -70,3 +72,5 @@ def property(name: str, prop: int) -> str:
     return f"""\
 property {name} = {prop};
 """
+
+__all__ = ["property", "composition", "noise_tracking_init", "noc_init"]
