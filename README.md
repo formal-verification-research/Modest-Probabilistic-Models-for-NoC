@@ -13,7 +13,7 @@ directory.
   Modest.
 - [PreviousModels](./PreviousModels/): Contains previous works (both
   published and not published).
-= [Tools](./Tools/): Contains tools for automating verification.
+- [Tools](./Tools/): Contains tools for automating verification.
 
 > [!NOTE]
 > This repository used to be laid out quite differently. If you would
