@@ -1,0 +1,1362 @@
+The Modest Toolset (www.modestchecker.net), version v3.1.290-gff8cae090+ff8cae0903ec136f9c4c15123e444b0b0399ff6b.
+Command: modest modes /tmp/tmptchwh5dd/__tmp__.modest --unsafe --max-run-length 0 -D --rng MersenneTwister -E "RESISTIVE_THRESH=20, INDUCTIVE_THRESH=1" -O /tmp/tmptchwh5dd/__tmp__.txt minimal
+
+
+
+
+__tmp__.modest: info: __tmp__ is a DTMC model and will be simulated as an MDP using uniform resolution of nondeterminism.
+__tmp__.modest: info: Using default confidence level of 0.95.
+__tmp__.modest: info: Using default absolute half-width of 0.01.
+
+Peak memory usage: 112 MB
+Analysis results for __tmp__.modest
+Experiment RESISTIVE_THRESH=20, INDUCTIVE_THRESH=1
+Time for model compilation: 0.3 s
+Number of states:           unknown
+Min. probability:           ≥ 1/3
+Status:                     Finished
+Simulation time:            66.2 s
+
++ Properties "R_100", "R_101", "R_102", "R_103", "R_104", "R_105", "R_106", "R_107", "R_108", "R_109", "R_110", "R_111", "R_112", "R_113", "R_114", "R_115", "R_116", "R_117", "R_118", "R_119", "R_120", "R_121", "R_122", "R_123", "R_124", "R_125", "R_126", "R_127", "R_128", "R_129", "R_130", "R_131", "R_132", "R_133", "R_134", "R_135", "R_136", "R_137", "R_138", "R_139", "R_140", "R_141", "R_142", "R_143", "R_144", "R_145", "R_146", "R_147", "R_148", "R_149", "R_150", "R_151", "R_152", "R_153", "R_154", "R_155", "R_156", "R_157", "R_158", "R_159", "R_160", "R_161", "R_162", "R_163", "R_164", "R_165", "R_166", "R_167", "R_168", "R_169", "R_170", "R_171", "R_172", "R_173", "R_174", "R_175", "R_176", "R_177", "R_178", "R_179", "R_180", "R_181", "R_182", "R_183", "R_184", "R_185", "R_186", "R_187", "R_188", "R_189", "R_190", "R_191", "R_192", "R_193", "R_194", "R_195", "R_196", "R_197", "R_198" and "R_199"
+  Runs generated:  9826
+  Avg. run length: 13257.9
+  Run type:        MDP
+  Status:          Finished
+
+  + Property R_100
+    Estimated probability: 0.00010307153164296021
+    Confidence interval:   [2.609541812953831E-06, 0.0005741425347207227]
+    Interval half-width:   0.0002857664964538844
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_101
+    Estimated probability: 0.00020614306328592042
+    Confidence interval:   [2.496585635185993E-05, 0.0007444591447608702]
+    Interval half-width:   0.00035974664420450515
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_102
+    Estimated probability: 0.00041228612657184083
+    Confidence interval:   [0.00011234515341771623, 0.001055276717933941]
+    Interval half-width:   0.00047146578225811236
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_103
+    Estimated probability: 0.0005153576582148011
+    Confidence interval:   [0.00016735572766674755, 0.0012022595982208828]
+    Interval half-width:   0.0005174519352770676
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_104
+    Estimated probability: 0.0005153576582148011
+    Confidence interval:   [0.00016735572766674755, 0.0012022595982208828]
+    Interval half-width:   0.0005174519352770676
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_105
+    Estimated probability: 0.0005153576582148011
+    Confidence interval:   [0.00016735572766674755, 0.0012022595982208828]
+    Interval half-width:   0.0005174519352770676
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_106
+    Estimated probability: 0.0005153576582148011
+    Confidence interval:   [0.00016735572766674755, 0.0012022595982208828]
+    Interval half-width:   0.0005174519352770676
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_107
+    Estimated probability: 0.0005153576582148011
+    Confidence interval:   [0.00016735572766674755, 0.0012022595982208828]
+    Interval half-width:   0.0005174519352770676
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_108
+    Estimated probability: 0.0005153576582148011
+    Confidence interval:   [0.00016735572766674755, 0.0012022595982208828]
+    Interval half-width:   0.0005174519352770676
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_109
+    Estimated probability: 0.0005153576582148011
+    Confidence interval:   [0.00016735572766674755, 0.0012022595982208828]
+    Interval half-width:   0.0005174519352770676
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_110
+    Estimated probability: 0.0005153576582148011
+    Confidence interval:   [0.00016735572766674755, 0.0012022595982208828]
+    Interval half-width:   0.0005174519352770676
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_111
+    Estimated probability: 0.0007215007215007215
+    Confidence interval:   [0.0002901283482203162, 0.0014859986301561095]
+    Interval half-width:   0.0005979351409678966
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_112
+    Estimated probability: 0.0013399299113584827
+    Confidence interval:   [0.0007136430554255051, 0.0022902309920371233]
+    Interval half-width:   0.000788293968305809
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_113
+    Estimated probability: 0.0013399299113584827
+    Confidence interval:   [0.0007136430554255051, 0.0022902309920371233]
+    Interval half-width:   0.000788293968305809
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_114
+    Estimated probability: 0.0013399299113584827
+    Confidence interval:   [0.0007136430554255051, 0.0022902309920371233]
+    Interval half-width:   0.000788293968305809
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_115
+    Estimated probability: 0.0013399299113584827
+    Confidence interval:   [0.0007136430554255051, 0.0022902309920371233]
+    Interval half-width:   0.000788293968305809
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_116
+    Estimated probability: 0.0013399299113584827
+    Confidence interval:   [0.0007136430554255051, 0.0022902309920371233]
+    Interval half-width:   0.000788293968305809
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_117
+    Estimated probability: 0.0013399299113584827
+    Confidence interval:   [0.0007136430554255051, 0.0022902309920371233]
+    Interval half-width:   0.000788293968305809
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_118
+    Estimated probability: 0.0013399299113584827
+    Confidence interval:   [0.0007136430554255051, 0.0022902309920371233]
+    Interval half-width:   0.000788293968305809
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_119
+    Estimated probability: 0.0013399299113584827
+    Confidence interval:   [0.0007136430554255051, 0.0022902309920371233]
+    Interval half-width:   0.000788293968305809
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_120
+    Estimated probability: 0.0013399299113584827
+    Confidence interval:   [0.0007136430554255051, 0.0022902309920371233]
+    Interval half-width:   0.000788293968305809
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_121
+    Estimated probability: 0.0022675736961451248
+    Confidence interval:   [0.0014216050389354745, 0.003431132774156558]
+    Interval half-width:   0.0010047638676105417
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_122
+    Estimated probability: 0.004432075860647289
+    Confidence interval:   [0.0032093166175056523, 0.005965383968251475]
+    Interval half-width:   0.0013780336753729113
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_123
+    Estimated probability: 0.00474129045557617
+    Confidence interval:   [0.00347324924939666, 0.006319208610119263]
+    Interval half-width:   0.0014229796803613016
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_124
+    Estimated probability: 0.00474129045557617
+    Confidence interval:   [0.00347324924939666, 0.006319208610119263]
+    Interval half-width:   0.0014229796803613016
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_125
+    Estimated probability: 0.00474129045557617
+    Confidence interval:   [0.00347324924939666, 0.006319208610119263]
+    Interval half-width:   0.0014229796803613016
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_126
+    Estimated probability: 0.00474129045557617
+    Confidence interval:   [0.00347324924939666, 0.006319208610119263]
+    Interval half-width:   0.0014229796803613016
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_127
+    Estimated probability: 0.00474129045557617
+    Confidence interval:   [0.00347324924939666, 0.006319208610119263]
+    Interval half-width:   0.0014229796803613016
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_128
+    Estimated probability: 0.00474129045557617
+    Confidence interval:   [0.00347324924939666, 0.006319208610119263]
+    Interval half-width:   0.0014229796803613016
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_129
+    Estimated probability: 0.00474129045557617
+    Confidence interval:   [0.00347324924939666, 0.006319208610119263]
+    Interval half-width:   0.0014229796803613016
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_130
+    Estimated probability: 0.00474129045557617
+    Confidence interval:   [0.00347324924939666, 0.006319208610119263]
+    Interval half-width:   0.0014229796803613016
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_131
+    Estimated probability: 0.006390434961863534
+    Confidence interval:   [0.004902916948199449, 0.008184861824805273]
+    Interval half-width:   0.0016409724383029119
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_132
+    Estimated probability: 0.010101010101010102
+    Confidence interval:   [0.008207881905401693, 0.012296276970616915]
+    Interval half-width:   0.002044197532607611
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_133
+    Estimated probability: 0.010513296227581941
+    Confidence interval:   [0.008580240383609794, 0.01274804618703058]
+    Interval half-width:   0.0020839029017103924
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_134
+    Estimated probability: 0.010513296227581941
+    Confidence interval:   [0.008580240383609794, 0.01274804618703058]
+    Interval half-width:   0.0020839029017103924
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_135
+    Estimated probability: 0.010513296227581941
+    Confidence interval:   [0.008580240383609794, 0.01274804618703058]
+    Interval half-width:   0.0020839029017103924
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_136
+    Estimated probability: 0.010513296227581941
+    Confidence interval:   [0.008580240383609794, 0.01274804618703058]
+    Interval half-width:   0.0020839029017103924
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_137
+    Estimated probability: 0.010513296227581941
+    Confidence interval:   [0.008580240383609794, 0.01274804618703058]
+    Interval half-width:   0.0020839029017103924
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_138
+    Estimated probability: 0.010513296227581941
+    Confidence interval:   [0.008580240383609794, 0.01274804618703058]
+    Interval half-width:   0.0020839029017103924
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_139
+    Estimated probability: 0.010513296227581941
+    Confidence interval:   [0.008580240383609794, 0.01274804618703058]
+    Interval half-width:   0.0020839029017103924
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_140
+    Estimated probability: 0.010513296227581941
+    Confidence interval:   [0.008580240383609794, 0.01274804618703058]
+    Interval half-width:   0.0020839029017103924
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_141
+    Estimated probability: 0.013090084518655946
+    Confidence interval:   [0.010923978330402932, 0.015555322491240973]
+    Interval half-width:   0.002315672080419021
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_142
+    Estimated probability: 0.019789734075448363
+    Confidence interval:   [0.017111702821325226, 0.022761228749867756]
+    Interval half-width:   0.002824762964271265
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_143
+    Estimated probability: 0.021129663986806844
+    Confidence interval:   [0.018360878647489972, 0.024190876344789603]
+    Interval half-width:   0.0029149988486498156
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_144
+    Estimated probability: 0.021129663986806844
+    Confidence interval:   [0.018360878647489972, 0.024190876344789603]
+    Interval half-width:   0.0029149988486498156
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_145
+    Estimated probability: 0.021129663986806844
+    Confidence interval:   [0.018360878647489972, 0.024190876344789603]
+    Interval half-width:   0.0029149988486498156
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_146
+    Estimated probability: 0.021129663986806844
+    Confidence interval:   [0.018360878647489972, 0.024190876344789603]
+    Interval half-width:   0.0029149988486498156
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_147
+    Estimated probability: 0.021129663986806844
+    Confidence interval:   [0.018360878647489972, 0.024190876344789603]
+    Interval half-width:   0.0029149988486498156
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_148
+    Estimated probability: 0.021129663986806844
+    Confidence interval:   [0.018360878647489972, 0.024190876344789603]
+    Interval half-width:   0.0029149988486498156
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_149
+    Estimated probability: 0.021129663986806844
+    Confidence interval:   [0.018360878647489972, 0.024190876344789603]
+    Interval half-width:   0.0029149988486498156
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_150
+    Estimated probability: 0.021129663986806844
+    Confidence interval:   [0.018360878647489972, 0.024190876344789603]
+    Interval half-width:   0.0029149988486498156
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_151
+    Estimated probability: 0.025664811379097093
+    Confidence interval:   [0.02260972612633133, 0.029008954722094926]
+    Interval half-width:   0.0031996142978817973
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_152
+    Estimated probability: 0.03607503607503607
+    Confidence interval:   [0.032452765652846736, 0.039979122887759684]
+    Interval half-width:   0.003763178617456474
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_153
+    Estimated probability: 0.03741496598639456
+    Confidence interval:   [0.033726633429729314, 0.04138421398935832]
+    Interval half-width:   0.0038287902798145035
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_154
+    Estimated probability: 0.03741496598639456
+    Confidence interval:   [0.033726633429729314, 0.04138421398935832]
+    Interval half-width:   0.0038287902798145035
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_155
+    Estimated probability: 0.03741496598639456
+    Confidence interval:   [0.033726633429729314, 0.04138421398935832]
+    Interval half-width:   0.0038287902798145035
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_156
+    Estimated probability: 0.03741496598639456
+    Confidence interval:   [0.033726633429729314, 0.04138421398935832]
+    Interval half-width:   0.0038287902798145035
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_157
+    Estimated probability: 0.03741496598639456
+    Confidence interval:   [0.033726633429729314, 0.04138421398935832]
+    Interval half-width:   0.0038287902798145035
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_158
+    Estimated probability: 0.03741496598639456
+    Confidence interval:   [0.033726633429729314, 0.04138421398935832]
+    Interval half-width:   0.0038287902798145035
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_159
+    Estimated probability: 0.03741496598639456
+    Confidence interval:   [0.033726633429729314, 0.04138421398935832]
+    Interval half-width:   0.0038287902798145035
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_160
+    Estimated probability: 0.03741496598639456
+    Confidence interval:   [0.033726633429729314, 0.04138421398935832]
+    Interval half-width:   0.0038287902798145035
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_161
+    Estimated probability: 0.04596990311276026
+    Confidence interval:   [0.04188811337350756, 0.050326960049483234]
+    Interval half-width:   0.0042194233379878356
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_162
+    Estimated probability: 0.06307977736549165
+    Confidence interval:   [0.05832254964860334, 0.06810131419462687]
+    Interval half-width:   0.004889382273011764
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_163
+    Estimated probability: 0.06503813646670789
+    Confidence interval:   [0.06021094285807296, 0.0701284032693947]
+    Interval half-width:   0.004958730205660872
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_164
+    Estimated probability: 0.06503813646670789
+    Confidence interval:   [0.06021094285807296, 0.0701284032693947]
+    Interval half-width:   0.004958730205660872
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_165
+    Estimated probability: 0.06503813646670789
+    Confidence interval:   [0.06021094285807296, 0.0701284032693947]
+    Interval half-width:   0.004958730205660872
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_166
+    Estimated probability: 0.06503813646670789
+    Confidence interval:   [0.06021094285807296, 0.0701284032693947]
+    Interval half-width:   0.004958730205660872
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_167
+    Estimated probability: 0.06503813646670789
+    Confidence interval:   [0.06021094285807296, 0.0701284032693947]
+    Interval half-width:   0.004958730205660872
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_168
+    Estimated probability: 0.06503813646670789
+    Confidence interval:   [0.06021094285807296, 0.0701284032693947]
+    Interval half-width:   0.004958730205660872
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_169
+    Estimated probability: 0.06503813646670789
+    Confidence interval:   [0.06021094285807296, 0.0701284032693947]
+    Interval half-width:   0.004958730205660872
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_170
+    Estimated probability: 0.06503813646670789
+    Confidence interval:   [0.06021094285807296, 0.0701284032693947]
+    Interval half-width:   0.004958730205660872
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_171
+    Estimated probability: 0.07596371882086168
+    Confidence interval:   [0.07076819028415007, 0.08141547125648868]
+    Interval half-width:   0.005323640486169304
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_172
+    Estimated probability: 0.09606266749123892
+    Confidence interval:   [0.09026943060549723, 0.10209967138640474]
+    Interval half-width:   0.0059151203904537555
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_173
+    Estimated probability: 0.0999793856936714
+    Confidence interval:   [0.09407961400197119, 0.10612051210008944]
+    Interval half-width:   0.006020449049059122
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_174
+    Estimated probability: 0.0999793856936714
+    Confidence interval:   [0.09407961400197119, 0.10612051210008944]
+    Interval half-width:   0.006020449049059122
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_175
+    Estimated probability: 0.0999793856936714
+    Confidence interval:   [0.09407961400197119, 0.10612051210008944]
+    Interval half-width:   0.006020449049059122
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_176
+    Estimated probability: 0.0999793856936714
+    Confidence interval:   [0.09407961400197119, 0.10612051210008944]
+    Interval half-width:   0.006020449049059122
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_177
+    Estimated probability: 0.0999793856936714
+    Confidence interval:   [0.09407961400197119, 0.10612051210008944]
+    Interval half-width:   0.006020449049059122
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_178
+    Estimated probability: 0.0999793856936714
+    Confidence interval:   [0.09407961400197119, 0.10612051210008944]
+    Interval half-width:   0.006020449049059122
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_179
+    Estimated probability: 0.0999793856936714
+    Confidence interval:   [0.09407961400197119, 0.10612051210008944]
+    Interval half-width:   0.006020449049059122
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_180
+    Estimated probability: 0.0999793856936714
+    Confidence interval:   [0.09407961400197119, 0.10612051210008944]
+    Interval half-width:   0.006020449049059122
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_181
+    Estimated probability: 0.11348175633889919
+    Confidence interval:   [0.10723554962719738, 0.11996102907242187]
+    Interval half-width:   0.006362739722612247
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_182
+    Estimated probability: 0.14028035456606885
+    Confidence interval:   [0.13342729512006357, 0.14735012105065812]
+    Interval half-width:   0.006961412965297273
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_183
+    Estimated probability: 0.14440321583178725
+    Confidence interval:   [0.1374649494789492, 0.15155568047794074]
+    Interval half-width:   0.007045365499495776
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_184
+    Estimated probability: 0.14440321583178725
+    Confidence interval:   [0.1374649494789492, 0.15155568047794074]
+    Interval half-width:   0.007045365499495776
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_185
+    Estimated probability: 0.14440321583178725
+    Confidence interval:   [0.1374649494789492, 0.15155568047794074]
+    Interval half-width:   0.007045365499495776
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_186
+    Estimated probability: 0.14440321583178725
+    Confidence interval:   [0.1374649494789492, 0.15155568047794074]
+    Interval half-width:   0.007045365499495776
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_187
+    Estimated probability: 0.14440321583178725
+    Confidence interval:   [0.1374649494789492, 0.15155568047794074]
+    Interval half-width:   0.007045365499495776
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_188
+    Estimated probability: 0.14440321583178725
+    Confidence interval:   [0.1374649494789492, 0.15155568047794074]
+    Interval half-width:   0.007045365499495776
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_189
+    Estimated probability: 0.14440321583178725
+    Confidence interval:   [0.1374649494789492, 0.15155568047794074]
+    Interval half-width:   0.007045365499495776
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_190
+    Estimated probability: 0.14440321583178725
+    Confidence interval:   [0.1374649494789492, 0.15155568047794074]
+    Interval half-width:   0.007045365499495776
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_191
+    Estimated probability: 0.1629560915275201
+    Confidence interval:   [0.15565756606119113, 0.17045754559286377]
+    Interval half-width:   0.007399989765836321
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_192
+    Estimated probability: 0.19624819624819625
+    Confidence interval:   [0.18838593074088295, 0.204293228448712]
+    Interval half-width:   0.00795364885391453
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_193
+    Estimated probability: 0.20088641517212946
+    Confidence interval:   [0.1929530280494975, 0.2089997647738785]
+    Interval half-width:   0.008023368362190503
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_194
+    Estimated probability: 0.20088641517212946
+    Confidence interval:   [0.1929530280494975, 0.2089997647738785]
+    Interval half-width:   0.008023368362190503
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_195
+    Estimated probability: 0.20088641517212946
+    Confidence interval:   [0.1929530280494975, 0.2089997647738785]
+    Interval half-width:   0.008023368362190503
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_196
+    Estimated probability: 0.20088641517212946
+    Confidence interval:   [0.1929530280494975, 0.2089997647738785]
+    Interval half-width:   0.008023368362190503
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_197
+    Estimated probability: 0.20088641517212946
+    Confidence interval:   [0.1929530280494975, 0.2089997647738785]
+    Interval half-width:   0.008023368362190503
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_198
+    Estimated probability: 0.20088641517212946
+    Confidence interval:   [0.1929530280494975, 0.2089997647738785]
+    Interval half-width:   0.008023368362190503
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property R_199
+    Estimated probability: 0.20088641517212946
+    Confidence interval:   [0.1929530280494975, 0.2089997647738785]
+    Interval half-width:   0.008023368362190503
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Diagnostics for thread 1
+    Time active:    66.0 s
+    Time blocked:   0.0 s
+    Runs generated: 415
+    Time per run:   159 ms
+
+  + Diagnostics for thread 2
+    Time active:    66.0 s
+    Time blocked:   0.0 s
+    Runs generated: 418
+    Time per run:   158 ms
+
+  + Diagnostics for thread 3
+    Time active:    66.0 s
+    Time blocked:   0.0 s
+    Runs generated: 430
+    Time per run:   154 ms
+
+  + Diagnostics for thread 4
+    Time active:    66.0 s
+    Time blocked:   0.0 s
+    Runs generated: 437
+    Time per run:   151 ms
+
+  + Diagnostics for thread 5
+    Time active:    66.0 s
+    Time blocked:   0.0 s
+    Runs generated: 431
+    Time per run:   153 ms
+
+  + Diagnostics for thread 6
+    Time active:    66.0 s
+    Time blocked:   0.0 s
+    Runs generated: 430
+    Time per run:   154 ms
+
+  + Diagnostics for thread 7
+    Time active:    66.0 s
+    Time blocked:   0.0 s
+    Runs generated: 413
+    Time per run:   160 ms
+
+  + Diagnostics for thread 8
+    Time active:    66.0 s
+    Time blocked:   0.0 s
+    Runs generated: 440
+    Time per run:   150 ms
+
+  + Diagnostics for thread 9
+    Time active:    66.0 s
+    Time blocked:   0.0 s
+    Runs generated: 429
+    Time per run:   154 ms
+
+  + Diagnostics for thread 10
+    Time active:    66.0 s
+    Time blocked:   0.0 s
+    Runs generated: 435
+    Time per run:   152 ms
+
+  + Diagnostics for thread 11
+    Time active:    66.0 s
+    Time blocked:   0.0 s
+    Runs generated: 420
+    Time per run:   157 ms
+
+  + Diagnostics for thread 12
+    Time active:    66.0 s
+    Time blocked:   0.0 s
+    Runs generated: 440
+    Time per run:   150 ms
+
+  + Diagnostics for thread 13
+    Time active:    66.0 s
+    Time blocked:   0.0 s
+    Runs generated: 421
+    Time per run:   157 ms
+
+  + Diagnostics for thread 14
+    Time active:    66.0 s
+    Time blocked:   0.0 s
+    Runs generated: 441
+    Time per run:   150 ms
+
+  + Diagnostics for thread 15
+    Time active:    66.0 s
+    Time blocked:   0.0 s
+    Runs generated: 421
+    Time per run:   157 ms
+
+  + Diagnostics for thread 16
+    Time active:    66.0 s
+    Time blocked:   0.0 s
+    Runs generated: 435
+    Time per run:   152 ms
+
+  + Diagnostics for thread 17
+    Time active:    66.0 s
+    Time blocked:   0.0 s
+    Runs generated: 426
+    Time per run:   155 ms
+
+  + Diagnostics for thread 18
+    Time active:    66.0 s
+    Time blocked:   0.0 s
+    Runs generated: 417
+    Time per run:   158 ms
+
+  + Diagnostics for thread 19
+    Time active:    66.0 s
+    Time blocked:   0.0 s
+    Runs generated: 422
+    Time per run:   156 ms
+
+  + Diagnostics for thread 20
+    Time active:    66.0 s
+    Time blocked:   0.0 s
+    Runs generated: 421
+    Time per run:   157 ms
+
+  + Diagnostics for thread 21
+    Time active:    66.0 s
+    Time blocked:   0.0 s
+    Runs generated: 434
+    Time per run:   152 ms
+
+  + Diagnostics for thread 22
+    Time active:    66.0 s
+    Time blocked:   0.0 s
+    Runs generated: 429
+    Time per run:   154 ms
+
+  + Diagnostics for thread 23
+    Time active:    66.0 s
+    Time blocked:   0.0 s
+    Runs generated: 421
+    Time per run:   157 ms

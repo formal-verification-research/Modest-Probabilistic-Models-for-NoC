@@ -1,8 +1,7 @@
 # Formal NoC Verification
 
-This repository is dedicated to NoC verification work under Dr. Zhen
-Zhang at Utah State University. This currently includes probabilistic
-models using the Modest toolset and deductive models using Dafny.
+This repository is dedicated to probabilistic NoC verification using the
+Modest toolset under Dr. Zhen Zhang at Utah State University.
 
 ## Repository Layout
 
@@ -10,11 +9,11 @@ Each sub-directory in this repository has it's own README file with
 instructions on how to read, use, and extend the work in that
 directory.
 
-- [DafnyModels](./DafnyModels/): Contains deductive NoC models in Dafny.
-- [ModestModels](./ModestModels/): Contains probabilistic NoC models in
+- [CurrentModels](./CurrentModels/): Contains probabilistic NoC models in
   Modest.
 - [PreviousModels](./PreviousModels/): Contains previous works (both
   published and not published).
+= [Tools](./Tools/): Contains tools for automating verification.
 
 > [!NOTE]
 > This repository used to be laid out quite differently. If you would
@@ -23,10 +22,7 @@ directory.
 
 ## Contributing
 
-Currently, there is really only one contributor to this repository at a
-time, so they will contribute however they would like. However, to
-maintain ease of use it's recommended that careful consideration to
-file organization is made when working in this repository.
+See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## Related Works
 

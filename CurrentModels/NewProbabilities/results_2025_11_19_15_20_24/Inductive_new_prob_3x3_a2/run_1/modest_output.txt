@@ -1,0 +1,270 @@
+The Modest Toolset (www.modestchecker.net), version v3.1.290-gff8cae090+ff8cae0903ec136f9c4c15123e444b0b0399ff6b.
+Command: modest modes /tmp/tmph_nsnpa3/__tmp__.modest --unsafe --max-run-length 0 -D --rng MersenneTwister -E ACTIVITY_THRESH=2 -O /tmp/tmph_nsnpa3/__tmp__.txt minimal
+
+
+
+
+__tmp__.modest: info: __tmp__ is a DTMC model and will be simulated as an MDP using uniform resolution of nondeterminism.
+__tmp__.modest: info: Using default confidence level of 0.95.
+__tmp__.modest: info: Using default absolute half-width of 0.01.
+
+Peak memory usage: 121 MB
+Analysis results for __tmp__.modest
+Experiment ACTIVITY_THRESH=2
+Time for model compilation: 0.6 s
+Number of states:           unknown
+Min. probability:           ≥ 0.125
+Status:                     Finished
+Simulation time:            8.2 s
+
++ Properties "r0_I_1000", "r1_I_1000", "r2_I_1000", "r3_I_1000", "r4_I_1000", "r5_I_1000", "r6_I_1000", "r7_I_1000" and "r8_I_1000"
+  Runs generated:  9853
+  Avg. run length: 254.9
+  Run type:        MDP
+  Status:          Finished
+
+  + Property r0_I_1000
+    Estimated probability: 0.3427128427128427
+    Confidence interval:   [0.333265592658723, 0.3522546004190175]
+    Interval half-width:   0.009494503880147248
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property r1_I_1000
+    Estimated probability: 0.7241805813234384
+    Confidence interval:   [0.715169537385513, 0.733056864360434]
+    Interval half-width:   0.008943663487460507
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property r2_I_1000
+    Estimated probability: 0.3253968253968254
+    Confidence interval:   [0.31607600080821713, 0.3348225719000785]
+    Interval half-width:   0.009373285545930699
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property r3_I_1000
+    Estimated probability: 0.5631828488971347
+    Confidence interval:   [0.5532441442046214, 0.5730836011999615]
+    Interval half-width:   0.009919728497670033
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property r4_I_1000
+    Estimated probability: 0.8795093795093795
+    Confidence interval:   [0.8728660869082485, 0.8859238947288984]
+    Interval half-width:   0.006528903910324957
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property r5_I_1000
+    Estimated probability: 0.5697794269222841
+    Confidence interval:   [0.5598563457247895, 0.5796605928146524]
+    Interval half-width:   0.009902123544931474
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property r6_I_1000
+    Estimated probability: 0.3235415378272521
+    Confidence interval:   [0.3142351087370927, 0.33295400484601695]
+    Interval half-width:   0.009359448054462122
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property r7_I_1000
+    Estimated probability: 0.7286126571840857
+    Confidence interval:   [0.7196450533167641, 0.7374428306377271]
+    Interval half-width:   0.008898888660481497
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Property r8_I_1000
+    Estimated probability: 0.33199340342197486
+    Confidence interval:   [0.32262273798282465, 0.34146502305074783]
+    Interval half-width:   0.00942114253396159
+    Runs used:             9702
+    Distribution support:  {0, 1}
+
+    + Statistical guarantees
+      Method:    Clopper-Pearson interval
+      Statement: 100*γ % of the confidence intervals contain the true probability
+      γ:         0.95
+
+  + Diagnostics for thread 1
+    Time active:    7.5 s
+    Time blocked:   0.0 s
+    Runs generated: 422
+    Time per run:   18 ms
+
+  + Diagnostics for thread 2
+    Time active:    7.5 s
+    Time blocked:   0.0 s
+    Runs generated: 438
+    Time per run:   17 ms
+
+  + Diagnostics for thread 3
+    Time active:    7.5 s
+    Time blocked:   0.0 s
+    Runs generated: 425
+    Time per run:   18 ms
+
+  + Diagnostics for thread 4
+    Time active:    7.5 s
+    Time blocked:   0.0 s
+    Runs generated: 423
+    Time per run:   18 ms
+
+  + Diagnostics for thread 5
+    Time active:    7.5 s
+    Time blocked:   0.0 s
+    Runs generated: 419
+    Time per run:   18 ms
+
+  + Diagnostics for thread 6
+    Time active:    7.5 s
+    Time blocked:   0.0 s
+    Runs generated: 420
+    Time per run:   18 ms
+
+  + Diagnostics for thread 7
+    Time active:    7.5 s
+    Time blocked:   0.0 s
+    Runs generated: 430
+    Time per run:   18 ms
+
+  + Diagnostics for thread 8
+    Time active:    7.5 s
+    Time blocked:   0.0 s
+    Runs generated: 427
+    Time per run:   18 ms
+
+  + Diagnostics for thread 9
+    Time active:    7.5 s
+    Time blocked:   0.0 s
+    Runs generated: 442
+    Time per run:   17 ms
+
+  + Diagnostics for thread 10
+    Time active:    7.5 s
+    Time blocked:   0.0 s
+    Runs generated: 422
+    Time per run:   18 ms
+
+  + Diagnostics for thread 11
+    Time active:    7.5 s
+    Time blocked:   0.0 s
+    Runs generated: 462
+    Time per run:   16 ms
+
+  + Diagnostics for thread 12
+    Time active:    7.5 s
+    Time blocked:   0.0 s
+    Runs generated: 421
+    Time per run:   18 ms
+
+  + Diagnostics for thread 13
+    Time active:    7.5 s
+    Time blocked:   0.0 s
+    Runs generated: 436
+    Time per run:   17 ms
+
+  + Diagnostics for thread 14
+    Time active:    7.5 s
+    Time blocked:   0.0 s
+    Runs generated: 431
+    Time per run:   17 ms
+
+  + Diagnostics for thread 15
+    Time active:    7.5 s
+    Time blocked:   0.0 s
+    Runs generated: 446
+    Time per run:   17 ms
+
+  + Diagnostics for thread 16
+    Time active:    7.5 s
+    Time blocked:   0.0 s
+    Runs generated: 419
+    Time per run:   18 ms
+
+  + Diagnostics for thread 17
+    Time active:    7.5 s
+    Time blocked:   0.0 s
+    Runs generated: 420
+    Time per run:   18 ms
+
+  + Diagnostics for thread 18
+    Time active:    7.5 s
+    Time blocked:   0.0 s
+    Runs generated: 423
+    Time per run:   18 ms
+
+  + Diagnostics for thread 19
+    Time active:    7.5 s
+    Time blocked:   0.0 s
+    Runs generated: 410
+    Time per run:   18 ms
+
+  + Diagnostics for thread 20
+    Time active:    7.5 s
+    Time blocked:   0.0 s
+    Runs generated: 423
+    Time per run:   18 ms
+
+  + Diagnostics for thread 21
+    Time active:    7.5 s
+    Time blocked:   0.0 s
+    Runs generated: 453
+    Time per run:   17 ms
+
+  + Diagnostics for thread 22
+    Time active:    7.5 s
+    Time blocked:   0.0 s
+    Runs generated: 419
+    Time per run:   18 ms
+
+  + Diagnostics for thread 23
+    Time active:    7.5 s
+    Time blocked:   0.0 s
+    Runs generated: 422
+    Time per run:   18 ms
