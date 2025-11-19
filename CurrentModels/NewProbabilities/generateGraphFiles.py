@@ -7,6 +7,7 @@ from Tools import sim_schema
 from typing import Dict, Tuple
 import re
 import matplotlib.pyplot as plt
+import math
 
 pattern = r"^r(\d+)_[RI]_(\d+)$"
 matcher = re.compile(pattern)
@@ -57,7 +58,6 @@ if __name__ == "__main__":
             properties = properties | run.properties
 
         clk_data: Dict[int, Dict[int, float]] = {}
-
         for k, v in properties.items():
             r, c = extract_indices(k)
             if r not in clk_data:
@@ -70,12 +70,18 @@ if __name__ == "__main__":
                 for clk, prob in sorted(clk_data[r].items()):
                     f.write(f"{clk} {prob}\n")
         
+        highest_prob: float = max(val for inner_dict in clk_data.values() for val in inner_dict.values())
+        highest_prob_rounded: float = math.ceil(highest_prob * 10.0) / 10.0
+
         for r in sorted(clk_data):
             plt.subplot(3,3,r+1)
             x, y = zip(*sorted(clk_data[r].items()))
             plt.plot(x, y)
             plt.title(f"Router {r}")
-            plt.ylim(0.0, 1.0)
+            plt.ylim(0.0, highest_prob_rounded)
         
         plt.tight_layout()
         plt.savefig(output_dir / "plot.pdf")
+        plt.close('all')
+        
+        del project, properties, clk_data
