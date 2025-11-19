@@ -16,7 +16,7 @@ router at each clock cycle.
 
 [newProbDriver](./newProbDriver.py) is provided to generate results. Currently it's set up
 to generate the probability of seeing an activity level of at least $A$ for resistive and
-inductive PSN up to 1000 clock cycles where $A \in \{1,2,3,4,5\}$.
+inductive PSN up to 1000 clock cycles where $A \in \{2,3,4,5\}$.
 
 [generateGraphFiles](./generateGraphFiles.py) is a tool that takes a result directory as a
 cli input and then generates both a plot and plot files for that experiment. The plot is a
