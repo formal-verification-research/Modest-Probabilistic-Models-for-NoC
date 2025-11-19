@@ -6,8 +6,9 @@ import os
 from Tools import sim_schema
 from typing import Dict, Tuple
 import re
+import matplotlib.pyplot as plt
 
-pattern = r"^r(\d+)_R_(\d+)$"
+pattern = r"^r(\d+)_[RI]_(\d+)$"
 matcher = re.compile(pattern)
 
 def extract_indices(prop_label: str) -> Tuple[int, int]:
@@ -68,3 +69,13 @@ if __name__ == "__main__":
                 f.write(f"# Data for router {r}\n")
                 for clk, prob in sorted(clk_data[r].items()):
                     f.write(f"{clk} {prob}\n")
+        
+        for r in sorted(clk_data):
+            plt.subplot(3,3,r+1)
+            x, y = zip(*sorted(clk_data[r].items()))
+            plt.plot(x, y)
+            plt.title(f"Router {r}")
+            plt.ylim(0.0, 1.0)
+        
+        plt.tight_layout()
+        plt.savefig(output_dir / "plot.pdf")
