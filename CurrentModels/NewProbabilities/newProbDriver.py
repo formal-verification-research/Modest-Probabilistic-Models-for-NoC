@@ -108,8 +108,7 @@ def main():
         model = f.read()
 
     # Resistive 2x2 Simulations
-    # for thresh, clk in [(1,1000),(2,1000),(3,1000),(4,1000),(5,1000)]:
-    for thresh, clk in [(3,1000)]:
+    for thresh, clk in [(1,1000),(2,1000),(3,1000),(4,1000),(5,1000)]:
         r = run_psn_analysis(max_clk=clk,
                              stride=10,
                              batch=100,
@@ -119,14 +118,14 @@ def main():
         sim_schema.save_as_directory(r, output_dir)
 
     # Inductive 2x2 Simulations
-    # for thresh, clk in [(1,1000),(2,1000),(3,1000),(4,1000),(5,1000)]:
-    #     i = run_psn_analysis(max_clk=clk,
-    #                          stride=10,
-    #                          batch=100,
-    #                          activity_threshold=thresh,
-    #                          original_model=model,
-    #                          sim_type="Inductive")
-    #     sim_schema.save_as_directory(i, output_dir)
+    for thresh, clk in [(1,1000),(2,1000),(3,1000),(4,1000),(5,1000)]:
+        i = run_psn_analysis(max_clk=clk,
+                             stride=10,
+                             batch=100,
+                             activity_threshold=thresh,
+                             original_model=model,
+                             sim_type="Inductive")
+        sim_schema.save_as_directory(i, output_dir)
 
 if __name__ == "__main__":
     main()
