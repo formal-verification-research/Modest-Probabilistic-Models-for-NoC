@@ -52,7 +52,7 @@ def __run(model: str, command: list[str], *, opts: list[str] = []) -> Tuple[str,
             for line in property_file.readlines():
                 prop = list(filter(None, re.split(r"[:\s]", line)))
                 if len(prop) != 2: continue
-                properties[str(prop[0])] = float(prop[1])
+                properties[str(prop[0]).replace('"','')] = float(prop[1])
 
     # Return the combined stdout and stderr    
     return (output, properties)
