@@ -56,7 +56,7 @@ datatype buffer = {
     buffer option tl
 };
 
-datatype channel = {
+datatype flaggedBuffer = {
     buffer option buffer,
     bool serviced,
     bool isEmpty,
@@ -64,7 +64,7 @@ datatype channel = {
 };
 
 datatype router = {
-    channel[] channels,
+    flaggedBuffer[] channels,
     int(0..4)[] priority_list,
     int(0..4)[] priority_list_temp,
     int(0..4) serviced_index,
@@ -85,11 +85,11 @@ datatype sendCounter = {
 router[] noc = [
 router {
     channels: [
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false}],
     priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
     priority_list_temp: [0, 0, 0, 0, 0],
     serviced_index: 0,
@@ -101,11 +101,11 @@ router {
 },
 router {
     channels: [
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false}],
     priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
     priority_list_temp: [0, 0, 0, 0, 0],
     serviced_index: 0,
@@ -117,11 +117,11 @@ router {
 },
 router {
     channels: [
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false}],
     priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
     priority_list_temp: [0, 0, 0, 0, 0],
     serviced_index: 0,
@@ -133,11 +133,11 @@ router {
 },
 router {
     channels: [
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false}],
     priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
     priority_list_temp: [0, 0, 0, 0, 0],
     serviced_index: 0,
@@ -149,11 +149,11 @@ router {
 },
 router {
     channels: [
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false}],
     priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
     priority_list_temp: [0, 0, 0, 0, 0],
     serviced_index: 0,
@@ -165,11 +165,11 @@ router {
 },
 router {
     channels: [
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false}],
     priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
     priority_list_temp: [0, 0, 0, 0, 0],
     serviced_index: 0,
@@ -181,11 +181,11 @@ router {
 },
 router {
     channels: [
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false}],
     priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
     priority_list_temp: [0, 0, 0, 0, 0],
     serviced_index: 0,
@@ -197,11 +197,11 @@ router {
 },
 router {
     channels: [
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false}],
     priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
     priority_list_temp: [0, 0, 0, 0, 0],
     serviced_index: 0,
@@ -213,11 +213,11 @@ router {
 },
 router {
     channels: [
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        channel {buffer: none, serviced: false, isEmpty: true, isFull: false}],
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false}],
     priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
     priority_list_temp: [0, 0, 0, 0, 0],
     serviced_index: 0,
