@@ -64,7 +64,7 @@ datatype flaggedBuffer = {
 };
 
 datatype router = {
-    flaggedBuffer[] channels,
+    flaggedBuffer[] buffers,
     int(0..4)[] priority_list,
     int(0..4)[] priority_list_temp,
     int(0..4) serviced_index,
@@ -84,7 +84,7 @@ datatype sendCounter = {
 // ----- Variables -----
 router[] noc = array(i, NOC_MAX_ID + 1,
     router {
-        channels: [
+        buffers: [
             flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
             flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
             flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
@@ -210,16 +210,16 @@ action generateFlits;
 process GenerateFlits(int id) {
     int(0..NOC_MAX_ID) destination;
 
-    if (!isBufferFull(noc[id].channels[LOCAL].buffer) && clk < INJECTION_RATE_NUMERATOR) {
+    if (!isBufferFull(noc[id].buffers[LOCAL].buffer) && clk < INJECTION_RATE_NUMERATOR) {
         // Add the new flit to the local buffer
         // If the destination is greater than or equal to the ID, we shift it
         // up by one to exclude the possiblity of sending a flit to ourselves
         generateFlits {=
             0: destination = DiscreteUniform(0, NOC_MAX_ID - 1),
-            1: noc[id].channels[LOCAL].buffer = 
+            1: noc[id].buffers[LOCAL].buffer = 
                 enqueue(destination >= id ? 
                             destination + 1 : 
-                            destination, noc[id].channels[LOCAL].buffer)
+                            destination, noc[id].buffers[LOCAL].buffer)
         =}
     }
     else {
@@ -233,24 +233,24 @@ process PrepRouter(int id) {
     // Prep all the channels
     prepRouter {=
         // North Channel (0)
-        noc[id].channels[NORTH].isEmpty = len(noc[id].channels[NORTH].buffer) == 0,
-        noc[id].channels[NORTH].isFull = isBufferFull(noc[id].channels[NORTH].buffer),
+        noc[id].buffers[NORTH].isEmpty = len(noc[id].buffers[NORTH].buffer) == 0,
+        noc[id].buffers[NORTH].isFull = isBufferFull(noc[id].buffers[NORTH].buffer),
 
         // WEST Channel (1)
-        noc[id].channels[WEST].isEmpty = len(noc[id].channels[WEST].buffer) == 0,
-        noc[id].channels[WEST].isFull = isBufferFull(noc[id].channels[WEST].buffer),
+        noc[id].buffers[WEST].isEmpty = len(noc[id].buffers[WEST].buffer) == 0,
+        noc[id].buffers[WEST].isFull = isBufferFull(noc[id].buffers[WEST].buffer),
 
         // East Channel (2)
-        noc[id].channels[EAST].isEmpty = len(noc[id].channels[EAST].buffer) == 0,
-        noc[id].channels[EAST].isFull = isBufferFull(noc[id].channels[EAST].buffer),
+        noc[id].buffers[EAST].isEmpty = len(noc[id].buffers[EAST].buffer) == 0,
+        noc[id].buffers[EAST].isFull = isBufferFull(noc[id].buffers[EAST].buffer),
 
         // South Channel (3)
-        noc[id].channels[SOUTH].isEmpty = len(noc[id].channels[SOUTH].buffer) == 0,
-        noc[id].channels[SOUTH].isFull = isBufferFull(noc[id].channels[SOUTH].buffer),
+        noc[id].buffers[SOUTH].isEmpty = len(noc[id].buffers[SOUTH].buffer) == 0,
+        noc[id].buffers[SOUTH].isFull = isBufferFull(noc[id].buffers[SOUTH].buffer),
 
         // Local Channel (4)
-        noc[id].channels[LOCAL].isEmpty = len(noc[id].channels[LOCAL].buffer) == 0,
-        noc[id].channels[LOCAL].isFull = isBufferFull(noc[id].channels[LOCAL].buffer)
+        noc[id].buffers[LOCAL].isEmpty = len(noc[id].buffers[LOCAL].buffer) == 0,
+        noc[id].buffers[LOCAL].isFull = isBufferFull(noc[id].buffers[LOCAL].buffer)
     =}
 }
 
@@ -259,18 +259,18 @@ process Send(int id, int ch, int dir) {
     advanceChannel;
 
     // If the destination is not full, and the channel has not been used in this cycle, then service the buffer
-    if(!noc[getNeighborID(id, dir)].channels[getDestinationChannel(dir)].isFull && !noc[id].used[dir]){
+    if(!noc[getNeighborID(id, dir)].buffers[getDestinationChannel(dir)].isFull && !noc[id].used[dir]){
         advanceChannelSend {=
             // Add flit to destination buffer
-            1: noc[getNeighborID(id, dir)].channels[getDestinationChannel(dir)].buffer =
-                enqueue(peekFront(noc[id].channels[ch].buffer), noc[getNeighborID(id, dir)].channels[getDestinationChannel(dir)].buffer),
+            1: noc[getNeighborID(id, dir)].buffers[getDestinationChannel(dir)].buffer =
+                enqueue(peekFront(noc[id].buffers[ch].buffer), noc[getNeighborID(id, dir)].buffers[getDestinationChannel(dir)].buffer),
 
             // Then, remove it from the source buffer
-            2: noc[id].channels[ch].buffer = dequeue(noc[id].channels[ch].buffer),
+            2: noc[id].buffers[ch].buffer = dequeue(noc[id].buffers[ch].buffer),
 
             // Mark that output as used and that channel as serviced
             4: noc[id].used[dir] = true,
-            4: noc[id].channels[ch].serviced = true,
+            4: noc[id].buffers[ch].serviced = true,
 
 			// Increment the count for buffers serviced in this cycle
 			4: noc[id].thisActivity++
@@ -287,9 +287,9 @@ process Send(int id, int ch, int dir) {
 // Determine which direction to send the front-most flit in channel `ch` of router `id`
 process AdvanceFlits(int id, int ch) {
     // If flit needs to stay on this row
-    if(getColumnShift(id, peekFront(noc[id].channels[ch].buffer)) == 0) {
+    if(getColumnShift(id, peekFront(noc[id].buffers[ch].buffer)) == 0) {
         // Send it north
-        if(peekFront(noc[id].channels[ch].buffer) < id){
+        if(peekFront(noc[id].buffers[ch].buffer) < id){
             Send(id, ch, NORTH)
         }
         // Or send it south
@@ -298,7 +298,7 @@ process AdvanceFlits(int id, int ch) {
         }
     }
     // Else, if flit needs to go west
-    else if(getColumnShift(id, peekFront(noc[id].channels[ch].buffer)) < 0) {
+    else if(getColumnShift(id, peekFront(noc[id].buffers[ch].buffer)) < 0) {
         Send(id, ch, WEST)
     }
     // Else, flit needs to go east
@@ -313,22 +313,22 @@ action advanceChannelSend;
 process AdvanceChannel(int id, int ch) {
     // If this channel was not assigned a neighbor or if it is
     // empty, then mark it as serviced and move on to the next one
-    if ((ch != 4 && getNeighborID(id, ch) == NO_CONNECT) || noc[id].channels[ch].isEmpty == true) {
+    if ((ch != 4 && getNeighborID(id, ch) == NO_CONNECT) || noc[id].buffers[ch].isEmpty == true) {
         advanceChannel {=
             // Mark the channel as serviced
-            noc[id].channels[ch].serviced = true
+            noc[id].buffers[ch].serviced = true
         =};
 	    advanceChannelSend
     }
     // If the flit has reached its destination...
-    else if (peekFront(noc[id].channels[ch].buffer) == id) {
+    else if (peekFront(noc[id].buffers[ch].buffer) == id) {
         advanceChannel {=
             /* -- if the local channel has not been used this clock cycle -- */
             // Mark the channel as serviced
-            1: noc[id].channels[ch].serviced = !noc[id].used[LOCAL],
+            1: noc[id].buffers[ch].serviced = !noc[id].used[LOCAL],
             
             // Remove this flit. It has reached its destination
-            1: noc[id].channels[ch].buffer = !noc[id].used[LOCAL] ? dequeue(noc[id].channels[ch].buffer) : noc[id].channels[ch].buffer,
+            1: noc[id].buffers[ch].buffer = !noc[id].used[LOCAL] ? dequeue(noc[id].buffers[ch].buffer) : noc[id].buffers[ch].buffer,
             
             // Increment the activity for this cycle as we removed a flit
             1: noc[id].thisActivity = !noc[id].used[LOCAL] ? noc[id].thisActivity + 1 : noc[id].thisActivity,
@@ -359,7 +359,7 @@ process AdvanceRouter(int id) {
 
 // Update the priority list value at index `i` in router `id`
 process UpdatePriorityList(int id, int i) {
-    if (noc[id].channels[noc[id].priority_list[i]].serviced) {
+    if (noc[id].buffers[noc[id].priority_list[i]].serviced) {
         updatePriority {=
             0: noc[id].priority_list_temp[noc[id].total_unserviced + noc[id].serviced_index] = noc[id].priority_list[i],
             1: noc[id].serviced_index++
@@ -394,19 +394,19 @@ process UpdatePiority(int id) {
         // Make our next priority list the current priority list
         // However, if all of our channels are empty, then just reset
         // the priority list. This helps with the state space
-        0: noc[id].priority_list = (noc[id].channels[0].isEmpty &&
-                                    noc[id].channels[1].isEmpty &&
-                                    noc[id].channels[2].isEmpty &&
-                                    noc[id].channels[3].isEmpty &&
-                                    noc[id].channels[4].isEmpty) ?
+        0: noc[id].priority_list = (noc[id].buffers[0].isEmpty &&
+                                    noc[id].buffers[1].isEmpty &&
+                                    noc[id].buffers[2].isEmpty &&
+                                    noc[id].buffers[3].isEmpty &&
+                                    noc[id].buffers[4].isEmpty) ?
                                     [NORTH, EAST, SOUTH, WEST, LOCAL] : noc[id].priority_list_temp,
 
         // Reset the used and serviced variables
-        1: noc[id].channels[0].serviced = false,
-        1: noc[id].channels[1].serviced = false,
-        1: noc[id].channels[2].serviced = false,
-        1: noc[id].channels[3].serviced = false,
-        1: noc[id].channels[4].serviced = false,
+        1: noc[id].buffers[0].serviced = false,
+        1: noc[id].buffers[1].serviced = false,
+        1: noc[id].buffers[2].serviced = false,
+        1: noc[id].buffers[3].serviced = false,
+        1: noc[id].buffers[4].serviced = false,
         1: noc[id].total_unserviced = 0,
         1: noc[id].used = [false, false, false, false, false],
         1: noc[id].priority_list_temp = [0, 0, 0, 0, 0],
