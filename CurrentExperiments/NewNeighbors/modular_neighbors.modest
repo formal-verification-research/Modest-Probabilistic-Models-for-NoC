@@ -82,154 +82,26 @@ datatype sendCounter = {
 };
 
 // ----- Variables -----
-router[] noc = [
-router {
-    channels: [
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false}],
-    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
-    priority_list_temp: [0, 0, 0, 0, 0],
-    serviced_index: 0,
-    unserviced_index: 0,
-    total_unserviced: 0,
-    thisActivity: 0,
-    lastActivity: 0,
-    used: [false, false, false, false, false]
-},
-router {
-    channels: [
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false}],
-    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
-    priority_list_temp: [0, 0, 0, 0, 0],
-    serviced_index: 0,
-    unserviced_index: 0,
-    total_unserviced: 0,
-    thisActivity: 0,
-    lastActivity: 0,
-    used: [false, false, false, false, false]
-},
-router {
-    channels: [
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false}],
-    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
-    priority_list_temp: [0, 0, 0, 0, 0],
-    serviced_index: 0,
-    unserviced_index: 0,
-    total_unserviced: 0,
-    thisActivity: 0,
-    lastActivity: 0,
-    used: [false, false, false, false, false]
-},
-router {
-    channels: [
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false}],
-    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
-    priority_list_temp: [0, 0, 0, 0, 0],
-    serviced_index: 0,
-    unserviced_index: 0,
-    total_unserviced: 0,
-    thisActivity: 0,
-    lastActivity: 0,
-    used: [false, false, false, false, false]
-},
-router {
-    channels: [
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false}],
-    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
-    priority_list_temp: [0, 0, 0, 0, 0],
-    serviced_index: 0,
-    unserviced_index: 0,
-    total_unserviced: 0,
-    thisActivity: 0,
-    lastActivity: 0,
-    used: [false, false, false, false, false]
-},
-router {
-    channels: [
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false}],
-    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
-    priority_list_temp: [0, 0, 0, 0, 0],
-    serviced_index: 0,
-    unserviced_index: 0,
-    total_unserviced: 0,
-    thisActivity: 0,
-    lastActivity: 0,
-    used: [false, false, false, false, false]
-},
-router {
-    channels: [
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false}],
-    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
-    priority_list_temp: [0, 0, 0, 0, 0],
-    serviced_index: 0,
-    unserviced_index: 0,
-    total_unserviced: 0,
-    thisActivity: 0,
-    lastActivity: 0,
-    used: [false, false, false, false, false]
-},
-router {
-    channels: [
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false}],
-    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
-    priority_list_temp: [0, 0, 0, 0, 0],
-    serviced_index: 0,
-    unserviced_index: 0,
-    total_unserviced: 0,
-    thisActivity: 0,
-    lastActivity: 0,
-    used: [false, false, false, false, false]
-},
-router {
-    channels: [
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
-        flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false}],
-    priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
-    priority_list_temp: [0, 0, 0, 0, 0],
-    serviced_index: 0,
-    unserviced_index: 0,
-    total_unserviced: 0,
-    thisActivity: 0,
-    lastActivity: 0,
-    used: [false, false, false, false, false]
-}];
+router[] noc = array(i, NOC_MAX_ID + 1,
+    router {
+        channels: [
+            flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+            flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+            flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+            flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+            flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false}],
+        priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
+        priority_list_temp: [0, 0, 0, 0, 0],
+        serviced_index: 0,
+        unserviced_index: 0,
+        total_unserviced: 0,
+        thisActivity: 0,
+        lastActivity: 0,
+        used: [false, false, false, false, false]
+    });
 
-int(0..5)[] currentActivities  = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-int(0..5)[] previousActivities = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+int(0..5)[] currentActivities  = array(i, NOC_MAX_ID + 1, 0);
+int(0..5)[] previousActivities = array(i, NOC_MAX_ID + 1, 0);
 
 // ----- Integer functions -----
 
