@@ -305,13 +305,21 @@ function int idToRow(int id) = (int)(id / NOC_MESH_HEIGHT);
 function int getColumnShift(int id, int dst) = idToColumn(dst) - idToColumn(id);
 
 // ----- Neighbor ID Calculation -----
+// Validates an ID is in the NoC
+function bool isValidID(int id) = 0 <= id && id <= NOC_MAX_ID;
+
 // Given a valid id and direction, calculate the id of the neighbor in that direction.
-// Ensures that if we have a valid ID we will never return an invalid ID
-function int getNeighborID(int id, int dir) =
-    if      dir == NORTH && (id - NOC_MESH_WIDTH) > 0             then id - NOC_MESH_WIDTH
-    else if dir == SOUTH && (id + NOC_MESH_WIDTH) <= NOC_MAX_ID   then id + NOC_MESH_WIDTH
+function int getNeighborID_internal(int id, int dir) =
+    if      dir == NORTH                                          then id - NOC_MESH_WIDTH
+    else if dir == SOUTH                                          then id + NOC_MESH_WIDTH
     else if dir == EAST  && (idToColumn(id) < NOC_MESH_WIDTH - 1) then id + 1
     else if dir == WEST  && (idToColumn(id) > 0)                  then id - 1
+    else NO_CONNECT;
+
+// Given an ID and a direction calculate the id of the neighbor in that direction. If an
+// invalid ID is returned, then return no connect
+function int getNeighborID(int id, int dir) = 
+    if isValidID(getNeighborID_internal(id, dir)) then getNeighborID_internal(id, dir)
     else NO_CONNECT;
 
 // ----- Processes -----
