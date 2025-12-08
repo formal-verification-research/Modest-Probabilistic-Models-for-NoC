@@ -104,7 +104,7 @@ def main():
     output_dir.mkdir()
 
     # Run the 2x2 model
-    with open(script_dir / "modular_new_probabilities.modest", "r") as f:
+    with open(script_dir / "modular_neighbors.modest", "r") as f:
         model = f.read()
 
     # Resistive 2x2 Simulations
