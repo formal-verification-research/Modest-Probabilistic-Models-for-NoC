@@ -48,11 +48,15 @@ def __run(model: str, command: list[str], *, opts: list[str] = []) -> Tuple[str,
         output = stdout + stderr
 
         # Now capture the properties
-        with open(temp_properties_path, "r") as property_file:
-            for line in property_file.readlines():
-                prop = list(filter(None, re.split(r"[:\s]", line)))
-                if len(prop) != 2: continue
-                properties[str(prop[0]).replace('"','')] = float(prop[1])
+        try:
+            with open(temp_properties_path, "r") as property_file:
+                for line in property_file.readlines():
+                    prop = list(filter(None, re.split(r"[:\s]", line)))
+                    if len(prop) != 2: continue
+                    properties[str(prop[0]).replace('"','')] = float(prop[1])
+        except:
+            print("Failed to get output properties, skipping property output...")
+
 
     # Return the combined stdout and stderr    
     return (output, properties)
