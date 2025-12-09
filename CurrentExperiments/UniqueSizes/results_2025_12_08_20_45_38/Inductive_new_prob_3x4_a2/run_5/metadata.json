@@ -1,0 +1,37 @@
+{
+  "noc_parameters": {
+    "size": [
+      3,
+      4
+    ],
+    "buffer_size": 4,
+    "activity_thresh": 2,
+    "injection_rate_numerator": 3,
+    "injection_rate_denominator": 10,
+    "resistive_noise_threshold": null,
+    "inductive_noise_threshold": null
+  },
+  "modest_command": "modest <model_file> --unsafe --max-run-length 0 -D --rng MersenneTwister -E ACTIVITY_THRESH=2,NOC_MESH_WIDTH=3,NOC_MESH_HEIGHT=4",
+  "verification_time_sec": 7.606926918029785,
+  "properties": {
+    "r0_I_500": 0.3021026592455164,
+    "r1_I_500": 0.6856318284889713,
+    "r2_I_500": 0.2949907235621521,
+    "r3_I_500": 0.43609565038136466,
+    "r4_I_500": 0.8046794475365904,
+    "r5_I_500": 0.4491857349000206,
+    "r6_I_500": 0.4411461554318697,
+    "r7_I_500": 0.8103483817769532,
+    "r8_I_500": 0.4399092970521542,
+    "r9_I_500": 0.2938569367140796,
+    "r10_I_500": 0.6848072562358276,
+    "r11_I_500": 0.2891156462585034
+  },
+  "verification_type": "modes",
+  "clock_cycle_bounds": [
+    500,
+    500
+  ],
+  "noc_model_file_path": "noc_model.modest",
+  "raw_modest_output_path": "modest_output.txt"
+}
