@@ -463,16 +463,3 @@ process Clock() {
     nextClockCycle {= clk = (clk + 1) % INJECTION_RATE_DENOMINATOR, clk_indicator = 1 =};
     Clock()
 }
-
-par {
-    :: Clock()
-    :: Router(0)
-    :: Router(1)
-    :: Router(2)
-    :: Router(3)
-    :: Router(4)
-    :: Router(5)
-    :: Router(6)
-    :: Router(7)
-    :: Router(8)
-}

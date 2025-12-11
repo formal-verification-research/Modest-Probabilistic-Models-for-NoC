@@ -21,7 +21,6 @@ const int INJECTION_RATE_DENOMINATOR = 10;
 // This represents a cyclic clock counter that wraps from 0 to INJECTION_RATE_DENOMINATOR - 1
 // and it's used to determine the flit generation pattern. For unique patterns you'll need
 // to adjust this to meet your use case.
-int(0..INJECTION_RATE_DENOMINATOR) clk = 0;
 transient int(0..1) clk_indicator;
 
 // #CUSTOMIZE the number of buffers a router must service before noise will be incremented.
@@ -471,19 +470,6 @@ process Router(int id) {
 // Model the cyclic clock
 action nextClockCycle;
 process Clock() {
-    nextClockCycle {= clk = (clk + 1) % INJECTION_RATE_DENOMINATOR, clk_indicator = 1 =};
+    nextClockCycle {= clk_indicator = 1 =};
     Clock()
-}
-
-par {
-    :: Clock()
-    :: Router(0)
-    :: Router(1)
-    :: Router(2)
-    :: Router(3)
-    :: Router(4)
-    :: Router(5)
-    :: Router(6)
-    :: Router(7)
-    :: Router(8)
 }

@@ -10,13 +10,27 @@ from time import time
 
 NoiseType = Literal["Resistive", "Inductive"]
 
-def generate_model(original_model: str, clk: range, type: NoiseType):
-    for router in range(0,9):
+def generate_model(
+        original_model: str,
+        clk: range,
+        type: NoiseType,
+        width: int,
+        height: int) -> str:
+    num_routers = width*height
+
+    # Add router instances
+    original_model += "\npar {\n:: Clock()"
+    for i in range(0,num_routers):
+        original_model += f"\n:: Router({i})"
+    original_model += "\n}\n"
+    
+    # Add properties
+    for router in range(0,num_routers):
         for i in clk:
             if type == "Resistive":
-                original_model += f"\nproperty r{router}_R_{i} = Pmax(<>[S(clk)<={i}] (noc[{router}].thisActivity >= ACTIVITY_THRESH));"
+                original_model += f"\nproperty r{router}_R_{i} = Pmax(<>[S(clk)<={i}] (currentActivities[{router}] >= ACTIVITY_THRESH));"
             elif type == "Inductive":
-                original_model += f"\nproperty r{router}_I_{i} = Pmax(<>[S(clk)<={i}] (abs(noc[{router}].thisActivity - noc[{router}].lastActivity) >= ACTIVITY_THRESH));"
+                original_model += f"\nproperty r{router}_I_{i} = Pmax(<>[S(clk)<={i}] (abs(currentActivities[{router}] - previousActivities[{router}]) >= ACTIVITY_THRESH));"
     return original_model
 
 def run_psn_analysis(
@@ -71,7 +85,9 @@ def run_psn_analysis(
 
         model = generate_model(original_model,
                                i,
-                               sim_type)
+                               sim_type,
+                               width,
+                               height)
         
         start = time()
         results, properties = modest.simulate(model, opts=opts)
