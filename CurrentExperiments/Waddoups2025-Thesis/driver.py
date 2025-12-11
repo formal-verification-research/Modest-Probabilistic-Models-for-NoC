@@ -23,14 +23,14 @@ def generate_model(
     for i in range(0,num_routers):
         original_model += f"\n:: Router({i})"
     original_model += "\n}\n"
-    
+
     # Add properties
-    for router in range(0,num_routers):
+    for router in range(0,9):
         for i in clk:
             if type == "Resistive":
-                original_model += f"\nproperty r{router}_R_{i} = Pmax(<>[S(clk)<={i}] (currentActivities[{router}] >= ACTIVITY_THRESH));"
+                original_model += f"\nproperty r{router}_R_{i} = Pmax(<>[S(clk)<={i}] (noc[{router}].thisActivity >= ACTIVITY_THRESH));"
             elif type == "Inductive":
-                original_model += f"\nproperty r{router}_I_{i} = Pmax(<>[S(clk)<={i}] (abs(currentActivities[{router}] - previousActivities[{router}]) >= ACTIVITY_THRESH));"
+                original_model += f"\nproperty r{router}_I_{i} = Pmax(<>[S(clk)<={i}] (abs(noc[{router}].thisActivity - noc[{router}].lastActivity) >= ACTIVITY_THRESH));"
     return original_model
 
 def run_psn_analysis(
