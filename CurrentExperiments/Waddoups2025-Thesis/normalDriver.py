@@ -117,7 +117,7 @@ def run_psn_analysis(
 
     return sims
 
-def bursty():
+def normal():
     # Locate the script directory
     script_dir = Path(__file__).resolve().parent
 
@@ -170,7 +170,7 @@ def main():
         print("Modest executable not found. Exiting...")
         return
     
-    bursty()
+    normal()
 
 if __name__ == "__main__":
     main()
