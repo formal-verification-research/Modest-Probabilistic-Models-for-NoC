@@ -63,7 +63,8 @@ def run_psn_analysis(
 
     # constants for this analysis
     opts = ["--max-run-length", "0", 
-            "-D", 
+            "-D",
+            "--unsafe",
             "--rng", "MersenneTwister", 
             "-E", experiments]
 
