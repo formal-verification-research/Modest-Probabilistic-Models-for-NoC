@@ -142,32 +142,31 @@ def bursty():
 
     for burst, sleep in [(10, 200), (20, 200), (40, 200)]:
         experiments = f"BURST={burst},SLEEP={sleep},INIT_SLEEP_OFFSET={init_sleep_offset},INIT_SLEEP_SCALE={init_sleep_scale}"
+        thresh = 3
 
         # Resistive 2x2 Simulations
-        for thresh, clk in [(3,1000)]:
-            r = run_psn_analysis(max_clk=clk,
-                                stride=10,
-                                batch=101,
-                                activity_threshold=thresh,
-                                original_model=model,
-                                sim_type="Resistive",
-                                width=2,
-                                height=2,
-                                experiments=experiments)
-            sim_schema.save_as_directory(r, output_dir)
+        r = run_psn_analysis(max_clk=1000,
+                            stride=10,
+                            batch=101,
+                            activity_threshold=thresh,
+                            original_model=model,
+                            sim_type="Resistive",
+                            width=2,
+                            height=2,
+                            experiments=experiments)
+        sim_schema.save_as_directory(r, output_dir)
 
         # Inductive 2x2 Simulations
-        for thresh, clk in [(3,1000)]:
-            i = run_psn_analysis(max_clk=clk,
-                                stride=10,
-                                batch=101,
-                                activity_threshold=thresh,
-                                original_model=model,
-                                sim_type="Inductive",
-                                width=2,
-                                height=2,
-                                experiments=experiments)
-            sim_schema.save_as_directory(i, output_dir)
+        i = run_psn_analysis(max_clk=2000,
+                            stride=10,
+                            batch=201,
+                            activity_threshold=thresh,
+                            original_model=model,
+                            sim_type="Inductive",
+                            width=2,
+                            height=2,
+                            experiments=experiments)
+        sim_schema.save_as_directory(i, output_dir)
 
 def main():
     # Check if modest is available
