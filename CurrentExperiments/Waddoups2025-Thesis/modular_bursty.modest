@@ -223,9 +223,9 @@ process GenerateFlits(int id) {
                 0: destination = DiscreteUniform(0, NOC_MAX_ID - 1),
                 1: noc[id].buffers[LOCAL].buffer = 
                     enqueue(destination >= id
-                    ? destination + 1
-                    : destination, noc[id].buffers[LOCAL].buffer),
-            2: burst_times[id] = burst_times[id] - 1
+                        ? destination + 1
+                        : destination, noc[id].buffers[LOCAL].buffer),
+                2: burst_times[id] = burst_times[id] - 1
             =}
         } else {
             generateFlits {=
