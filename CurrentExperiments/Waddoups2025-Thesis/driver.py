@@ -55,8 +55,7 @@ def run_psn_analysis(
     assert 3 <= width + height # minimum size is 2x1 or 1x2
 
     # constants for this analysis
-    opts = ["--unsafe",
-            "--max-run-length", "0", 
+    opts = ["--max-run-length", "0", 
             "-D", 
             "--rng", "MersenneTwister", 
             "-E", f"ACTIVITY_THRESH={activity_threshold},NOC_MESH_WIDTH={width},NOC_MESH_HEIGHT={height}"]
