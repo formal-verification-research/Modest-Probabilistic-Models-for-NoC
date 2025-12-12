@@ -24,7 +24,7 @@ def __run(model: str, command: list[str], *, opts: list[str] = []) -> Tuple[str,
         opts: cli opts to pass to modest
     
     Returns:
-        Output of running command + opts result as string
+        Output of running command + properties as dictionary
     """
     output: str = ""
     properties: Dict[str, float] = {}
@@ -69,7 +69,7 @@ def check(model: str, opts: list[str] = []) -> Tuple[str, Dict[str, float]]:
         opts: cli opts to pass to modest
     
     Returns:
-        Output of running command + opts result as string
+        Output of running command + properties as dictionary
     """
     return __run(model, command=[MODEST_EXECUTABLE, "mcsta"], opts=opts)
 
@@ -81,7 +81,7 @@ def simulate(model: str, opts: list[str] = []) -> Tuple[str, Dict[str, float]]:
         opts: cli opts to pass to modest
     
     Returns:
-        Output of running command + opts result as string
+        Output of running command + properties as dictionary
     """
     return __run(model, command=[MODEST_EXECUTABLE, "modes"], opts=opts)
 
