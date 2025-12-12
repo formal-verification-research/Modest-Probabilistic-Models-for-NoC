@@ -25,7 +25,7 @@ def generate_model(
     original_model += "\n}\n"
 
     # Add properties
-    for router in range(0,9):
+    for router in range(0,num_routers):
         for i in clk:
             if type == "Resistive":
                 original_model += f"\nproperty r{router}_R_{i} = Pmax(<>[S(clk_indicator)<={i}] (noc[{router}].thisActivity >= ACTIVITY_THRESH));"
