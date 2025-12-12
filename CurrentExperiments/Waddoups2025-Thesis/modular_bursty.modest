@@ -201,9 +201,9 @@ function int getNeighborID(int id, int dir) =
 
 // #CUSTOMIZE
 const int BURST_MIN = 10;
-const int BURST_MAX = 100;
+const int BURST_MAX = 12;
 const int SLEEP_MIN = 200;
-const int SLEEP_MAX = 400;
+const int SLEEP_MAX = 202;
 int[] burst_times = array(i, NOC_MAX_ID + 1, 0);
 int[] sleep_times = array(i, NOC_MAX_ID + 1, 0);
 action generateFlits;
