@@ -53,6 +53,9 @@ if __name__ == "__main__":
         
         project = sim_schema.load_from_directory(dir)
 
+        width = project.sub_runs[0].noc_parameters["size"][0]
+        height = project.sub_runs[0].noc_parameters["size"][1]
+
         properties: Dict[str, float] = {}
         for run in project.sub_runs:
             properties = properties | run.properties
@@ -74,7 +77,7 @@ if __name__ == "__main__":
         highest_prob_rounded: float = math.ceil(highest_prob * 10.0) / 10.0
 
         for r in sorted(clk_data):
-            plt.subplot(3,3,r+1)
+            plt.subplot(height,width,r+1)
             x, y = zip(*sorted(clk_data[r].items()))
             plt.plot(x, y)
             plt.title(f"Router {r}")
