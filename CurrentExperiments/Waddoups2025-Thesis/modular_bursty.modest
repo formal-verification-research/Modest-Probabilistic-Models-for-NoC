@@ -200,12 +200,12 @@ function int getNeighborID(int id, int dir) =
 // routers within those processes.
 
 // #CUSTOMIZE
-const int BURST_MIN = 10;
-const int BURST_MAX = 12;
-const int SLEEP_MIN = 200;
-const int SLEEP_MAX = 202;
-int[] burst_times = array(i, NOC_MAX_ID + 1, 0);
-int[] sleep_times = array(i, NOC_MAX_ID + 1, 0);
+const int BURST;
+const int SLEEP;
+const int INIT_SLEEP_OFFSET;
+const real INIT_SLEEP_SCALE;
+int[] burst_times = array(i, NOC_MAX_ID + 1, BURST);
+int[] sleep_times = array(i, NOC_MAX_ID + 1, INIT_SLEEP_OFFSET + (int)(i * INIT_SLEEP_SCALE));
 action generateFlits;
 process GenerateFlits(int id) {
     int(0..NOC_MAX_ID) destination;
@@ -229,8 +229,8 @@ process GenerateFlits(int id) {
             =}
         } else {
             generateFlits {=
-            burst_times[id] = DiscreteUniform(BURST_MIN, BURST_MAX),
-            sleep_times[id] = DiscreteUniform(SLEEP_MIN, SLEEP_MAX)
+            burst_times[id] = BURST,
+            sleep_times[id] = SLEEP
             =}
         }
     }
@@ -473,3 +473,5 @@ process Clock() {
     nextClockCycle {= clk_indicator = 1 =};
     Clock()
 }
+
+Clock()

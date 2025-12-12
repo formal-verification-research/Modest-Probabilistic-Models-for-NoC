@@ -41,7 +41,8 @@ def run_psn_analysis(
         original_model: str,
         sim_type: NoiseType,
         width: int,
-        height: int
+        height: int,
+        experiments: str = ""
     ) -> sim_schema.SimulationSummary:
     """Runs psn analysis on the modular model for `max_clk` cycles with a stride
     of `stride` cycles in batches of `batch`"""
@@ -54,11 +55,17 @@ def run_psn_analysis(
     assert 1 <= height
     assert 3 <= width + height # minimum size is 2x1 or 1x2
 
+    # Set experiments string
+    if experiments != "":
+        experiments = f"ACTIVITY_THRESH={activity_threshold},NOC_MESH_WIDTH={width},NOC_MESH_HEIGHT={height},{experiments}"
+    else:
+        experiments = f"ACTIVITY_THRESH={activity_threshold},NOC_MESH_WIDTH={width},NOC_MESH_HEIGHT={height}"
+
     # constants for this analysis
     opts = ["--max-run-length", "0", 
             "-D", 
             "--rng", "MersenneTwister", 
-            "-E", f"ACTIVITY_THRESH={activity_threshold},NOC_MESH_WIDTH={width},NOC_MESH_HEIGHT={height}"]
+            "-E", experiments]
 
     # Create the title
     title = f"{sim_type}_{width}x{height}_a{activity_threshold}"
@@ -109,12 +116,7 @@ def run_psn_analysis(
 
     return sims
 
-def main():
-    # Check if modest is available
-    if not modest.is_modest_on_path():
-        print("Modest executable not found. Exiting...")
-        exit(1)
-    
+def bursty():
     # Locate the script directory
     script_dir = Path(__file__).resolve().parent
 
@@ -123,41 +125,60 @@ def main():
         with open(script_dir / "modular_bursty.modest", "r") as f:
             model = f.read()
     except:
-        print("Failed to open model file")
-        exit(1)
+        print("Failed to open model file 'modular_bursty.modest'")
+        return
+    
+    # Display output
+    print("Running bursty model...")
     
     # Setup the output directory
     timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
     output_dir = script_dir / sanitize_filename(f"results_bursty_{timestamp}")
     output_dir.mkdir()
 
-    # Resistive 2x2 Simulations
-    for thresh, clk in [(3,500)]:
-        r = run_psn_analysis(max_clk=clk,
-                            stride=2,
-                            batch=100,
-                            activity_threshold=thresh,
-                            original_model=model,
-                            sim_type="Resistive",
-                            width=2,
-                            height=2)
-        sim_schema.save_as_directory(r, output_dir)
+    # Set simulation constants
+    init_sleep_offset: int = 10
+    init_sleep_scale: float = 2.5
 
-    # Inductive 2x2 Simulations
-    for thresh, clk in [(3,500)]:
-        i = run_psn_analysis(max_clk=clk,
-                            stride=2,
-                            batch=100,
-                            activity_threshold=thresh,
-                            original_model=model,
-                            sim_type="Inductive",
-                            width=2,
-                            height=2)
-        sim_schema.save_as_directory(i, output_dir)
+    for burst, sleep in [(10, 200), (20, 200), (40, 200)]:
+        experiments = f"BURST={burst},SLEEP={sleep},INIT_SLEEP_OFFSET={init_sleep_offset},INIT_SLEEP_SCALE={init_sleep_scale}"
+
+        # Resistive 2x2 Simulations
+        for thresh, clk in [(3,1000)]:
+            r = run_psn_analysis(max_clk=clk,
+                                stride=10,
+                                batch=101,
+                                activity_threshold=thresh,
+                                original_model=model,
+                                sim_type="Resistive",
+                                width=2,
+                                height=2,
+                                experiments=experiments)
+            sim_schema.save_as_directory(r, output_dir)
+
+        # Inductive 2x2 Simulations
+        for thresh, clk in [(3,1000)]:
+            i = run_psn_analysis(max_clk=clk,
+                                stride=10,
+                                batch=101,
+                                activity_threshold=thresh,
+                                original_model=model,
+                                sim_type="Inductive",
+                                width=2,
+                                height=2,
+                                experiments=experiments)
+            sim_schema.save_as_directory(i, output_dir)
+
+def main():
+    # Check if modest is available
+    if not modest.is_modest_on_path():
+        print("Modest executable not found. Exiting...")
+        return
+    
+    bursty()
 
 if __name__ == "__main__":
     main()
 else:
     print("Driver should only be run as a main CLI script.")
     exit(1)
-
