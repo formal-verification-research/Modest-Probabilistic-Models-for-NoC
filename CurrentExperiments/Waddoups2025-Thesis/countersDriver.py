@@ -25,12 +25,11 @@ def generate_model(
     original_model += "\n}\n"
 
     # Add properties
-    for router in range(0,num_routers):
-        for i in clk:
-            if type == "Resistive":
-                original_model += f"\nproperty R_{i} = Pmax(<>[S(clk_indicator)<={i}] c_res >= RESISTIVE_THRESH);"
-            elif type == "Inductive":
-                original_model += f"\nproperty I_{i} = Pmax(<>[S(clk_indicator)<={i}] c_ind >= INDUCTIVE_THRESH);"
+    for i in clk:
+        if type == "Resistive":
+            original_model += f"\nproperty R_{i} = Pmax(<>[S(clk_indicator)<={i}] c_res >= RESISTIVE_THRESH);"
+        elif type == "Inductive":
+            original_model += f"\nproperty I_{i} = Pmax(<>[S(clk_indicator)<={i}] c_ind >= INDUCTIVE_THRESH);"
     return original_model
 
 def run_psn_analysis(
