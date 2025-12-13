@@ -78,24 +78,26 @@ if __name__ == "__main__":
                 clk_data[r] = {}
             clk_data[r][c] = v
 
+        # We don't write the data because we won't use it.
         # We need to write the data, sorted by `r` first then sorted by
         # clock cycle to unique files that can be used by TikZ
-        for r in sorted(clk_data):
-            with open(output_dir / f"router_{r}.txt", "w") as f:
-                f.write(f"# Data for router {r}\n")
-                for clk, prob in sorted(clk_data[r].items()):
-                    f.write(f"{clk} {prob}\n")
+        # for r in sorted(clk_data):
+        #     with open(output_dir / f"router_{r}.txt", "w") as f:
+        #         f.write(f"# Data for router {r}\n")
+        #         for clk, prob in sorted(clk_data[r].items()):
+        #             f.write(f"{clk} {prob}\n")
         
         ## Next we'll plot the noise vs. time graphs for each result
-        # To start we'll calculate the bounds for the plot. We know that 
-        # since each property is a probability it's bounded [0,1], but it
-        # may actually be bounded by a smaller value. We'll calculate that
-        # value and round up to the nearest 0.1 to get a tight, but clean
-        # plot
-        highest_prob: float = max(val for inner_dict in clk_data.values() for val in inner_dict.values())
-        highest_prob_rounded: float = math.ceil(highest_prob * 20.0) / 20.0
 
         for cycles in [10, 50, 100, 250, 500, 1000]:
+            # To start we'll calculate the bounds for the plot. We know that 
+            # since each property is a probability it's bounded [0,1], but it
+            # may actually be bounded by a smaller value. We'll calculate that
+            # value and round up to the nearest 0.1 to get a tight, but clean
+            # plot
+            highest_prob: float = max(val for inner_dict in clk_data.values() for val in list(inner_dict.values())[:(cycles+1)])
+            highest_prob_rounded: float = math.ceil(highest_prob * 20.0) / 20.0
+
             ## Plot 1 - Noise vs. Cycles per Router (Small)
             # Now in a subplot we'll plot the noise vs. cycles plot for
             # each router
@@ -153,7 +155,7 @@ if __name__ == "__main__":
             hmap_min = min(min(r) for r in max_probs)
 
             # Round
-            hmap_max = math.ceil(hmap_max * 10) / 10
+            hmap_max = min(math.ceil(hmap_max * 10) / 10, 1.0)
             hmap_min = math.floor(hmap_min * 10) / 10
 
             plt.figure(figsize=(3, 3))
