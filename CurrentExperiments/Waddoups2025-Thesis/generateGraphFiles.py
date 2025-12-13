@@ -88,20 +88,66 @@ if __name__ == "__main__":
         # value and round up to the nearest 0.1 to get a tight, but clean
         # plot
         highest_prob: float = max(val for inner_dict in clk_data.values() for val in inner_dict.values())
-        highest_prob_rounded: float = math.ceil(highest_prob * 10.0) / 10.0
+        highest_prob_rounded: float = math.ceil(highest_prob * 20.0) / 20.0
 
-        ## Plot 1 - Noise vs. Cycles per Router
+        ## Plot 1 - Noise vs. Cycles per Router (Small)
         # Now in a subplot we'll plot the noise vs. cycles plot for
         # each router
+        plt.figure(figsize=(3, 3))
+        plt.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01, wspace=0.025, hspace=0.025)
         for r in sorted(clk_data):
             plt.subplot(height,width,r+1)
             x, y = zip(*sorted(clk_data[r].items()))
-            plt.plot(x, y)
-            plt.title(f"Router {r}")
+            plt.plot(x, y, color='black')
+            plt.title(f"$R_{{{r}}}$", fontsize=11)
+            plt.xticks(fontsize=8)
+            plt.yticks(fontsize=8)
+            plt.grid(True, color='lightgray', linestyle='--', linewidth=0.5, alpha=0.7)
+            ax = plt.gca()
+            for spine in ax.spines.values():
+                spine.set_color('darkgray')
             plt.ylim(0.0, highest_prob_rounded)
         
         plt.tight_layout()
-        plt.savefig(output_dir / "plot.pdf")
+        plt.savefig(output_dir / "plot_small.pdf")
+        plt.close('all')
+
+        ## Plot 2 - Noise vs. Cycles per Router (Large)
+        plt.figure(figsize=(6, 6))
+        plt.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01, wspace=0.025, hspace=0.025)
+        for r in sorted(clk_data):
+            plt.subplot(height,width,r+1)
+            x, y = zip(*sorted(clk_data[r].items()))
+            plt.plot(x, y, color='black')
+            plt.title(f"$R_{{{r}}}$", fontsize=11)
+            plt.xticks(fontsize=8)
+            plt.yticks(fontsize=8)
+            plt.grid(True, color='lightgray', linestyle='--', linewidth=0.5, alpha=0.7)
+            ax = plt.gca()
+            for spine in ax.spines.values():
+                spine.set_color('darkgray')
+            plt.ylim(0.0, highest_prob_rounded)
+        
+        plt.tight_layout()
+        plt.savefig(output_dir / "plot_large.pdf")
+        plt.close('all')
+
+        ## Plot 3 - Heatmap
+        # Create a heatmap where each cell represents the max probability for each router
+        max_probs = [[0 for _ in range(width)] for _ in range(height)]
+        for r in sorted(clk_data):
+            row = r // width
+            col = r % width
+            max_probs[row][col] = max(clk_data[r].values())
+        
+        plt.figure(figsize=(3, 3))
+        plt.imshow(max_probs, cmap='viridis', vmin=0, vmax=highest_prob, origin='upper')
+        plt.colorbar(shrink=0.8)
+        plt.xticks(range(width), fontsize=8)
+        plt.yticks(range(height), fontsize=8)
+        plt.title("Max Probability Heatmap", fontsize=11)
+        plt.tight_layout()
+        plt.savefig(output_dir / "heatmap.pdf")
         plt.close('all')
         
         # Clean up before next loop
