@@ -51,15 +51,21 @@ if __name__ == "__main__":
         output_dir = dir / sanitize_filename(f"plots_{timestamp}_of_{dir.name}")
         output_dir.mkdir()
         
+        # Load the project description
         project = sim_schema.load_from_directory(dir)
 
+        # Get the width and height of the current router
         width = project.sub_runs[0].noc_parameters["size"][0]
         height = project.sub_runs[0].noc_parameters["size"][1]
 
+        # Merge all the properties for this run together
         properties: Dict[str, float] = {}
         for run in project.sub_runs:
             properties = properties | run.properties
 
+        # Properties as stored as a {str |-> float}, but we need to extract
+        # the router id `r` and the clock cycle `c` from them in order to
+        # plot noise vs time per router
         clk_data: Dict[int, Dict[int, float]] = {}
         for k, v in properties.items():
             r, c = extract_indices(k)
@@ -67,15 +73,26 @@ if __name__ == "__main__":
                 clk_data[r] = {}
             clk_data[r][c] = v
 
+        # We need to write the data, sorted by `r` first then sorted by
+        # clock cycle to unique files that can be used by TikZ
         for r in sorted(clk_data):
             with open(output_dir / f"router_{r}.txt", "w") as f:
                 f.write(f"# Data for router {r}\n")
                 for clk, prob in sorted(clk_data[r].items()):
                     f.write(f"{clk} {prob}\n")
         
+        ## Next we'll plot the noise vs. time graphs for each result
+        # To start we'll calculate the bounds for the plot. We know that 
+        # since each property is a probability it's bounded [0,1], but it
+        # may actually be bounded by a smaller value. We'll calculate that
+        # value and round up to the nearest 0.1 to get a tight, but clean
+        # plot
         highest_prob: float = max(val for inner_dict in clk_data.values() for val in inner_dict.values())
         highest_prob_rounded: float = math.ceil(highest_prob * 10.0) / 10.0
 
+        ## Plot 1 - Noise vs. Cycles per Router
+        # Now in a subplot we'll plot the noise vs. cycles plot for
+        # each router
         for r in sorted(clk_data):
             plt.subplot(height,width,r+1)
             x, y = zip(*sorted(clk_data[r].items()))
@@ -87,4 +104,5 @@ if __name__ == "__main__":
         plt.savefig(output_dir / "plot.pdf")
         plt.close('all')
         
+        # Clean up before next loop
         del project, properties, clk_data
