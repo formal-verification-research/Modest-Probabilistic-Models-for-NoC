@@ -107,9 +107,9 @@ if __name__ == "__main__":
                 for r in sorted(clk_data):
                     plt.subplot(height,width,r+1)
                     x, y = zip(*sorted(clk_data[r].items()))
-                    stop_index = next((i for i, val in enumerate(list(y)) if val >= cycles), None)
+                    stop_index = next((i for i, val in enumerate(list(x)) if val >= cycles), None)
                     if stop_index is None:
-                        stop_index = max(y)
+                        stop_index = int(max(list(x)))
                     plt.plot(x[:(stop_index+1)], y[:(stop_index+1)], color='black')
                     plt.title(f"R{r}", fontsize=8)
                     plt.xticks(fontsize=6)
@@ -132,9 +132,9 @@ if __name__ == "__main__":
                 for r in sorted(clk_data):
                     plt.subplot(height,width,r+1)
                     x, y = zip(*sorted(clk_data[r].items()))
-                    stop_index = next((i for i, val in enumerate(list(y)) if val >= cycles), None)
+                    stop_index = next((i for i, val in enumerate(list(x)) if val >= cycles), None)
                     if stop_index is None:
-                        stop_index = max(y)
+                        stop_index = int(max(list(x)))
                     plt.plot(x[:(stop_index+1)], y[:(stop_index+1)], color='black')
                     plt.title(f"R{r}", fontsize=8)
                     plt.xticks(fontsize=6)
@@ -161,11 +161,15 @@ if __name__ == "__main__":
             hmap_min = min(min(r) for r in max_probs)
 
             # Round
-            hmap_max = min(math.ceil(hmap_max * 10) / 10, 1.0)
+            hmap_max = math.ceil(hmap_max * 10) / 10
             hmap_min = math.floor(hmap_min * 10) / 10
 
+            # Bound
+            hmap_max = 1.0 if hmap_max > 1.0 else hmap_max
+            hmap_min = 0.0 if hmap_min < 0.0 else hmap_min
+
             plt.figure(figsize=(3, 3))
-            plt.imshow(max_probs, cmap='OrRd', vmin=hmap_min, vmax=hmap_max, origin='upper')
+            plt.imshow(max_probs, cmap='YlGnBu', vmin=hmap_min, vmax=hmap_max, origin='upper')
             plt.colorbar(shrink=0.8)
             plt.xticks([])
             plt.yticks([])
