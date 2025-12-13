@@ -107,7 +107,10 @@ if __name__ == "__main__":
                 for r in sorted(clk_data):
                     plt.subplot(height,width,r+1)
                     x, y = zip(*sorted(clk_data[r].items()))
-                    plt.plot(x[:(cycles+1)], y[:(cycles+1)], color='black')
+                    stop_index = next((i for i, val in enumerate(list(y)) if val >= cycles), None)
+                    if stop_index is None:
+                        stop_index = max(y)
+                    plt.plot(x[:(stop_index+1)], y[:(stop_index+1)], color='black')
                     plt.title(f"R{r}", fontsize=8)
                     plt.xticks(fontsize=6)
                     plt.yticks(fontsize=6)
@@ -129,7 +132,10 @@ if __name__ == "__main__":
                 for r in sorted(clk_data):
                     plt.subplot(height,width,r+1)
                     x, y = zip(*sorted(clk_data[r].items()))
-                    plt.plot(x[:(cycles+1)], y[:(cycles+1)], color='black')
+                    stop_index = next((i for i, val in enumerate(list(y)) if val >= cycles), None)
+                    if stop_index is None:
+                        stop_index = max(y)
+                    plt.plot(x[:(stop_index+1)], y[:(stop_index+1)], color='black')
                     plt.title(f"R{r}", fontsize=8)
                     plt.xticks(fontsize=6)
                     plt.yticks(fontsize=6)
