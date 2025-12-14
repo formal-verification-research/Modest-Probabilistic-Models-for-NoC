@@ -89,7 +89,7 @@ if __name__ == "__main__":
         
         ## Next we'll plot the noise vs. time graphs for each result
 
-        for cycles in [10, 50, 100, 250, 500, 1000]:
+        for cycles in [1, 5, 10, 50, 100, 250, 500, 1000]:
             # To start we'll calculate the bounds for the plot. We know that 
             # since each property is a probability it's bounded [0,1], but it
             # may actually be bounded by a smaller value. We'll calculate that
@@ -168,14 +168,41 @@ if __name__ == "__main__":
             hmap_max = 1.0 if hmap_max > 1.0 else hmap_max
             hmap_min = 0.0 if hmap_min < 0.0 else hmap_min
 
-            plt.figure(figsize=(3, 3))
+            plt.figure(figsize=(6,6))
             plt.imshow(max_probs, cmap='YlGnBu', vmin=hmap_min, vmax=hmap_max, origin='upper')
             plt.colorbar(shrink=0.8)
             plt.xticks([])
             plt.yticks([])
-            plt.title(f"Probability Distribution at {cycles} Cycles", fontsize=11)
             plt.tight_layout()
-            plt.savefig(output_dir / f"heatmap_{cycles}.pdf")
+            plt.savefig(output_dir / f"heatmap_{cycles}.pdf", bbox_inches='tight')
+            plt.close('all')
+
+            ## Plot 4 - Heatmap Small
+            # Create a heatmap where each cell represents the max probability for each router
+            max_probs = [[0 for _ in range(width)] for _ in range(height)]
+            for r in sorted(clk_data):
+                row = r // width
+                col = r % width
+                max_probs[row][col] = max(list(clk_data[r].values())[:(cycles+1)])
+            
+            hmap_max = max(max(r) for r in max_probs)
+            hmap_min = min(min(r) for r in max_probs)
+
+            # Round
+            hmap_max = math.ceil(hmap_max * 10) / 10
+            hmap_min = math.floor(hmap_min * 10) / 10
+
+            # Bound
+            hmap_max = 1.0 if hmap_max > 1.0 else hmap_max
+            hmap_min = 0.0 if hmap_min < 0.0 else hmap_min
+
+            plt.figure(figsize=(2,2))
+            plt.imshow(max_probs, cmap='YlGnBu', vmin=hmap_min, vmax=hmap_max, origin='upper')
+            plt.colorbar(shrink=0.8)
+            plt.xticks([])
+            plt.yticks([])
+            plt.tight_layout()
+            plt.savefig(output_dir / f"heatmap_{cycles}_small.pdf", bbox_inches='tight')
             plt.close('all')
         
         # Clean up before next loop
