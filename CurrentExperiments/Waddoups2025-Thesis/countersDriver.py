@@ -64,7 +64,7 @@ def run_psn_analysis(
             "-E", experiments]
 
     # Create the title
-    title = f"{sim_type}_{width}x{height}_a{activity_threshold}"
+    title = f"{sim_type}_{width}x{height}_a{activity_threshold}_r{res_thresh}_i{ind_thresh}"
 
     # Create simulation data
     sims = sim_schema.SimulationSummary(
@@ -137,40 +137,38 @@ def normal():
     output_dir = script_dir / sanitize_filename(f"results_counters_{timestamp}")
     output_dir.mkdir()
 
-    for width, height in zip([2, 3, 4, 8, 12], [2, 3, 4, 8, 12]):
+    for width, height, res, clk in zip([4, 8, 12], [4, 8, 12], [5, 10, 20], [250, 400, 600]):
         print(f"Running {width}x{height} model...")
 
         thresh = 3
 
         # Resistive Simulations
-        for res, clk in [(1,200),(5,250),(10,400),(20,600)]:
-            print(f"Running resistive noise for {clk} cycles with thresh == {res}...")
-            r = run_psn_analysis(max_clk=clk,
-                                stride=1,
-                                batch=100,
-                                activity_threshold=thresh,
-                                original_model=model,
-                                sim_type="Resistive",
-                                width=width,
-                                height=height,
-                                res_thresh=res,
-                                ind_thresh=0)
-            sim_schema.save_as_directory(r, output_dir)
+        print(f"Running resistive noise for {clk} cycles with thresh == {res}...")
+        r = run_psn_analysis(max_clk=clk,
+                            stride=1,
+                            batch=100,
+                            activity_threshold=thresh,
+                            original_model=model,
+                            sim_type="Resistive",
+                            width=width,
+                            height=height,
+                            res_thresh=res,
+                            ind_thresh=0)
+        sim_schema.save_as_directory(r, output_dir)
 
-        # Inductive 2x2 Simulations
-        for ind, clk in [(1,1500),(5,2500),(10,3500)]:
-            print(f"Running inductive noise for {clk} cycles with thresh == {ind}...")
-            i = run_psn_analysis(max_clk=clk,
-                                stride=10,
-                                batch=100,
-                                activity_threshold=thresh,
-                                original_model=model,
-                                sim_type="Inductive",
-                                width=width,
-                                height=height,
-                                res_thresh=0,
-                                ind_thresh=ind)
-            sim_schema.save_as_directory(i, output_dir)
+    for width, height, ind, clk in zip([4, 8, 12], [4, 8, 12], [5, 10, 20], [1500, 2500, 2500]):
+        print(f"Running inductive noise for {clk} cycles with thresh == {ind}...")
+        i = run_psn_analysis(max_clk=clk,
+                            stride=10,
+                            batch=100,
+                            activity_threshold=thresh,
+                            original_model=model,
+                            sim_type="Inductive",
+                            width=width,
+                            height=height,
+                            res_thresh=0,
+                            ind_thresh=ind)
+        sim_schema.save_as_directory(i, output_dir)
 
 def main():
     # Check if modest is available

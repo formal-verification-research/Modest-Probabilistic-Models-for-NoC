@@ -42,6 +42,7 @@ def run_psn_analysis(
         sim_type: NoiseType,
         width: int,
         height: int,
+        burst: int,
         experiments: str = ""
     ) -> sim_schema.SimulationSummary:
     """Runs psn analysis on the modular model for `max_clk` cycles with a stride
@@ -67,7 +68,7 @@ def run_psn_analysis(
             "-E", experiments]
 
     # Create the title
-    title = f"{sim_type}_{width}x{height}_a{activity_threshold}"
+    title = f"{sim_type}_{width}x{height}_a{activity_threshold}_b{burst}"
 
     # Create simulation data
     sims = sim_schema.SimulationSummary(
@@ -152,11 +153,12 @@ def bursty():
                             sim_type="Resistive",
                             width=2,
                             height=2,
+                            burst=burst,
                             experiments=experiments)
         sim_schema.save_as_directory(r, output_dir)
 
         # Inductive 2x2 Simulations
-        i = run_psn_analysis(max_clk=2000,
+        i = run_psn_analysis(max_clk=1000,
                             stride=10,
                             batch=201,
                             activity_threshold=thresh,
@@ -164,6 +166,7 @@ def bursty():
                             sim_type="Inductive",
                             width=2,
                             height=2,
+                            burst=burst,
                             experiments=experiments)
         sim_schema.save_as_directory(i, output_dir)
 

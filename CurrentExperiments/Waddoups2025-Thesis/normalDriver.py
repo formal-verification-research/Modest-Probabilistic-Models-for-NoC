@@ -135,7 +135,7 @@ def normal():
     output_dir = script_dir / sanitize_filename(f"results_normal_{timestamp}")
     output_dir.mkdir()
 
-    for width, height in zip([2, 3, 4, 8, 12, 16, 20], [2, 3, 4, 8, 12, 16, 20]):
+    for width, height in zip([3, 4, 8, 12], [3, 4, 8, 12]):
         print(f"Running {width}x{height} model...")
 
         thresh = 3
