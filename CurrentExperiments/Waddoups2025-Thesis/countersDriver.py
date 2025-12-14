@@ -59,10 +59,8 @@ def run_psn_analysis(
     experiments = f"ACTIVITY_THRESH={activity_threshold},NOC_MESH_WIDTH={width},NOC_MESH_HEIGHT={height},RESISTIVE_THRESH={res_thresh},INDUCTIVE_THRESH={ind_thresh}"
 
     # constants for this analysis
-    opts = ["--max-run-length", "0", 
-            "-D",
+    opts = ["--max-run-length", "0",
             "--unsafe",
-            "--rng", "MersenneTwister", 
             "-E", experiments]
 
     # Create the title
