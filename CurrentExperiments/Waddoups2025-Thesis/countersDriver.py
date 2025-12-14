@@ -41,7 +41,8 @@ def run_psn_analysis(
         sim_type: NoiseType,
         width: int,
         height: int,
-        experiments: str = ""
+        res_thresh: int,
+        ind_thresh: int
     ) -> sim_schema.SimulationSummary:
     """Runs psn analysis on the modular model for `max_clk` cycles with a stride
     of `stride` cycles in batches of `batch`"""
@@ -55,10 +56,7 @@ def run_psn_analysis(
     assert 3 <= width + height # minimum size is 2x1 or 1x2
 
     # Set experiments string
-    if experiments != "":
-        experiments = f"ACTIVITY_THRESH={activity_threshold},NOC_MESH_WIDTH={width},NOC_MESH_HEIGHT={height},{experiments}"
-    else:
-        experiments = f"ACTIVITY_THRESH={activity_threshold},NOC_MESH_WIDTH={width},NOC_MESH_HEIGHT={height}"
+    experiments = f"ACTIVITY_THRESH={activity_threshold},NOC_MESH_WIDTH={width},NOC_MESH_HEIGHT={height},RESISTIVE_THRESH={res_thresh},INDUCTIVE_THRESH={ind_thresh}"
 
     # constants for this analysis
     opts = ["--max-run-length", "0", 
@@ -83,7 +81,9 @@ def run_psn_analysis(
         buffer_size=4,
         activity_thresh=activity_threshold,
         injection_rate_numerator=3,
-        injection_rate_denominator=10
+        injection_rate_denominator=10,
+        resistive_noise_threshold=res_thresh,
+        inductive_noise_threshold=ind_thresh
     )
 
     # Run resistive simulations
@@ -147,7 +147,6 @@ def normal():
         # Resistive Simulations
         for res, clk in [(1,200),(5,250),(10,400),(20,600)]:
             print(f"Running resistive noise for {clk} cycles with thresh == {res}...")
-            experiments = f"RESISTIVE_THRESH={res},INDUCTIVE_THRESH=0"
             r = run_psn_analysis(max_clk=clk,
                                 stride=1,
                                 batch=100,
@@ -156,13 +155,13 @@ def normal():
                                 sim_type="Resistive",
                                 width=width,
                                 height=height,
-                                experiments=experiments)
+                                res_thresh=res,
+                                ind_thresh=0)
             sim_schema.save_as_directory(r, output_dir)
 
         # Inductive 2x2 Simulations
         for ind, clk in [(1,1500),(5,2500),(10,3500)]:
             print(f"Running inductive noise for {clk} cycles with thresh == {ind}...")
-            experiments = f"RESISTIVE_THRESH=0,INDUCTIVE_THRESH={ind}"
             i = run_psn_analysis(max_clk=clk,
                                 stride=10,
                                 batch=100,
@@ -171,7 +170,8 @@ def normal():
                                 sim_type="Inductive",
                                 width=width,
                                 height=height,
-                                experiments=experiments)
+                                res_thresh=0,
+                                ind_thresh=ind)
             sim_schema.save_as_directory(i, output_dir)
 
 def main():
