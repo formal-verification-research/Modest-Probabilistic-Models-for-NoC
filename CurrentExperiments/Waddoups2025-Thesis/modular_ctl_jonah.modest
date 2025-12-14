@@ -40,9 +40,6 @@ router[] noc = array(i, NOC_MAX_ID + 1,
 // #CUSTOMIZE this value changes the buffer length of all buffers.
 const int BUFFER_LENGTH = 4;
 
-// #CUSTOMIZE the number of buffers a router must service before noise will be incramented.
-const int ACTIVITY_THRESH = 3;
-
 // #CUSTOMIZE these values change the frequency with witch flits are injected.
 const int INJECTION_RATE_NUMERATOR = 3;
 const int INJECTION_RATE_DENOMINATOR = 10;
@@ -50,10 +47,6 @@ const int INJECTION_RATE_DENOMINATOR = 10;
 // #CUSTOMIZE this is the upper bound of cycles run before quiting.
 transient int(0..1) clk = 0;
 int(0..INJECTION_RATE_DENOMINATOR-1) clk_counter = 0;
-
-// #CUSTOMIZE this is the upper threshoold for noise detected in the system.
-const int RESISTIVE_NOISE_THRESH;
-const int INDUCTIVE_NOISE_THRESH;
 
 // These are for tracking resistive and inductive noise and must be initialized to 0.
 int resistiveNoise = 0;
