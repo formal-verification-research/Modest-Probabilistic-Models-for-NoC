@@ -12,11 +12,17 @@ const int NOC_MESH_HEIGHT = 2;
 // This value changes the buffer length of all buffers.
 const int BUFFER_LENGTH = 4;
 
+// #CUSTOMIZE 
+// These values change the frequency with witch flits are injected.
+const int INJECTION_RATE_NUMERATOR = 3;
+const int INJECTION_RATE_DENOMINATOR = 10;
+
 // #CUSTOMIZE
 // This represents a cyclic clock counter that wraps from 0 to INJECTION_RATE_DENOMINATOR - 1
 // and it's used to determine the flit generation pattern. For unique patterns you'll need
 // to adjust this to meet your use case.
 transient int(0..1) clk_indicator;
+int(0..INJECTION_RATE_DENOMINATOR) clk = 0;
 
 // #CUSTOMIZE the number of buffers a router must service before noise will be incremented.
 const int ACTIVITY_THRESH = 3;
@@ -191,39 +197,24 @@ function int getNeighborID(int id, int dir) =
 // routers within those processes.
 
 // #CUSTOMIZE
-const int BURST_MIN = 10;
-const int BURST_MAX = 100;
-const int SLEEP_MIN = 200;
-const int SLEEP_MAX = 400;
-int[] burst_times = array(i, NOC_MAX_ID + 1, 0);
-int[] sleep_times = array(i, NOC_MAX_ID + 1, 0);
 action generateFlits;
 process GenerateFlits(int id) {
     int(0..NOC_MAX_ID) destination;
 
-    if (isBufferFull(noc[id].buffers[LOCAL].buffer)) {
-        generateFlits
-    } else {
-        // This custom process sends a flit in a bursty pattern
-        if (sleep_times[id] != 0) {
-            generateFlits {=
-            sleep_times[id] = sleep_times[id] - 1
-            =}
-        } else if (burst_times[id] != 0) {
-            generateFlits {=
-                0: destination = DiscreteUniform(0, NOC_MAX_ID - 1),
-                1: noc[id].buffers[LOCAL].buffer = 
-                    enqueue(destination >= id
-                    ? destination + 1
-                    : destination, noc[id].buffers[LOCAL].buffer),
-            2: burst_times[id] = burst_times[id] - 1
-            =}
-        } else {
-            generateFlits {=
-            burst_times[id] = DiscreteUniform(BURST_MIN, BURST_MAX),
-            sleep_times[id] = DiscreteUniform(SLEEP_MIN, SLEEP_MAX)
-            =}
-        }
+    if (!isBufferFull(noc[id].buffers[LOCAL].buffer) && clk < INJECTION_RATE_NUMERATOR) {
+        // Add the new flit to the local buffer
+        // If the destination is greater than or equal to the ID, we shift it
+        // up by one to exclude the possiblity of sending a flit to ourselves
+        generateFlits {=
+            0: destination = DiscreteUniform(0, NOC_MAX_ID - 1),
+            1: noc[id].buffers[LOCAL].buffer = 
+                enqueue(destination >= id ? 
+                            destination + 1 : 
+                            destination, noc[id].buffers[LOCAL].buffer)
+        =}
+    }
+    else {
+        generateFlits // Take this action instead of tau for better synchronization
     }
 }
 // Set the `isEmpty` and `isFull` flags for each channel based off the current
@@ -453,7 +444,7 @@ process Router(int id) {
 // Model the cyclic clock
 action nextClockCycle;
 process Clock() {
-    nextClockCycle {= clk_indicator = 1 =};
+    nextClockCycle {= clk_indicator = 1, clk = (clk + 1) % INJECTION_RATE_DENOMINATOR =};
     Clock()
 }
 

@@ -61,7 +61,7 @@ def run_ctl_analysis(
 
     return sims
 
-def ctl():
+def ctl_nick():
     # Locate the script directory
     script_dir = Path(__file__).resolve().parent
 
@@ -85,13 +85,37 @@ def ctl():
     r = run_ctl_analysis(original_model=model)
     sim_schema.save_as_directory(r, output_dir)
 
+def ctl_jonah():
+    # Locate the script directory
+    script_dir = Path(__file__).resolve().parent
+
+    # Run the 2x2 model
+    try:
+        with open(script_dir / "modular_ctl_jonah.modest", "r") as f:
+            model = f.read()
+    except:
+        print("Failed to open model file 'modular_ctl_jonah.modest'")
+        return
+    
+    # Display output
+    print("Running ctl checking (jonah) ...")
+    
+    # Setup the output directory
+    timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+    output_dir = script_dir / sanitize_filename(f"results_ctl_jonah_{timestamp}")
+    output_dir.mkdir()
+
+    # Resistive 2x2 Simulations
+    r = run_ctl_analysis(original_model=model)
+    sim_schema.save_as_directory(r, output_dir)
+
 def main():
     # Check if modest is available
     if not modest.is_modest_on_path():
         print("Modest executable not found. Exiting...")
         return
     
-    ctl()
+    ctl_nick()
 
 if __name__ == "__main__":
     main()
