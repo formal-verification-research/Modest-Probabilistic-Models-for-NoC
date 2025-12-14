@@ -27,9 +27,9 @@ def generate_model(
     # Add properties
     for i in clk:
         if type == "Resistive":
-            original_model += f"\nproperty R_{i} = Pmax(<>[S(clk_indicator)<={i}] c_res >= RESISTIVE_THRESH);"
+            original_model += f"\nproperty R_{i} = Pmax(<>[S(clk_indicator)<={i}] (c_res >= RESISTIVE_THRESH));"
         elif type == "Inductive":
-            original_model += f"\nproperty I_{i} = Pmax(<>[S(clk_indicator)<={i}] c_ind >= INDUCTIVE_THRESH);"
+            original_model += f"\nproperty I_{i} = Pmax(<>[S(clk_indicator)<={i}] (c_ind >= INDUCTIVE_THRESH));"
     return original_model
 
 def run_psn_analysis(
@@ -113,6 +113,9 @@ def run_psn_analysis(
 
         sims.sub_runs += [this_run]
         sims.total_time_sec += elapsed
+
+        if 1.0 in properties.values():
+            break
 
     return sims
 
