@@ -116,6 +116,7 @@ def main():
         return
     
     ctl_nick()
+    ctl_jonah()
 
 if __name__ == "__main__":
     main()
