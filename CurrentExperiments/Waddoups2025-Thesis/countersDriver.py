@@ -137,16 +137,17 @@ def normal():
     output_dir = script_dir / sanitize_filename(f"results_counters_{timestamp}")
     output_dir.mkdir()
 
-    for width, height, res, clk in zip([4, 8, 12], [4, 8, 12], [5, 10, 20], [250, 400, 600]):
+    for width, height, res in zip([4, 8, 12], [4, 8, 12], [5, 10, 20]):
         print(f"Running {width}x{height} model...")
 
         thresh = 3
+        clk = 1000
 
         # Resistive Simulations
         print(f"Running resistive noise for {clk} cycles with thresh == {res}...")
         r = run_psn_analysis(max_clk=clk,
-                            stride=1,
-                            batch=100,
+                            stride=3,
+                            batch=334,
                             activity_threshold=thresh,
                             original_model=model,
                             sim_type="Resistive",
@@ -156,11 +157,11 @@ def normal():
                             ind_thresh=0)
         sim_schema.save_as_directory(r, output_dir)
 
-    for width, height, ind, clk in zip([4, 8, 12], [4, 8, 12], [5, 10, 20], [1500, 2500, 2500]):
+    for width, height, ind in zip([4, 8, 12], [4, 8, 12], [5, 10, 20]):
         print(f"Running inductive noise for {clk} cycles with thresh == {ind}...")
         i = run_psn_analysis(max_clk=clk,
-                            stride=10,
-                            batch=100,
+                            stride=3,
+                            batch=334,
                             activity_threshold=thresh,
                             original_model=model,
                             sim_type="Inductive",
