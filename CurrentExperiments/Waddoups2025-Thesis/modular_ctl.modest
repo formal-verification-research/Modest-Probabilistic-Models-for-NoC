@@ -316,20 +316,35 @@ process AdvanceChannel(int id, int ch) {
         advanceChannel {=
             /* -- if the local channel has not been used this clock cycle -- */
             // Mark the channel as serviced
-            1: noc[id].buffers[ch].serviced = !noc[id].used[LOCAL],
+            1: noc[id].buffers[ch].serviced =
+                if !noc[id].used[LOCAL]
+                then true
+                else noc[id].buffers[ch].serviced,
             
             // Remove this flit. It has reached its destination
-            1: noc[id].buffers[ch].buffer = !noc[id].used[LOCAL] ? dequeue(noc[id].buffers[ch].buffer) : noc[id].buffers[ch].buffer,
+            1: noc[id].buffers[ch].buffer =
+                if !noc[id].used[LOCAL]
+                then dequeue(noc[id].buffers[ch].buffer)
+                else noc[id].buffers[ch].buffer,
             
             // Indicate that the local channel was used
-            1: sendCounts[id].counts[LOCAL] = sat_add(sendCounts[id].counts[LOCAL], 1, 2),
+            1: sendCounts[id].counts[LOCAL] =
+                if !noc[id].used[LOCAL]
+                then sat_add(sendCounts[id].counts[LOCAL], 1, 2)
+                else sendCounts[id].counts[LOCAL],
             
             /* -- if the local channel has been used this clock cycle -- */
             // Otherwise, increment total unserviced buffers
-            1: noc[id].total_unserviced = !noc[id].used[LOCAL] ? noc[id].total_unserviced : noc[id].total_unserviced + 1,
+            1: noc[id].total_unserviced =
+                if !noc[id].used[LOCAL] 
+                then noc[id].total_unserviced 
+                else noc[id].total_unserviced + 1,
             
             // Mark the channel as used now
-            2: noc[id].used[LOCAL] = !noc[id].used[LOCAL]
+            2: noc[id].used[LOCAL] = 
+                if !noc[id].used[LOCAL]
+                then true
+                else noc[id].used[LOCAL]
         =};
 	    advanceChannelSend
     }
