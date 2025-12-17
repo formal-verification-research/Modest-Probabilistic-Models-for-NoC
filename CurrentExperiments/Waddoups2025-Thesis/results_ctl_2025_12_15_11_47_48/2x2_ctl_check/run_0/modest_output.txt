@@ -1,0 +1,347 @@
+The Modest Toolset (www.modestchecker.net), version v3.1.290-gff8cae090+ff8cae0903ec136f9c4c15123e444b0b0399ff6b.
+Command: modest mcsta /tmp/tmpql7pqb0t/__tmp__.modest --unsafe --chainopt -D -O /tmp/tmpql7pqb0t/__tmp__.txt minimal
+
+
+
+
+__tmp__.modest: info: __tmp__ is a DTMC model.
+__tmp__.modest: info: Need at least 96 bytes per state.
+__tmp__.modest: warning: The probabilities for a transition labelled "generateFlits" with 81 branches in state (Clock.location = loc_1, Router.location = loc_6, Router.location = loc_6, Router.location = loc_6, Router.location = loc_6, clk = 0, Router.destination_ch = 0, Router.ch_id = 0, Router.id_i = 0, Router.ch = 0, Router.ch = 0, Router.dir = 0, Router.ch = 0, Router.dir = 0, Router.ch = 0, Router.dir = 0, Router.id_id_id_id = 1, Router.ch_i_destination = 0, Router.id_id = 0, Router.id = 0, Router.ch = 0, Router.id = 0, Router.ch = 0, Router.id = 0, Router.ch = 0, Router.dir = 0, Router.id = 0, Router.ch = 0, Router.dir = 0, Router.id = 0, Router.ch = 0, Router.dir = 0, Router.id_id_id_id = 2, Router.ch_i_destination = 0, Router.id_id = 0, Router.id = 0, Router.ch = 0, Router.id = 0, Router.ch = 0, Router.id = 0, Router.ch = 0, Router.dir = 0, Router.id = 0, Router.ch = 0, Router.dir = 0, Router.id = 0, Router.ch = 0, Router.dir = 0, Router.id_id_id_id = 3, Router.ch_i_destination = 0, Router.id_id = 0, Router.id = 0, Router.ch = 0, Router.id = 0, Router.ch = 0, Router.id = 0, Router.ch = 0, Router.dir = 0, Router.id = 0, Router.ch = 0, Router.dir = 0, Router.id = 0, Router.ch = 0, Router.dir = 0, noc = [{ buffers: [{ buffer: none, serviced: False, isEmpty: True, isFull: False }, { buffer: none, serviced: False, isEmpty: True, isFull: False }, { buffer: none, serviced: False, isEmpty: True, isFull: False }, { buffer: none, serviced: False, isEmpty: True, isFull: False }, { buffer: none, serviced: False, isEmpty: True, isFull: False }], priority_list: [0, 2, 3, 1, 4], priority_list_temp: [0, 0, 0, 0, 0], serviced_index: 0, unserviced_index: 0, total_unserviced: 0, used: [False, False, False, False, False] }, { buffers: [{ buffer: none, serviced: False, isEmpty: True, isFull: False }, { buffer: none, serviced: False, isEmpty: True, isFull: False }, { buffer: none, serviced: False, isEmpty: True, isFull: False }, { buffer: none, serviced: False, isEmpty: True, isFull: False }, { buffer: none, serviced: False, isEmpty: True, isFull: False }], priority_list: [0, 2, 3, 1, 4], priority_list_temp: [0, 0, 0, 0, 0], serviced_index: 0, unserviced_index: 0, total_unserviced: 0, used: [False, False, False, False, False] }, { buffers: [{ buffer: none, serviced: False, isEmpty: True, isFull: False }, { buffer: none, serviced: False, isEmpty: True, isFull: False }, { buffer: none, serviced: False, isEmpty: True, isFull: False }, { buffer: none, serviced: False, isEmpty: True, isFull: False }, { buffer: none, serviced: False, isEmpty: True, isFull: False }], priority_list: [0, 2, 3, 1, 4], priority_list_temp: [0, 0, 0, 0, 0], serviced_index: 0, unserviced_index: 0, total_unserviced: 0, used: [False, False, False, False, False] }, { buffers: [{ buffer: none, serviced: False, isEmpty: True, isFull: False }, { buffer: none, serviced: False, isEmpty: True, isFull: False }, { buffer: none, serviced: False, isEmpty: True, isFull: False }, { buffer: none, serviced: False, isEmpty: True, isFull: False }, { buffer: none, serviced: False, isEmpty: True, isFull: False }], priority_list: [0, 2, 3, 1, 4], priority_list_temp: [0, 0, 0, 0, 0], serviced_index: 0, unserviced_index: 0, total_unserviced: 0, used: [False, False, False, False, False] }], sendCounts = [{ counts: [0, 0, 0, 0, 0] }, { counts: [0, 0, 0, 0, 0] }, { counts: [0, 0, 0, 0, 0] }, { counts: [0, 0, 0, 0, 0] }]) do not sum up to the expected value of 1 (actual sum: 1.0000000000000022). Results will likely be affected by floating-point errors.
+__tmp__.modest: info: Explored 3446073 states.
+
+Peak memory usage: 14607 MB
+Analysis results for __tmp__.modest
+
++ State space exploration
+  Min. state size:    96 bytes
+  States:             3446073
+  Transitions:        3446073
+  Branches:           5513593
+  Rate:               6342 states/s
+  Peak memory:        9236.53 MB
+  Final size:         110.42 MB
+  Size on disk:       19.24 MB
+  Time (exploration): 543.3 s
+  Time (merging):     0.0 s
+
++ Property neverGeneratesFlitsForSelf0
+  Result: True
+  Time:   0.0 s
+
++ Property neverGeneratesFlitsForSelf1
+  Result: True
+  Time:   0.0 s
+
++ Property neverGeneratesFlitsForSelf2
+  Result: True
+  Time:   0.0 s
+
++ Property neverGeneratesFlitsForSelf3
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations0to1
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations0t02
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations0t03
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations1to0
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations1t02
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations1t03
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations2to0
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations2t01
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations2t03
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations3to0
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations3t01
+  Result: True
+  Time:   0.0 s
+
++ Property generatesForAllDestinations3t02
+  Result: True
+  Time:   0.0 s
+
++ Property alwaysContainsNorth___0
+  Result: True
+  Time:   0.0 s
+
++ Property alwaysContainsEast____0
+  Result: True
+  Time:   0.0 s
+
++ Property alwaysContainsSouth___0
+  Result: True
+  Time:   0.0 s
+
++ Property alwaysContainsWest____0
+  Result: True
+  Time:   0.0 s
+
++ Property alwaysContainsLocal___0
+  Result: True
+  Time:   0.0 s
+
++ Property allPrioritiesAreUnique0
+  Result: True
+  Time:   0.0 s
+
++ Property alwaysContainsNorth___1
+  Result: True
+  Time:   0.0 s
+
++ Property alwaysContainsEast____1
+  Result: True
+  Time:   0.0 s
+
++ Property alwaysContainsSouth___1
+  Result: True
+  Time:   0.0 s
+
++ Property alwaysContainsWest____1
+  Result: True
+  Time:   0.0 s
+
++ Property alwaysContainsLocal___1
+  Result: True
+  Time:   0.0 s
+
++ Property allPrioritiesAreUnique1
+  Result: True
+  Time:   0.0 s
+
++ Property alwaysContainsNorth___2
+  Result: True
+  Time:   0.0 s
+
++ Property alwaysContainsEast____2
+  Result: True
+  Time:   0.0 s
+
++ Property alwaysContainsSouth___2
+  Result: True
+  Time:   0.0 s
+
++ Property alwaysContainsWest____2
+  Result: True
+  Time:   0.0 s
+
++ Property alwaysContainsLocal___2
+  Result: True
+  Time:   0.0 s
+
++ Property allPrioritiesAreUnique2
+  Result: True
+  Time:   0.0 s
+
++ Property alwaysContainsNorth___3
+  Result: True
+  Time:   0.0 s
+
++ Property alwaysContainsEast____3
+  Result: True
+  Time:   0.0 s
+
++ Property alwaysContainsSouth___3
+  Result: True
+  Time:   0.0 s
+
++ Property alwaysContainsWest____3
+  Result: True
+  Time:   0.0 s
+
++ Property alwaysContainsLocal___3
+  Result: True
+  Time:   0.0 s
+
++ Property allPrioritiesAreUnique3
+  Result: True
+  Time:   0.0 s
+
++ Property r0BufferSizeAlwaysValidNorth
+  Result: True
+  Time:   0.0 s
+
++ Property r0BufferSizeAlwaysValidEast
+  Result: True
+  Time:   0.0 s
+
++ Property r0BufferSizeAlwaysValidSouth
+  Result: True
+  Time:   0.0 s
+
++ Property r0BufferSizeAlwaysValidWest
+  Result: True
+  Time:   0.0 s
+
++ Property r0BufferSizeAlwaysValidLocal
+  Result: True
+  Time:   0.0 s
+
++ Property r1BufferSizeAlwaysValidNorth
+  Result: True
+  Time:   0.0 s
+
++ Property r1BufferSizeAlwaysValidEast
+  Result: True
+  Time:   0.0 s
+
++ Property r1BufferSizeAlwaysValidSouth
+  Result: True
+  Time:   0.0 s
+
++ Property r1BufferSizeAlwaysValidWest
+  Result: True
+  Time:   0.0 s
+
++ Property r1BufferSizeAlwaysValidLocal
+  Result: True
+  Time:   0.0 s
+
++ Property r2BufferSizeAlwaysValidNorth
+  Result: True
+  Time:   0.0 s
+
++ Property r2BufferSizeAlwaysValidEast
+  Result: True
+  Time:   0.0 s
+
++ Property r2BufferSizeAlwaysValidSouth
+  Result: True
+  Time:   0.0 s
+
++ Property r2BufferSizeAlwaysValidWest
+  Result: True
+  Time:   0.0 s
+
++ Property r2BufferSizeAlwaysValidLocal
+  Result: True
+  Time:   0.0 s
+
++ Property r3BufferSizeAlwaysValidNorth
+  Result: True
+  Time:   0.0 s
+
++ Property r3BufferSizeAlwaysValidEast
+  Result: True
+  Time:   0.0 s
+
++ Property r3BufferSizeAlwaysValidSouth
+  Result: True
+  Time:   0.0 s
+
++ Property r3BufferSizeAlwaysValidWest
+  Result: True
+  Time:   0.0 s
+
++ Property r3BufferSizeAlwaysValidLocal
+  Result: True
+  Time:   0.0 s
+
++ Property r0SendAtMostOnceNorth
+  Result: True
+  Time:   0.0 s
+
++ Property r0SendAtMostOnceWest
+  Result: True
+  Time:   0.0 s
+
++ Property r0SendAtMostOnceEast
+  Result: True
+  Time:   0.0 s
+
++ Property r0SendAtMostOnceSouth
+  Result: True
+  Time:   0.0 s
+
++ Property r0SendAtMostOnceLocal
+  Result: True
+  Time:   0.0 s
+
++ Property r1SendAtMostOnceNorth
+  Result: True
+  Time:   0.0 s
+
++ Property r1SendAtMostOnceWest
+  Result: True
+  Time:   0.0 s
+
++ Property r1SendAtMostOnceEast
+  Result: True
+  Time:   0.0 s
+
++ Property r1SendAtMostOnceSouth
+  Result: True
+  Time:   0.0 s
+
++ Property r1SendAtMostOnceLocal
+  Result: True
+  Time:   0.0 s
+
++ Property r2SendAtMostOnceNorth
+  Result: True
+  Time:   0.0 s
+
++ Property r2SendAtMostOnceWest
+  Result: True
+  Time:   0.0 s
+
++ Property r2SendAtMostOnceEast
+  Result: True
+  Time:   0.0 s
+
++ Property r2SendAtMostOnceSouth
+  Result: True
+  Time:   0.0 s
+
++ Property r2SendAtMostOnceLocal
+  Result: True
+  Time:   0.0 s
+
++ Property r3SendAtMostOnceNorth
+  Result: True
+  Time:   0.0 s
+
++ Property r3SendAtMostOnceWest
+  Result: True
+  Time:   0.0 s
+
++ Property r3SendAtMostOnceEast
+  Result: True
+  Time:   0.0 s
+
++ Property r3SendAtMostOnceSouth
+  Result: True
+  Time:   0.0 s
+
++ Property r3SendAtMostOnceLocal
+  Result: True
+  Time:   0.0 s
+
+Exported results to file "/tmp/tmpql7pqb0t/__tmp__.txt".
