@@ -43,6 +43,7 @@ def run_psn_analysis(
         width: int,
         height: int,
         burst: int,
+        name: str,
         experiments: str = ""
     ) -> sim_schema.SimulationSummary:
     """Runs psn analysis on the modular model for `max_clk` cycles with a stride
@@ -68,7 +69,7 @@ def run_psn_analysis(
             "-E", experiments]
 
     # Create the title
-    title = f"{sim_type}_{width}x{height}_a{activity_threshold}_b{burst}"
+    title = f"{sim_type}_{width}x{height}_a{activity_threshold}_b{burst}_{name}"
 
     # Create simulation data
     sims = sim_schema.SimulationSummary(
@@ -138,15 +139,15 @@ def bursty():
 
     # Set simulation constants
     init_sleep_offset: int = 10
-    init_sleep_scale: float = 2.5
+    sleep: int = 200
 
-    for burst, sleep in [(10, 200), (20, 200), (40, 200)]:
+    for burst, init_sleep_scale in [(10, 0), (10, 20)]:
         experiments = f"BURST={burst},SLEEP={sleep},INIT_SLEEP_OFFSET={init_sleep_offset},INIT_SLEEP_SCALE={init_sleep_scale}"
         thresh = 3
 
         # Resistive 2x2 Simulations
-        r = run_psn_analysis(max_clk=1000,
-                            stride=10,
+        r = run_psn_analysis(max_clk=600,
+                            stride=6,
                             batch=101,
                             activity_threshold=thresh,
                             original_model=model,
@@ -154,19 +155,49 @@ def bursty():
                             width=2,
                             height=2,
                             burst=burst,
+                            name=f"s{init_sleep_scale}",
                             experiments=experiments)
         sim_schema.save_as_directory(r, output_dir)
 
         # Inductive 2x2 Simulations
-        i = run_psn_analysis(max_clk=1000,
-                            stride=10,
-                            batch=201,
+        i = run_psn_analysis(max_clk=600,
+                            stride=6,
+                            batch=101,
                             activity_threshold=thresh,
                             original_model=model,
                             sim_type="Inductive",
                             width=2,
                             height=2,
                             burst=burst,
+                            name=f"s{init_sleep_scale}",
+                            experiments=experiments)
+        sim_schema.save_as_directory(i, output_dir)
+
+        # Resistive 4x4 Simulations
+        r = run_psn_analysis(max_clk=600,
+                            stride=6,
+                            batch=101,
+                            activity_threshold=thresh,
+                            original_model=model,
+                            sim_type="Resistive",
+                            width=4,
+                            height=4,
+                            burst=burst,
+                            name=f"s{init_sleep_scale}",
+                            experiments=experiments)
+        sim_schema.save_as_directory(r, output_dir)
+
+        # Inductive 4x4 Simulations
+        i = run_psn_analysis(max_clk=600,
+                            stride=6,
+                            batch=101,
+                            activity_threshold=thresh,
+                            original_model=model,
+                            sim_type="Inductive",
+                            width=4,
+                            height=4,
+                            burst=burst,
+                            name=f"s{init_sleep_scale}",
                             experiments=experiments)
         sim_schema.save_as_directory(i, output_dir)
 
