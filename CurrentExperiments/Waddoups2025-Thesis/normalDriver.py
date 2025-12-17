@@ -135,15 +135,15 @@ def normal():
     output_dir = script_dir / sanitize_filename(f"results_normal_{timestamp}")
     output_dir.mkdir()
 
-    for width, height in zip([3, 4, 8, 12], [3, 4, 8, 12]):
+    for width, height in zip([2, 4, 8, 12], [2, 4, 8, 12]):
         print(f"Running {width}x{height} model...")
 
         thresh = 3
 
         # Resistive 2x2 Simulations
-        r = run_psn_analysis(max_clk=1000,
-                            stride=3,
-                            batch=334,
+        r = run_psn_analysis(max_clk=500,
+                            stride=2,
+                            batch=251,
                             activity_threshold=thresh,
                             original_model=model,
                             sim_type="Resistive",
@@ -152,9 +152,9 @@ def normal():
         sim_schema.save_as_directory(r, output_dir)
 
         # Inductive 2x2 Simulations
-        i = run_psn_analysis(max_clk=1000,
-                            stride=3,
-                            batch=334,
+        i = run_psn_analysis(max_clk=500,
+                            stride=2,
+                            batch=251,
                             activity_threshold=thresh,
                             original_model=model,
                             sim_type="Inductive",
