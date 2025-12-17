@@ -133,7 +133,7 @@ def bursty():
 
     thresh = 3
 
-    # Resistive 2x2 Simulations
+    # Resistive
     r = run_psn_analysis(max_clk=1000,
                         stride=3,
                         batch=334,
@@ -144,7 +144,7 @@ def bursty():
                         height=8)
     sim_schema.save_as_directory(r, output_dir)
 
-    # Inductive 2x2 Simulations
+    # Inductive
     i = run_psn_analysis(max_clk=1000,
                         stride=3,
                         batch=334,
