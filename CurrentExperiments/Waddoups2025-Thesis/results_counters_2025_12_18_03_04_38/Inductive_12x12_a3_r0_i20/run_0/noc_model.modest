@@ -1,0 +1,882 @@
+option "dtmc";
+
+//----- User Defined Constants -----
+
+// #CUSTOMIZE
+// Set the dimensions for the NoC, note that square dimensions are currently
+// the only accepted dimensions
+const int NOC_MESH_WIDTH;
+const int NOC_MESH_HEIGHT;
+
+// #CUSTOMIZE 
+// This value changes the buffer length of all buffers.
+const int BUFFER_LENGTH = 4;
+
+// #CUSTOMIZE 
+// These values change the frequency with witch flits are injected.
+const int INJECTION_RATE_NUMERATOR = 3;
+const int INJECTION_RATE_DENOMINATOR = 10;
+
+// #CUSTOMIZE
+// This represents a cyclic clock counter that wraps from 0 to INJECTION_RATE_DENOMINATOR - 1
+// and it's used to determine the flit generation pattern. For unique patterns you'll need
+// to adjust this to meet your use case.
+int(0..INJECTION_RATE_DENOMINATOR) clk = 0;
+transient int(0..1) clk_indicator;
+
+// #CUSTOMIZE the number of buffers a router must service before noise will be incremented.
+const int ACTIVITY_THRESH;
+const int RESISTIVE_THRESH;
+const int INDUCTIVE_THRESH;
+
+// ----- Calculated Constants -----
+
+// The max id for each router in the NoC. Ids range from 0 to NOC_MAX_ID in a
+// left-to-right, line by line pattern in the NoC
+/*
+e.g. a 2x2 NoC with it's corresponding ids
+
+ 0 -- 1
+ |    |
+ 2 -- 3
+*/
+const int NOC_MAX_ID = (NOC_MESH_WIDTH * NOC_MESH_HEIGHT) - 1;
+
+// Enumerated values representing the different directions in the
+// mesh
+const int NORTH = 0;
+const int WEST = 1;
+const int EAST = 2;
+const int SOUTH = 3;
+const int LOCAL = 4;
+const int NO_CONNECT = -1;
+
+// ----- Functional Datatypes -----
+
+datatype buffer = {
+    int(0..NOC_MAX_ID) hd,
+    buffer option tl
+};
+
+datatype flaggedBuffer = {
+    buffer option buffer,
+    bool serviced,
+    bool isEmpty,
+    bool isFull
+};
+
+datatype router = {
+    flaggedBuffer[] buffers,
+    int(0..4)[] priority_list,
+    int(0..4)[] priority_list_temp,
+    int(0..4) serviced_index,
+    int(0..4) unserviced_index,
+    int(0..5) total_unserviced,
+	int(0..5) thisActivity,
+	int(0..5) lastActivity,
+    bool[] used
+};
+
+// ----- Verification Datatypes -----
+
+datatype sendCounter = {
+    int(0..2)[] counts
+};
+
+// ----- Variables -----
+router[] noc = array(i, NOC_MAX_ID + 1,
+    router {
+        buffers: [
+            flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+            flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+            flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+            flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false},
+            flaggedBuffer {buffer: none, serviced: false, isEmpty: true, isFull: false}],
+        priority_list: [NORTH, EAST, SOUTH, WEST, LOCAL],
+        priority_list_temp: [0, 0, 0, 0, 0],
+        serviced_index: 0,
+        unserviced_index: 0,
+        total_unserviced: 0,
+        thisActivity: 0,
+        thisActivity: 0,
+        lastActivity: 0,
+        used: [false, false, false, false, false]
+    });
+
+int (0..RESISTIVE_THRESH) c_res = 0;
+int (0..INDUCTIVE_THRESH) c_ind = 0;
+
+// ----- Integer functions -----
+
+// Saturating addition
+function int sat_add(int l, int r, int max) =
+    if (l + r) > max then max
+    else l + r;
+
+// ----- Boolean Algebra Functions -----
+
+// Boolean implication (l ==> r)
+function bool implies(bool l, bool r) = (!l) || r;
+
+// ----- List Functions -----
+
+// Calculate length of list
+function int len(buffer option ls) = if ls == none then 0 else 1 + len(ls!.tl);
+
+// Add a flit to the buffer
+function buffer option enqueue(int n, buffer option ls) =
+    some(buffer {
+        hd: n,
+        tl: ls
+    });
+
+// Remove a flit from the buffer
+function buffer option dequeue(buffer option ls) =
+    if ls == none then none
+    else if ls!.tl == none then none
+    else some(buffer {
+        hd: ls!.hd,
+        tl: dequeue(ls!.tl)
+    });
+
+// Returns true if the buffer `ls` contains `id`, otherwise returns false 
+function bool contains(int id, buffer option ls) =
+	if ls == none then false
+    else if ls!.hd == id then true
+	else contains(id, ls!.tl);
+
+// Return the front of the queue
+function int peekFront(buffer option ls) =
+    if ls == none then -1
+    else if ls!.tl == none then ls!.hd
+    else peekFront(ls!.tl);
+
+// ----- Buffer Specific Functions -----
+
+// Tell if the buffer is full
+function bool isBufferFull(buffer option ls) = len(ls) >= BUFFER_LENGTH;
+
+// ----- Routing Functions ---
+
+// Get the mirror direction to determine what buffer will receive the flit
+// e.g. if we are R0 and we are sending across the South Channel to R2,
+// then R2 should receive the flit in their North Buffer
+function int getDestinationChannel(int dir) =
+    if dir == NORTH then SOUTH
+    else if dir == WEST then EAST
+    else if dir == EAST then WEST
+    else if dir == SOUTH then NORTH
+    else -1;
+
+// Calculate what column a specific ID is destined for
+function int idToColumn(int id) = (id % NOC_MESH_WIDTH);
+
+// Calculate what row a specific ID is destined for
+function int idToRow(int id) = (int)(id / NOC_MESH_HEIGHT);
+
+// Determine if the flits destination is in the same column as the current router
+// Returns < 0 if id needs to go to the left, > 0 to go right, and 0 if it's the
+// correct column
+function int getColumnShift(int id, int dst) = idToColumn(dst) - idToColumn(id);
+
+// ----- Neighbor ID Calculation -----
+// Validates an ID is in the NoC
+function bool isValidID(int id) = 0 <= id && id <= NOC_MAX_ID;
+
+// Given a valid id and direction, calculate the id of the neighbor in that direction.
+function int getNeighborID_internal(int id, int dir) =
+    if      dir == NORTH                                          then id - NOC_MESH_WIDTH
+    else if dir == SOUTH                                          then id + NOC_MESH_WIDTH
+    else if dir == EAST  && (idToColumn(id) < NOC_MESH_WIDTH - 1) then id + 1
+    else if dir == WEST  && (idToColumn(id) > 0)                  then id - 1
+    else NO_CONNECT;
+
+// Given an ID and a direction calculate the id of the neighbor in that direction. If an
+// invalid ID is returned, then return no connect
+function int getNeighborID(int id, int dir) = 
+    if isValidID(getNeighborID_internal(id, dir)) then getNeighborID_internal(id, dir)
+    else NO_CONNECT;
+
+// ----- Processes -----
+// General guidance for processes is that we want as much synchronized assignments to happen
+// as possible. A digital system is by default a synchronous system, so we don't typically
+// need worry about interleavings for our design. To accomplish this most processes also 
+// have an associated action with the same name that synchronizes assignments between
+// routers within those processes.
+
+// #CUSTOMIZE
+// This method is how flits are generated for the NoC. To change the flit injection pattern
+// change this method.
+// Flits are injected into a router's LOCAL buffer and then the router automatically routes
+// the flits to their destination.
+action generateFlits;
+process GenerateFlits(int id) {
+    int(0..NOC_MAX_ID) destination;
+
+    if (!isBufferFull(noc[id].buffers[LOCAL].buffer) && clk < INJECTION_RATE_NUMERATOR) {
+        // Add the new flit to the local buffer
+        // If the destination is greater than or equal to the ID, we shift it
+        // up by one to exclude the possiblity of sending a flit to ourselves
+        generateFlits {=
+            0: destination = DiscreteUniform(0, NOC_MAX_ID - 1),
+            1: noc[id].buffers[LOCAL].buffer = 
+                enqueue(destination >= id ? 
+                            destination + 1 : 
+                            destination, noc[id].buffers[LOCAL].buffer)
+        =}
+    }
+    else {
+        generateFlits // Take this action instead of tau for better synchronization
+    }
+}
+// Set the `isEmpty` and `isFull` flags for each channel based off the current
+// state of the buffers in the channel
+action prepRouter;
+process PrepRouter(int id) {
+    // Prep all the channels
+    prepRouter {=
+        // North Channel (0)
+        noc[id].buffers[NORTH].isEmpty = len(noc[id].buffers[NORTH].buffer) == 0,
+        noc[id].buffers[NORTH].isFull = isBufferFull(noc[id].buffers[NORTH].buffer),
+
+        // WEST Channel (1)
+        noc[id].buffers[WEST].isEmpty = len(noc[id].buffers[WEST].buffer) == 0,
+        noc[id].buffers[WEST].isFull = isBufferFull(noc[id].buffers[WEST].buffer),
+
+        // East Channel (2)
+        noc[id].buffers[EAST].isEmpty = len(noc[id].buffers[EAST].buffer) == 0,
+        noc[id].buffers[EAST].isFull = isBufferFull(noc[id].buffers[EAST].buffer),
+
+        // South Channel (3)
+        noc[id].buffers[SOUTH].isEmpty = len(noc[id].buffers[SOUTH].buffer) == 0,
+        noc[id].buffers[SOUTH].isFull = isBufferFull(noc[id].buffers[SOUTH].buffer),
+
+        // Local Channel (4)
+        noc[id].buffers[LOCAL].isEmpty = len(noc[id].buffers[LOCAL].buffer) == 0,
+        noc[id].buffers[LOCAL].isFull = isBufferFull(noc[id].buffers[LOCAL].buffer)
+    =}
+}
+
+// Send a flit from Router `id` across channel `ch` in the specified direction `dir`
+process Send(int id, int ch, int dir) {
+    advanceChannel;
+
+    // If the destination is not full, and the channel has not been used in this cycle, then service the buffer
+    if(!noc[getNeighborID(id, dir)].buffers[getDestinationChannel(dir)].isFull && !noc[id].used[dir]){
+        advanceChannelSend {=
+            // Add flit to destination buffer
+            1: noc[getNeighborID(id, dir)].buffers[getDestinationChannel(dir)].buffer =
+                enqueue(peekFront(noc[id].buffers[ch].buffer), noc[getNeighborID(id, dir)].buffers[getDestinationChannel(dir)].buffer),
+
+            // Then, remove it from the source buffer
+            2: noc[id].buffers[ch].buffer = dequeue(noc[id].buffers[ch].buffer),
+
+            // Mark that output as used and that channel as serviced
+            4: noc[id].used[dir] = true,
+            4: noc[id].buffers[ch].serviced = true,
+
+			// Increment the count for buffers serviced in this cycle
+			4: noc[id].thisActivity++
+        =}
+    }
+    // Otherwise, increment total unserviced buffers
+    else{
+        advanceChannelSend {=
+            noc[id].total_unserviced++
+        =}
+    }
+}
+
+// Determine which direction to send the front-most flit in channel `ch` of router `id`
+process AdvanceFlits(int id, int ch) {
+    // If flit needs to stay on this row
+    if(getColumnShift(id, peekFront(noc[id].buffers[ch].buffer)) == 0) {
+        // Send it north
+        if(peekFront(noc[id].buffers[ch].buffer) < id){
+            Send(id, ch, NORTH)
+        }
+        // Or send it south
+        else{
+            Send(id, ch, SOUTH)
+        }
+    }
+    // Else, if flit needs to go west
+    else if(getColumnShift(id, peekFront(noc[id].buffers[ch].buffer)) < 0) {
+        Send(id, ch, WEST)
+    }
+    // Else, flit needs to go east
+    else{
+        Send(id, ch, EAST)
+    }
+}
+
+// Advance a specific channel `ch` in router `id`
+action advanceChannel;
+action advanceChannelSend;
+process AdvanceChannel(int id, int ch) {
+    // If this channel was not assigned a neighbor or if it is
+    // empty, then mark it as serviced and move on to the next one
+    if ((ch != 4 && getNeighborID(id, ch) == NO_CONNECT) || noc[id].buffers[ch].isEmpty == true) {
+        advanceChannel {=
+            // Mark the channel as serviced
+            noc[id].buffers[ch].serviced = true
+        =};
+	    advanceChannelSend
+    }
+    // If the flit has reached its destination...
+    else if (peekFront(noc[id].buffers[ch].buffer) == id) {
+        advanceChannel {=
+            /* -- if the local channel has not been used this clock cycle -- */
+            // Mark the channel as serviced
+            1: noc[id].buffers[ch].serviced =
+                if !noc[id].used[LOCAL]
+                then true
+                else noc[id].buffers[ch].serviced,
+            
+            // Remove this flit. It has reached its destination
+            1: noc[id].buffers[ch].buffer =
+                if !noc[id].used[LOCAL]
+                then dequeue(noc[id].buffers[ch].buffer)
+                else noc[id].buffers[ch].buffer,
+            
+            // Increment the activity for this cycle as we removed a flit
+            1: noc[id].thisActivity = 
+                if !noc[id].used[LOCAL]
+                then noc[id].thisActivity + 1
+                else noc[id].thisActivity,
+            
+            /* -- if the local channel has been used this clock cycle -- */
+            // Otherwise, increment total unserviced buffers
+            1: noc[id].total_unserviced =
+                if !noc[id].used[LOCAL] 
+                then noc[id].total_unserviced 
+                else noc[id].total_unserviced + 1,
+            
+            // Mark the channel as used now
+            2: noc[id].used[LOCAL] = 
+                if !noc[id].used[LOCAL]
+                then true
+                else noc[id].used[LOCAL]
+        =};
+	    advanceChannelSend
+    }
+    // Otherwise, the flit must be for another router
+    else {
+        AdvanceFlits(id, ch)
+    }
+}
+
+// Advance every channel in the router in the order of the priority list
+process AdvanceRouter(int id) {
+    AdvanceChannel(id, noc[id].priority_list[0]);
+    AdvanceChannel(id, noc[id].priority_list[1]);
+    AdvanceChannel(id, noc[id].priority_list[2]);
+    AdvanceChannel(id, noc[id].priority_list[3]);
+    AdvanceChannel(id, noc[id].priority_list[4])
+}
+
+// Update the priority list value at index `i` in router `id`
+process UpdatePriorityList(int id, int i) {
+    if (noc[id].buffers[noc[id].priority_list[i]].serviced) {
+        updatePriority {=
+            0: noc[id].priority_list_temp[noc[id].total_unserviced + noc[id].serviced_index] = noc[id].priority_list[i],
+            1: noc[id].serviced_index++
+        =}
+    }
+    else {
+        updatePriority {=
+            0: noc[id].priority_list_temp[noc[id].unserviced_index] = noc[id].priority_list[i],
+            1: noc[id].unserviced_index++
+        =}
+    }
+}
+
+// Update the entire priority list (schedule) for router `id`
+action updatePriority;
+process UpdatePiority(int id) {
+    // Reset all of the temp values
+    updatePriority {=
+        noc[id].priority_list_temp = [0, 0, 0, 0, 0],
+        noc[id].serviced_index = 0,
+        noc[id].unserviced_index = 0
+    =};
+
+    // Update the ordering of priorities in the lists
+    UpdatePriorityList(id, 0);
+    UpdatePriorityList(id, 1);
+    UpdatePriorityList(id, 2);
+    UpdatePriorityList(id, 3);
+    UpdatePriorityList(id, 4);
+
+    updatePriority {=
+        // Make our next priority list the current priority list
+        // However, if all of our channels are empty, then just reset
+        // the priority list. This helps with the state space
+        0: noc[id].priority_list = (noc[id].buffers[0].isEmpty &&
+                                    noc[id].buffers[1].isEmpty &&
+                                    noc[id].buffers[2].isEmpty &&
+                                    noc[id].buffers[3].isEmpty &&
+                                    noc[id].buffers[4].isEmpty) ?
+                                    [NORTH, EAST, SOUTH, WEST, LOCAL] : noc[id].priority_list_temp,
+
+        // Reset the used and serviced variables
+        1: noc[id].buffers[0].serviced = false,
+        1: noc[id].buffers[1].serviced = false,
+        1: noc[id].buffers[2].serviced = false,
+        1: noc[id].buffers[3].serviced = false,
+        1: noc[id].buffers[4].serviced = false,
+        1: noc[id].total_unserviced = 0,
+        1: noc[id].used = [false, false, false, false, false],
+        1: noc[id].priority_list_temp = [0, 0, 0, 0, 0],
+        1: noc[id].serviced_index = 0,
+        1: noc[id].unserviced_index = 0
+    =}
+}
+
+action activityUpdate;
+process UpdateActivityTrackers(int id) {
+    activityUpdate {=
+        // Update this activity trackers for next round
+        0: c_res =
+            noc[id].thisActivity >= ACTIVITY_THRESH
+            ? sat_add(c_res, 1, RESISTIVE_THRESH)
+            : c_res,
+        0: c_ind =
+            abs(noc[id].thisActivity - noc[id].lastActivity) >= ACTIVITY_THRESH
+            ? sat_add(c_ind, 1, INDUCTIVE_THRESH)
+            : c_ind,
+        1: noc[id].lastActivity = noc[id].thisActivity,
+        2: noc[id].thisActivity = 0
+    =}
+}
+
+// Router model
+process Router(int id) {
+    // Generate new flits
+    GenerateFlits(id);
+
+    // Determine what channels will send this cycle
+    PrepRouter(id);
+
+    // Send the flits
+    AdvanceRouter(id);
+
+    // Update the priority list
+    UpdatePiority(id);
+
+    // Update noise tracking
+    UpdateActivityTrackers(id);
+
+    // Sync w/ the clock -
+    nextClockCycle;
+
+    // recursive call for next clock cycle
+    Router(id)
+}
+
+// Model the cyclic clock
+action nextClockCycle;
+process Clock() {
+    nextClockCycle {= clk = (clk + 1) % INJECTION_RATE_DENOMINATOR, clk_indicator = 1 =};
+    Clock()
+}
+
+par {
+:: Clock()
+:: Router(0)
+:: Router(1)
+:: Router(2)
+:: Router(3)
+:: Router(4)
+:: Router(5)
+:: Router(6)
+:: Router(7)
+:: Router(8)
+:: Router(9)
+:: Router(10)
+:: Router(11)
+:: Router(12)
+:: Router(13)
+:: Router(14)
+:: Router(15)
+:: Router(16)
+:: Router(17)
+:: Router(18)
+:: Router(19)
+:: Router(20)
+:: Router(21)
+:: Router(22)
+:: Router(23)
+:: Router(24)
+:: Router(25)
+:: Router(26)
+:: Router(27)
+:: Router(28)
+:: Router(29)
+:: Router(30)
+:: Router(31)
+:: Router(32)
+:: Router(33)
+:: Router(34)
+:: Router(35)
+:: Router(36)
+:: Router(37)
+:: Router(38)
+:: Router(39)
+:: Router(40)
+:: Router(41)
+:: Router(42)
+:: Router(43)
+:: Router(44)
+:: Router(45)
+:: Router(46)
+:: Router(47)
+:: Router(48)
+:: Router(49)
+:: Router(50)
+:: Router(51)
+:: Router(52)
+:: Router(53)
+:: Router(54)
+:: Router(55)
+:: Router(56)
+:: Router(57)
+:: Router(58)
+:: Router(59)
+:: Router(60)
+:: Router(61)
+:: Router(62)
+:: Router(63)
+:: Router(64)
+:: Router(65)
+:: Router(66)
+:: Router(67)
+:: Router(68)
+:: Router(69)
+:: Router(70)
+:: Router(71)
+:: Router(72)
+:: Router(73)
+:: Router(74)
+:: Router(75)
+:: Router(76)
+:: Router(77)
+:: Router(78)
+:: Router(79)
+:: Router(80)
+:: Router(81)
+:: Router(82)
+:: Router(83)
+:: Router(84)
+:: Router(85)
+:: Router(86)
+:: Router(87)
+:: Router(88)
+:: Router(89)
+:: Router(90)
+:: Router(91)
+:: Router(92)
+:: Router(93)
+:: Router(94)
+:: Router(95)
+:: Router(96)
+:: Router(97)
+:: Router(98)
+:: Router(99)
+:: Router(100)
+:: Router(101)
+:: Router(102)
+:: Router(103)
+:: Router(104)
+:: Router(105)
+:: Router(106)
+:: Router(107)
+:: Router(108)
+:: Router(109)
+:: Router(110)
+:: Router(111)
+:: Router(112)
+:: Router(113)
+:: Router(114)
+:: Router(115)
+:: Router(116)
+:: Router(117)
+:: Router(118)
+:: Router(119)
+:: Router(120)
+:: Router(121)
+:: Router(122)
+:: Router(123)
+:: Router(124)
+:: Router(125)
+:: Router(126)
+:: Router(127)
+:: Router(128)
+:: Router(129)
+:: Router(130)
+:: Router(131)
+:: Router(132)
+:: Router(133)
+:: Router(134)
+:: Router(135)
+:: Router(136)
+:: Router(137)
+:: Router(138)
+:: Router(139)
+:: Router(140)
+:: Router(141)
+:: Router(142)
+:: Router(143)
+}
+
+property I_0 = Pmax(<>[S(clk_indicator)<=0] (c_ind >= INDUCTIVE_THRESH));
+property I_2 = Pmax(<>[S(clk_indicator)<=2] (c_ind >= INDUCTIVE_THRESH));
+property I_4 = Pmax(<>[S(clk_indicator)<=4] (c_ind >= INDUCTIVE_THRESH));
+property I_6 = Pmax(<>[S(clk_indicator)<=6] (c_ind >= INDUCTIVE_THRESH));
+property I_8 = Pmax(<>[S(clk_indicator)<=8] (c_ind >= INDUCTIVE_THRESH));
+property I_10 = Pmax(<>[S(clk_indicator)<=10] (c_ind >= INDUCTIVE_THRESH));
+property I_12 = Pmax(<>[S(clk_indicator)<=12] (c_ind >= INDUCTIVE_THRESH));
+property I_14 = Pmax(<>[S(clk_indicator)<=14] (c_ind >= INDUCTIVE_THRESH));
+property I_16 = Pmax(<>[S(clk_indicator)<=16] (c_ind >= INDUCTIVE_THRESH));
+property I_18 = Pmax(<>[S(clk_indicator)<=18] (c_ind >= INDUCTIVE_THRESH));
+property I_20 = Pmax(<>[S(clk_indicator)<=20] (c_ind >= INDUCTIVE_THRESH));
+property I_22 = Pmax(<>[S(clk_indicator)<=22] (c_ind >= INDUCTIVE_THRESH));
+property I_24 = Pmax(<>[S(clk_indicator)<=24] (c_ind >= INDUCTIVE_THRESH));
+property I_26 = Pmax(<>[S(clk_indicator)<=26] (c_ind >= INDUCTIVE_THRESH));
+property I_28 = Pmax(<>[S(clk_indicator)<=28] (c_ind >= INDUCTIVE_THRESH));
+property I_30 = Pmax(<>[S(clk_indicator)<=30] (c_ind >= INDUCTIVE_THRESH));
+property I_32 = Pmax(<>[S(clk_indicator)<=32] (c_ind >= INDUCTIVE_THRESH));
+property I_34 = Pmax(<>[S(clk_indicator)<=34] (c_ind >= INDUCTIVE_THRESH));
+property I_36 = Pmax(<>[S(clk_indicator)<=36] (c_ind >= INDUCTIVE_THRESH));
+property I_38 = Pmax(<>[S(clk_indicator)<=38] (c_ind >= INDUCTIVE_THRESH));
+property I_40 = Pmax(<>[S(clk_indicator)<=40] (c_ind >= INDUCTIVE_THRESH));
+property I_42 = Pmax(<>[S(clk_indicator)<=42] (c_ind >= INDUCTIVE_THRESH));
+property I_44 = Pmax(<>[S(clk_indicator)<=44] (c_ind >= INDUCTIVE_THRESH));
+property I_46 = Pmax(<>[S(clk_indicator)<=46] (c_ind >= INDUCTIVE_THRESH));
+property I_48 = Pmax(<>[S(clk_indicator)<=48] (c_ind >= INDUCTIVE_THRESH));
+property I_50 = Pmax(<>[S(clk_indicator)<=50] (c_ind >= INDUCTIVE_THRESH));
+property I_52 = Pmax(<>[S(clk_indicator)<=52] (c_ind >= INDUCTIVE_THRESH));
+property I_54 = Pmax(<>[S(clk_indicator)<=54] (c_ind >= INDUCTIVE_THRESH));
+property I_56 = Pmax(<>[S(clk_indicator)<=56] (c_ind >= INDUCTIVE_THRESH));
+property I_58 = Pmax(<>[S(clk_indicator)<=58] (c_ind >= INDUCTIVE_THRESH));
+property I_60 = Pmax(<>[S(clk_indicator)<=60] (c_ind >= INDUCTIVE_THRESH));
+property I_62 = Pmax(<>[S(clk_indicator)<=62] (c_ind >= INDUCTIVE_THRESH));
+property I_64 = Pmax(<>[S(clk_indicator)<=64] (c_ind >= INDUCTIVE_THRESH));
+property I_66 = Pmax(<>[S(clk_indicator)<=66] (c_ind >= INDUCTIVE_THRESH));
+property I_68 = Pmax(<>[S(clk_indicator)<=68] (c_ind >= INDUCTIVE_THRESH));
+property I_70 = Pmax(<>[S(clk_indicator)<=70] (c_ind >= INDUCTIVE_THRESH));
+property I_72 = Pmax(<>[S(clk_indicator)<=72] (c_ind >= INDUCTIVE_THRESH));
+property I_74 = Pmax(<>[S(clk_indicator)<=74] (c_ind >= INDUCTIVE_THRESH));
+property I_76 = Pmax(<>[S(clk_indicator)<=76] (c_ind >= INDUCTIVE_THRESH));
+property I_78 = Pmax(<>[S(clk_indicator)<=78] (c_ind >= INDUCTIVE_THRESH));
+property I_80 = Pmax(<>[S(clk_indicator)<=80] (c_ind >= INDUCTIVE_THRESH));
+property I_82 = Pmax(<>[S(clk_indicator)<=82] (c_ind >= INDUCTIVE_THRESH));
+property I_84 = Pmax(<>[S(clk_indicator)<=84] (c_ind >= INDUCTIVE_THRESH));
+property I_86 = Pmax(<>[S(clk_indicator)<=86] (c_ind >= INDUCTIVE_THRESH));
+property I_88 = Pmax(<>[S(clk_indicator)<=88] (c_ind >= INDUCTIVE_THRESH));
+property I_90 = Pmax(<>[S(clk_indicator)<=90] (c_ind >= INDUCTIVE_THRESH));
+property I_92 = Pmax(<>[S(clk_indicator)<=92] (c_ind >= INDUCTIVE_THRESH));
+property I_94 = Pmax(<>[S(clk_indicator)<=94] (c_ind >= INDUCTIVE_THRESH));
+property I_96 = Pmax(<>[S(clk_indicator)<=96] (c_ind >= INDUCTIVE_THRESH));
+property I_98 = Pmax(<>[S(clk_indicator)<=98] (c_ind >= INDUCTIVE_THRESH));
+property I_100 = Pmax(<>[S(clk_indicator)<=100] (c_ind >= INDUCTIVE_THRESH));
+property I_102 = Pmax(<>[S(clk_indicator)<=102] (c_ind >= INDUCTIVE_THRESH));
+property I_104 = Pmax(<>[S(clk_indicator)<=104] (c_ind >= INDUCTIVE_THRESH));
+property I_106 = Pmax(<>[S(clk_indicator)<=106] (c_ind >= INDUCTIVE_THRESH));
+property I_108 = Pmax(<>[S(clk_indicator)<=108] (c_ind >= INDUCTIVE_THRESH));
+property I_110 = Pmax(<>[S(clk_indicator)<=110] (c_ind >= INDUCTIVE_THRESH));
+property I_112 = Pmax(<>[S(clk_indicator)<=112] (c_ind >= INDUCTIVE_THRESH));
+property I_114 = Pmax(<>[S(clk_indicator)<=114] (c_ind >= INDUCTIVE_THRESH));
+property I_116 = Pmax(<>[S(clk_indicator)<=116] (c_ind >= INDUCTIVE_THRESH));
+property I_118 = Pmax(<>[S(clk_indicator)<=118] (c_ind >= INDUCTIVE_THRESH));
+property I_120 = Pmax(<>[S(clk_indicator)<=120] (c_ind >= INDUCTIVE_THRESH));
+property I_122 = Pmax(<>[S(clk_indicator)<=122] (c_ind >= INDUCTIVE_THRESH));
+property I_124 = Pmax(<>[S(clk_indicator)<=124] (c_ind >= INDUCTIVE_THRESH));
+property I_126 = Pmax(<>[S(clk_indicator)<=126] (c_ind >= INDUCTIVE_THRESH));
+property I_128 = Pmax(<>[S(clk_indicator)<=128] (c_ind >= INDUCTIVE_THRESH));
+property I_130 = Pmax(<>[S(clk_indicator)<=130] (c_ind >= INDUCTIVE_THRESH));
+property I_132 = Pmax(<>[S(clk_indicator)<=132] (c_ind >= INDUCTIVE_THRESH));
+property I_134 = Pmax(<>[S(clk_indicator)<=134] (c_ind >= INDUCTIVE_THRESH));
+property I_136 = Pmax(<>[S(clk_indicator)<=136] (c_ind >= INDUCTIVE_THRESH));
+property I_138 = Pmax(<>[S(clk_indicator)<=138] (c_ind >= INDUCTIVE_THRESH));
+property I_140 = Pmax(<>[S(clk_indicator)<=140] (c_ind >= INDUCTIVE_THRESH));
+property I_142 = Pmax(<>[S(clk_indicator)<=142] (c_ind >= INDUCTIVE_THRESH));
+property I_144 = Pmax(<>[S(clk_indicator)<=144] (c_ind >= INDUCTIVE_THRESH));
+property I_146 = Pmax(<>[S(clk_indicator)<=146] (c_ind >= INDUCTIVE_THRESH));
+property I_148 = Pmax(<>[S(clk_indicator)<=148] (c_ind >= INDUCTIVE_THRESH));
+property I_150 = Pmax(<>[S(clk_indicator)<=150] (c_ind >= INDUCTIVE_THRESH));
+property I_152 = Pmax(<>[S(clk_indicator)<=152] (c_ind >= INDUCTIVE_THRESH));
+property I_154 = Pmax(<>[S(clk_indicator)<=154] (c_ind >= INDUCTIVE_THRESH));
+property I_156 = Pmax(<>[S(clk_indicator)<=156] (c_ind >= INDUCTIVE_THRESH));
+property I_158 = Pmax(<>[S(clk_indicator)<=158] (c_ind >= INDUCTIVE_THRESH));
+property I_160 = Pmax(<>[S(clk_indicator)<=160] (c_ind >= INDUCTIVE_THRESH));
+property I_162 = Pmax(<>[S(clk_indicator)<=162] (c_ind >= INDUCTIVE_THRESH));
+property I_164 = Pmax(<>[S(clk_indicator)<=164] (c_ind >= INDUCTIVE_THRESH));
+property I_166 = Pmax(<>[S(clk_indicator)<=166] (c_ind >= INDUCTIVE_THRESH));
+property I_168 = Pmax(<>[S(clk_indicator)<=168] (c_ind >= INDUCTIVE_THRESH));
+property I_170 = Pmax(<>[S(clk_indicator)<=170] (c_ind >= INDUCTIVE_THRESH));
+property I_172 = Pmax(<>[S(clk_indicator)<=172] (c_ind >= INDUCTIVE_THRESH));
+property I_174 = Pmax(<>[S(clk_indicator)<=174] (c_ind >= INDUCTIVE_THRESH));
+property I_176 = Pmax(<>[S(clk_indicator)<=176] (c_ind >= INDUCTIVE_THRESH));
+property I_178 = Pmax(<>[S(clk_indicator)<=178] (c_ind >= INDUCTIVE_THRESH));
+property I_180 = Pmax(<>[S(clk_indicator)<=180] (c_ind >= INDUCTIVE_THRESH));
+property I_182 = Pmax(<>[S(clk_indicator)<=182] (c_ind >= INDUCTIVE_THRESH));
+property I_184 = Pmax(<>[S(clk_indicator)<=184] (c_ind >= INDUCTIVE_THRESH));
+property I_186 = Pmax(<>[S(clk_indicator)<=186] (c_ind >= INDUCTIVE_THRESH));
+property I_188 = Pmax(<>[S(clk_indicator)<=188] (c_ind >= INDUCTIVE_THRESH));
+property I_190 = Pmax(<>[S(clk_indicator)<=190] (c_ind >= INDUCTIVE_THRESH));
+property I_192 = Pmax(<>[S(clk_indicator)<=192] (c_ind >= INDUCTIVE_THRESH));
+property I_194 = Pmax(<>[S(clk_indicator)<=194] (c_ind >= INDUCTIVE_THRESH));
+property I_196 = Pmax(<>[S(clk_indicator)<=196] (c_ind >= INDUCTIVE_THRESH));
+property I_198 = Pmax(<>[S(clk_indicator)<=198] (c_ind >= INDUCTIVE_THRESH));
+property I_200 = Pmax(<>[S(clk_indicator)<=200] (c_ind >= INDUCTIVE_THRESH));
+property I_202 = Pmax(<>[S(clk_indicator)<=202] (c_ind >= INDUCTIVE_THRESH));
+property I_204 = Pmax(<>[S(clk_indicator)<=204] (c_ind >= INDUCTIVE_THRESH));
+property I_206 = Pmax(<>[S(clk_indicator)<=206] (c_ind >= INDUCTIVE_THRESH));
+property I_208 = Pmax(<>[S(clk_indicator)<=208] (c_ind >= INDUCTIVE_THRESH));
+property I_210 = Pmax(<>[S(clk_indicator)<=210] (c_ind >= INDUCTIVE_THRESH));
+property I_212 = Pmax(<>[S(clk_indicator)<=212] (c_ind >= INDUCTIVE_THRESH));
+property I_214 = Pmax(<>[S(clk_indicator)<=214] (c_ind >= INDUCTIVE_THRESH));
+property I_216 = Pmax(<>[S(clk_indicator)<=216] (c_ind >= INDUCTIVE_THRESH));
+property I_218 = Pmax(<>[S(clk_indicator)<=218] (c_ind >= INDUCTIVE_THRESH));
+property I_220 = Pmax(<>[S(clk_indicator)<=220] (c_ind >= INDUCTIVE_THRESH));
+property I_222 = Pmax(<>[S(clk_indicator)<=222] (c_ind >= INDUCTIVE_THRESH));
+property I_224 = Pmax(<>[S(clk_indicator)<=224] (c_ind >= INDUCTIVE_THRESH));
+property I_226 = Pmax(<>[S(clk_indicator)<=226] (c_ind >= INDUCTIVE_THRESH));
+property I_228 = Pmax(<>[S(clk_indicator)<=228] (c_ind >= INDUCTIVE_THRESH));
+property I_230 = Pmax(<>[S(clk_indicator)<=230] (c_ind >= INDUCTIVE_THRESH));
+property I_232 = Pmax(<>[S(clk_indicator)<=232] (c_ind >= INDUCTIVE_THRESH));
+property I_234 = Pmax(<>[S(clk_indicator)<=234] (c_ind >= INDUCTIVE_THRESH));
+property I_236 = Pmax(<>[S(clk_indicator)<=236] (c_ind >= INDUCTIVE_THRESH));
+property I_238 = Pmax(<>[S(clk_indicator)<=238] (c_ind >= INDUCTIVE_THRESH));
+property I_240 = Pmax(<>[S(clk_indicator)<=240] (c_ind >= INDUCTIVE_THRESH));
+property I_242 = Pmax(<>[S(clk_indicator)<=242] (c_ind >= INDUCTIVE_THRESH));
+property I_244 = Pmax(<>[S(clk_indicator)<=244] (c_ind >= INDUCTIVE_THRESH));
+property I_246 = Pmax(<>[S(clk_indicator)<=246] (c_ind >= INDUCTIVE_THRESH));
+property I_248 = Pmax(<>[S(clk_indicator)<=248] (c_ind >= INDUCTIVE_THRESH));
+property I_250 = Pmax(<>[S(clk_indicator)<=250] (c_ind >= INDUCTIVE_THRESH));
+property I_252 = Pmax(<>[S(clk_indicator)<=252] (c_ind >= INDUCTIVE_THRESH));
+property I_254 = Pmax(<>[S(clk_indicator)<=254] (c_ind >= INDUCTIVE_THRESH));
+property I_256 = Pmax(<>[S(clk_indicator)<=256] (c_ind >= INDUCTIVE_THRESH));
+property I_258 = Pmax(<>[S(clk_indicator)<=258] (c_ind >= INDUCTIVE_THRESH));
+property I_260 = Pmax(<>[S(clk_indicator)<=260] (c_ind >= INDUCTIVE_THRESH));
+property I_262 = Pmax(<>[S(clk_indicator)<=262] (c_ind >= INDUCTIVE_THRESH));
+property I_264 = Pmax(<>[S(clk_indicator)<=264] (c_ind >= INDUCTIVE_THRESH));
+property I_266 = Pmax(<>[S(clk_indicator)<=266] (c_ind >= INDUCTIVE_THRESH));
+property I_268 = Pmax(<>[S(clk_indicator)<=268] (c_ind >= INDUCTIVE_THRESH));
+property I_270 = Pmax(<>[S(clk_indicator)<=270] (c_ind >= INDUCTIVE_THRESH));
+property I_272 = Pmax(<>[S(clk_indicator)<=272] (c_ind >= INDUCTIVE_THRESH));
+property I_274 = Pmax(<>[S(clk_indicator)<=274] (c_ind >= INDUCTIVE_THRESH));
+property I_276 = Pmax(<>[S(clk_indicator)<=276] (c_ind >= INDUCTIVE_THRESH));
+property I_278 = Pmax(<>[S(clk_indicator)<=278] (c_ind >= INDUCTIVE_THRESH));
+property I_280 = Pmax(<>[S(clk_indicator)<=280] (c_ind >= INDUCTIVE_THRESH));
+property I_282 = Pmax(<>[S(clk_indicator)<=282] (c_ind >= INDUCTIVE_THRESH));
+property I_284 = Pmax(<>[S(clk_indicator)<=284] (c_ind >= INDUCTIVE_THRESH));
+property I_286 = Pmax(<>[S(clk_indicator)<=286] (c_ind >= INDUCTIVE_THRESH));
+property I_288 = Pmax(<>[S(clk_indicator)<=288] (c_ind >= INDUCTIVE_THRESH));
+property I_290 = Pmax(<>[S(clk_indicator)<=290] (c_ind >= INDUCTIVE_THRESH));
+property I_292 = Pmax(<>[S(clk_indicator)<=292] (c_ind >= INDUCTIVE_THRESH));
+property I_294 = Pmax(<>[S(clk_indicator)<=294] (c_ind >= INDUCTIVE_THRESH));
+property I_296 = Pmax(<>[S(clk_indicator)<=296] (c_ind >= INDUCTIVE_THRESH));
+property I_298 = Pmax(<>[S(clk_indicator)<=298] (c_ind >= INDUCTIVE_THRESH));
+property I_300 = Pmax(<>[S(clk_indicator)<=300] (c_ind >= INDUCTIVE_THRESH));
+property I_302 = Pmax(<>[S(clk_indicator)<=302] (c_ind >= INDUCTIVE_THRESH));
+property I_304 = Pmax(<>[S(clk_indicator)<=304] (c_ind >= INDUCTIVE_THRESH));
+property I_306 = Pmax(<>[S(clk_indicator)<=306] (c_ind >= INDUCTIVE_THRESH));
+property I_308 = Pmax(<>[S(clk_indicator)<=308] (c_ind >= INDUCTIVE_THRESH));
+property I_310 = Pmax(<>[S(clk_indicator)<=310] (c_ind >= INDUCTIVE_THRESH));
+property I_312 = Pmax(<>[S(clk_indicator)<=312] (c_ind >= INDUCTIVE_THRESH));
+property I_314 = Pmax(<>[S(clk_indicator)<=314] (c_ind >= INDUCTIVE_THRESH));
+property I_316 = Pmax(<>[S(clk_indicator)<=316] (c_ind >= INDUCTIVE_THRESH));
+property I_318 = Pmax(<>[S(clk_indicator)<=318] (c_ind >= INDUCTIVE_THRESH));
+property I_320 = Pmax(<>[S(clk_indicator)<=320] (c_ind >= INDUCTIVE_THRESH));
+property I_322 = Pmax(<>[S(clk_indicator)<=322] (c_ind >= INDUCTIVE_THRESH));
+property I_324 = Pmax(<>[S(clk_indicator)<=324] (c_ind >= INDUCTIVE_THRESH));
+property I_326 = Pmax(<>[S(clk_indicator)<=326] (c_ind >= INDUCTIVE_THRESH));
+property I_328 = Pmax(<>[S(clk_indicator)<=328] (c_ind >= INDUCTIVE_THRESH));
+property I_330 = Pmax(<>[S(clk_indicator)<=330] (c_ind >= INDUCTIVE_THRESH));
+property I_332 = Pmax(<>[S(clk_indicator)<=332] (c_ind >= INDUCTIVE_THRESH));
+property I_334 = Pmax(<>[S(clk_indicator)<=334] (c_ind >= INDUCTIVE_THRESH));
+property I_336 = Pmax(<>[S(clk_indicator)<=336] (c_ind >= INDUCTIVE_THRESH));
+property I_338 = Pmax(<>[S(clk_indicator)<=338] (c_ind >= INDUCTIVE_THRESH));
+property I_340 = Pmax(<>[S(clk_indicator)<=340] (c_ind >= INDUCTIVE_THRESH));
+property I_342 = Pmax(<>[S(clk_indicator)<=342] (c_ind >= INDUCTIVE_THRESH));
+property I_344 = Pmax(<>[S(clk_indicator)<=344] (c_ind >= INDUCTIVE_THRESH));
+property I_346 = Pmax(<>[S(clk_indicator)<=346] (c_ind >= INDUCTIVE_THRESH));
+property I_348 = Pmax(<>[S(clk_indicator)<=348] (c_ind >= INDUCTIVE_THRESH));
+property I_350 = Pmax(<>[S(clk_indicator)<=350] (c_ind >= INDUCTIVE_THRESH));
+property I_352 = Pmax(<>[S(clk_indicator)<=352] (c_ind >= INDUCTIVE_THRESH));
+property I_354 = Pmax(<>[S(clk_indicator)<=354] (c_ind >= INDUCTIVE_THRESH));
+property I_356 = Pmax(<>[S(clk_indicator)<=356] (c_ind >= INDUCTIVE_THRESH));
+property I_358 = Pmax(<>[S(clk_indicator)<=358] (c_ind >= INDUCTIVE_THRESH));
+property I_360 = Pmax(<>[S(clk_indicator)<=360] (c_ind >= INDUCTIVE_THRESH));
+property I_362 = Pmax(<>[S(clk_indicator)<=362] (c_ind >= INDUCTIVE_THRESH));
+property I_364 = Pmax(<>[S(clk_indicator)<=364] (c_ind >= INDUCTIVE_THRESH));
+property I_366 = Pmax(<>[S(clk_indicator)<=366] (c_ind >= INDUCTIVE_THRESH));
+property I_368 = Pmax(<>[S(clk_indicator)<=368] (c_ind >= INDUCTIVE_THRESH));
+property I_370 = Pmax(<>[S(clk_indicator)<=370] (c_ind >= INDUCTIVE_THRESH));
+property I_372 = Pmax(<>[S(clk_indicator)<=372] (c_ind >= INDUCTIVE_THRESH));
+property I_374 = Pmax(<>[S(clk_indicator)<=374] (c_ind >= INDUCTIVE_THRESH));
+property I_376 = Pmax(<>[S(clk_indicator)<=376] (c_ind >= INDUCTIVE_THRESH));
+property I_378 = Pmax(<>[S(clk_indicator)<=378] (c_ind >= INDUCTIVE_THRESH));
+property I_380 = Pmax(<>[S(clk_indicator)<=380] (c_ind >= INDUCTIVE_THRESH));
+property I_382 = Pmax(<>[S(clk_indicator)<=382] (c_ind >= INDUCTIVE_THRESH));
+property I_384 = Pmax(<>[S(clk_indicator)<=384] (c_ind >= INDUCTIVE_THRESH));
+property I_386 = Pmax(<>[S(clk_indicator)<=386] (c_ind >= INDUCTIVE_THRESH));
+property I_388 = Pmax(<>[S(clk_indicator)<=388] (c_ind >= INDUCTIVE_THRESH));
+property I_390 = Pmax(<>[S(clk_indicator)<=390] (c_ind >= INDUCTIVE_THRESH));
+property I_392 = Pmax(<>[S(clk_indicator)<=392] (c_ind >= INDUCTIVE_THRESH));
+property I_394 = Pmax(<>[S(clk_indicator)<=394] (c_ind >= INDUCTIVE_THRESH));
+property I_396 = Pmax(<>[S(clk_indicator)<=396] (c_ind >= INDUCTIVE_THRESH));
+property I_398 = Pmax(<>[S(clk_indicator)<=398] (c_ind >= INDUCTIVE_THRESH));
+property I_400 = Pmax(<>[S(clk_indicator)<=400] (c_ind >= INDUCTIVE_THRESH));
+property I_402 = Pmax(<>[S(clk_indicator)<=402] (c_ind >= INDUCTIVE_THRESH));
+property I_404 = Pmax(<>[S(clk_indicator)<=404] (c_ind >= INDUCTIVE_THRESH));
+property I_406 = Pmax(<>[S(clk_indicator)<=406] (c_ind >= INDUCTIVE_THRESH));
+property I_408 = Pmax(<>[S(clk_indicator)<=408] (c_ind >= INDUCTIVE_THRESH));
+property I_410 = Pmax(<>[S(clk_indicator)<=410] (c_ind >= INDUCTIVE_THRESH));
+property I_412 = Pmax(<>[S(clk_indicator)<=412] (c_ind >= INDUCTIVE_THRESH));
+property I_414 = Pmax(<>[S(clk_indicator)<=414] (c_ind >= INDUCTIVE_THRESH));
+property I_416 = Pmax(<>[S(clk_indicator)<=416] (c_ind >= INDUCTIVE_THRESH));
+property I_418 = Pmax(<>[S(clk_indicator)<=418] (c_ind >= INDUCTIVE_THRESH));
+property I_420 = Pmax(<>[S(clk_indicator)<=420] (c_ind >= INDUCTIVE_THRESH));
+property I_422 = Pmax(<>[S(clk_indicator)<=422] (c_ind >= INDUCTIVE_THRESH));
+property I_424 = Pmax(<>[S(clk_indicator)<=424] (c_ind >= INDUCTIVE_THRESH));
+property I_426 = Pmax(<>[S(clk_indicator)<=426] (c_ind >= INDUCTIVE_THRESH));
+property I_428 = Pmax(<>[S(clk_indicator)<=428] (c_ind >= INDUCTIVE_THRESH));
+property I_430 = Pmax(<>[S(clk_indicator)<=430] (c_ind >= INDUCTIVE_THRESH));
+property I_432 = Pmax(<>[S(clk_indicator)<=432] (c_ind >= INDUCTIVE_THRESH));
+property I_434 = Pmax(<>[S(clk_indicator)<=434] (c_ind >= INDUCTIVE_THRESH));
+property I_436 = Pmax(<>[S(clk_indicator)<=436] (c_ind >= INDUCTIVE_THRESH));
+property I_438 = Pmax(<>[S(clk_indicator)<=438] (c_ind >= INDUCTIVE_THRESH));
+property I_440 = Pmax(<>[S(clk_indicator)<=440] (c_ind >= INDUCTIVE_THRESH));
+property I_442 = Pmax(<>[S(clk_indicator)<=442] (c_ind >= INDUCTIVE_THRESH));
+property I_444 = Pmax(<>[S(clk_indicator)<=444] (c_ind >= INDUCTIVE_THRESH));
+property I_446 = Pmax(<>[S(clk_indicator)<=446] (c_ind >= INDUCTIVE_THRESH));
+property I_448 = Pmax(<>[S(clk_indicator)<=448] (c_ind >= INDUCTIVE_THRESH));
+property I_450 = Pmax(<>[S(clk_indicator)<=450] (c_ind >= INDUCTIVE_THRESH));
+property I_452 = Pmax(<>[S(clk_indicator)<=452] (c_ind >= INDUCTIVE_THRESH));
+property I_454 = Pmax(<>[S(clk_indicator)<=454] (c_ind >= INDUCTIVE_THRESH));
+property I_456 = Pmax(<>[S(clk_indicator)<=456] (c_ind >= INDUCTIVE_THRESH));
+property I_458 = Pmax(<>[S(clk_indicator)<=458] (c_ind >= INDUCTIVE_THRESH));
+property I_460 = Pmax(<>[S(clk_indicator)<=460] (c_ind >= INDUCTIVE_THRESH));
+property I_462 = Pmax(<>[S(clk_indicator)<=462] (c_ind >= INDUCTIVE_THRESH));
+property I_464 = Pmax(<>[S(clk_indicator)<=464] (c_ind >= INDUCTIVE_THRESH));
+property I_466 = Pmax(<>[S(clk_indicator)<=466] (c_ind >= INDUCTIVE_THRESH));
+property I_468 = Pmax(<>[S(clk_indicator)<=468] (c_ind >= INDUCTIVE_THRESH));
+property I_470 = Pmax(<>[S(clk_indicator)<=470] (c_ind >= INDUCTIVE_THRESH));
+property I_472 = Pmax(<>[S(clk_indicator)<=472] (c_ind >= INDUCTIVE_THRESH));
+property I_474 = Pmax(<>[S(clk_indicator)<=474] (c_ind >= INDUCTIVE_THRESH));
+property I_476 = Pmax(<>[S(clk_indicator)<=476] (c_ind >= INDUCTIVE_THRESH));
+property I_478 = Pmax(<>[S(clk_indicator)<=478] (c_ind >= INDUCTIVE_THRESH));
+property I_480 = Pmax(<>[S(clk_indicator)<=480] (c_ind >= INDUCTIVE_THRESH));
+property I_482 = Pmax(<>[S(clk_indicator)<=482] (c_ind >= INDUCTIVE_THRESH));
+property I_484 = Pmax(<>[S(clk_indicator)<=484] (c_ind >= INDUCTIVE_THRESH));
+property I_486 = Pmax(<>[S(clk_indicator)<=486] (c_ind >= INDUCTIVE_THRESH));
+property I_488 = Pmax(<>[S(clk_indicator)<=488] (c_ind >= INDUCTIVE_THRESH));
+property I_490 = Pmax(<>[S(clk_indicator)<=490] (c_ind >= INDUCTIVE_THRESH));
+property I_492 = Pmax(<>[S(clk_indicator)<=492] (c_ind >= INDUCTIVE_THRESH));
+property I_494 = Pmax(<>[S(clk_indicator)<=494] (c_ind >= INDUCTIVE_THRESH));
+property I_496 = Pmax(<>[S(clk_indicator)<=496] (c_ind >= INDUCTIVE_THRESH));
+property I_498 = Pmax(<>[S(clk_indicator)<=498] (c_ind >= INDUCTIVE_THRESH));
+property I_500 = Pmax(<>[S(clk_indicator)<=500] (c_ind >= INDUCTIVE_THRESH));
