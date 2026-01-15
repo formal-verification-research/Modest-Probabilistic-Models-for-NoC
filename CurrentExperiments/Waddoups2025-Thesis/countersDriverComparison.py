@@ -61,6 +61,7 @@ def run_psn_analysis(
     # constants for this analysis
     opts = ["--max-run-length", "0",
             "--unsafe",
+            "-D",
             "-E", experiments]
 
     # Create the title

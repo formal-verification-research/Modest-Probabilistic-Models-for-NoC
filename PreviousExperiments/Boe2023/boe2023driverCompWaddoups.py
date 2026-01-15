@@ -47,8 +47,7 @@ def run_psn_analysis(
     # constants for this analysis
     opts = ["--unsafe",
             "--max-run-length", "0", 
-            "-D", 
-            "--rng", "MersenneTwister", 
+            "-D",
             "-E", f"RESISTIVE_NOISE_THRESH={resistive_threshold}, INDUCTIVE_NOISE_THRESH={inductive_threshold}"]
 
     # Create the title
