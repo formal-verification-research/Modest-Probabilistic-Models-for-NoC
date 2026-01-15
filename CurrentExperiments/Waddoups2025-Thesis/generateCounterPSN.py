@@ -102,7 +102,7 @@ if __name__ == "__main__":
             if data:
                 fig, ax = plt.subplots(figsize=(6, 6))
                 for thresh, x, y in sorted(data, key=lambda t: t[0]):
-                    ax.plot(x, y, label=f"$\ge {thresh}$")
+                    ax.plot(x, y, label=f"$\\ge$ {thresh}")
                 ax.legend()
                 ax.set_xlabel("Clock Cycles")
                 ax.set_ylabel("Probability")
@@ -111,7 +111,7 @@ if __name__ == "__main__":
 
                 fig, ax = plt.subplots(figsize=(3, 3))
                 for thresh, x, y in sorted(data, key=lambda t: t[0]):
-                    ax.plot(x, y, label=f"$\ge {thresh}$")
+                    ax.plot(x, y, label=f"$\\ge$ {thresh}")
                 ax.legend()
                 ax.set_xlabel("Clock Cycles")
                 ax.set_ylabel("Probability")
